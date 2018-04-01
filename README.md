@@ -1,9 +1,9 @@
 # Linux 运维架构-[零壹码博客](https://lingyima.com)
-## [计算机入门 ComputersGetting started](./computerGetting-started/)
-- [计算机概论](./computerGetting-started/computer-concepts/)
-- [操作系统](./computerGetting-started/operating-system/)
-- [计算机网络](./computerGetting-started/computer-network/)
-- [程序设计语言](./computerGetting-started/programming-language/)
+## [计算机入门](./introduction-to-computers/)
+- [计算机概论](./introduction-to-computers/computer-concepts/)
+- [操作系统](./introduction-to-computers/operating-system/)
+- [计算机网络](./introduction-to-computers/computer-network/)
+- [程序设计语言](./introduction-to-computers/programming-language/)
 
 ## [Linux 基础系统](./Linux-BasicSystem/)
 - Linux 安装与配置环境
