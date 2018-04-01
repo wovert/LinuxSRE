@@ -93,7 +93,6 @@
 - `ifconfig`或`ip addr list` 查看活动接口的IP地址
 - `echo` 回显
 - `ping` 探测网络上目标主机与当前主机之间的连通性
-- `Ctrl+c` 终止命令执行
 
 - 关机命令：
 	+ CentOS 7:
@@ -189,3 +188,93 @@ open(), read(), write(), close(), delete(), create()
 
 `~]# dirname /PATH/TO/SOMEFILE`
 **/PATH/TO**
+
+## 参考书籍
+- 《穿越计算机的迷雾》
+- 《量子物理史话》
+
+
+## 命令格式
+
+### 命令的语法通用格式:
+- `COMMAND [OPTIONS...] [ARGUMENTS...]`
+- 命令     选项    参数
+
+### COMMAND
+> 发起一个命令，请求内核将某个二进制程序运行为一个进程：
+- 程序转为进程
+- 静态转为动态（有生命周期）
+
+- 命令本身是一个可执行的程序文件：二进制格式的文件，有可能会调用共享库文件
+	+ 多数系统自带程序文件都存放在：**/bin, /sbin, /usr/bin, /usr/sbin**
+	+ 第三方程序文件：**/usr/local/bin, /usr/local/sbin**
+
+	+ 普通命令： **/bin, /usr/bin, /usr/local/bin**
+	+ 管理命令：**/sibn, /usr/sbin, /usr/local/sbin**
+
+	+ 注意：并非所有的命令都有一个在某目录与之对应的可执行程序文件（内置命令）
+
+	+ 共享库：**/lib, /lib64, /usr/lib, /usr/lib64, /usr/local/lib, /usr/local/lib64**
+		* 32bits 库：**/lib, /usr/lib, /usr/local/lib**
+		* 64bits 库：**/lib64, /usr/lib64, /usr/local/lib64**
+
+### 命令必须遵循特定格式规范
+- Windows: **exe,msi**
+- Linux: **ELF**
+
+- 查看可执行文件格式
+`~]# file /bin/ls`
+
+### 命令分类
+- __内置命令__(builtin)：由shell程序自带的命令
+- __外部命令__：独立的可执行程序文件，文件名即命令名
+
+注意：命令可以有别名，别名可以与原名相同，此时原名被隐藏；此时如果要运行**原命令**，则使用`\command`
+
+### alias 命令别名
+- 获取所有可用别名的定义：
+`~]# alias`
+
+- 定义别名：仅对当前shell有效
+`~]# alias COMMAND_ALIAS='COMMAND'`
+		
+### shell程序是独特的程序，负责解析用户提供的命令
+- 环境变量
+	+ **PATH**：从哪些路径中查找用户键入的命令字符串所对应的命令文件
+		* `~]# echo $PATH`
+		* /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin
+	+ 查找次序：自左而右
+	+ 注意：只有**外部命令**根据环境变量`$PATH`查找命令文件
+
+### 查看命令类型
+`~]# type COMMAND`
+
+###	OPTIONS 选项
+> 调整命令的运行特性
+
+- 选项分类
+	+ 短选项：-C，例如：-l, -ld
+		* 同一命令同时使用多个短选项，多数可合并：-l -d = -ld
+		* 注意：有些命令的选项没有-
+		
+	+ 长选项：-word, 例如：--help, --human-reable
+		* 注意：长选项不能合并多个选项
+
+	+ 注意：有些选项可以带参数，称为**选项参数**
+
+### ARGUMENTS 参数
+> 命令的作用对象；命令对什么生效
+
+`~]# ls -l /var`
+- 注意：不同的命令的参数，有些命令可同时带**多个参数**，多个之间以空白字符分割
+`~]# ls -l -l /var /etc` 命令 -选项 -选项 参数 参数
+
+### 执行多个命令
+`~]# command; command; command`
+
+### 取消命令
+`Ctrl+c` 终止命令执行
+
+
+## 命令帮助
+
