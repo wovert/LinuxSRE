@@ -278,3 +278,413 @@ open(), read(), write(), close(), delete(), create()
 
 ## 命令帮助
 
+### 内建命令 `help COMMAND`
+`~]# help cd`
+	
+### 外部命令
+#### 1. 简要格式使用帮助
+`~]# COMMAND --help`
+
+#### 2. 使用手册：manual
+- 系统手册路径
+`/usr/share/man`
+
+- 查看手册
+`~]# man COMMAND`
+
+- SECTION 章节
+	+ NAME: 简要功能性说明
+	+ SYNOPSIS: 命令使用格式; 概要；大纲
+	+ DESCRIPTION: 描述
+	+ OPTIONS: 选项
+	+ EXAMPLES: 使用示例
+	+ AUTHORS: 作者
+	+ BUGS: 报告程序bug的方式
+	+ SELL ALSO: 参见
+
+##### SYNOPSIS
+- **[]** 可选内容
+- **<>** 必须提供的内容
+- **a|b** 多选一
+- **...** 同类内容可出现多个
+
+#### 使用手册：压缩格式的文件，有章节之分
+`/user/share/man`
+man1, man2, ...
+
+- **1: Executale programs or shell commands** 	普通用户和管理员可执行的命令
+- **2: System calls** 	系统调用
+- **3: Library calls** 	C库调用
+- **4: device files and special files** 设备文件及特殊文件
+- **5: file format;** 	配置文件格式
+- **6: Game;**			游戏使用帮助
+- **7: Miscellaneous** 	其他
+- **8： Administrator command；** 管理工具及守护进程
+
+`~]# man [1-8]? COMMAND`
+- 注意：并非每个command在所有章节都有手册
+
+- 查看命令有哪些章节：
+`~]# whatis COMMAND`
+`~]# man -f Keyword` 精确查找
+
+- 注意：whatis 执行过程是查询数据库进行
+- 手动更新数据：
+	+ CentOS 6: `~]# makewhatis`
+	+ CentOS 7: `~]# mandb`
+
+- 指定目录下查找手册
+`~]# man -M /PAHT/TO/SOMEDIR COMMAND`
+/usr/share/man 目录复制到其他目录下
+man1, man5, man8 等
+
+- 模糊查找
+`~]# man -k Keyword`
+
+##### man命令打开手册以后的操作方法：
+- __翻屏__
+	+ `空格键` 向文件尾部翻一屏
+	+ `b` 向文件首部翻一屏
+
+	+ `Ctrl+d` 向文件尾部翻半屏
+	+ `Ctrl+u` 向文件首部翻半屏
+	
+	+ `回车键` 向文件尾部翻一行
+	+ `k` 向文件首部翻一行
+
+	+ `G` 跳转至最后一行
+	+ `nG` 跳转至指定行
+	+ `1G` 跳转至文件首部
+	
+- __搜索__：查找时不分区大小写
+	+ `/keyword` 从文件首部向文件尾部依次查找
+	+ `?keyword` 从文件尾部向文件首部依次查找
+	+ `n` 同方向查找下一个
+	+ `N` 反方向查找下一个
+
+- __退出__
+	+ `q` 退出
+
+#### 3. `info COMMAND`
+> 获取命令的在线文档
+
+#### 4. 程序自带的帮助文件：`/usr/share/doc/APP-VERSION`
+- __README__: 程序的相关的信息
+- __INSTALL__: 安装帮助
+- __CHANGES__: 版本迭代时的改动信息
+
+#### 5. 主流发行版官方文档
+- http://www.redhat.com/doc
+
+#### 6. 程序的官方文档
+- 官方站点上的 **Document**
+
+#### 7. 搜索引擎
+- google
+	+ `filetype: pdf`
+	+ `site:lingyima.com`  
+		* domain.tld(top level domain)
+	+ `intitle: `
+	+ `inurl:`
+	+ `intext:`
+		
+#### 8. 书籍出版社
+- 外文书籍
+- O'reiley
+- Wrox
+- 机械工业、电子工业、人邮、清华大学、水利水电
+
+### 练习：获取 useradd 命令的用法
+1. 添加用户 gentoo
+`~]# useradd gentoo`
+`~]# id gentoo`
+
+2. 添加用户 slackware，要求指定其所用的 shell 为 /bin/tcsh
+`~]# useradd -s /bin/tcsh slackware`
+`~]# tail -1 /etc/passwd`
+
+## 常用命令
+
+### 目录命令
+#### 查看当前目录 - print working directory
+`~]# pwd`
+
+#### 切换工作目录 -  change directory
+`~]# cd [/PATH/TO/SOMEDIR]` 切换到自定目录
+`~]# cd ~` 				切换到当前用户家目录
+`~]# cd ~USERNAME` 		切换至指定用户的家目录
+`~]# cd -` 				切换到上次目录
+
+- 环境变量
+`~]# echo $HOME`
+`~]# echo $PWD`
+`~]# echo $OLDPWD`
+
+#### 列出指定目录下的文件列表 - list
+`ls [OPTIONS]... [FILE]...`
+- 选项
+`-a` 显示所有文件，包括隐藏文件
+`-A` 显示所有文件，除了.和..的所有隐藏文件
+`-r,--reverse` 逆序显示
+`-R,--recursive` 递归显示
+`-i, --inode`
+`--file-type：/`
+
+`-lc` ctime
+`-lu` atime
+`-t` 按修改时间先后显示
+`-m` 填满宽度的逗号分隔列表条目
+`-S` 以文件大小排序显示
+
+`-d, --directory` 查看目录自身属性信息，结合使用l选项，-ld
+`-h, --human-readable` 人为可读的格式显示，换算后的结果会丢失精度
+`-l，--long` 长格式列表，即显示文件的详细属性信息
+	
+- 文件类型：属主权限：属组权限：其他权限：隐藏属性：硬链接数：文件的属主:文件的属组：文件大小（字节）：最近一次被修改日期：文件名
+- drwxr-xr-x. 2 root root    4096 Sep 17  2016 anaconda
+- drwxr-x---. 2 root root      22 Sep 17  2016 audit
+- -rw-r--r--  1 root root    8659 Jul  2 10:38 boot.log
+
+
+#### mkdir：make directories
+`mkdir [OPTION]... DIRECTORY...`
+`-p` 自动按需创建父目录
+`-v` verbose，显示详细过程
+`-m MODE` 直接给定权限
+
+- 注意：路径基名方为命令的作用对象；基名之前的路径必须得存在；
+
+#### rmdir：remove empty directories
+`rmdir [OPTION]... DIRECTORY...`
+`p` 删除某目录后，如果其父目录为空，则一并删除之；
+ `v` verbose
+
+
+#### mktemp 命令：create a temporary file or directory
+`mktemp [OPTION]... [TEMPLATE]`
+`-d, --directory` 创建临时目录
+`-u, --dry-run` do not create anything
+
+`~]# mktemp XXX.ab`
+- 注意：mktemp 会将创建的临时文件名直接返回，因此，可直接通过命令引用保存起来
+
+
+### 文件查看工具
+
+#### 查看文件内容类型
+`file [FILE]...`
+ASCII, ELF 
+
+#### 查看文件内容
+1. `cat [OPTION]... [FILE]..`
+- OPTIONS
+`-n, --number` 显示行号
+`-E, --show-ends` 显示行结束符
+`-v， --show-nonpriting` 显示非打印字符
+`-e = -vE` 显示行结束符及非打印字符
+`-s, --squeeze-blank` suppress repeated empty output lines
+`~]# cat /etc/fstab /etc/issue`
+
+2. `tac [-n] [-E]`
+
+3. `more/less` 命令
+
+4. `head命令` 查看文件的前n行
+`n #` 或者 `-#`
+
+5. `tail` 查看文件的后n行
+`n #` 或者 `-#`
+`-f` 查看文件尾部内容结束后不退出，跟随显示新增的行
+
+#### 回显
+`echo [SHORT-OPTION]... [STRING]...`
+
+- OPTIONS
+`-n` do not output the trailing newline
+`-e` 转义符生效
+	`\r: 回车符
+	\n： 换行符
+	\t：制表符
+	\v：纵向制表符
+	\b：退格符 
+	\\：反斜线`
+- `\033[31m  \033[0m`
+
+- 第一个 `#`
+	+ **1** 加粗
+	+ **3** 前景
+	+ **4** 背景色
+	+ **5** 闪烁
+	+ **7** 前景背景互换 
+
+- 第二个 `#`：
+	+ **颜色**，1-7
+
+- `\033[0m` 控制结束符
+`~]#  echo -e "\033[31;1;42mHello\033[0m"`
+
+- STRING 可以使用引号，单引号和双引号
+	+ 单引号：**强引用**，变量不会被替换
+	+ 双引号：**弱引用**，变量引用会替换
+	+ 反引号：**命令解析**，$(COMMAND)=`COMMAND`
+
+- 注意：变量引用的正规符号
+	+ `${变量名}`
+
+
+### 日期相关命令
+> 系统启动时从硬件读取日期和时间信息；读取完成以后，就不在与硬件相关联
+- 系统时钟
+- 硬件时钟
+
+#### date：系统时钟
+- 显示日期时间：`date [OPTIONS]... [+FORMAT]`
+
+- `+FORMAT`:
+`%F` fulldate
+`%Y` year
+`%m` month
+`%d` day
+`%T` time
+`%H` hour
+`%M` minute
+`%S` second
+`%s` unixtimestamp, unix元年 1970-1-1 0:0:0之后经过的秒数
+
+`~]# date +"%F %T"`
+
+- 设定日期时间：`date [-u|--utc|--universal] [MMDDhhmm[[CC]YY][.ss]]`
+
+#### clock 硬件时钟
+> 是 hwclcok 的软链接
+
+#### hwclock - query or set the hardware clock(RTC)
+`-s, --hctosys`
+Set the System Time from the Hardware Clock.
+
+`-w, --systohc`
+Set the Hardware Clock to the current System Time.
+
+#### cal
+`cal [options] [[[day] month] year]`
+
+### `which`
+`--skip-alias` 忽略别名
+
+### `whereis`
+`-b` binary path
+`-m` man path
+
+### `who`
+`-b` 最近一次系统启动时间
+`-r` runlevel
+`-u` 显示进程号
+
+### `w` 增强版的 who 命令
+- IDEL
+- JCPU 与该tty终端连接的所有进程占用的时间，不包括过去的后台作业时间
+- PCPU 当前进程(即w项中显示的)所占用的时间
+	
+
+### 文件管理
+#### stat 命令
+> 显示文件系统状态的文件
+
+- 文件
+	+ 元数据：metadata，inode
+	+ 数据: data, block
+
+- 时间戳：
+	+ access time
+	+ modify time(数据)
+	+ change time(元数据)
+
+#### touch 命令 - change file timestamps
+`-c` 指定的文件路径不存在时不予创建
+`-a` 修改access time
+`-m` 修改modify time
+`-t` [[CC]YY]MMDDhhmm[.ss]
+
+#### mv 命令
+`mv [OPTION]... SOURCE... DIRECTORY`
+`mv [OPTION]... -t DIRECTORY SOURCE...`
+
+- options
+`-i` interactive
+`-f` force
+
+#### rm 命令 - remove
+- options
+`-i` interactive
+`-f` force
+`-r` recursive
+- 注意：所有不用的文件建议不要直接删除，而是移动至某个专用目录；（模拟回收站
+
+#### cp 命令 - copy
+- 单源复制：`cp [OPTION]... [-T] SOURCE DEST`
+- 多源复制：`cp [OPTION]... SOURCE... DIRECTORY`
+	
+`cp [OPTION]... -t DIRECTORY SOURCE...`
+
+- 源复制：`cp [OPTION]... [-T] SOURCE DEST`
+	+ 如果 **DEST**  不存在：则事先创建此文件，并复制源文件的数据流至 **DEST** 中；
+	+ 如果 **DEST** 存在：
+		+ 如果 **DEST** 是非目录文件：则覆盖目标文件；
+		+ 如果 **DEST** 是目录文件：则先在 **DEST** 目录下创建一个与源文件同名的文件，并复制其数据流；
+	
+- 多源复制：`cp [OPTION]... SOURCE... DIRECTORY
+ 		cp [OPTION]... -t DIRECTORY SOURCE...`
+ 	+ 如果 **DEST** 不存在：错误；
+	+ 如果 **DEST** 存在：
+		* 如果 **DEST** 是非目录文件：错误；
+	    * 如果 **DEST** 是目录文件：分别复制每个文件至目标目录中，并保持原名；
+	
+- 常用选项
+`-i` interactive，覆盖文件时提醒信息
+`-f` force
+`-r, -R` recursive
+`-d` 复制符号链接文件本身，而非其指向的源文件；--preserver=links
+`-a` -dR --preserve=all, archive，用于实现归档；
+`--preserve=`
+mode：权限
+ownership：属主和属组
+timestamps: 时间戳
+context：安全标签
+xattr：扩展属性
+links：符号链接
+all：上述所有属性
+
+#### install 命令
+- 单源复制
+`install [OPTION]... [-t] SOURCE DEST` 
+
+- 多源复制
+`install [OPTION]... SOURCE... DIRECTORY`
+`install [OPTION]... -t DIRECTORY SOURCE...`
+	
+- 创建空目录：
+`install [OPTION]... -d DIRECTORY...`
+	
+- 选项
+`-m, --mode=MODE` 设定目标文件权限，默认为 755
+`-o, --owner=OWNER` 设定文件的属主
+`-g, --group=GROUP` 设定文件的属组
+`-d` 创建空目录
+`-t` 指定目标目录
+
+- 注意：install命令不能复制目录
+`# install -d demo demo3`
+`# install -m 770 -o redhat -g linux -t /tmp/etc/ /etc/*`
+
+#### dd 命令 - convert and copy a file
+`dd if=/PATH/FROM/SRC of=/PATH/TO/DEST bs=block size count=数量`
+- bs=#，block size，复制单元大小，单位：byte
+
+- 磁盘对考：`~]# dd if=/dev/sda of=/dev/sdb`
+- 备份 MBR: `~]# dd if=/dev/sda of=/tmp/mbr.bak bs=512 count=1`
+- 清除分区：`~]# dd if=/dev/zero of=/dev/sda bs=512 count=1`
+- 破坏MBR中的Bootloader：`~]# dd if=/dev/zero of=/dev/sda bs=256 count=1`
+
+- 两个特殊设备
+`/dev/null` 数据黑洞
+`/dev/zero` 吐零机
