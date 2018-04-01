@@ -5,16 +5,16 @@
 - [计算机网络](./introduction-to-computers/computer-network/)
 - [程序设计语言](./introduction-to-computers/programming-language/)
 
-## [Linux 基础系统](./Linux-BasicSystem/)
-- Linux 安装与配置环境
-- Linux 基础入门
-- 文件系统
-- 文件操作工具
-- bash 特性
-- 文本处理工具及正则表达式
-- 用户管理工具
-- Linux 编辑器
-- 压缩打包工具
+## [Linux 基础系统](./linux-basic-system/)
+- [Linux 安装与配置](./setup-setting/)
+- [Linux 基础入门](./linux-basic/)
+- [文件系统](./file-system/)
+- [文件操作工具](./file-operations/)
+- [bash 特性](./bash/)
+- [文本处理工具及正则表达式](./text-manipulation-regular-expression/)
+- [用户管理工具](./user-manager/)
+- [Linux 编辑器](./editor/)
+- [压缩打包工具](./compression-packing/)
 
 ## Linux 系统管理
 - 磁盘分区
