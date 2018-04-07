@@ -640,19 +640,19 @@ Set the Hardware Clock to the current System Time.
 	    * 如果 **DEST** 是目录文件：分别复制每个文件至目标目录中，并保持原名；
 	
 - 常用选项
-`-i` interactive，覆盖文件时提醒信息
-`-f` force
-`-r, -R` recursive
-`-d` 复制符号链接文件本身，而非其指向的源文件；--preserver=links
-`-a` -dR --preserve=all, archive，用于实现归档；
-`--preserve=`
-mode：权限
-ownership：属主和属组
-timestamps: 时间戳
-context：安全标签
-xattr：扩展属性
-links：符号链接
-all：上述所有属性
+	+ `-i` interactive，覆盖文件时提醒信息
+	+ `-f` force，强制覆盖目标文件
+	+ `-r, -R` recursive，递归复制目录
+	+ `-d` 复制符号链接文件本身，而非其指向的源文件；--preserver=links
+	+ `-a` -dR --preserve=all, archive，用于实现归档；
+	+ `--preserve=`
+		* mode：权限
+		* ownership：属主和属组
+		* timestamps: 时间戳
+		* context：安全标签
+		* xattr：扩展属性
+		* links：符号链接
+		* all：上述所有属性
 
 #### install 命令
 - 单源复制
