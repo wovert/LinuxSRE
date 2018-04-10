@@ -439,138 +439,136 @@
 - 能否删除此文件？不能修改文件内容，可以删除此文件
 
 
-umask：文件权限的方向掩码，遮罩码：
-	文件：666-umask
-	目录：777-umask
+## umask：文件权限的方向掩码，遮罩码：
+- 文件：666-umask
+- 目录：777-umask
 
-	root:0022
-		文件：644
-		目录：755
-	
-	普通用户：0002
-		文件：664
-		目录：775
+- root:0022
+	+ 文件：644
+	+ 目录：755
 
-	注意：文件用666，表示文件默认不能拥有执行权限；如果减得的结果中有执行权限，则需要将其加1；
+- 普通用户：0002
+	+ 文件：664
+	+ 目录：775
 
-	umask: 023
-		666-023=643, 644
-		777-023=754
+- 注意：文件用666，表示文件默认不能拥有执行权限；如果减得的结果中有执行权限，则需要将其加1；
 
-	umask命令：
-	umask：查看当前umask
-	umask MAST：设置umask
+- umask: 023
+	+ 666-023=643, 644
+	+ 777-023=754
 
-	注意：此类设定仅对当前shell进程有效
+`umask命令：`
+`umask：查看当前umask`
+`umask MAST：设置umask`
 
-	练习：
-		1、新建系统组mariadb，新建系统mariadb，属于mariadb组且没有家目录，shell为/sbin/nologin；尝试root切换至用户，查看其命令提示符；
-		2、新建GID为5000的组lingyima，新建用户gentoo，要求其家目录为/users/gentoo,密码同用户名；
-		3、新建用户fedora，其家目录为/users/fedora，密码同用户名；
-		4、新建用户www，其家目录为/users/www，删除www用户，但保留其家目录；
-		5、为用户gentoo和fedora新增附加组lingyima;
-		6、复制目录/var/log至/tmp/目录，修改/tmp/log及其内部的所有文件的属组为lingyima,并让属组对目录本身拥有写权限；
+- 注意：此类设定仅对当前 shell 进程有效
 
-
-特殊权限：SUID, SGID, STICKY
-	安全上下文：
-		1、进程以某用户的身份运行；进程是发起此进程用户的代理，因此以此用户的身份和权限完成所有操作；
-		2、权限匹配模型；
-			(1) 判断进程的属主，是否为被访问的文件属主；如果是，则应用属主的权限；否则进入第2步；
-			(2) 判断进程的属主，是否属于被访问的文件属组；如果是，则应用属组的权限；否则进入第3步；
-			(3) 应用other的权限；
-
-	SUID：
-		默认情况下：用户发起的进程，进程的属主是其发起者；因此，其以发起者的身份在运行；
-
-		SUID的功用：用户运行某程序时，如果此程序拥有SUID权限，那些程序运行为进程时，进程的属主不是发起者，而程序文件自己的属主；
-
-		chmod u[+-]s FILE...
-			展示位置：属主的执行权限位
-			如果属主原本有执行权限，显示为小写s；
-			否则，显示为大写S；
-
-		示例：
-			# cp /bin/cat /tmp/
-			# chmod u+s /tmp/cat
-			# /tmp/cat /etc/passwd
-	
-	SGID：
-		功用：当目录属组写权限，且有SGID权限时，那么所有属于此目录的属组，且以属组身份在此目录中新建文件或目录时，新文件的属组不是用户的基本组，而是此目录的属组；
-
-		管理文件的SGID权限：chmod g[+-]s FILE...
-		展示位置：属组的执行权限位
-		如果属组原本有执行权限，显示为小写s；否则，显示为大写S；
-
-		示例：
-			# mkdir -pv /tmp/sgid/test
-			# chmod g+s /tmp/sgid/test
-			# chgrp mygrp /tmp/sgid/test
-			# su - centos
-			$ touch /tmp/sgid/test/a.centos
-			$ su - fedora
-			$ touch /tmp/sgid/test/b.fedora
-			$ ls -l /tmp/sgid/test
-			
-			$ su - centos
-			$ rm -rf /tmp/sgid/b.fedora
-
-	Sticky：
-		功用：对于属组或全局可写的目录，组内的所有用户或系统上的所用用户对此目录都能创建文件或删除所有的已有文件；如果为此类目录设置Sticky权限，则每个用户能创建新文件，且只能删除自己的文件
-
-		管理文件的Sticky权限：chmod o[+-]t FILE...
-			展示位置：其他用户的执行权限位
-			如果其他用户原本有执行权限，显示为小写t;否则，显示为大写T
-			系统上的/tmp和/var/tmp目录默认均有sticky权限
-
-		# chmod o+t /tmp/sticky
-
-		管理特殊权限的另一种方式：
-			suid sgid sticky 八进制权限
-			0 0 0	0 
-			0 0 1 	1
-			0 1 0 	2
-			0 1 1 	3
-			1 0 0 	4
-			1 0 1 	5
-			1 1 0 	6
-			1 1 1 	7
-		
-		基于八进制方式赋权时，可于默认的三位八进制左侧再加一位八进制数字；
-			例如：chmod 1777
-
-	facl：file access control lists文件的额外赋权机制：
-		在原来的u,g,o之外，另一层让普通用户能控制赋权给另外的用户或组的机制
-
-	getfacl命令：
-		getfacl FILE...
-			user:USERNAME:MODE
-			group:GROUPNAME:MODE
-
-		# file: search/
-		# owner: root
-		# group: root
-		user::rwx		默认属主权限
-		group::r-x		默认属组权限
-		group:linux:rwx
-		mask::rwx
-		other::r-x
+### 练习
+1. 新建系统组mariadb，新建系统mariadb，属于mariadb组且没有家目录，shell为/sbin/nologin；尝试root切换至用户，查看其命令提示符；
+2. 新建GID为5000的组lingyima，新建用户gentoo，要求其家目录为/users/gentoo,密码同用户名；
+3. 新建用户fedora，其家目录为/users/fedora，密码同用户名；
+4. 新建用户www，其家目录为/users/www，删除www用户，但保留其家目录；
+5. 为用户gentoo和fedora新增附加组lingyima;
+6. 复制目录/var/log至/tmp/目录，修改/tmp/log及其内部的所有文件的属组为lingyima,并让属组对目录本身拥有写权限；
 
 
-	setfacl命令：
-		赋权给用户：setfacl -m u:USERNAME:MODE FILE...
-		赋权给组：setfacl -m g:GROUPNAME:MODE FILE...
-		撤销用户赋权：setfacl -x u:USERNAME FILE...
-		撤销组赋权: setfacl -x g:GROUPNAME FILE...
+## 特殊权限：SUID, SGID, STICKY
 
-		目录赋权给用户: setfacl -m u:USERNAME:MODE -R FILE
-		目录赋权给组: setfacl -m g:GROUPNAME:MODE -R FILE
+### 安全上下文：
+1. 进程以某用户的身份运行；进程是发起此进程用户的代理，因此以此用户的身份和权限完成所有操作；
+2. 权限匹配模型；
+	+ (1) 判断进程的属主，是否为被访问的文件属主；如果是，则应用属主的权限；否则进入第2步；
+	+ (2) 判断进程的属主，是否属于被访问的文件属组；如果是，则应用属组的权限；否则进入第3步；
+	+ (3) 应用other的权限；
 
-	MODE=--- 拒绝某个用户访问控制列表
+## SUID
+- 默认情况下：用户发起的进程，进程的属主是其发起者；因此，其以发起者的身份在运行；
 
-	发起进程属主 ? (SUID)命令的属组 -> facl属主 -> 发起进程属组 ? (SGID)命令的属组
+- SUID的功用：用户运行某程序时，如果此程序拥有SUID权限，那些程序运行为进程时，进程的属主不是发起者，而程序文件自己的属主；
+
+- chmod u[+-]s FILE...
+	+ 展示位置：属主的执行权限位
+	+ 如果属主原本有执行权限，显示为小写s；
+	+ 否则，显示为大写S；
+
+- 示例：
+	+ `cp /bin/cat /tmp/`
+	+ `chmod u+s /tmp/cat`
+	+ `/tmp/cat /etc/passwd`
+
+### SGID
+- 功用：当目录属组写权限，且有SGID权限时，那么所有属于此目录的属组，且以属组身份在此目录中新建文件或目录时，新文件的属组不是用户的基本组，而是此目录的属组；
+
+- 管理文件的SGID权限：`chmod g[+-]s FILE...`
+- 展示位置：属组的执行权限位
+- 如果属组原本有执行权限，显示为小写s；否则，显示为大写S；
+
+- 示例：
+`# mkdir -pv /tmp/sgid/test`
+`# chmod g+s /tmp/sgid/test`
+`# chgrp mygrp /tmp/sgid/test`
+`# su - centos`
+`$ touch /tmp/sgid/test/a.centos`
+`$ su - fedora`
+`$ touch /tmp/sgid/test/b.fedora`
+`$ ls -l /tmp/sgid/test`
+`$ su - centos`
+`$ rm -rf /tmp/sgid/b.fedora`
+
+### Sticky
+- 功用：对于属组或全局可写的目录，组内的所有用户或系统上的所用用户对此目录都能创建文件或删除所有的已有文件；如果为此类目录设置Sticky权限，则每个用户能创建新文件，且只能删除自己的文件
+
+- 管理文件的Sticky权限：chmod o[+-]t FILE...
+	+ 展示位置：其他用户的执行权限位
+	+ 如果其他用户原本有执行权限，显示为小写t;否则，显示为大写T
+	+ 系统上的/tmp和/var/tmp目录默认均有sticky权限
+
+`# chmod o+t /tmp/sticky`
+
+- 管理特殊权限的另一种方式：
+	+ suid sgid sticky 八进制权限
+	+ 0 0 0	0 
+	+ 0 0 1 	1
+	+ 0 1 0 	2
+	+ 0 1 1 	3
+	+ 1 0 0 	4
+	+ 1 0 1 	5
+	+ 1 1 0 	6
+	+ 1 1 1 	7
+
+- 基于八进制方式赋权时，可于默认的三位八进制左侧再加一位八进制数字；
+例如：`chmod 1777`
+
+### facl：file access control lists文件的额外赋权机制：
+> 在原来的u,g,o之外，另一层让普通用户能控制赋权给另外的用户或组的机制
+
+`getfacl命令：`
+- getfacl FILE...
+	+ user:USERNAME:MODE
+	+ group:GROUPNAME:MODE
+
+- # file: search/
+- # owner: root
+- # group: root
+- user::rwx		默认属主权限
+- group::r-x		默认属组权限
+- group:linux:rwx
+- mask::rwx
+- other::r-x
 
 
+### setfacl命令
+- 赋权给用户：setfacl -m u:USERNAME:MODE FILE...
+- 赋权给组：setfacl -m g:GROUPNAME:MODE FILE...
+- 撤销用户赋权：setfacl -x u:USERNAME FILE...
+- 撤销组赋权: setfacl -x g:GROUPNAME FILE...
+
+- 目录赋权给用户: setfacl -m u:USERNAME:MODE -R FILE
+- 目录赋权给组: setfacl -m g:GROUPNAME:MODE -R FILE
+
+- MODE=--- 拒绝某个用户访问控制列表
+
+- 发起进程属主 ? (SUID)命令的属组 -> facl属主 -> 发起进程属组 ? (SGID)命令的属组
 
 
 ## sudo命令	
