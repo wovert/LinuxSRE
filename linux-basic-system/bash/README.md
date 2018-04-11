@@ -100,11 +100,12 @@
 - `Ctrl+l`：清屏，相当于clear
 
 # 8. 命令哈希
-## 缓存此前命令的查找结果：
+## 缓存此前命令的查找结果
 - key：搜索键
 - value：值
 
-## hash命令
+## hash 命令
+- `hash` 列出
 - `hash -d COMMAND`：删除
 - `hash -r`：清空
 
@@ -117,7 +118,7 @@
 - 程序：算法+数据结构
 - 算法：设计解决问题的路径
 
-- 变量名+指向的内存空间
+- 变量：变量名+指向的内存空间
 - 变量赋值：name=value
 
 ## 数据类型
@@ -135,7 +136,7 @@
 
 ## 编程语言：
 - 强类型变量：Java、C/C++
-- 弱类型变量：bash、javascript、PHP
+- 弱类型变量：bash、javascript、PHP、Ruby、Python
 	+ **bash 把所有变量统统视作 字符型**
 	+ **bash不支持浮点型数据**，除非使用外在工具
 	+ **bash中的变量无需事先声明**；把声明和赋值过程同时实现
@@ -144,57 +145,57 @@
 - 变量替换：把变量名出现的位置替换为其所指向的内存空间中数据
 - 变量引用：${var_name}， $var_name
 
-## 变量名：
+## 变量名
 1. 变量名只能包含**数字、字母和下划线**，而其**不能以数字开头**
 2. **见名知义**，命名机制遵循某种法则;chicken_total, chickenTotal
 3. **不能使用程序的保留字**，例如if, else, then, while等等
 
-## bash变量类型：
+## bash变量类型
 - 本地变量：作用域为当前shell进程
 - 环境变量：作用域为当前shell进程及其子进程
 - 局部变量：作用域为某代码片段（函数上下文）
-- 只读变量：重新赋值并且不支持撤销；当前shell进程的生命周期随shell进程终止而终止
-- 位置参数变量：执行脚本的shell进程传递的参数
-- 特殊变量: shell内置的特殊功用的变量
+- 只读变量：重新赋值并且不支持撤销；当前 shell 进程的生命周期随 shell 进程终止而终止
+- 位置参数变量：执行脚本的 shell 进程传递的参数
+- 特殊变量: shell 内置的特殊功用的变量
 
-## 本地变量：
-- 作用域：当前shell进程
-- 变量赋值：name=value
-- 变量引用：${name}, $name
-- 查看变量：set
-- 撤销变量：unset name
+## 本地变量
+- 作用域：当前 shell 进程
+- 变量赋值：`name=value`
+- 变量引用：`${name}, $name`
+- 查看变量：`set`
+- 撤销变量：`unset name`
 	+ 注意：此处非变量引用
 
-## 环境变量：
-- 作用域：当前shell进程及其子进程
+## 环境变量
+- 作用域：当前 shell 进程及其子进程
 - 变量赋值：
-	+ export name=value
-	+ name=value
-		* export name
-	+ declare -x name=value
-	+ name=value
-		* declare -x name
+	+ `export name=value`
+	+ `name=value`
+		* `export name`
+	+ `declare -x name=value`
+	+ `name=value`
+		* `declare -x name`
 
-注意：bash内嵌了许多环境变量（通常为大写字母），用于定义bash的工作环境
-PATH, HISTFILE, HISTSIZE, HISTFILESIZE, HISTCONTROL, SHELL, HOME, PWD,OLDPWD,UID
+注意：bash内嵌了许多环境变量（通常为大写字母），用于定义 bash 的工作环境
+`PATH, HISTFILE, HISTSIZE, HISTFILESIZE, HISTCONTROL, SHELL, HOME, PWD,OLDPWD,UID`
 
-- 查看环境变量：export, declare -x, printenv, env
-- 撤销环境变量：unset name
+- 查看环境变量：`export, declare -x, printenv, env`
+- 撤销环境变量：`unset name`
 
-## 局部变量：
+## 局部变量
 - 作用域：某个代码片段（函数上下文）
 
 ## 位置参数变量：当执行脚本的shell进程传递的参数
-- $0 $# $@ $*
+- `$0 $# $@ $*`
 
 ## 特殊变量：shell内置的有特殊公用的变量；
-- $?：上一个命令的执行状态结果
-	+ 0：succes
-	+ 1-255: failue
+- `$?`：上一个命令的执行状态结果
+	+ `0`：succes
+	+ `1-255`: failue
 
-## 只读变量：
-- (1) declare -r name
-- (2) readonly name
+## 只读变量
+- `declare -r name`
+- `readonly name`
 
 只读变量无法重新赋值，并且不支持撤销；存活时间为当前shell进程的生命周期，随shell进程终止而终止
 
@@ -206,27 +207,27 @@ PATH, HISTFILE, HISTSIZE, HISTFILESIZE, HISTCONTROL, SHELL, HOME, PWD,OLDPWD,UID
 - `*` 匹配任意长度的任意字符
 	+ `pa*, *pa*, *pa, *p*a*`
 	+ pa, paa, passwd
-- ?：匹配任意单个字符
+- `?`：匹配任意单个字符
 	+ pa?, ??pa, p?a, p?a?
 	+ pa, paa, passwd
-- []：匹配指定范围内的任意单个字符
-	+ [a-z]=[A-Z](不区分大小写), [0-9], [a-z0-9]=[A-Z0-9]
-	+ [[:digit:]]：所有数字 [0-9]
-	+ [[:upper:]]：所有大写字母
-	+ [[:lower:]]：所有小写字母
-	+ [[:alpha:]]：所有字母 [a-z], [A-Z]
-	+ [[:alnum:]]：所有的字母和数字 [0-9a-z],[0-9A-Z]
-	+ [[:space:]]：所有空白字符
-	+ [[:punct:]]：所有标点符号
-	+ [^]：匹配指定范围外的任意单个字符
-	+ [^a-z]=[^A-Z](不区分大小写), [^0-9], [^a-z0-9]=[^A-Z0-9]
-	+ [^[:digit:]]：非数字
-	+ [^[:upper:]]：非大写字母
-	+ [^[:lower:]]：非小写字母
-	+ [^[:alpha:]]：非字母
-	+ [^[:alnum:]]：非字母和数字
-	+ [^[:space:]]：非空白字符
-	+ [^[:punct:]]：非标点符号
+- `[]`：匹配指定范围内的任意单个字符
+	+ `[a-z]=[A-Z]`(不区分大小写), [0-9], [a-z0-9]=[A-Z0-9]
+	+ `[[:digit:]]`：所有数字 [0-9]
+	+ `[[:upper:]]`：所有大写字母
+	+ `[[:lower:]]`：所有小写字母
+	+ `[[:alpha:]]`：所有字母 [a-z], [A-Z]
+	+ `[[:alnum:]]`：所有的字母和数字 [0-9a-z],[0-9A-Z]
+	+ `[[:space:]]`：所有空白字符
+	+ `[[:punct:]]`：所有标点符号
+	+ `[^]`：匹配指定范围外的任意单个字符
+	+ `[^a-z]=[^A-Z]`(不区分大小写), [^0-9], [^a-z0-9]=[^A-Z0-9]
+	+ `[^[:digit:]]`：非数字
+	+ `[^[:upper:]]`：非大写字母
+	+ `[^[:lower:]]`：非小写字母
+	+ `[^[:alpha:]]`：非字母
+	+ `[^[:alnum:]]`：非字母和数字
+	+ `[^[:space:]]`：非空白字符
+	+ `[^[:punct:]]`：非标点符号
 
 ## 练习
 1. 显示/var目录所有以l开头，以一个小写字母结尾，且中间出现一位任意字符的文件或目录；
@@ -420,8 +421,8 @@ PATH, HISTFILE, HISTSIZE, HISTFILESIZE, HISTCONTROL, SHELL, HOME, PWD,OLDPWD,UID
 
 ## shell配置文件
 - 两类：
-	+ profile类：为交互式登陆的shell进程提供配置
-	+ bashrc类：为非交互式登陆的shell进程提供配置
+	+ profile 类：为交互式登陆的shell进程提供配置
+	+ bashrc 类：为非交互式登陆的shell进程提供配置
 
 - 登录类型：
 	+ 交互式登录shell进程：
@@ -470,8 +471,6 @@ PATH, HISTFILE, HISTSIZE, HISTFILESIZE, HISTCONTROL, SHELL, HOME, PWD,OLDPWD,UID
 		* `~]# source /PATH/TO/SOMEFILE`
 		* `~]# . /PATH/TO/SOMEFILE`
 
-
-
 ## 算术运算：
 - +, -, *, /, %, **		
 - let VAR=expression
@@ -482,14 +481,14 @@ PATH, HISTFILE, HISTSIZE, HISTFILESIZE, HISTCONTROL, SHELL, HOME, PWD,OLDPWD,UID
 注意：乘法符号有些场景中需要使用转义符；
 
 ### 增强型赋值：变量做某种算术运算后回存至此变量中；
-- let i=$i+#
-- let i+=#
-- +=，-=，*=, /=, %=
+- `let i=$i+#`
+- `let i+=#`
+- `+=，-=，*=, /=, %=`
 		
 ### 自增：
-- VAR=$[$VAR+1]
-- let  VAR+=1
-- let  VAR++
+- `VAR=$[$VAR+1]`
+- `let  VAR+=1`
+- `let  VAR++`
 			
 ### 自减：
 - VAR=$[$VAR-1]
