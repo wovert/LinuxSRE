@@ -360,123 +360,115 @@
 
 
 # 13. shell scirpt
-- 编程语言的分类：根据运行方式	
-	+ 编译运行：
-		* 源代码用编译器转换为汇编文件
-		* 汇编文件转用汇编器转换成机器代码
-		* 项目管理构建工具，编译一部分代码
+## 编程语言的分类：根据运行方式	
+- 编译运行：
+	+ 源代码用编译器转换为汇编文件
+	+ 汇编文件转用汇编器转换成机器代码
+	+ 项目管理构建工具，编译一部分代码
 
-	+ 解释运行：
-		* 源代码运行时启动解释器，有解释器边解释边运行
-		* 注意：词法分析、语法分析
+- 解释运行：
+	+ 源代码运行时启动解释器，有解释器边解释边运行
+	+ 注意：词法分析、语法分析
 
 - 根据其编程过程中功能的实现是调用库还是调用外部的库文件
 	+ shell编程:
 		* 利用系统上的命令及编程组件进行编程
-
-	+ 完整编程：
+	+ 完整编程
 		* 利用库和编程组件进行编程
 
-- 编程模型：
+## 编程模型
+- **过程式编程语言**：以指令为中心来组织的代码，数据服务于代码
+	+ 顺序执行
+	+ 选择执行
+	+ 循环执行
+	+ 代表：C, Bash
+- **面向对象编程语言**：以数据位中心来组织代码，围绕数据来组织指令
+	+ class：实例化对象，method；
+	+ 代表：Java, C++, Python
 
-	+ 程序=指令+数据
-	
-	+ 过程式编程语言：以指令为中心来组织的代码，数据服务于代码
-		* 顺序执行
-		* 选择执行
-		* 循环执行
-		* 代表：C, Bash
-	+ 面向对象编程语言：以数据位中心来组织代码，围绕数据来组织指令
-		* class：实例化对象，method；
-		* 代表：Java, C++, Python
+## shell脚本编程特点
+- 过程是编程、解释运行、依赖于外部程序文件运行
 
-- shell脚本编程特点：过程是编程、解释运行、依赖于外部程序文件运行
-- 如何写shell脚本：
-	+ 脚本文件的第一行,顶格；给出shellbang，解释器路径，用于指明解释执行当前脚本的解释器程序文件
-	
-	+ 常见的解释器：
-		* `#!/bin/bash`
-		* `#!/usr/bin/python`
-		* `#!/usr/bin/env python`
-		* `#!/usr/bin/perl`
+## 如何写shell脚本：
+- 脚本文件的第一行,顶格；给出shellbang，解释器路径，用于指明解释执行当前脚本的解释器程序文件
 
-- 文本编辑器：
-	`行编辑器：sed`
-	`全屏幕编辑器：nano, vi/vim`
+- 常见的解释器：
+	+ `#!/bin/bash`
+	+ `#!/usr/bin/python`
+	+ `#!/usr/bin/env python`
+	+ `#!/usr/bin/perl`
 
-- What is shell script？
-	+ 命令的堆积；
-	+ 很多命令不具有幂等性，需要用程序逻辑来判断运行条件是否满足，以避免其运行中发生错误
+## 文本编辑器：`nano`
+- 行编辑器：`sed`
+- 全屏幕编辑器：`nano, vi/vim`
 
+## What is shell script？
+- 命令的堆积；
+- 很多命令不具有幂等性，需要用程序逻辑来判断运行条件是否满足，以避免其运行中发生错误
 
-- 运行脚本：
-	+ 1. 赋予执行权限，并直接运行此程序文件；
-		`~]# chmod u+x /PATH/TO/SCRIPT_FILE`
-	+2. 直接运行解释器，将脚本以命令行参数传递给解释器程序
-		`~]# bash /PATH/TO/SCRIPT_FILE`
+## 运行脚本
+1. 赋予执行权限，并直接运行此程序文件；
+`~]# chmod u+x /PATH/TO/SCRIPT_FILE`
+2. 直接运行解释器，将脚本以命令行参数传递给解释器程序
+`~]# bash /PATH/TO/SCRIPT_FILE`
 
-- 注意：脚本中空白行会被解释器忽略
-	+ 脚本中，除了shellbang，余下所有以#开头的行，都会被视作注释行而被忽略；此即为注释行；
-	shell脚本的运行时通过运行一个子shell进程实现的；
+## 注意：脚本中空白行会被解释器忽略
+- 脚本中，除了 shell bang，余下所有以`#`开头的行，都会被视作注释行而被忽略；此即为注释行；
+- shell 脚本的运行时通过运行一个子shell进程实现的；
 
 ## shell配置文件
-- 两类：
-	+ profile 类：为交互式登陆的shell进程提供配置
-	+ bashrc 类：为非交互式登陆的shell进程提供配置
+- `profile` 类：为交互式登陆的 shell 进程提供配置
+- `bashrc` 类：为非交互式登陆的 shell 进程提供配置
 
-- 登录类型：
-	+ 交互式登录shell进程：
-		* 直接通过某终端输入账号和密码后登录打开的shell进程；
-		* 使用su命令：su - USERNAME, 或者使用su -l USERNAME执行的登录切换；
+### 登录类型：
+- 交互式登录 shell 进程：
+	+ 直接通过某终端输入账号和密码后登录打开的 `shell` 进程；
+	+ 使用 su 命令：`su - USERNAME`, 或者使用 `su -l USERNAME`执行的登录切换；
 
-	+ 非交互式登录shell进程：
-		* su USERNAME执行的登录切换
-		* 图像界面下打开的终端
-		* 运行脚本
+- 非交互式登录 `shell` 进程：
+	+ `su USERNAME` 执行的登录切换
+	+ 图像界面下打开的终端
+	+ 运行脚本
 
-- profile类：
-	+ 全局：对所有用户都生效；
-		* /etc/profile
-		* /etc/profile.d/*.sh
-	
-	+ 用户个人：仅对当前用户有效；
-		* ~/.bash_profile
-	
-	+ 功用：
-		* 1、用于定义环境变量；
-		* 2、运行命令或脚本；
+### profile类
+- 全局：对所有用户都生效；
+	+ `/etc/profile`
+	+ `/etc/profile.d/*.sh`
+- 用户个人：仅对当前用户有效；
+	+ `~/.bash_profile`
 
-- bashrc类：
-	+ 全局：/etc/bashrc
-	+ 用户个人：~/.bashrc
-	+ 功用：
-		* 1、定义本地变量；
-		* 2、定义命令别名；
-		* 注意：仅管理员可修改全局配置文件；
+- 功用：
+1. 用于定义环境变量；
+2. 运行命令或脚本；
+
+### bashrc类：
+- 全局：`/etc/bashrc`
+- 用户个人：`~/.bashrc`
+- 功用：
+	+ 1、定义本地变量；
+	+ 2、定义命令别名；
+	+ 注意：仅管理员可修改全局配置文件；
 
 - 交互式登录shell进程：
-	+ /etc/profile --> /etc/profile.d/*.sh 
-	+ --> ~/.bash_profile --> ~/.bashrc 
-	+　--> /etc/bashrc
+	+ `/etc/profile --> /etc/profile.d/*.sh --> ~/.bash_profile --> ~/.bashrc --> /etc/bashrc`
 
 - 非交互式登录shell进程：
-	+ ~/.bashrc --> /etc/bashrc --> /etc/profile.d/*.sh
-
+	+ `~/.bashrc --> /etc/bashrc --> /etc/profile.d/*.sh`
 - 命令行中定义的特性，例如变量和别名作用域为当前shell进程的声明周期；
 - 配置文件定义的特性，只对随后新启动的shell进程有效；
 
-- 让通过配置文件定义的特性立即生效：
-	+ (1) 通过命令行重新定义一次；
-	+ (2) 让shell进程重读配置文件；
-		* `~]# source /PATH/TO/SOMEFILE`
-		* `~]# . /PATH/TO/SOMEFILE`
+## 让通过配置文件定义的特性立即生效：
+1. 通过命令行重新定义一次；
+2. 让shell进程重读配置文件；
+- `~]# source /PATH/TO/SOMEFILE`
+- `~]# . /PATH/TO/SOMEFILE`
 
 ## 算术运算：
-- +, -, *, /, %, **		
-- let VAR=expression
-- VAR=$[expression]
-- VAR=$((expression))
-- VAR=$(expr argu1 argu2 argu3)
+- `+, -, *, /, %, **`		
+- `let VAR=expression`
+- `VAR=$[expression]`
+- `VAR=$((expression))`
+- `VAR=$(expr argu1 argu2 argu3)`
 
 注意：乘法符号有些场景中需要使用转义符；
 
@@ -485,148 +477,141 @@
 - `let i+=#`
 - `+=，-=，*=, /=, %=`
 		
-### 自增：
+### 自增
 - `VAR=$[$VAR+1]`
 - `let  VAR+=1`
 - `let  VAR++`
 			
-### 自减：
-- VAR=$[$VAR-1]
-- let  VAR-=1
-- let  VAR--
+### 自减
+- `VAR=$[$VAR-1]`
+- `let  VAR-=1`
+- `let  VAR--`
 
 ### 练习：
-- 写一个脚本
-	+ 计算/etc/passwd文件中的第10个用户和第20个用户的id号之和；
-		* `id1=$(head -10  /etc/passwd | tail -1  | cut  -d:  -f3)`
-		* `id2=$(head -20   /etc/passwd | tail -1  | cut  -d:  -f3)`
-- 写一个脚本
-	+ 计算/etc/rc.d/init.d/functions和/etc/inittab文件的空白行数之和；
-		* `grep "^[[:space:]]*$"   /etc/rc.d/init.d/functions | wc -l`
+- 写一个脚本: 计算 `/etc/passwd`文件中的第10个用户和第20个用户的id号之和；
+	+ `id1=$(head -10  /etc/passwd | tail -1  | cut  -d:  -f3)`
+	+ `id2=$(head -20   /etc/passwd | tail -1  | cut  -d:  -f3)`
+- 写一个脚本: 计算/etc/rc.d/init.d/functions和/etc/inittab文件的空白行数之和；
+	+ `grep "^[[:space:]]*$"   /etc/rc.d/init.d/functions | wc -l`
 
 
-##　条件测试：
+##　条件测试
 > 判断某需求是否满足，需要由测试机制来实现；
 
-- 如何编写测试表达式以实现所需的测试：
-	+ (1) 执行命令并利用命令状态返回值来判断
-		* 0：成功
-		* 1-255：失败
+### 如何编写测试表达式以实现所需的测试：
+1. 执行命令并利用命令状态返回值来判断
+- `0：成功`
+- `1-255：失败`
 
-	+ (2) 测试表达式
-		* test  EXPRESSION
-		* [ EXPRESSION ]
-		* [[ EXPRESSION ]]
+2. 测试表达式
+- `test  EXPRESSION`
+- `[ EXPRESSION ]`
+- `[[ EXPRESSION ]]`
 
-		* 注意：EXPRESSION两端必须有空白字符，否则为语法错误；
+- 注意：`EXPRESSION`两端必须有空白字符，否则为语法错误；
 
 ### bash的测试类型：
 - 数值比较测试：`-eq, -ne, -gt, -ge, -lt, -le, `
-
 - 字符串测试：`==, >, <, !=, =~, -z, -n`
-
 - 文件测试：
-`-a or-e`
-`-f, -d, -h or -L, -b, -c, -S, -p`
-`-r, -w, -x`
-`-u, -g, -k`
-`-s, -N, -O, -G,-ef, -nt, -ot`
-
+	+ `-a or-e`
+	+ `-f, -d, -h or -L, -b, -c, -S, -p`
+	+ `-r, -w, -x`
+	+ `-u, -g, -k`
+	+ `-s, -N, -O, -G,-ef, -nt, -ot`
 
 ###　数值测试：数值比较
-- -eq：是否等于； [ $num1 -eq $num2 ]
-- -ne：是否不等于；
-- -gt：是否大于；
-- -ge：是否大于等于；
-- -lt：是否小于；
-- -le：是否小于等于；	
+- `-eq`：是否等于； [ $num1 -eq $num2 ]
+- `-ne`：是否不等于；
+- `-gt`：是否大于；
+- `-ge`：是否大于等于；
+- `-lt`：是否小于；
+- `-le`：是否小于等于；	
 
-### 字符串测试：[[ “STRING” ]]
-- ==：是否等于；
-- >：是否大于；
-- <：是否小于；
-- !=：是否不等于；
-- =~：左侧字符串是否能够被右侧的PATTERN所匹配
-- -z "STRING"：判断指定的字串是否为空；空则为真，不空则假；
-- -n "STRING"：判断指定的字符串是否不空；不空则真，空则为假；	
+### 字符串测试：`[[ "STRING" ]]`
+- `==`：是否等于；
+- `>`：是否大于；
+- `<`：是否小于；
+- `!=`：是否不等于；
+- `=~`：左侧字符串是否能够被右侧的PATTERN所匹配
+- `-z "STRING"`：判断指定的字串是否为空；空则为真，不空则假；
+- `-n "STRING"`：判断指定的字符串是否不空；不空则真，空则为假；	
 - 注意：
-	+ (1) 字符串一定要加引用；
-	+ (2) 要使用[[ ]]； 使用[]的<,>需要转移,\>,\<
+	+ 字符串一定要加**引用**；
+	+ 要使用**[[ ]]**； 使用`[]`的`<,>`需要转移,`\>`,`\<`
 
-	+ "a" > "b" > "1"
+	+ `"a" > "b" > "1"`
 
-### 文件测试：
+### 文件测试
 - 存在性测试 
-	+ -a  FILE，-e  FILE 
+	+ `-a  FILE`，`-e  FILE` 
 	+ 文件的存在性测试，存在则为真，否则则为假；
 
 - 存在性及类型测试
-	+ -b  FILE：是否存在并且为 块设备 文件；
-	+ -c  FILE：是否存在并且为 字符设备 文件；
-	+ -d  FILE：是否存在并且为 目录文件；
-	+ -f  FILE：是否存在并且为 普通文件；
-	+ -h  FILE或 -L  FILE：是否存在并且为 符号链接文件；
-	+ -p FILE：是否存在且为 命名管道文件；
-	+ -S  FILE：是否存在且为 套接字文件；
+	+ `-b  FILE`：是否存在并且为 块设备 文件；
+	+ `-c  FILE`：是否存在并且为 字符设备 文件；
+	+ `-d  FILE`：是否存在并且为 目录文件；
+	+ `-f  FILE`：是否存在并且为 普通文件；
+	+ `-h  FILE`或`-L  FILE`：是否存在并且为 符号链接文件；
+	+ `-p FILE`：是否存在且为 命名管道文件；
+	+ `-S  FILE`：是否存在且为 套接字文件；
 
 - 文件权限测试
-	+ -r  FILE：是否存在并且 对当前用户可读；
-	+ -w  FILE：是否存在并且 对当前用户可写；
-	+ -x  FILE：是否存在并且 对当前用户可执行；
+	+ `-r  FILE`：是否存在并且 对当前用户可读；
+	+ `-w  FILE`：是否存在并且 对当前用户可写；
+	+ `-x  FILE`：是否存在并且 对当前用户可执行；
 
 - 特殊权限测试
-	+ -u  FILE：是否存在并且 拥有suid权限；
-	+ -g  FILE：是否存在并且 拥有sgid权限；
-	+ -k  FILE：是否存在并且 拥有sticky权限；
+	+ `-u  FILE`：是否存在并且 拥有suid权限；
+	+ `-g  FILE`：是否存在并且 拥有sgid权限；
+	+ `-k  FILE`：是否存在并且 拥有sticky权限；
 
 - 文件是否有内容：
-	+ -s  FILE：是否有内容；有内容为真，否则为假；
+	+ `-s  FILE`：是否有内容；有内容为真，否则为假；
 
 - 时间戳：
-	+ -N FILE：文件自从上一次读操作后是否被修改过；
+	+ `-N FILE`：文件自从上一次读操作后是否被修改过；
 				修改为真，否则为假；
 - 从属关系测试：
-	+ -O  FILE：当前用户是否为文件的属主；
-	+ -G  FILE：当前用户是否属于文件的属组；
+	+ `-O  FILE`：当前用户是否为文件的属主；
+	+ `-G  FILE`：当前用户是否属于文件的属组；
 
 - 双目测试：
-	+ FILE1  -ef  FILE2：FILE1与FILE2是否指向同一个文件系统的相同inode的硬链接；
+	+ `FILE1  -ef  FILE2`：FILE1与FILE2是否指向同一个文件系统的相同inode的硬链接；
 	
-	+ FILE1  -nt  FILE2：FILE1是否新于FILE2；
-	+ FILE1  -ot  FILE2：FILE1是否旧于FILE2；
+	+ `FILE1  -nt  FILE2`：FILE1是否新于FILE2；
+	+ `FILE1  -ot  FILE2`：FILE1是否旧于FILE2；
 
 - 组合测试条件：
-	+ 逻辑运算：
-		* 第一种方式：
-			`COMMAND1 && COMMAND2`
-			`COMMAND1 || COMMAND2`
-			`! COMMAND `
+	+ 逻辑运算： 第一种方式
+		* `COMMAND1 && COMMAND2`
+		* `COMMAND1 || COMMAND2`
+		* `! COMMAND `		
+		* `[ -O FILE ] && [ -r FILE ]`
 					
-			`[ -O FILE ] && [ -r FILE ]`
-					
-		* 第二种方式：
-			`EXPRESSION1  -a  EXPRESSION2`
-			`EXPRESSION1  -o  EXPRESSION2`
-			`! EXPRESSION`
-			`[ -O FILE -a -x FILE ]`
+	+ 逻辑运算：第二种方式
+		* `EXPRESSION1  -a  EXPRESSION2`
+		* `EXPRESSION1  -o  EXPRESSION2`
+		* `! EXPRESSION`
+		* `[ -O FILE -a -x FILE ]`
 						
 ### 练习：将当前主机名称保存至hostName变量中；
 `# 主机名如果为空，或者为localhost.localdomain，则将其设置为www.magedu.com；`
 `hostName=$(hostname)`
 `[ -z "$hostName" -o "$hostName" == "localhost.localdomain" -o "$hostName" == "localhost" ] && hostname www.magedu.com `
 					
-## 脚本的状态返回值：
+## 脚本的状态返回值
 > 默认是脚本中执行的最后一条件命令的状态返回值；
 
 - 自定义状态退出状态码：exit  [n]：n为自己指定的状态码；
 - 注意：shell进程遇到exit时，即会终止，因此，整个脚本执行即为结束；
 
-## 向脚本传递参数：
+## 向脚本传递参数
 - 位置参数变量
 
-`myscript.sh  argu1 argu2`
-引用方式：`$1,  $2, ..., ${10}, ${11}, ...`	
-轮替：`shift  [n]`：位置参数轮替；
+- `myscript.sh  argu1 argu2`
+- 引用方式：`$1,  $2, ..., ${10}, ${11}, ...`	
+- 轮替：`shift  [n]`：位置参数轮替；
 
 ### 练习：写一脚本，通过命令传递两个文本文件路径给脚本，计算其空白行数之和；
 `#!/bin/bash`
@@ -635,33 +620,34 @@
 `echo "Total blank lines: $[$file1_lines+$file2_lines]"	`
 
 - 特殊变量：
-`$0`：脚本文件路径本身
-`$#`：脚本参数的个数
-`$*`：所有参数
-`$@`：所有参数
+	+ `$0`：脚本文件路径本身
+	+ `$#`：脚本参数的个数
+	+ `$*`：所有参数
+	+ `$@`：所有参数
 
 ## 过程式编程语言的代码执行顺序：
 - 顺序执行：逐条运行；
 - 选择执行：
-	* 代码有一个分支：条件满足时才会执行；
-	* 两个或以上的分支：只会执行其中一个满足条件的分支；
+	+ 代码有一个分支：条件满足时才会执行；
+	+ 两个或以上的分支：只会执行其中一个满足条件的分支；
 - 循环执行：
-	* 代码片断（循环体）要执行0、1或多个来回；
+	+ 代码片断（循环体）要执行0、1或多个来回；
 
-### 选择执行：
-单分支的if语句：
-	if  测试条件
-	then
-		代码分支
-	fi		
-双分支的if语句：
-	if  测试条件; then
-		条件为真时执行的分支
-	else
-		条件为假时执行的分支
-	fi
+# 选择执行
+- 单分支的if语句：
+`if  测试条件
+then
+	代码分支
+fi`
+
+- 双分支的if语句
+`if  测试条件; then
+	条件为真时执行的分支
+else
+	条件为假时执行的分支
+fi`
 				
-### 示例：通过参数传递一个用户名给脚本，此用户不存时，则添加之；
+## 示例：通过参数传递一个用户名给脚本，此用户不存时，则添加之；
 `#!/bin/bash`
 `if ! grep "^$1\>" /etc/passwd &> /dev/null; then`
 `	useradd $1`
