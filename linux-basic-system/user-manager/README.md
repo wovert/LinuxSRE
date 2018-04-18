@@ -661,4 +661,4 @@ centos ALL=(root) usr/sbin/useradd, /usr/sbin/usermod, /usr/bin/passwd
 
 	+ root ALL=(ALL)		ALL
 	+ root用户已任何用户身份运行任何命令
-	+%whell ALL=(ALL)		ALL
+	+　%whell ALL=(ALL)		ALL
