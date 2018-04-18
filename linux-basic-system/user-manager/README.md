@@ -558,13 +558,13 @@
 
 
 ### setfacl命令
-- 赋权给用户：setfacl -m u:USERNAME:MODE FILE...
-- 赋权给组：setfacl -m g:GROUPNAME:MODE FILE...
-- 撤销用户赋权：setfacl -x u:USERNAME FILE...
-- 撤销组赋权: setfacl -x g:GROUPNAME FILE...
+- 赋权给用户：`setfacl -m u:USERNAME:MODE FILE...`
+- 赋权给组：`setfacl -m g:GROUPNAME:MODE FILE...`
+- 撤销用户赋权：`setfacl -x u:USERNAME FILE...`
+- 撤销组赋权: `setfacl -x g:GROUPNAME FILE...`
 
-- 目录赋权给用户: setfacl -m u:USERNAME:MODE -R FILE
-- 目录赋权给组: setfacl -m g:GROUPNAME:MODE -R FILE
+- 目录赋权给用户: `setfacl -m u:USERNAME:MODE -R FILE`
+- 目录赋权给组: `setfacl -m g:GROUPNAME:MODE -R FILE`
 
 - MODE=--- 拒绝某个用户访问控制列表
 
@@ -590,80 +590,75 @@
 
 `# man visudo`
 
-sudo [options] command
-	-u username：以指定的用户身份运行命令
+`sudo [options] command`
+`-u username：以指定的用户身份运行命令`
 `# sudo -u centos whoami`
 
 - Centos
 `# usermod -aG wheel centos`
 `# su - centos`
 `# sudo -l`
-	-l：列出用户能以sudo方式执行的所有命令
-	-k：清楚此前缓存的用户认证的密码，默认为5分钟不用输入密码
-
+- -l：列出用户能以sudo方式执行的所有命令
+- -k：清楚此前缓存的用户认证的密码，默认为5分钟不用输入密码
 
 %wheel （wheel组）
 `# usermod -aG wheel centos`
 
-
 - who:谁
-	username：单个用户
-	#uid：单个用户的ID号
-	%groupname：组内的所有用户
-	%#gid：组内的所有用户
-	user_alias：用户别名
+	+ username：单个用户
+	+ #uid：单个用户的ID号
+	+ %groupname：组内的所有用户
+	+ %#gid：组内的所有用户
+	+ user_alias：用户别名
 
 - where：在哪里
-	ip或hostname：单个主机
-	NetAddr：网络地址；
-	host_alias：主机别名
+	+ ip或hostname：单个主机
+	+ NetAddr：网络地址；
+	+ host_alias：主机别名
 
 - whom：谁的身份
-	username
-	#uid
-	runas_alias
+	+ username
+	+ #uid
+	+ runas_alias
 
 - commands: 谁的身份运行命令
-	command：单个命令
-	directory：指定目录内的所有程序
-	sudoedit：特殊权限，可用于向其他用户授予sudo权限
-	cmnd_alias：命令别名
+	+ command：单个命令
+	+ directory：指定目录内的所有程序
+	+ sudoedit：特殊权限，可用于向其他用户授予sudo权限
+	+ cmnd_alias：命令别名
 
-# which useradd
-# which usermod
-# visudo
+`# which useradd`
+`# which usermod`
+`# visudo`
 /etc/sudoers.d
 centos ALL=(root) usr/sbin/useradd, /usr/sbin/usermod, /usr/bin/passwd
-# su - centos
-$ sudo -l
-$ sudo /usr/sbin/useradd slackware
-$ tail -1 /etc/passwd
-$ sudo userel -r slackware
+`# su - centos`
+`$ sudo -l`
+`$ sudo /usr/sbin/useradd slackware`
+`$ tail -1 /etc/passwd`
+`$ sudo userel -r slackware`
 
-- 定义别名的方法：
-	ALIAS_TYPE NAME=item,item2,itemn
+- 定义别名的方法：`ALIAS_TYPE NAME=item,item2,itemn`
 
-ALIAS_TYPE：
-	User_Alias
-	Host_Alias
-	Runas_Alias
-	Cmnd_Alias
+- ALIAS_TYPE：
+	+ User_Alias
+	+ Host_Alias
+	+ Runas_Alias
+	+ Cmnd_Alias
 
-NAME：别名的名称字符，必须使用全大写字母；
+- NAME：别名的名称字符，必须使用全大写字母；
 
-示例：
-	User_Alias USERADMINS=tom,jerry
-	Cmnd_Alias USERADMINCMNDS=/usr/sbin/useradd,/user/sbin/usermod,/user/bin/passwd [a-z]*, !/usr/bin/passwd root, /usr/sbin/userdel
+- 示例：
+`User_Alias USERADMINS=tom,jerry`
+`Cmnd_Alias USERADMINCMNDS=/usr/sbin/useradd,/user/sbin/usermod,/user/bin/passwd [a-z]*, !/usr/bin/passwd root, /usr/sbin/userdel`
+`USERADMINS ALL=(root) USERADMINCMNDS`
 
-	
-	USERADMINS ALL=(root) USERADMINCMNDS
+- 常用标签：
+	+ NOPASSWD：不需要输入密码
+	+ PASSWD: 需要输入秘密，默认为缓存5分钟内，不需要输入
 
-常用标签：
-	NOPASSWD：不需要输入密码
-	PASSWD: 需要输入秘密，默认为缓存5分钟内，不需要输入
+	+ centos ALL=(root) NOPASSWD: /usr/sbin/useradd, /usr/sbin/usermod, /usr/bin/passwd, PASSWD: /usr/sbin/userdel
 
-	centos ALL=(root) NOPASSWD: /usr/sbin/useradd, /usr/sbin/usermod, /usr/bin/passwd, PASSWD: /usr/sbin/userdel
-
-	root ALL=(ALL)		ALL
-	root用户已任何用户身份运行任何命令
-	%whell ALL=(ALL)		ALL
+	+ root ALL=(ALL)		ALL
+	+ root用户已任何用户身份运行任何命令
+	+%whell ALL=(ALL)		ALL

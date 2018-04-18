@@ -463,14 +463,14 @@
 - `~]# source /PATH/TO/SOMEFILE`
 - `~]# . /PATH/TO/SOMEFILE`
 
-## 算术运算：
+## 算术运算
 - `+, -, *, /, %, **`		
 - `let VAR=expression`
 - `VAR=$[expression]`
 - `VAR=$((expression))`
-- `VAR=$(expr argu1 argu2 argu3)`
+- `VAR=$(expr argu1 $op argu2)`
 
-注意：乘法符号有些场景中需要使用转义符；
+- 注意：乘法符号有些场景中需要使用转义符；
 
 ### 增强型赋值：变量做某种算术运算后回存至此变量中；
 - `let i=$i+#`
@@ -479,21 +479,20 @@
 		
 ### 自增
 - `VAR=$[$VAR+1]`
-- `let  VAR+=1`
-- `let  VAR++`
+- `let VAR+=1`
+- `let VAR++`
 			
 ### 自减
 - `VAR=$[$VAR-1]`
-- `let  VAR-=1`
-- `let  VAR--`
+- `let VAR-=1`
+- `let VAR--`
 
-### 练习：
+### 练习
 - 写一个脚本: 计算 `/etc/passwd`文件中的第10个用户和第20个用户的id号之和；
 	+ `id1=$(head -10  /etc/passwd | tail -1  | cut  -d:  -f3)`
 	+ `id2=$(head -20   /etc/passwd | tail -1  | cut  -d:  -f3)`
 - 写一个脚本: 计算/etc/rc.d/init.d/functions和/etc/inittab文件的空白行数之和；
 	+ `grep "^[[:space:]]*$"   /etc/rc.d/init.d/functions | wc -l`
-
 
 ##　条件测试
 > 判断某需求是否满足，需要由测试机制来实现；
@@ -510,7 +509,7 @@
 
 - 注意：`EXPRESSION`两端必须有空白字符，否则为语法错误；
 
-### bash的测试类型：
+### bash的测试类型
 - 数值比较测试：`-eq, -ne, -gt, -ge, -lt, -le, `
 - 字符串测试：`==, >, <, !=, =~, -z, -n`
 - 文件测试：
