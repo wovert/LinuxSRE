@@ -6,23 +6,25 @@
 - [程序设计语言](./introduction-to-computers/programming-language/)
 
 ## [Linux 基础系统](./linux-basic-system/)
-- [Linux 安装与配置](./setup-setting/)
-- [Linux 基础入门](./linux-basic/)
-- [文件系统](./file-system/)
-- [文件操作工具](./file-operations/)
-- [bash 特性](./bash/)
-- [文本处理工具及正则表达式](./text-manipulation-regular-expression/)
-- [用户管理工具](./user-manager/)
-- [Linux 编辑器](./editor/)
-- [压缩打包工具](./compression-packing/)
+- [Linux 安装与配置](./linux-basic-system/setup-setting/)
+- [Linux 基础入门](./linux-basic-system/linux-basic/)
+- [文件系统](./linux-basic-system/file-system/)
+- [文件操作工具](./linux-basic-system/file-operations/)
+- [bash 特性](./linux-basic-system/bash/)
+- [文本处理工具及正则表达式](./linux-basic-system/text-manipulation-regular-expression/)
+- [用户管理工具](./linux-basic-system/user-manager/)
+- [Linux 编辑器](./linux-basic-system/editor/)
+- [压缩打包工具](./linux-basic-system/compression-packing/)
 
-## Linux 系统管理
-- 磁盘分区
+## [Linux 系统管理](./system-management/)
+- [磁盘分区](./system-management/)
 - 文件系统管理工具
 - 程序包管理
+- RAID
+- LVM
 - 网络管理
 - 进程管理
-- Linux 启动流程
+- 系统启动流程
 - 内核管理
 - 安装系统
 
