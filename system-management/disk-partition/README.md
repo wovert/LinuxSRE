@@ -12,56 +12,57 @@
 - shell脚本编程
 
 # 磁盘分区及文件系统管理
-- 磁盘接口类型
-	+ 并口：IDE,SCSI
-	+ 串口：SATA, SAS, USB
-	+ IDE(早期为ata，但并不相同)：并口
-		* 速率：133MB/s
-		* 接口名：/dev/hd[a-z]
-	+ SCSI：并口
-		* 接口名：/dev/sd[a-z]
-		* UltraSCSI320, 320MB/s
-		* UltraSCSI640, 640MB/s
-	+ SATA：串口
-		* 速率：6Gbps, 
-		* 接口名：/dev/sd[a-z]
-	+ SAS：串口（SCSI），
-		* 速率：6Gbps 
-		* 接口名：/dev/sd[a-z]
-	+ USB：串口
-		* 速率：3.1v 480MB/s
-		* 接口名：/dev/sd[a-z]
-	+ 并口：同一线缆可以接多块设备
-		* IDE：两个，主设备，从设备
-		* SCSI：
-			- 宽带：16-1
-			- 窄带：8-1
-	+ 串口：同一线缆只可以接一个设备
+
+## 磁盘接口类型
+- 并口：IDE,SCSI
+- 串口：SATA, SAS, USB
+- IDE(早期为ata，但并不相同)：并口
+	+ 速率：133MB/s
+	+ 接口名：/dev/hd[a-z]
+- SCSI：并口
+	+ 接口名：/dev/sd[a-z]
+	+ UltraSCSI320, 320MB/s
+	+ UltraSCSI640, 640MB/s
+- SATA：串口
+	+ 速率：6Gbps, 
+	+ 接口名：/dev/sd[a-z]
+- SAS：串口（SCSI），
+	+ 速率：6Gbps 
+	+ 接口名：/dev/sd[a-z]
+- USB：串口
+	+ 速率：3.1v 480MB/s
+	+ 接口名：/dev/sd[a-z]
+- 并口：同一线缆可以接多块设备
+	+ IDE：两个，主设备，从设备
+	+ SCSI：
+		* 宽带：16-1
+		* 窄带：8-1
++ 串口：同一线缆只可以接一个设备
 
 > IOPS (Input/Output Operations Per Second)，即每秒进行读写（I/O）操作的次数，多用于数据库等场合，衡量随机访问的性能。存储端的IOPS性能和主机端的IO是不同的，IOPS是指存储每秒可接受多少次主机发出的访问，主机的一次IO需要多次访问存储才可以完成。例如，主机写入一个最小的数据块，也要经过“发送写入请求、写入数据、收到写入确认”等三个步骤，也就是3个存储端访问
 		
-- IOPS理论值：
-	+ IDE: 100
-	+ SCSI: 150
-	+ SATA: 100
-	+ SAS: 150-200
+## IOPS理论值：
+- IDE: 100
+- SCSI: 150
+- SATA: 100
+- SAS: 150-200
 
-- 硬盘结构
-	+ 机械硬盘：电子设备
-	+ 马达带动的轴上多个盘片，盘片划分成等同的同心圆，即磁道track
-	+ 每个磁道划分成若干个等同的扇区sector，512bytes
-	+ 不同盘面上的的同一个编号盘面，柱面，Cylinder
-	+ 分区划分基于cylinder实现的
-	+ 最外层的柱面速度最快
-	+ 固定角速度
-	+ 机械臂
-	+ 磁头悬浮在盘面上
+## 硬盘结构
+- 机械硬盘：电子设备
+- 马达带动的轴上多个盘片，盘片划分成等同的同心圆，即磁道track
+- 每个磁道划分成若干个等同的扇区sector，512bytes
+- 不同盘面上的的同一个编号盘面，柱面，Cylinder
+- 分区划分基于cylinder实现的
+- 最外层的柱面速度最快
+- 固定角速度
+- 机械臂
+- 磁头悬浮在盘面上
 	
-- 读取数据：
+## 读取数据：
 1. 挪动磁头固定到磁道上
 2. 等待数据转过来
 	
-- 平均寻到时间
+## 平均寻到时间
 1. 磁头挪动时间
 2. 盘片转速
 	+ 5400rpm,笔记本
@@ -69,30 +70,30 @@
 	+ 离心机：30000rpm/m
 
 
-- 固态硬盘：多个并行的USB盘，电气设备
-	+ IOPS: 400
-	+ PIC-E：100000
+## 固态硬盘：多个并行的USB盘，电气设备
+- IOPS: 400
+- PIC-E：100000
 
-- 设备类型：
-	+ 块(block)：随机访问，数据交换单位是“块”
-	+ 字符(character)：线性访问，数据交换单位是“字符”
+## 设备类型：
+- 块(block)：随机访问，数据交换单位是“块”
+- 字符(character)：线性访问，数据交换单位是“字符”
 
-- 设备文件：FHS
-	+ 设备文件的作用：
-		* 关联至设备驱动程序（内核中的程序文件）；
-		* 设备的访问入口
-		
-	+ 设备号：
-		* major：主设备号，区分设备类型；用于标明设备所需要的驱动程序
-		* minor：次设备号，区分同种类型下的不同的设备;是特定设备的访问入口
+## 设备文件：FHS
+- 设备文件的作用：
+	+ 关联至设备驱动程序（内核中的程序文件）；
+	+ 设备的访问入口
+- 设备号：
+	+ major：主设备号，区分**设备类型**；用于标明设备所需要的驱动程序
+	+ minor：次设备号，区分**同种类型下的不同的设备**;是特定设备的访问入口
 
+## mknod 命令
+> make block or charactoer special files
 
-#### mknod命令:make block or charactoer special files
-- mknod [OPTION]... NAME TYPE [MAJOR MINOR]
-	+ 选项：
-		* TYPE: c | b
-		* -m, --mode：创建设备文件的访问权限，系统调用来实现的
-			
+- `mknod [OPTION]... NAME TYPE [MAJOR MINOR]`
+- 选项
+	+ `TYPE: c | b`
+	+ `-m, --mode` 创建设备文件的访问权限，**系统调用**来实现的
+
 `~]# mknod /dev/testdev/ c 111 1`
 `~]# ls -l /dev/testdev`
 `~]# install -m` 复制同时修改权限
@@ -101,57 +102,56 @@
 `~]# chmod a-x /tmp/chmod`
 `~]# install -m 755 /tmp/chmod /tmp/test/`
 
-设备文件名：**ICANN**机构分配
+- 设备文件名：**ICANN** 机构分配
 
-- 磁盘：
-	+ IDE: /dev/hd[a-z]
-	+ SCSI,SATA,SAS,USB: /dev/sd[a-z]
+## 磁盘命令
+- IDE: /dev/hd[a-z]
+- SCSI,SATA,SAS,USB: /dev/sd[a-z]
+- 分区：
+	+ /dev/sda#
+	+ /dev/sda1,...
+- 注意：CentOS 6和7统统将硬盘设备文件标识为/dev/sd[a-z]#
+- 引用设备的方式：
+	+ 设备文件名
+	+ 卷标
+	+ UUID：128位的编号
 
-	+ 分区：
-		* /dev/sda#
-		* /dev/sda1,...
+## 磁盘分区：MBR，GPT
+- MBR: Master Boot Recored,主引导记录
+	+ 位置：0 sector，512byte, 0编号扇区
 
-	+ 注意：CentOS 6和7统统将硬盘设备文件标识为/dev/sd[a-z]#
+	+ 分为三部分：
+		* 446byte: bootloader, 引导启动操作系统的程序
+		* 64byte: 分表表，每16byte表示一个分区，一共只能有4个分区
+			- 4主分区
+			- 3主1扩展（n逻辑分区）
+		* 2bytes: MBR区域的有效性校验；55AA为有效
 
-	+ 引用设备的方式：
-		* 设备文件名
-		* 卷标
-		* UUID：128位的编号
+	+ 主分区和扩展分区的表示：1-4
+	+ 逻辑分区：5+
 
-- 磁盘分区：MBR，GPT
-	+ MBR: Master Boot Recored,主引导记录
-		* 位置：0 sector，512byte, 0编号扇区
+- 课外作业：GTP是什么，怎么使用？
 
-		* 分为三部分：
-			+ 446byte: bootloader, 引导启动操作系统的程序
-			+ 64byte: 分表表，每16byte表示一个分区，一共只能有4个分区
-				- 4主分区
-				- 3主1扩展（n逻辑分区）
-			+ 2bytes: MBR区域的有效性校验；55AA为有效
+## fdisk 
+> manipulate disk partion table
 
-		* 主分区和扩展分区的表示：1-4
-		* 逻辑分区：5+
-
-课外作业：GTP是什么，怎么使用？
-
-### fdisk命令：manipulate disk partion table
 1. 查看分区
-	- fdisk -l -u [device...] 列出指定磁盘设备上的分区情况
-		+ 实际内核查看分区表：# cat /proc/partitions 
+- fdisk -l -u [device...] 列出指定磁盘设备上的分区情况
+	+ 实际内核查看分区表：`# cat /proc/partitions `
 
-	+ CentOS 7 扇区标识
-	+ CentOS 6 柱面标识
+- CentOS 7 扇区标识
+- CentOS 6 柱面标识
 
-	+ 分区类型：16进制
-		- Linux标识主分区：		83
-		- Extended标识主分区：	5
-		- Swap标识交换分区：	82
+- 分区类型：16进制
+	+ Linux标识主分区：		83
+	+ Extended标识主分区：	5
+	+ Swap标识交换分区：		82
 
 2. 管理分区
-`~]# fidsk device`
-fidsk提供了一个交互式接口管理分区，有很多子命令，分别用于不同的管理功能；
-所有的操作均在内存中完成，没有直接同步到磁盘；
-直到使用w命令保存至磁盘上；
+- `~]# fidsk device`
+- fidsk提供了一个交互式接口管理分区，有很多子命令，分别用于不同的管理功能；
+- 所有的操作均在内存中完成，没有直接同步到磁盘；
+- 直到使用w命令保存至磁盘上；
 		
 	常用命令：
 		n: add a new partition
