@@ -41,7 +41,7 @@
 
 > IOPS (Input/Output Operations Per Second)，即每秒进行读写（I/O）操作的次数，多用于数据库等场合，衡量随机访问的性能。存储端的IOPS性能和主机端的IO是不同的，IOPS是指存储每秒可接受多少次主机发出的访问，主机的一次IO需要多次访问存储才可以完成。例如，主机写入一个最小的数据块，也要经过“发送写入请求、写入数据、收到写入确认”等三个步骤，也就是3个存储端访问
 		
-## IOPS理论值：
+## IOPS理论值
 - IDE: 100
 - SCSI: 150
 - SATA: 100
@@ -139,8 +139,8 @@
 - fdisk -l -u [device...] 列出指定磁盘设备上的分区情况
 	+ 实际内核查看分区表：`# cat /proc/partitions `
 
-- CentOS 7 扇区标识
-- CentOS 6 柱面标识
+- CentOS 7 扇区标识： Start End
+- CentOS 6 柱面标识: Start End
 
 - 分区类型：16进制
 	+ Linux标识主分区：		83
@@ -153,211 +153,206 @@
 - 所有的操作均在内存中完成，没有直接同步到磁盘；
 - 直到使用w命令保存至磁盘上；
 		
-	常用命令：
-		n: add a new partition
-			p(主分区) or e(扩展分区) or l(逻辑分区)
-				number {1-4}
-			start sector
-				+10G
-		d：delete partition
-		t: modify partition type
-		
-		w: save and quite
-		q: not save and quite
-		
-		p: print list partitions
-		l：all partition type list
-		m: help
+## 常用命令
+- n: add a new partition
+	+ p(主分区) or e(扩展分区) or l(逻辑分区)
+		* number {1-4}
+	+ start sector
+		* +10G
+- d：delete partition
+- t: modify partition type
 
-	注意：在已经分区并且已经挂载其中某个分区的磁盘设备上的创建的新分区，内核可能在完成之后无法直接识别
+- w: save and quite
+- q: not save and quite
 
-		查看：~]# cat /proc/partitions
+- p: print list partitions
+- l：all partition type list
+- m: help
 
-		通知内核强制重读分区表：
-			CentOS 5: # partprob [device]
-			CentOS 6,7: 
-				~]# partx -a device 读取所有分区并添加分区
-					-a: Add the specified partitions, or read the disk and add all partitions
-				~]# kpartx -af device
-					-a: append partition mapping
-					-f: force creations of mapping; overrides 'no_partitions' feature
+- 注意：在**已经分区并且已经挂载**其中某个**分区**的磁盘设备上的**创建的新分区**，**内核**可能在完成之后**无法直接识别**
+	+ 查看内核识别的分区：`~]# cat /proc/partitions`
 
-分区创建工具：parted, sfdisk
+### 通知内核强制重读分区表
+- CentOS 5: `# partprob [device]`
+- CentOS 6|7:
+	+ `~]# partx -a device` 读取所有分区并添加分区（有时需要执行两次命令）
+		* -a: Add the specified partitions, or read the disk and add all partitions
+	+ `~]# kpartx -af device`
+		* -a: append partition mapping
+		* -f: force creations of mapping; overrides 'no_partitions' feature
 
-创建文件系统
-	格式化：
-		低级格式化（分区之前进行、划分磁道）
-		高级格式化（分区之后对分区进行，创建文件系统）
+- 分区创建工具：`parted, sfdisk`
 
-		元数据、数据区
+# 创建文件系统
+## 格式化
+1. 低级格式化（分区之前进行 =>划分磁道）
+2. 高级格式化（分区之后对分区进行 => 创建文件系统）
 
-		元数据区：
-			文件元数据：
-				inode，索引节点，inode大小一样
-				大小、权限、属主属组、时间戳、数据块指针（占据了哪些数据块）
+## 元数据和数据区
+### 元数据区
+- 文件元数据：大小、权限、属主属组、时间戳、数据块指针（占据了哪些数据块，单个文件大小有限）
+	+ inode(index node) 是索引节点 
+	+ inode 大小固定
+	+ 文件名不在元数据存储，而是在目录当中保存文件名
+	+ inode 数量少，浪费数据空间
+	+ inode 数量多，浪费 inode 空间
 
-				inode数量少，浪费数据空间
-				inode数量多，浪费inode空间
+- 元数据还包含
+	+ inode data
+	+ bitmap inode index
+	+ bitmap block index
+	
+### 数据区
+	+ block:磁盘块大小，n*512bytes
+	+ 文件块不连续，说明有碎片
 
-			包含：
-				inode数据
-				bitmap inode
-				bitmap block
+### 保留预留空间
+- 用于当磁盘空间占满时，管理员可以管理的空间
 
-		数据区：
-			block:磁盘块大小，n*512bytes
-			文件块不连续，说明有碎片
+- inode 与 block 比率？
+- inode 和 block 怎么知道空闲？
+- **Bitmap block index**：磁盘块位图索引（1bit,0：未使用，1：使用）
+- **Bitmap inode index**：索引节点位图缩影（1bit,0：未使用，1：使用）
 
-		保留预留空间
+- 符号连接文件：存储数据指针的空间当中存储的是**真实文件的访问路径**
+- 设备文件：存储数据指针的空间当中存储的设备号(major, minor)
+
+### 磁盘块组（逻辑分区）
+- 元数据区/每个块组
+	+ inode table
+	+ 磁盘块位图索引
+	+ inode 位图索引
+	+ 有超级块（所有块组）+ 块组描述符（当前块组的）
+- 数据区/每个块组
+
+- 超级块：管理磁盘块组
+	+ 超级块也在块组当中
+	+ 管理块分组
+	+ 备份超级块便于某个超级快损坏时适应该超级快作为管理块组
+
+- **先分块，然后分元数据块和数据块**
 
 
-		inode与block比率？
-		inode和block怎么知道空闲？
-		Bitmap block：磁盘块位图索引（1bit,0：未使用，1：使用）
-		Bitmap inode：索引节点位图缩影（1bit,0：未使用，1：使用）
+### 文件名存储在哪里？
+- /var/log/messages
 
+1. 根（/）查找inode，找到磁盘块（目录下所有的文件名和inode的对应关系）
+	文件名	inode
+	+ var		0x1023930
+	+ bin		0x2093902
+	+ sbin	0x2d92392
+	+ ...
+2. var 文件所对应的 inode 编号 0x1023930
+3. var 文件磁盘块（目录下所有的文件名和 inode 对应关系）
+	+ log 	0x2309230
+	+ cache	0x2039203
+4. log 文件的 inode 编号 0x2309230，在磁盘块中查找 log 磁盘块(目录下所有的文件名inode对应关系)
+	+ message 0x2930239
+5. message 文件的 inode 编号 0x2930239，在磁盘块中找到文件内容
+	+ 文件名保存在目录上（即数据块上）
 
-		磁盘块组（逻辑分区）：
-			元数据区
-				inode table
-				磁盘块位图索引
-				inode位图索引
-				有超级块（所有块组）＋块组描述符（当前块组的）
-			数据区
+- 目录：文件路径映射
 
-			超级块：
-				超级块也在块组当中
-				管理块分组
-				备份超级块
+- 文件路径缓存到内存里以便日后快速查找
+	+ free 命令的 cache 和 buffer
+	+ free 命令
+		Buffer（写）/cache（读）：有元数据和数据
 
-		文件名存储在哪里？
-			/var/log/messages
+## VFS
+> Virtual File System, 虚拟文件系统
+- 当两个层次不衔接时，加入中间层
 
-			1、根（/）查找inode，找到磁盘块（目录下所有的文件名和inode的对应关系）
-				文件名	inode
-				var		0x1023930
-				bin		0x2093902
-				sbin	0x2d92392
-				...
+- Linux的文件系统：ext2,ext3,ext4,xfs(CentOS 7,64位),btrfs(测试使用),reiserfx(查找功能,反删除功能强),jfs,swap
+- 光驱文件系统：iso9669
+- 网络文件系统：nfs, cifs,smbfs
+- 集群文件系统：gffs2,ocfs2
+- 内核级分布式式文件系统：ceph, 
+- 用户空间的分布式文件系统：moosefs,gluster, mogilefs
+- windows的文件系统：vfat,ntfs
+- 伪文件系统：proc,sys,tmpfs,hugepagefs
+- Unix文件系统：UFS, FFS, JFS
+- 交换文件系统：swap
+- 数据交换：内存不够时数据保存在交换文件系统内，内存使用时再次调用交换文件系统内的数据（虚拟内存）
 
-			2、var文件所对应的inode编号0x1023930
-			3、var文件磁盘块（目录下所有的文件名和inode对应关系）
-				log 	0x2309230
-				cache	0x2039203
+- 符号链接文件：存储数据指针的空间当中存储的是真实文件的访问路径
+- 设备文件：存储数据指针的空间当中存储的是设备号（major,minor）
 
-			4、log文件的inode编号0x2309230，在磁盘块中查找log磁盘块(目录下所有的文件名inode对应关系)
-				message 0x2930239
+## 文件系统管理工具：
+- 创建文件系统：mkfs -t, mkfs.ext2, mke2fs -t
+- 检测及修复文件系统：fsck,fsck.ext2,fsc.ext3....
+- 查看属性：dumpe2fs
+- 修改属性：tune2fs
 
-			5、message文件的inode编号0x2930239，在磁盘块中找到文件内容
+## 创建文件系统工具
+- mkfs -t ext2 ext3 ext4 xfs vfat
+- mkfs.ext2, mkfs.ext3, mkfx.ex4, mkfs.xfs, mkfs.vfat
+- mke2fs -t ext2 ext3 ext4 xfs
 
-				文件名保存在目录上（即数据块上）
+## 检测及修复文件系统的工具
+- fsck
+- fsck.ext2 fsck.ext3,..
 
-			目录：文件路径映射
+## 查看其属性的工具
+- dumpe2fs, tune2fs
 
-			文件路径缓存到内存里以便日后快速查找
-				free命令的cache和buffer
-				free命令
-					Buffer（写）/cache（读）：有元数据和数据
+## 调整文件系统特性：
+- tune2fs
 
-	VFS：Virtual File System, 虚拟文件系统
-		当两个层次不衔接时，加入中间层
+## 内核及文件系统的组成部分：
+- 文件系统驱动：由内核提供
+- 文件系统管理工具：由用户空间的应用程序提供
 
-		Linux的文件系统：ext2,ext3,ext4,xfs(CentOS 7,64位),btrfs(测试使用),reiserfx(查找功能,反删除功能强),jfs,swap
-		光驱文件系统：iso9669
-		网络文件系统：nfs, cifs,smbfs
-		集群文件系统：gffs2,ocfs2
-		内核级分布式式文件系统：ceph, 
-		用户空间的分布式文件系统：moosefs,gluster, mogilefs
-		windows的文件系统：vfat,ntfs
-		伪文件系统：proc,sys,tmpfs,hugepagefs
-		Unix文件系统：UFS, FFS, JFS
-		交换文件系统：swap
-		数据交换：内存不够时数据保存在交换文件系统内，内存使用时再次调用交换文件系统内的数据（虚拟内存）
+## 查看内核装载模块
+1. 装载模块到内核：`# lsmod`
+2.编译进内核模块，内核一部分；`# lsmod命令看不到`
 
-	符号链接文件：存储数据指针的空间当中存储的是真实文件的访问路径
-	设备文件：存储数据指针的空间当中存储的是设备号（major,minor）
+## 文件系统类型：
+- 日记型文件系统：journal, ext3, ext4, xfs
+- 非日记型文件系统：ext2,vfat
 
-	文件系统管理工具：
+## 日志文件系统
+1. 元数据放到日志区
+2. 数据存储完毕，数据没有存储，电源关闭。开机直接在日志区中修复。
+3. 元数据放到元数据区
 
-		创建文件系统：mkfs -t, mkfs.ext2, mke2fs -t
-		检测及修复文件系统：fsck,fsck.ext2,fsc.ext3....
-		查看属性：dumpe2fs
-		修改属性：tune2fs
+- 优势：数据保证
+- 缺点：性能损失（IO读取）
 
-		创建文件系统工具
-			mkfs -t ext2 ext3 ext4 xfs vfat
-			mkfs.ext2, mkfs.ext3, mkfx.ex4, mkfs.xfs, mkfs.vfat
-			mke2fs -t ext2 ext3 ext4 xfs
+## 链接文件：访问同一个文件, 观世音菩萨，路径
+- 硬链接：指向同一个inode的多个文件路径
+	+ 特性：
+		* 1、目录不支持硬链接（避免循环链接）
+		* 2、不能跨文件系统(不同的inode独立管理的)
+		* 3、创建硬链接会增加inode应用计数
+	
+	+ 用法：
+		* `# ln source link_file`
 
-		检测及修复文件系统的工具
-			fsck
-			fsck.ext2 fsck.ext3,..
+- 符号链接：指向一个文件路径的另一个文件路径
+	+ Inode当中指针不指向磁盘块，而是指向访问文件的路径
+	
+	+ 特性：
+		* 1. 符号链接与文件是各自独立的文件，各有自己的inode；对原文件创建符号不会增加inode引用计数；
+		* 2. 支持目录创建符号链接，可以跨文件系统
+		* 3. 删除符号链接文件不影响原文件；但删除原文件，符号指定的路径不存在，此时会变成无效链接
+		* 4. 符号链接大小是其指定的文件的路径字符串的字符数
+	
+- 用法：`# ln -sv source link_file`
 
-		查看其属性的工具
-			dumpe2fs, tune2fs
+## stat命令
+- Regular file
+- Symbolic file
 
-		调整文件系统特性：
-			tune2fs
+## 文件系统的组织结构中的术语：
+- block groups, block,inode tables, inode, inode bitmap, block bitmap,superblock, block group descriptor
 
-		内核及文件系统的组成部分：
-			文件系统驱动：由内核提供
-			文件系统管理工具：由用户空间的应用程序提供
+## Linux信息：
+- /etc/issue
+	+ CentOS release 6.7 (Final)
+- `uname -r`
+	+ 2.6.32-573.el6.x86_64
 
-	查看内核装载模块：
-		1.装载模块到内核：
-			# lsmod
-
-		2.编译进内核模块，内核一部分；
-			# lsmod命令看不到
-
-	文件系统类型：
-		日记型文件系统：journal, ext3, ext4, xfs
-		非日记型文件系统：ext2,vfat
-
-	日志文件系统
-		1、元数据放到日志区
-		2、数据存储完毕，数据没有存储，电源关闭。开机直接在日志区中修复。
-		3、元数据放到元数据区
-
-		优势：数据保证
-		缺点：性能损失（IO读取）
-
-	链接文件：访问同一个文件, 观世音菩萨，路径
-		硬链接：指向同一个inode的多个文件路径
-			特性：
-				1、目录不支持硬链接（避免循环链接）
-				2、不能跨文件系统(不同的inode独立管理的)
-				3、创建硬链接会增加inode应用计数
-			
-			用法：
-				# ln source link_file
-
-		符号链接：指向一个文件路径的另一个文件路径
-			Inode当中指针不指向磁盘块，而是指向访问文件的路径
-			
-			特性：
-				1、符号链接与文件是各自独立的文件，各有自己的inode；对原文件创建符号不会增加inode引用计数；
-				2、支持目录创建符号链接，可以跨文件系统
-				3、删除符号链接文件不影响原文件；但删除原文件，符号指定的路径不存在，此时会变成无效链接
-				4、符号链接大小是其指定的文件的路径字符串的字符数
-			
-			用法：
-				# ln -sv source link_file
-
-	stat命令
-		Regular file
-		Symbolic file
-
-	文件系统的组织结构中的术语：
-		block groups, block,inode tables, inode, inode bitmap, block bitmap,superblock, block group descriptor
-
-	Linux信息：
-		/etc/issue
-			CentOS release 6.7 (Final)
-		uname -r
-			2.6.32-573.el6.x86_64
-
-文件系统管理工具：
+## 文件系统管理工具
 
 	ext系列文件系统的管理工具：
 		mkfs.ext2, mkfs.ext3, mkfs.ext4
