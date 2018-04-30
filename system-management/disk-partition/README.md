@@ -277,7 +277,7 @@
 - 符号链接文件：存储数据指针的空间当中存储的是真实文件的访问路径
 - 设备文件：存储数据指针的空间当中存储的是设备号（major,minor）
 
-## 文件系统管理工具：
+## 文件系统管理工具
 - 创建文件系统：mkfs -t, mkfs.ext2, mke2fs -t
 - 检测及修复文件系统：fsck,fsck.ext2,fsc.ext3....
 - 查看属性：dumpe2fs
@@ -295,18 +295,18 @@
 ## 查看其属性的工具
 - dumpe2fs, tune2fs
 
-## 调整文件系统特性：
+## 调整文件系统特性
 - tune2fs
 
-## 内核及文件系统的组成部分：
+## 内核及文件系统的组成部分
 - 文件系统驱动：由内核提供
 - 文件系统管理工具：由用户空间的应用程序提供
 
 ## 查看内核装载模块
 1. 装载模块到内核：`# lsmod`
-2.编译进内核模块，内核一部分；`# lsmod命令看不到`
+2. 编译进内核模块，内核一部分；`# lsmod命令看不到`
 
-## 文件系统类型：
+## 文件系统类型
 - 日记型文件系统：journal, ext3, ext4, xfs
 - 非日记型文件系统：ext2,vfat
 
@@ -319,23 +319,21 @@
 - 缺点：性能损失（IO读取）
 
 ## 链接文件：访问同一个文件, 观世音菩萨，路径
-- 硬链接：指向同一个inode的多个文件路径
-	+ 特性：
-		* 1、目录不支持硬链接（避免循环链接）
-		* 2、不能跨文件系统(不同的inode独立管理的)
-		* 3、创建硬链接会增加inode应用计数
-	
-	+ 用法：
-		* `# ln source link_file`
+### 硬链接：多个文件路径指向同一个 inode
+- 特性：
+	1. 目录不支持硬链接（避免循环链接）
+	2. 不能跨文件系统(不同的inode独立管理的)
+	3. 创建硬链接会增加inode应用计数
 
-- 符号链接：指向一个文件路径的另一个文件路径
-	+ Inode当中指针不指向磁盘块，而是指向访问文件的路径
-	
-	+ 特性：
-		* 1. 符号链接与文件是各自独立的文件，各有自己的inode；对原文件创建符号不会增加inode引用计数；
-		* 2. 支持目录创建符号链接，可以跨文件系统
-		* 3. 删除符号链接文件不影响原文件；但删除原文件，符号指定的路径不存在，此时会变成无效链接
-		* 4. 符号链接大小是其指定的文件的路径字符串的字符数
+- 用法：`# ln source link_file`
+
+### 符号链接：指向一个文件路径的另一个文件路径
+- Inode 当中指针不指向磁盘块，而是指向访问文件的路径
+- 特性
+	1. 符号链接与文件是各自独立的文件，各有自己的inode；对原文件创建符号不会增加inode引用计数
+	2. 支持目录创建符号链接，可以跨文件系统
+	3. 删除符号链接文件不影响原文件；但删除原文件，符号指定的路径不存在，此时会变成无效链接
+	4. 符号链接大小是其指定的文件的路径字符串的字符数
 	
 - 用法：`# ln -sv source link_file`
 
@@ -352,272 +350,274 @@
 - `uname -r`
 	+ 2.6.32-573.el6.x86_64
 
-## 文件系统管理工具
+# 文件系统管理工具
 
-	ext系列文件系统的管理工具：
-		mkfs.ext2, mkfs.ext3, mkfs.ext4
-		mkfs -t ext2 = mkfs.ext2
+## ext系列文件系统的管理工具：
+- mkfs.ext2, mkfs.ext3, mkfs.ext4
+- mkfs -t ext2 = mkfs.ext2
 
-	ext系列文件系统专用管理工具：mke2fs
-		mke2fs [OPTIONS] device
-			-t {ext2|ext3|ext4}：指明要创建的文件系统类型
-			
-		mkfs.ext4 = mkfs -t ext4 = mke2fs -t ext4
-			-b {1024|2048|4096}:文件系统块大小，默认4096
-			-L LABEL：指明卷标, blkid /dev/sda3
-			-j：创建有日志功能的文件系统
-					mke2fs -j = mke2fs -t ext3 = mkfs -t ext3 = mkfs.ext3 = mke2fs -O has_journal
-			-i #：bytes-per-inode, inode与字节的比率，每多少字节创建一个inode
-			-N #：直接指明给此文件系统创建的inode数量
-			-m #：预留空间百分比
-
-			-O [^]feature：特性,指定的特性创建目标文件系统，^取消特性
-
-	e2label命令：查看与设定卷标
-		查看：# e2label device
-		设定：# e2label device LABEL 
-
-	tune2fs命令：查看或修改ext系列文件系统的某些属性；块大小创建后不可修改
-		tune2fs [OPTIONS] device
-		-l:查看超级块信息
-			FileSystem magic number: 文件系统类型标识
-			Filesystem state: clean(文件没有损坏状态) dirty
-
-		修改指定文件系统的属性：
-			-j: ext2 --> ext3
-			-L LABEL：修改卷标
-			-m #: 调整预留给百分比，默认5%
-			-O [^]feather开启或关闭某种特性
-				# tune2fs -O ^has_journal /dev/sda5
-            -o [^]mount_options：开启或关闭某种默认挂载选项 
-				acl：是否支持facl功能
-
-	dumpe2fs命令：显示ext系列文件系统的属性详细信息
-		dumpe2fs [-h] device 显示超级块信息
-
-	fsck命令：系统突然断电，手动执行文件系统的检测，修复命令
-	因进程意外终止或系统崩溃等原因导致定稿操作非正常终止时，可能会造成文件损坏；此时，应该检测并修复文件系统；建议，离线进行；
-
-	ext系列文件系统的专用工具：
-		e2fsck - check a Linux ext2/ext3/ext4 file system
-			e2fsck [OPTIONS] device
-				-y：对所有问题自动回答为yes
-				-f：即使文件系统处理clean状态，也要进行强制进行检查
-
-		fsck：check repare a Linux file system
-			-t fstype：指明文件系统类型
-				fsck -t ext4 = fsck.ext4
-			-a：无需交互自动修复所有操作
-			-r：交互式修复
-
-	blkid命令：blkid [OPITONS] device
-		blkid -L LABEL:根据LABEL定位设备
-		blkid -U UUID：根据UUID定位设备
-
-	CentOS 6默认不支持xfs文件系统，需要安装rpm包：
-
-		1. 修改yum源cd /etc/yum.repos.d/
-			# wget http://172.16.0.1/centos6.7.repo
-			# mv CentOS-Base.repo CentOS-Base.repo.bak
-		2. # yum install xfsprogs
-		   # yum -ql xfsprogs
-		3. # mkfs.xfs -f DEVICE
+## ext系列文件系统专用管理工具：mke2fs
+- mke2fs [OPTIONS] device
+	+ -t {ext2|ext3|ext4}：指明要创建的文件系统类型
 		
-		# blkid DEVICE
-		SEC_TYPE=安全类型
+- mkfs.ext4 = mkfs -t ext4 = mke2fs -t ext4
+	+ -b {1024|2048|4096}:文件系统块大小，默认4096
+	+ -L LABEL：指明卷标, blkid /dev/sda3
+	+ -j：创建有日志功能的文件系统
+			mke2fs -j = mke2fs -t ext3 = mkfs -t ext3 = mkfs.ext3 = mke2fs -O has_journal
+	+ -i #：bytes-per-inode, inode与字节的比率，每多少字节创建一个inode
+	+ -N #：直接指明给此文件系统创建的inode数量
+	+ -m #：预留空间百分比
 
-	swap文件系统
-		Linux上的交换分区必须使用独立的文件系统
-		且文件系统上的System ID必须为82
+	+ -O [^]feature：特性,指定的特性创建目标文件系统，^取消特性
 
-		创建swap设备：mkswap命令
-			mkswap [options] device
-				-L LABEL：指明卷标
-				-f：强制
+## e2label命令：查看与设定卷标
+- 查看：`# e2label device`
+- 设定：`# e2label device LABEL`
 
-	Windows无法识别Linux的文件系统； 因此，存储设备需要两种系统之间交叉使用时，应该使用windows和Linux同时支持的文件系统：fat32(vfat); 
-		# mkfs.vfat device
+## tune2fs命令：查看或修改ext系列文件系统的某些属性；块大小创建后不可修改
+- tune2fs [OPTIONS] device
+	+ -l:查看超级块信息
+		* FileSystem magic number: 文件系统类型标识
+		* Filesystem state: clean(文件没有损坏状态) dirty
 
-	文件系统的使用：
-		首先要"挂载"：mount命令和umount命令
-			
-		根文件系统这外的其它文件系统要想能够被访问，都必须通过“关联”至根文件系统上的某个目录来实现，此关联操作即为“挂载”；此目录即为“挂载点”；
-			
-		挂载点：mount_point，用于作为另一个文件系统的访问入口；
-			(1) 事先存在；
-			(2) 应该使用未被或不会被其它进程使用到的目录；
-			(3) 挂载点下原有的文件将会被隐藏；
+- 修改指定文件系统的属性
+	+ -j: ext2 --> ext3
+	+ -L LABEL：修改卷标
+	+ -m #: 调整预留给百分比，默认5%
+	+ -O [^]feather开启或关闭某种特性
+	+ # tune2fs -O ^has_journal /dev/sda5
+	+ -o [^]mount_options：开启或关闭某种默认挂载选项 
+	+ acl：是否支持facl功能
+
+## dumpe2fs命令：显示ext系列文件系统的属性详细信息
+- dumpe2fs [-h] device 显示超级块信息
+
+## fsck命令：系统突然断电，手动执行文件系统的检测，修复命令
+> 因进程意外终止或系统崩溃等原因导致定稿操作非正常终止时，可能会造成文件损坏；此时，应该检测并修复文件系统；建议，离线进行；
+
+## ext系列文件系统的专用工具：
+- e2fsck - check a Linux ext2/ext3/ext4 file system
+- e2fsck [OPTIONS] device
+	+ -y：对所有问题自动回答为yes
+	+ -f：即使文件系统处理clean状态，也要进行强制进行检查
+
+- fsck：check repare a Linux file system
+	+ -t fstype：指明文件系统类型
+	+ fsck -t ext4 = fsck.ext4
+	+ -a：无需交互自动修复所有操作
+	+ -r：交互式修复
+
+## blkid命令：blkid [OPITONS] device
+- blkid -L LABEL:根据LABEL定位设备
+- blkid -U UUID：根据UUID定位设备
+
+## CentOS 6默认不支持xfs文件系统，需要安装rpm包：
+1. 修改yum源cd /etc/yum.repos.d/
+```
+# wget http://172.16.0.1/centos6.7.repo
+# mv CentOS-Base.repo CentOS-Base.repo.bak
+```
+2. # yum install xfsprogs
+`# yum -ql xfsprogs`
+3. # mkfs.xfs -f DEVICE
+	
+## blkid DEVICE
+- SEC_TYPE=安全类型
+
+## swap文件系统
+- Linux上的交换分区必须使用独立的文件系统
+- 且文件系统上的System ID必须为82
+
+- 创建swap设备：mkswap命令
+```
+mkswap [options] device
+	-L LABEL：指明卷标
+	-f：强制
+```
+
+- Windows无法识别Linux的文件系统； 因此，存储设备需要两种系统之间交叉使用时，应该使用windows和Linux同时支持的文件系统：fat32(vfat); 
+`# mkfs.vfat device`
+
+## 文件系统的使用
+首先要"挂载"：mount命令和umount命令
 		
-	mount命令：
-		mount  [-nrw]  [-t vfstype]  [-o options]  device  dir
-			命令选项：
-				-r：readonly，只读挂载
-				-w：read and write, 读写挂载
-				-n：默认设备挂载或卸载的操作会同步更新至/etc/mtab文件中；用于禁止此特性
-				-t vfstype：指明要挂载的设备上的文件系统的类型；多数情况下可省略，此时mount会通过blkid来判断要挂载的设备的文件系统类型
+根文件系统这外的其它文件系统要想能够被访问，都必须通过“关联”至根文件系统上的某个目录来实现，此关联操作即为“挂载”；此目录即为“挂载点”；
+		
+挂载点：mount_point，用于作为另一个文件系统的访问入口；
+1. 事先存在；
+2. 应该使用未被或不会被其它进程使用到的目录；
+3. 挂载点下原有的文件将会被隐藏；
+		
+# mount命令
+`mount  [-nrw]  [-t vfstype]  [-o options]  device  dir`
+## 命令选项
+- -r：readonly，只读挂载
+- -w：read and write, 读写挂载
+- -n：默认设备挂载或卸载的操作会同步更新至/etc/mtab文件中；用于禁止此特性
+- -t vfstype：指明要挂载的设备上的文件系统的类型；多数情况下可省略，此时mount会通过blkid来判断要挂载的设备的文件系统类型
+
+- -L LABEL：挂载时以卷标的方式指明设备
+	+ # mount -L LABEL dir
+- -U UUID：挂载时以UUID的方式指明设备
+	+ # mount -U UUID dir
+	
+- -o options：挂载选项
+	+ sync/async：同步/异步操作
+	+	异步：进程中写入磁盘先存入内存，然后写入磁盘
+	+	同步：立即写入到磁盘上
+	+ atime/noatime(default)：文件或目录在被访问时是否更新其访问时间戳
+	+ diratime/nodiratime(default)：目录在被访问时是否更新其访问时间戳		remount：不用卸载，重新挂载
+	+ acl：支持使用facl功能
+		* # mount -o acl device dir 
+		* # tune2fs  -o  acl  device 
+	+ ro：只读 
+	+ rw：读写	
+	+ dev/nodev：此设备上是否允许创建设备文件
+	+ exec/noexec：是否允许运行此设备上的程序文件
+	+ auto/noauto：自动挂载（写人/etc/fstab文件中才能自动挂载）
+	+ user/nouser：是否允许普通用户挂载此文件系统
+	+ suid/nosuid：是否允许程序文件上的suid和sgid特殊权限生效	
+	+ relatime/norelatime：是否参考修改或更新来更新访问时间
+	
+	+ defaults：rw, suid, dev, exec, auto, nouser, async, and relatime.
 				
-				-L LABEL：挂载时以卷标的方式指明设备
-					# mount -L LABEL dir
-				-U UUID：挂载时以UUID的方式指明设备
-					# mount -U UUID dir
+- 可以实现将目录绑定至另一个目录上，作为其临时访问入口；
+`# mount --bind  源目录  目标目录`
 					
-				-o options：挂载选项
-					sync/async：同步/异步操作
-						异步：进程中写入磁盘先存入内存，然后写入磁盘
-						同步：立即写入到磁盘上
-					atime/noatime(default)：文件或目录在被访问时是否更新其访问时间戳
-					diratime/nodiratime(default)：目录在被访问时是否更新其访问时间戳		remount：不用卸载，重新挂载
-					acl：支持使用facl功能
-						# mount -o acl device dir 
-						# tune2fs  -o  acl  device 
-					ro：只读 
-					rw：读写	
-					dev/nodev：此设备上是否允许创建设备文件
-					exec/noexec：是否允许运行此设备上的程序文件
-					auto/noauto：自动挂载（写人/etc/fstab文件中才能自动挂载）
-					user/nouser：是否允许普通用户挂载此文件系统
-					suid/nosuid：是否允许程序文件上的suid和sgid特殊权限生效	
-					relatime/norelatime：是否参考修改或更新来更新访问时间
-					
-					defaults：rw, suid, dev, exec, auto, nouser, async, and relatime.
-						
-			* 可以实现将目录绑定至另一个目录上，作为其临时访问入口；
-				# mount --bind  源目录  目标目录
-						
-			查看当前系统所有已挂载的设备：
-				# mount 
-				# cat  /etc/mtab
-				# cat  /proc/mounts
-					
-			挂载光盘：
-				# mount  -r  /dev/cdrom  mount_point
-					
-			光盘设备文件
-				IDE：/dev/hdc
-				SATA: /dev/sr0
+## 查看当前系统所有已挂载的设备：
+```
+# mount 
+# cat  /etc/mtab
+# cat  /proc/mounts
+```				
+- 挂载光盘：`# mount  -r  /dev/cdrom  mount_point`
+- 光盘设备文件
+	+ IDE：/dev/hdc
+	+ SATA: /dev/sr0
 
-				符号链接文件：
-					/dev/cdrom
-					/dev/cdrw
-					/dev/dvd
-					/dev/dvdrw
+- 符号链接文件：
+	+ /dev/cdrom
+	+ /dev/cdrw
+	+ /dev/dvd
+	+ /dev/dvdrw
 
-					# mount -r device mount_point
-					# mount /dev/cdrom
+```
+# mount -r device mount_point
+# mount /dev/cdrom
+```
+
+- 挂载U盘：事先识别U盘的设备文件
+- 保证你的U盘的格式是fat格式
+`# mount -t vfat /dev/sdb /mnt/usb`
+
+
+## 挂载本地的回环设备：光盘镜像文件
+```
+# mount -o loop /PATH/TO/SOME_LOOP_FILE MOUNT_POINT 
+# mount -o loop /XXX.iso或img	/media
+```
+
+## umount 命令
+`umount  device|dir`
 		
-			挂载U盘：事先识别U盘的设备文件
-				保证你的U盘的格式是fat格式
-				# mount -t vfat /dev/sdb /mnt/usb
-
-
-			挂载本地的回环设备：光盘镜像文件
-				# mount -o loop /PATH/TO/SOME_LOOP_FILE MOUNT_POINT 
-				# mount -o loop /XXX.iso或img	/media
-					
-	umount命令：
-		umount  device|dir
+- 注意：正在被进程访问到的挂载点无法被卸载；
+- 查看被哪个或哪些进程所战用：
+`# lsof  MOUNT_POINT`
+`# fuser -v  MOUNT_POINT`
 			
-		注意：正在被进程访问到的挂载点无法被卸载；
-		查看被哪个或哪些进程所战用：
-			# lsof  MOUNT_POINT
-			# fuser -v  MOUNT_POINT
+- 终止所有正在访问某挂载点的进程：
+	+ `# fuser  -km  MOUNT_POINT`
 					
-		终止所有正在访问某挂载点的进程：
-			# fuser  -km  MOUNT_POINT
-					
-交换分区的启用和禁用：
-	创建交换分区的命令：mkswap
+## 交换分区的启用和禁用：
+- 创建交换分区的命令：mkswap		
+- 启用：swapon
+```
+swapon  [OPTION]  [DEVICE]
+	-a：定义在/etc/fstab文件中的所有swap设备；
+```				
+- 禁用：swapoff
+`swapoff DEVICE`
+			
+	
+## 设定除根文件系统以外的其它文件系统能够开机时自动挂载：/etc/fstab文件 
+- 每行定义一个要挂载的文件系统及相关属性：6个字段
+1. 要挂载的设备
+	设备文件
+	LABEL
+	UUID
+	伪文件系统：如sysfs, proc, tmpfs等
+
+	LABEL=MYSAA
+	UUID=209909sf0ad9f0asdf0a9sf
+
+2. 挂载点 
+	swap类型的设备的挂载点为swap
+3. 文件系统类型
+4. 挂载选项
+	defaults：使用默认挂载选项；
+	如果要同时指明多个挂载选项，彼此间以事情分隔；
+		defaults,acl,noatime,noexec
+5. 转储频率
+	0：从不备份
+	1：每天备份
+	2：每隔一天备份
+6. 自检次序（自检系统文件系统是否有损坏）
+	0：不自检
+	1：首先自检，通常只能是根文件系统可用1
+	2：次级自检
+
+`# mount -a` 可自动挂载定义在此文件中的所支持自动挂载的设备；
+			
+## df命令：disk free，磁盘挂载情况
+```
+df [OPTION]... [FILE]...
+	-l：仅显示本地文件的相关信息，不现实网络文件系统
+	-h：human-readable
+	-i：显示inode的使用状态而非blocks
+```		
+
+## du命令：disk user磁盘使用状态，当前目录下所有文件大小
+```
+du [OPTION]... [FILE]...
+	-s: 只显示总大小，sumary
+	-h: human-readable
+```
+
+### 练习：
+1. 创建一个10G的分区，并格式化为ext4文件系统； 
+	1.1 block大小为2048；预留空间为2%，卷标为MYDATA；
+	1.2 挂载至/mydata目录，要求挂载时禁止程序自动运行，且不更新文件的访问时间戳；
+	1.3 可开机自动挂载；
 		
-		启用：swapon
-			swapon  [OPTION]  [DEVICE]
-				-a：定义在/etc/fstab文件中的所有swap设备；
-					
-		禁用：swapoff
-			swapoff DEVICE
-			
-	设定除根文件系统以外的其它文件系统能够开机时自动挂载：/etc/fstab文件 
-		每行定义一个要挂载的文件系统及相关属性：
-			6个字段：
-				(1) 要挂载的设备
-					设备文件
-					LABEL
-					UUID
-					伪文件系统：如sysfs, proc, tmpfs等
-
-					LABEL=MYSAA
-					UUID=209909sf0ad9f0asdf0a9sf
-
-				(2) 挂载点 
-					swap类型的设备的挂载点为swap
-				(3) 文件系统类型
-				(4) 挂载选项
-					defaults：使用默认挂载选项；
-					如果要同时指明多个挂载选项，彼此间以事情分隔；
-						defaults,acl,noatime,noexec
-				(5) 转储频率
-					0：从不备份
-					1：每天备份
-					2：每隔一天备份
-				(6) 自检次序（自检系统文件系统是否有损坏）
-					0：不自检
-					1：首先自检，通常只能是根文件系统可用1
-					2：次级自检
-			mount -a：可自动挂载定义在此文件中的所支持自动挂载的设备；
-			
-	df命令：disk free，磁盘挂载情况
-		df [OPTION]... [FILE]...
-			-l：仅显示本地文件的相关信息，不现实网络文件系统
-			-h：human-readable
-			-i：显示inode的使用状态而非blocks
-			
-	du命令：disk user磁盘使用状态，当前目录下所有文件大小
-		du [OPTION]... [FILE]...
-			-s: 只显示总大小，sumary
-			-h: human-readable
+2.创建一个大小为1G的swap分区，并启动之；
 				
-	练习：
-		1、创建一个10G的分区，并格式化为ext4文件系统； 
-			(1) block大小为2048；预留空间为2%，卷标为MYDATA；
-			(2) 挂载至/mydata目录，要求挂载时禁止程序自动运行，且不更新文件的访问时间戳；
-			(3) 可开机自动挂载；
-			
-		2、创建一个大小为1G的swap分区，并启动之；
 		
-	管理工具：mkfs, mke2fs, e2label, tune2fs, dumpe2fs, e2fsck, blkid
-		mkfs.xfs, mkfs.vfat, fsck
-		mkswap, swapon, swapoff
-		mount, umount, fuser, lsof
-		df, du
-		
-		
-	文件系统：
-		目录：文件
-			元数据：inode, inode table
-			数据：data blocks
-				下级文件或目录的文件名与其inode对应关系
-				dentry
-		文件名：上级目录；
-		
-		删除文件：将此文件指向的所有data block标记为未使用状态；将此文件的inode标记为未使用；
-		复制和移动文件：
-			复制：新建文件；
-			移动文件：
-				在同一文件系统：改变的仅是其路径；
-				在不同文件系统：复制数据至目标文件，并删除原文件；
-				
-		符号链接：
-			权限：lrwxrwxrwx，其指向链接的文件
-		硬链接：指向同一个inode；
+## 文件系统：
+- 目录：文件
+	+ 元数据：inode, inode table
+	+ 数据：data blocks
+		* 下级文件或目录的文件名与其inode对应关系
+		* dentry
+- 文件名：上级目录；
 
-## RAID 
+- 删除文件：将此文件指向的所有data block标记为未使用状态；将此文件的inode标记为未使用；
+- 复制和移动文件：
+	+ 复制：新建文件；
+	+ 移动文件：
+		* 在同一文件系统：改变的仅是其路径；
+		* 在不同文件系统：复制数据至目标文件，并删除原文件；
+		
+- 符号链接：
+	+ 权限：lrwxrwxrwx，其指向链接的文件
+- 硬链接：指向同一个inode；
 
+
+# RAID 
 - Redundant Arrays of Inexpensive Disks 廉价磁盘冗余阵列
 - Redundant Arrays of Independent Disks 独立磁盘冗余陈列
-
 - Berkeley: A case for Redundent Arrays of Inexpensive Disks RAID
-
 > 多块硬盘按照某种组织格式形成一个硬盘使用
-
 - 作用
 	+ 提高IO能力
 		* 磁盘并行读写（内置raid内存,额外供电防止断电导致数据丢失）
@@ -626,176 +626,184 @@
 
 - 级别：多块磁盘组织在一起的工作方式有所不同
 
-- RAID实现方式：
-	+ 外界式磁盘阵列：通过扩展卡适配能力
-	+ 内接式RAID：主板集成RAID控制器
-	+ Software RAID
-
+## RAID实现方式：
+- 外界式磁盘阵列：通过扩展卡适配能力
+- 内接式RAID：主板集成RAID控制器
+- Software RAID
 - BIOS:外界式/内接式，安装OS之前配置好
 
-- 级别：level
+## 级别：level
 >磁盘组织形式不同，0-7
 
-	+ RAID-0：0，条带卷，strip
-		* 若干个chunk平均分散存储
-		* 磁盘上一块由若干个地址连接的磁盘块构成的大小固定的区域
-		* chunk：块
+### RAID-0：0，条带卷，strip
+- 若干个chunk平均分散存储
+- 磁盘上一块由若干个地址连接的磁盘块构成的大小固定的区域
+- chunk：块
 
-		* 读、写性能提升
-		* 可用空间：N*min(S1,S2,...) 10G, 20G, 30G => 10G,10G,10G
-		* 无容错能力
-		* 最少磁盘数：2,2+
+- 读、写性能提升
+- 可用空间：N*min(S1,S2,...) 10G, 20G, 30G => 10G,10G,10G
+- 无容错能力
+- 最少磁盘数：2,2+
 
-		* 优点：提供IO并行
-		* 缺点：减低耐用性，任何一块硬盘损坏全部损毁
-		* 用途：非关键性数据，临时文件系统、交互数据等
+- 优点：提供IO并行
+- 缺点：减低耐用性，任何一块硬盘损坏全部损毁
+- 用途：非关键性数据，临时文件系统、交互数据等
 
-	+ RAID-1: 1, 镜像卷，mirror
-		* 若干个chunk分别存储
+### RAID-1: 1, 镜像卷，mirror
+- 若干个chunk分别存储
 
-		* 读性能提升：不同的磁盘上读取
-		* 写性能略有下降：同一个数据分别不同的磁盘上
-		* 可用空间：1*min(S1,S2,S3,...)10G,20G => 10G最少硬盘决定可用空间
-		* 有冗余能力
-		* 最少磁盘数：2,2+
+- 读性能提升：不同的磁盘上读取
+- 写性能略有下降：同一个数据分别不同的磁盘上
+- 可用空间：1*min(S1,S2,S3,...)10G,20G => 10G最少硬盘决定可用空间
+- 有冗余能力
+- 最少磁盘数：2,2+
 
-	+ RAID-4: 4
-		* 至少三个磁盘，2个数据盘，1个校验盘
-		* 2个数据盘(RAID0)
-		* 1个校验盘(2个数据盘上的数据^运算结果)
-		* 例如：
-			+ 1101^0110 => 1011
-			+ 一个硬盘损坏，降级工作模式；及时更换硬盘
-			+ 有灯来指示是否损坏
-			+ 监控工具监听数据
-			+ 硬件接口API
+### RAID-4: 4
+- 至少三个磁盘，2个数据盘，1个校验盘
+- 2个数据盘(RAID0)
+- 1个校验盘(2个数据盘上的数据^运算结果)
+- 例如：
+	+ 1101^0110 => 1011
+	+ 一个硬盘损坏，降级工作模式；及时更换硬盘
+	+ 有灯来指示是否损坏
+	+ 监控工具监听数据
+	+ 硬件接口API
 
-		* 使用热备份(备胎)
-		* 总结：性能差、有冗余能力
+- 使用热备份(备胎)
+- 总结：性能差、有冗余能力
 
-	+ RAID-5: 5,
-		* 校验码轮流放入不同的磁盘上
-		* 数据布局：左称线
+### RAID-5: 5
+- 校验码轮流放入不同的磁盘上
+- 数据布局：左称线
 
-		* 读、写性能提升
-		* 可用空间：(N-1)*min(S1,S2,S3,...) 
-		* 10G 20G 30G
-		* 10G
-		* 有容错能力：1块磁盘
-		* 最少磁盘数：3,3+
+- 读、写性能提升
+- 可用空间：(N-1)*min(S1,S2,S3,...) 
+- 10G 20G 30G
+- 10G
+- 有容错能力：1块磁盘
+- 最少磁盘数：3,3+
 
-	+ RAID-6: 6
-		* 2个校验盘、2个数据盘
-		* 读、写性能提升
-		* 可用空间：（N-2）*min(S1,S2,...)
-		* 有容错能力：2块磁盘
-		* 最少磁盘数：4，4+
+### RAID-6: 6
+- 2个校验盘、2个数据盘
+- 读、写性能提升
+- 可用空间：（N-2）*min(S1,S2,...)
+- 有容错能力：2块磁盘
+- 最少磁盘数：4，4+
 
-	+ RAID-10:
-		* 先做1，后做0（从下往上）
-		* 读、写性能提升
-		* 可用空间：N*min(S1,S2,...)/2
-		* 有容错能力：每组镜像最多只能坏一块
-		* 最少磁盘数：4,4+
+### RAID-10
+- 先做1，后做0（从下往上）
+- 读、写性能提升
+- 可用空间：N*min(S1,S2,...)/2
+- 有容错能力：每组镜像最多只能坏一块
+- 最少磁盘数：4,4+
 
-	+ RAID-01:
-		* 先做0，后做1（从下往上）
-	
-	+ RAID-50:
-		* 先做0，后做1（从下往上）
-		* 至少6个
-		* 最多只能坏一个
-	
-	+ RAID-7:
-		* IO能力非常好，价格昂贵
+### RAID-01:
+- 先做0，后做1（从下往上）
 
-	+ JBOD: Just a Bunch Of Disks
-		- 单个文件3.5T
-		- 4个每个1T
-		- 功能：将多块磁盘的空间合并一个大的连续空间使用
-		- 可用空间：sum(S1,S2,...)
+### RAID-50:
+- 先做0，后做1（从下往上）
+- 至少6个
+- 最多只能坏一个
 
-- 常用级别：RAID-0, RAID-1, RAID-5, RAID-10, RAID-50， JBOD
-- 实现方式：
-	+ 硬件实现方式
-	+ 软件实现方式
+### RAID-7:
+- IO能力非常好，价格昂贵
 
-### CentOS 6上的软件RAID的实现
+### JBOD: Just a Bunch Of Disks
+- 单个文件3.5T
+- 4个每个1T
+- 功能：将多块磁盘的空间合并一个大的连续空间使用
+- 可用空间：sum(S1,S2,...)
+
+### 常用级别：RAID-0, RAID-1, RAID-5, RAID-10, RAID-50， JBOD
+### 实现方式：
+- 硬件实现方式
+- 软件实现方式
+
+# CentOS 6上的软件 RAID 的实现
 > 结合内核中的**md模块**（multi deviced）
-mdadm命令与内核中进行通信，与系统调用通信
 
-- mdadm：模式化的工具，CentOS 6,7之后md有变化
-	+ 命令语法格式：mdadm [mode] <raiddevice> [options] <component-devices>
+- mdadm命令与内核中进行通信，与系统调用通信
+
+## mdadm：模式化的工具，CentOS 6,7之后md有变化
+- 命令语法格式：`mdadm [mode] <raiddevice> [options] <component-devices>`
 		
-		* 支持的RAID级别：LINER,RAID0，RAID1，RAID4， RAID5， RAID6， RAID10
-		* 模式：
-			+ 创建：-C
-			+ 装配：-A
-			+ 监控：-F follow
-			+ 管理：-f, -r, -a 
-		* raiddevice: /dev/md#
-		* component-devices：任意块设备，整个磁盘或分区
+- 支持的RAID级别：LINER,RAID0，RAID1，RAID4， RAID5， RAID6， RAID10
+- 模式：
+	+ 创建：-C
+	+ 装配：-A
+	+ 监控：-F follow
+	+ 管理：-f, -r, -a 
+- raiddevice: /dev/md#
+- component-devices：任意块设备，整个磁盘或分区
 
-	+ -C：创建模式
-		* -n #：使用#块设备来创建此RAID
-		* -l #：指明要创建的RAID的级别
-		* -a {yes|no} 是否自动创建目标RAID设备的设备文件
-		* -c CHUNK_SIZE：指明块大小，默认512kb
-		* -x #：指明空闲盘的个数；有冗余能力的；热备份，备胎
-		* 例如：创建一个10G可用空间的RAID5
-			+ $ fdisk /dev/sda{6,7,8,9}
-			+ 设备类型：fd Linux raid auto
+### -C：创建模式
+- -n #：使用#块设备来创建此RAID
+- -l #：指明要创建的RAID的级别
+- -a {yes|no} 是否自动创建目标RAID设备的设备文件
+- -c CHUNK_SIZE：指明块大小，默认512kb
+- -x #：指明空闲盘的个数；有冗余能力的；热备份，备胎
+- 例如：创建一个10G可用空间的RAID5
+	+ $ fdisk /dev/sda{6,7,8,9}
+	+ 设备类型：fd Linux raid auto
 
-	+ -D：显示raid的详细信息
-		* $ mdadm -D /dev/md[0-9]+
+### -D：显示raid的详细信息
+- `$ mdadm -D /dev/md[0-9]+`
 
-	+ 管理模式：
-		* -f: 标记指定磁盘为损坏
-		* -a：添加磁盘
-		* -r：移动磁盘
+### 管理模式：
+- -f: 标记指定磁盘为损坏
+- -a：添加磁盘
+- -r：移动磁盘
 
-	+ 观察md状态：
-		* $ cat /proc/mdstat
-		* $ watch -n1 'cat /proc/mdstat'
+### 观察md状态：
+- `$ cat /proc/mdstat`
+- `$ watch -n1 'cat /proc/mdstat'`
 
-	+ 停止md设备：
-		* $ mdadm -S /dev/md0
+### 停止md设备：
+- `$ mdadm -S /dev/md0`
 
-#### 彻底删除raid设备文件：
-	1. 卸载设备
-	2. 删除raid
-		$ mdadm /dev/md0 --fail /dev/sdb5 --remove /dev/sdb5
-		$ mdadm /dev/md0 --fail /dev/sdb6 --remove /dev/sdb6
-		$ mdadm /dev/md0 --fail /dev/sdb7 --remove /dev/sdb7
-		$ mdadm /dev/md0 --fail /dev/sdb8 --remove /dev/sdb8
-	3. 停止运行raid
-		$ mdadm -S /dev/md0
-		$ mdadm --remove /dev/md0
-		$ mdadm --misc --zero-superblock /dev/sdb5
-		$ mdadm --misc --zero-superblock /dev/sdb6
-		$ mdadm --misc --zero-superblock /dev/sdb7
-		$ mdadm --misc --zero-superblock /dev/sdb8
+#### 彻底删除raid设备文件
+1. 卸载设备
+2. 删除raid
+```
+$ mdadm /dev/md0 --fail /dev/sdb5 --remove /dev/sdb5
+$ mdadm /dev/md0 --fail /dev/sdb6 --remove /dev/sdb6
+$ mdadm /dev/md0 --fail /dev/sdb7 --remove /dev/sdb7
+$ mdadm /dev/md0 --fail /dev/sdb8 --remove /dev/sdb8
+```
+3. 停止运行raid
+```
+$ mdadm -S /dev/md0
+$ mdadm --remove /dev/md0
+$ mdadm --misc --zero-superblock /dev/sdb5
+$ mdadm --misc --zero-superblock /dev/sdb6
+$ mdadm --misc --zero-superblock /dev/sdb7
+$ mdadm --misc --zero-superblock /dev/sdb8
+```
 
-先删除RAID中的所有设备，然后停止该RAID即可
+- 先删除RAID中的所有设备，然后停止该RAID即可
 
-为了防止系统启动时候启动raid
-	$ rm -f /etc/mdadm.conf
-	$ rm -f /etc/raidtab
+- 为了防止系统启动时候启动raid
+```
+$ rm -f /etc/mdadm.conf
+$ rm -f /etc/raidtab
+```
 
-检查系统启动文件中是否还有其他mdad启动方式
-	$ vi /etc/rc.sysinit+/raid\c
+- 检查系统启动文件中是否还有其他mdad启动方式
+```
+$ vi /etc/rc.sysinit+/raid\c
+```
 
-watch options 'COMMAND'
-	-n #：刷新间隔，单位是秒
+## watch options 'COMMAND'
+- -n #：刷新间隔，单位是秒
 
-#### 创建一个10G可用的RAID5
+#### 创建一个 10G 可用的 RAID5
 > 3个5G或5个2.5G
-磁盘个数越多浪费空间越小，当组织处理多
-练习10G可用的RAID5，还有一个冗余磁盘
+- 磁盘个数越多浪费空间越小，当组织处理多
+- 练习 10G 可用的 RAID5，还有一个冗余磁盘
 
-1. Raid分区必须使用System ID为fd
-2. $ cat /proc/mdstat 查看md设备
-	$ ls -l /dev/ | grep md*
+1. Raid 分区必须使用 System ID 为 fd
+2. $ cat /proc/mdstat 查看 md 设备
+`$ ls -l /dev/ | grep md*`
 3. $ mdadm -C /dev/md0 -a yes -l 5 -x 1 -n 3 /dev/sdb{5,6,7,8}
 4. $ cat /proc/mdstat
 5. $ mke2fs -t ext /dev/md0
@@ -803,48 +811,45 @@ watch options 'COMMAND'
 7. $ mount /dev/md0 /mydata
 8. $ df -hl
 9. $ blkid /dev/md0
-10. 使用UUID或LABEL挂载到/etc/fstab
+10. 使用 UUID 或 LABEL 挂载到 /etc/fstab
 11. $ mdadm -D /dev/md0
-	D:Detail 信息
+- D:Detail 信息
 
 #### 损坏磁盘：自动热备份
-	1. $ mdadm /dev/md0 -f /dev/sdb5 标记为损坏
-	2. 每一秒钟刷新一次
-		$ watch -n1 'cat /proc/mdstat'
-	3. $ mdadm -D /dev/md0
+1. $ mdadm /dev/md0 -f /dev/sdb5 标记为损坏
+2. 每一秒钟刷新一次
+`$ watch -n1 'cat /proc/mdstat'`
+3. $ mdadm -D /dev/md0
 
-#### 再次损坏磁盘：
-	1. $ cat /etc/fstab /mydata
-	2. $ mdadm /dev/md0 -f /dev/sdb7
-	3. $ mdadm -D /dev/md0
-	4. $ cat /mydata/fstab
+#### 再次损坏磁盘
+1. $ cat /etc/fstab /mydata
+2. $ mdadm /dev/md0 -f /dev/sdb7
+3. $ mdadm -D /dev/md0
+4. $ cat /mydata/fstab
 
-#### 移除磁盘：
-	1. $ mdadm /dev/md0 -r /dev/两个丢失的磁盘
-	2. $ mdadm -D /dev/md0
-		State: clean, degraded（降级状态）
-		Layout: left-symmetric（左对称）
+#### 移除磁盘
+1. $ mdadm /dev/md0 -r /dev/两个丢失的磁盘
+2. $ mdadm -D /dev/md0
+	State: clean, degraded（降级状态）
+	Layout: left-symmetric（左对称）
 
 #### 添加磁盘
-	1. $ mdadm /dev/md0 -a /dev/sda?
-	2. $ mdadm -D /dev/md0
-		State: clean, degraded, recovering
+1. $ mdadm /dev/md0 -a /dev/sda?
+2. $ mdadm -D /dev/md0
+	State: clean, degraded, recovering
 
-在添加磁盘成为空闲盘使用，做冗余磁盘
+- 在添加磁盘成为空闲盘使用，做冗余磁盘
 
-练习：
-	1. 创建一个可用空间为10G的RAID0设备，要求其chunnk大小128k,文件系统为ext4，开机可自动挂载至/backup目录
-	2. 创建一个可用空间为10G的RAID10设备，要求其chunk大小为256k，文件系统为ext4，开机自动挂载至/my目录
+## 练习
+1. 创建一个可用空间为10G的RAID0设备，要求其chunnk大小128k,文件系统为ext4，开机可自动挂载至/backup目录
+2. 创建一个可用空间为10G的RAID10设备，要求其chunk大小为256k，文件系统为ext4，开机自动挂载至/my目录
 
-磁盘损坏导致数据丢失，但备份数据不能少
+## 磁盘损坏导致数据丢失，但备份数据不能少
 
-博客作业：raid各级别特性；
-
-
-## LVM
-**LVM**：Logical Volume Manager, Version: 2
-**dm模块**：device mapper，将一个或多个底层设备组织成一个逻辑设备的模块
-设备文件：/dev/md-#
+# LVM
+- **LVM**：Logical Volume Manager, Version: 2
+- **dm模块**：device mapper，将一个或多个底层设备组织成一个逻辑设备的模块
+- 设备文件：/dev/md-#
 
 - LV(Logical Volume) 
 	+ LE (Logic Extend)
@@ -858,63 +863,64 @@ watch options 'COMMAND'
 	<-- /dev/vol0/root
     <-- /dev/dm-0
 
-#### 创建步骤
+## 创建步骤
 1. create pv(pe)
 2. create vg
 3. create lv(le)
 
-#### LVM系统分区ID：**8e, Linux LVM**
+## LVM系统分区ID：**8e, Linux LVM**
 
-### pvcreate：创建pv
+## pvcreate：创建 pv
 - `$ pvcreate /dev/DEVICE`
 	+ `-v:verbose`
 	+ `-f:force 覆盖数据`
 
-### pvremove：移除pv
+## pvremove：移除pv
 - `$ pvremove /dev/DEVICE`
 
-### pvs,pvdisplay：查看pv
+## pvs,pvdisplay：查看pv
 - `$ pvs /dev/DEVICE` 		简要显示信息
 - `$ pvdisplay /dev/DEVICE` 详细显示信息
 		
-### 其他pv管理工具
+## 其他pv管理工具
 - pvmove
 - pvscan
 - pvresize
 - pvck
 - pvchange
 
-### vgs,vgdisplay: 查看vg
+## vgs,vgdisplay: 查看vg
 `$ vgs`
 `$ vgdisplay [vgName]`
 
-### vgcreate: 创建vg, 默认PE 4MB
+## vgcreate: 创建vg, 默认PE 4MB
 `$ vgcreate -s #[kKmMgGtTpPeE] vgName /dev/DEVICE ...`
 
-### vgremove: 移除vg
+## vgremove: 移除vg
 `$ vgremove -s #[kKmMgGtTpPeE] vgName /dev/DEVICE`
 
 ## vgextend: 扩展vg
 `$ vgextend vgname /dev/DEVICES`
 
-### vgreduce: 缩减vg
+## vgreduce: 缩减vg
 `$ pvmove /dev/DEVICE`			移动数据
 `$ vgreduce vgname /dev/DEVICE` 后缩减vg
 
-### lvs,lvdisplay: 查看lv
+## lvs,lvdisplay: 查看lv
 `$ lvs`
 `$ lvdisplay [/dev/vg0/root]`
 `$ lvdisplay [/dev/mapper/vg0-root]`
 
-### lvcreate, 创建lv
+## lvcreate, 创建lv
 `$ lvcreate -L #[mMgGtTpPeE] -n lvName vgName`
 `$ lcreate -L 8G -n lv0 vg0`
 `$ ls -l /dev/mapper/vg0-lv0 --> ../dm-0`
 
-### lvremove，移除lv
+## lvremove，移除lv
 `$ lvremove lvName vgName`
 
-### lextend, 扩展lv
+## lextend, 扩展lv
+```
 `$ lvextend -L +#[mMgGtT] /dev/vg0/lv0`
 `$ lvextend -L +2G /dev/vg0/lv0`
 +加多少
@@ -925,37 +931,38 @@ watch options 'COMMAND'
 文件系统没有扩展，所以没有显示增加的大小
 `$ resize2fs /dev/vg0/lv0` 扩展文件系统占用空间
 `$ df -hl`
+```
 
-### 缩减逻辑卷
+## 缩减逻辑卷
 1. `# umount /dev/VG_NAME/LV_NAME`
 2. `# e2fsck -f /dev/VG_NAME/LV_NAME` 文件系统强制检测
 3. `# resize2fs /dev/VG_NAME/LV_NAME #[mMgGtT]` 缩减文件系统大小
 4. `# lvreduce -L [-]#[mMgGtT] /dev/VG_NAME/LV_NAME`
 5. `# mount`
 
-##　快照：snapshot
-访问原卷的路径
-原卷发生变化时，把数据存储到快照卷上，然后修改原数据
-目的：文件的另一个访问路径，与硬链接相似
+#　快照：snapshot
+- 访问原卷的路径
+- 原卷发生变化时，把数据存储到快照卷上，然后修改原数据
+- 目的：文件的另一个访问路径，与硬链接相似
 
-### 创建快照,r只读
+## 创建快照,r只读
 `# lvcreate -L sieze -p r -s -n snapshot_lv_name orginal_lv_name`
 `# lvcreate -s -L 512M -n lv0-snap -p r /dev/vg0/lv0` 
 `# mount /dev/vg0/lv0-snap /mnt`
 
-### 删除快照：
+## 删除快照：
 `# umount /mnt`
 `# lvremove /dev/vg0/lv0-snap`
 
-练习：
-1、创建一个至少有两个PV组成的大小为20G的名为testvg的VG；要求PE大小为16MB，而后在卷组中创建大小为5G的逻辑卷testlv；挂载至/users目录
-2、新建用户archlinux，其家目录为/users/archlinux，而后su切换至archlinux用户，复制/etc/pam.d目录至自己的家目录
-3、扩展testlv至7G，要求archlinux用户的文件不能丢失
-4、收缩testlv至3G，要求archilnux用户的文件不能丢失
-5、对testlv创建快照，并尝试基于快照备份数据，验证快照的功能；
+## 练习：
+1. 创建一个至少有两个PV组成的大小为20G的名为testvg的VG；要求PE大小为16MB，而后在卷组中创建大小为5G的逻辑卷testlv；挂载至/users目录
+2. 新建用户archlinux，其家目录为/users/archlinux，而后su切换至archlinux用户，复制/etc/pam.d目录至自己的家目录
+3. 扩展testlv至7G，要求archlinux用户的文件不能丢失
+4. 收缩testlv至3G，要求archilnux用户的文件不能丢失
+5. 对testlv创建快照，并尝试基于快照备份数据，验证快照的功能；
 
 
-## BRTFS文件系统
+## BRTFS 文件系统
 - BTRfs(B-tree, Butter FS, Better FS), GPL,2007年 Oracle, 支持CoW(写时复制)
 - 支持大容量单文件
 - 支持快照（累计快照），对文件快照
@@ -982,42 +989,40 @@ watch options 'COMMAND'
 		raid0,raid1,raid5,raid6,raid10,single
 	+ -O：features
 
-### 查看特定命令, 列出支持的所有features
+### 查看特定命令, 列出支持的所有 features
 `# mkfs.btrfs -O list-all`
 
 ### 关闭图形界面
 `# systemctl set-default multi-user.target`
 
-### 创建3个磁盘，并创建BTRFS
+### 创建3个磁盘，并创建 BTRFS
 > 不建议同一磁盘上使用raid，使用多块硬盘使用raid
 `# fdisk -l`
 `# mkfs.btrfs -L BTRDATA /dev/sdc /dev/sdd`
 
-### 显示btrfs文件系统
+### 显示 btrfs 文件系统
 `# man btrfs-filesystem 子命令`
 `# btrfs filesystem show	--all-devices(默认)`
 `# btrfs filesystem show	LABEL	`
 `# btrfs filesystem show	/dev/sdc`
 `# btrfs filesystem show	/dev/sdd`	
 
-
-
 ### Label: 'BTRDATA'
 `# btrfs /dev/sdc`
 `# btr /dev/sdd`
 `/dev/sdc和/dev/sdd的UUID是一样，UUID_SUB不一样`
 
-#### 查看卷标名
+### 查看卷标名
 `# btrfs filessytem label /dev/sdd`
 
-#### 挂载文件系统
+### 挂载文件系统
 `# mkdir /btrdata`
 `# mount -t btrfs /dev/sdd /btrdata`
 
-#### 透明压缩机制：
+### 透明压缩机制：
 `# mount -o compress={lzo|zlib} DEVICE MOUNT_POINT`
 
-#### 扩展/缩减设备空间大小：
+### 扩展/缩减设备空间大小：
 `# btrfs filesystem resize +10G /btrdata`
 `# btrfs filesystem resize -10G /btrdata`
 
@@ -1036,7 +1041,7 @@ watch options 'COMMAND'
  
 `# btrfs balance start -mconvert=raid5 /btrdata`
  > m:metadata
-磁盘不够时不能修改
+- 磁盘不够时不能修改
 
 ## 创建子卷
 `# man btrfs-subvolume`
