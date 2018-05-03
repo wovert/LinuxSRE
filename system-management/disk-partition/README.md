@@ -203,8 +203,8 @@
 	+ bitmap block index
 	
 ### 数据区
-	+ block:磁盘块大小，n*512bytes
-	+ 文件块不连续，说明有碎片
+- block:磁盘块大小，n*512bytes
+- 文件块不连续，说明有碎片
 
 ### 保留预留空间
 - 用于当磁盘空间占满时，管理员可以管理的空间
@@ -230,7 +230,7 @@
 	+ 管理块分组
 	+ 备份超级块便于某个超级快损坏时适应该超级快作为管理块组
 
-- **先分块，然后分元数据块和数据块**
+**先分块，然后分元数据块和数据块**
 
 
 ### 文件名存储在哪里？
@@ -283,28 +283,28 @@
 - 查看属性：dumpe2fs
 - 修改属性：tune2fs
 
-## 创建文件系统工具
-- mkfs -t ext2 ext3 ext4 xfs vfat
+### 创建文件系统工具
+- mkfs -t ext2|ext3|ext4|xfs|vfat
 - mkfs.ext2, mkfs.ext3, mkfx.ex4, mkfs.xfs, mkfs.vfat
-- mke2fs -t ext2 ext3 ext4 xfs
+- mke2fs -t ext2|ext3|ext4|xfs
 
-## 检测及修复文件系统的工具
+### 检测及修复文件系统的工具
 - fsck
 - fsck.ext2 fsck.ext3,..
 
-## 查看其属性的工具
+### 查看其属性的工具
 - dumpe2fs, tune2fs
 
-## 调整文件系统特性
+### 调整文件系统特性
 - tune2fs
 
 ## 内核及文件系统的组成部分
 - 文件系统驱动：由内核提供
 - 文件系统管理工具：由用户空间的应用程序提供
 
-## 查看内核装载模块
+### 查看内核装载模块
 1. 装载模块到内核：`# lsmod`
-2. 编译进内核模块，内核一部分；`# lsmod命令看不到`
+2. 编译进内核模块，内核一部分；`# lsmod 命令看不到`
 
 ## 文件系统类型
 - 日记型文件系统：journal, ext3, ext4, xfs
@@ -320,7 +320,7 @@
 
 ## 链接文件：访问同一个文件, 观世音菩萨，路径
 ### 硬链接：多个文件路径指向同一个 inode
-- 特性：
+- 特性
 	1. 目录不支持硬链接（避免循环链接）
 	2. 不能跨文件系统(不同的inode独立管理的)
 	3. 创建硬链接会增加inode应用计数
@@ -344,7 +344,7 @@
 ## 文件系统的组织结构中的术语：
 - block groups, block,inode tables, inode, inode bitmap, block bitmap,superblock, block group descriptor
 
-## Linux信息：
+## Linux信息
 - /etc/issue
 	+ CentOS release 6.7 (Final)
 - `uname -r`
@@ -352,46 +352,46 @@
 
 # 文件系统管理工具
 
-## ext系列文件系统的管理工具：
-- mkfs.ext2, mkfs.ext3, mkfs.ext4
-- mkfs -t ext2 = mkfs.ext2
+## ext系列文件系统的管理工具
+- `mkfs.ext2, mkfs.ext3, mkfs.ext4`
+- `mkfs -t ext2 = mkfs.ext2`
 
 ## ext系列文件系统专用管理工具：mke2fs
-- mke2fs [OPTIONS] device
+- `mke2fs [OPTIONS] device`
 	+ -t {ext2|ext3|ext4}：指明要创建的文件系统类型
-		
-- mkfs.ext4 = mkfs -t ext4 = mke2fs -t ext4
-	+ -b {1024|2048|4096}:文件系统块大小，默认4096
-	+ -L LABEL：指明卷标, blkid /dev/sda3
+		* mkfs.ext4 = mkfs -t ext4 = mke2fs -t ext4
+	+ -b {1024|2048|4096}: 指明文件系统块大小，默认 4096
+	+ -L LABEL：指明卷标, `blkid /dev/sda3`
 	+ -j：创建有日志功能的文件系统
-			mke2fs -j = mke2fs -t ext3 = mkfs -t ext3 = mkfs.ext3 = mke2fs -O has_journal
-	+ -i #：bytes-per-inode, inode与字节的比率，每多少字节创建一个inode
-	+ -N #：直接指明给此文件系统创建的inode数量
-	+ -m #：预留空间百分比
+		* mke2fs -j = mke2fs -t ext3 = mkfs -t ext3 = mkfs.ext3 = mke2fs -O has_journal
+	+ -i #：bytes-per-inode, inode 与字节的比率，每多少字节创建一个 inode
+	+ -N #：直接指明给此文件系统创建的 inode 数量
+	+ -m #：预留空间百分比,默认是5（也就是5%）
+	+ -O [^]feature：特性, 指定的特性创建目标文件系统，^取消特性
 
-	+ -O [^]feature：特性,指定的特性创建目标文件系统，^取消特性
-
-## e2label命令：查看与设定卷标
+## e2label 命令
+> 查看与设定卷标
 - 查看：`# e2label device`
 - 设定：`# e2label device LABEL`
 
-## tune2fs命令：查看或修改ext系列文件系统的某些属性；块大小创建后不可修改
-- tune2fs [OPTIONS] device
-	+ -l:查看超级块信息
+## tune2fs 命令
+> 查看或修改ext系列文件系统的某些属性；**块大小创建后不可修改**
+- `tune2fs [OPTIONS] device`
+	+ -l: 查看超级块信息
 		* FileSystem magic number: 文件系统类型标识
-		* Filesystem state: clean(文件没有损坏状态) dirty
-
+		* Filesystem state: clean(文件没有损坏状态) dirty(数据处理时断电)
+		* Fragment size 片段大小
 - 修改指定文件系统的属性
 	+ -j: ext2 --> ext3
 	+ -L LABEL：修改卷标
 	+ -m #: 调整预留给百分比，默认5%
-	+ -O [^]feather开启或关闭某种特性
+	+ -O [^]feather: 开启或关闭某种特性
 	+ # tune2fs -O ^has_journal /dev/sda5
-	+ -o [^]mount_options：开启或关闭某种默认挂载选项 
-	+ acl：是否支持facl功能
+	+ -o [^]mount_options: 开启或关闭某种默认挂载选项 
+	+ acl: 是否支持facl功能
 
 ## dumpe2fs命令：显示ext系列文件系统的属性详细信息
-- dumpe2fs [-h] device 显示超级块信息
+- `dumpe2fs [-h] device` 显示超级块信息
 
 ## fsck命令：系统突然断电，手动执行文件系统的检测，修复命令
 > 因进程意外终止或系统崩溃等原因导致定稿操作非正常终止时，可能会造成文件损坏；此时，应该检测并修复文件系统；建议，离线进行；
@@ -417,11 +417,16 @@
 ```
 # wget http://172.16.0.1/centos6.7.repo
 # mv CentOS-Base.repo CentOS-Base.repo.bak
+
 ```
 2. # yum install xfsprogs
 `# yum -ql xfsprogs`
-3. # mkfs.xfs -f DEVICE
-	
+
+3. `# mkfs.xfs -f DEVICE`
+- -f : force
+
+4. `# blkid /DEVICE`
+
 ## blkid DEVICE
 - SEC_TYPE=安全类型
 
@@ -440,11 +445,11 @@ mkswap [options] device
 `# mkfs.vfat device`
 
 ## 文件系统的使用
-首先要"挂载"：mount命令和umount命令
+- 首先要"挂载"：mount命令和umount命令
 		
-根文件系统这外的其它文件系统要想能够被访问，都必须通过“关联”至根文件系统上的某个目录来实现，此关联操作即为“挂载”；此目录即为“挂载点”；
+- 根文件系统这外的其它文件系统要想能够被访问，都必须通过“关联”至根文件系统上的某个目录来实现，此关联操作即为“挂载”；此目录即为“挂载点”；
 		
-挂载点：mount_point，用于作为另一个文件系统的访问入口；
+## 挂载点：mount_point，用于作为另一个文件系统的访问入口；
 1. 事先存在；
 2. 应该使用未被或不会被其它进程使用到的目录；
 3. 挂载点下原有的文件将会被隐藏；
@@ -590,7 +595,7 @@ du [OPTION]... [FILE]...
 	1.2 挂载至/mydata目录，要求挂载时禁止程序自动运行，且不更新文件的访问时间戳；
 	1.3 可开机自动挂载；
 		
-2.创建一个大小为1G的swap分区，并启动之；
+2. 创建一个大小为1G的swap分区，并启动之；
 				
 		
 ## 文件系统：
@@ -903,34 +908,38 @@ $ vi /etc/rc.sysinit+/raid\c
 `$ vgextend vgname /dev/DEVICES`
 
 ## vgreduce: 缩减vg
-`$ pvmove /dev/DEVICE`			移动数据
-`$ vgreduce vgname /dev/DEVICE` 后缩减vg
+- `$ pvmove /dev/DEVICE`			移动数据
+- `$ vgreduce vgname /dev/DEVICE` 后缩减vg
 
 ## lvs,lvdisplay: 查看lv
-`$ lvs`
-`$ lvdisplay [/dev/vg0/root]`
-`$ lvdisplay [/dev/mapper/vg0-root]`
+```
+$ lvs
+$ lvdisplay [/dev/vg0/root]
+$ lvdisplay [/dev/mapper/vg0-root]
+```
 
 ## lvcreate, 创建lv
-`$ lvcreate -L #[mMgGtTpPeE] -n lvName vgName`
-`$ lcreate -L 8G -n lv0 vg0`
-`$ ls -l /dev/mapper/vg0-lv0 --> ../dm-0`
+```
+$ lvcreate -L #[mMgGtTpPeE] -n lvName vgName
+$ lcreate -L 8G -n lv0 vg0
+$ ls -l /dev/mapper/vg0-lv0 --> ../dm-0
+```
 
 ## lvremove，移除lv
 `$ lvremove lvName vgName`
 
 ## lextend, 扩展lv
 ```
-`$ lvextend -L +#[mMgGtT] /dev/vg0/lv0`
-`$ lvextend -L +2G /dev/vg0/lv0`
-+加多少
+$ lvextend -L +#[mMgGtT] /dev/vg0/lv0
+$ lvextend -L +2G /dev/vg0/lv0
+加多少
 目标大小直接写大小
-`$ umount /lvdata`
-`$ mount /dev/vg0/lv0 /lvdata`
+$ umount /lvdata
+$ mount /dev/vg0/lv0 /lvdata
 大小还是没有变化？
 文件系统没有扩展，所以没有显示增加的大小
-`$ resize2fs /dev/vg0/lv0` 扩展文件系统占用空间
-`$ df -hl`
+$ resize2fs /dev/vg0/lv0 扩展文件系统占用空间
+$ df -hl
 ```
 
 ## 缩减逻辑卷
@@ -960,7 +969,6 @@ $ vi /etc/rc.sysinit+/raid\c
 3. 扩展testlv至7G，要求archlinux用户的文件不能丢失
 4. 收缩testlv至3G，要求archilnux用户的文件不能丢失
 5. 对testlv创建快照，并尝试基于快照备份数据，验证快照的功能；
-
 
 ## BRTFS 文件系统
 - BTRfs(B-tree, Butter FS, Better FS), GPL,2007年 Oracle, 支持CoW(写时复制)
