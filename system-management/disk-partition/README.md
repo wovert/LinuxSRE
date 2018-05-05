@@ -390,7 +390,7 @@
 	+ -o [^]mount_options: 开启或关闭某种默认挂载选项 
 	+ acl: 是否支持facl功能
 
-## dumpe2fs命令：显示ext系列文件系统的属性详细信息
+## dumpe2fs命令：显示 ext 系列文件系统的属性详细信息
 - `dumpe2fs [-h] device` 显示超级块信息
 
 ## fsck命令：系统突然断电，手动执行文件系统的检测，修复命令
@@ -434,28 +434,29 @@
 - Linux上的交换分区必须使用独立的文件系统
 - 且文件系统上的System ID必须为82
 
-- 创建swap设备：mkswap命令
+- 创建 swap 设备：mkswap 命令
 ```
 mkswap [options] device
 	-L LABEL：指明卷标
 	-f：强制
 ```
 
-- Windows无法识别Linux的文件系统； 因此，存储设备需要两种系统之间交叉使用时，应该使用windows和Linux同时支持的文件系统：fat32(vfat); 
+- Windows无法识别Linux的文件系统； 因此，存储设备需要两种系统之间交叉使用时，应该使用 windows 和 Linux 同时支持的文件系统：fat32(vfat)
 `# mkfs.vfat device`
 
 ## 文件系统的使用
-- 首先要"挂载"：mount命令和umount命令
+- 首先要"挂载"：mount 命令和 umount 命令
 		
 - 根文件系统这外的其它文件系统要想能够被访问，都必须通过“关联”至根文件系统上的某个目录来实现，此关联操作即为“挂载”；此目录即为“挂载点”；
 		
-## 挂载点：mount_point，用于作为另一个文件系统的访问入口；
+## 挂载点：mount_point，用于作为另一个文件系统的访问入口
 1. 事先存在；
 2. 应该使用未被或不会被其它进程使用到的目录；
 3. 挂载点下原有的文件将会被隐藏；
 		
 # mount命令
-`mount  [-nrw]  [-t vfstype]  [-o options]  device  dir`
+- `mount  [-nrw]  [-t vfstype]  [-o options]  device  dir`
+
 ## 命令选项
 - -r：readonly，只读挂载
 - -w：read and write, 读写挂载
@@ -463,29 +464,30 @@ mkswap [options] device
 - -t vfstype：指明要挂载的设备上的文件系统的类型；多数情况下可省略，此时mount会通过blkid来判断要挂载的设备的文件系统类型
 
 - -L LABEL：挂载时以卷标的方式指明设备
-	+ # mount -L LABEL dir
+	+ `# mount -L LABEL dir`
 - -U UUID：挂载时以UUID的方式指明设备
-	+ # mount -U UUID dir
+	+ `# mount -U UUID dir`
 	
-- -o options：挂载选项
-	+ sync/async：同步/异步操作
-	+	异步：进程中写入磁盘先存入内存，然后写入磁盘
-	+	同步：立即写入到磁盘上
-	+ atime/noatime(default)：文件或目录在被访问时是否更新其访问时间戳
-	+ diratime/nodiratime(default)：目录在被访问时是否更新其访问时间戳		remount：不用卸载，重新挂载
-	+ acl：支持使用facl功能
-		* # mount -o acl device dir 
-		* # tune2fs  -o  acl  device 
-	+ ro：只读 
-	+ rw：读写	
-	+ dev/nodev：此设备上是否允许创建设备文件
-	+ exec/noexec：是否允许运行此设备上的程序文件
-	+ auto/noauto：自动挂载（写人/etc/fstab文件中才能自动挂载）
-	+ user/nouser：是否允许普通用户挂载此文件系统
-	+ suid/nosuid：是否允许程序文件上的suid和sgid特殊权限生效	
-	+ relatime/norelatime：是否参考修改或更新来更新访问时间
+- `-o options`：挂载选项
+	+ `sync/async`：同步/异步操作
+		*	异步：进程中写入磁盘先存入内存，然后写入磁盘
+		*	同步：立即写入到磁盘上
+	+ `atime/noatime(default)`：文件或目录在被访问时是否更新其访问时间戳
+	+ `diratime/nodiratime(default)`：目录在被访问时是否更新其访问时间戳		
+	+ `remount`：不用卸载，重新挂载
+	+ `acl`：支持使用facl功能
+		* `# mount -o acl device dir` 
+		* `# tune2fs  -o  acl  device` 
+	+ `ro`：只读 
+	+ `rw`：读写	
+	+ `dev/nodev`：此设备上是否允许创建设备文件
+	+ `exec/noexec`：是否允许运行此设备上的程序文件
+	+ `auto/noauto`：自动挂载（写人/etc/fstab文件中才能自动挂载）
+	+ `user/nouser`：是否允许普通用户挂载此文件系统
+	+ `suid/nosuid`：是否允许程序文件上的suid和sgid特殊权限生效	
+	+ `relatime/norelatime`：是否参考修改或更新来更新访问时间
 	
-	+ defaults：rw, suid, dev, exec, auto, nouser, async, and relatime.
+	+ `defaults`：rw, suid, dev, exec, auto, nouser, async, and relatime.
 				
 - 可以实现将目录绑定至另一个目录上，作为其临时访问入口；
 `# mount --bind  源目录  目标目录`
@@ -501,7 +503,7 @@ mkswap [options] device
 	+ IDE：/dev/hdc
 	+ SATA: /dev/sr0
 
-- 符号链接文件：
+- 符号链接文件
 	+ /dev/cdrom
 	+ /dev/cdrw
 	+ /dev/dvd
@@ -516,7 +518,6 @@ mkswap [options] device
 - 保证你的U盘的格式是fat格式
 `# mount -t vfat /dev/sdb /mnt/usb`
 
-
 ## 挂载本地的回环设备：光盘镜像文件
 ```
 # mount -o loop /PATH/TO/SOME_LOOP_FILE MOUNT_POINT 
@@ -524,17 +525,17 @@ mkswap [options] device
 ```
 
 ## umount 命令
-`umount  device|dir`
+`# umount  device|dir`
 		
 - 注意：正在被进程访问到的挂载点无法被卸载；
 - 查看被哪个或哪些进程所战用：
-`# lsof  MOUNT_POINT`
-`# fuser -v  MOUNT_POINT`
+	+ `# lsof  MOUNT_POINT`
+	+ `# fuser -v  MOUNT_POINT`
 			
 - 终止所有正在访问某挂载点的进程：
 	+ `# fuser  -km  MOUNT_POINT`
 					
-## 交换分区的启用和禁用：
+## 交换分区的启用和禁用
 - 创建交换分区的命令：mkswap		
 - 启用：swapon
 ```
@@ -544,33 +545,31 @@ swapon  [OPTION]  [DEVICE]
 - 禁用：swapoff
 `swapoff DEVICE`
 			
-	
 ## 设定除根文件系统以外的其它文件系统能够开机时自动挂载：/etc/fstab文件 
 - 每行定义一个要挂载的文件系统及相关属性：6个字段
 1. 要挂载的设备
-	设备文件
-	LABEL
-	UUID
-	伪文件系统：如sysfs, proc, tmpfs等
+- 设备文件
+- LABEL
+- UUID
+- 伪文件系统：如sysfs, proc, tmpfs等
 
-	LABEL=MYSAA
-	UUID=209909sf0ad9f0asdf0a9sf
+- LABEL=MYSAA
+- UUID=209909sf0ad9f0asdf0a9sf
 
-2. 挂载点 
-	swap类型的设备的挂载点为swap
+2. 挂载点 : swap类型的设备的挂载点为swap
 3. 文件系统类型
 4. 挂载选项
-	defaults：使用默认挂载选项；
-	如果要同时指明多个挂载选项，彼此间以事情分隔；
-		defaults,acl,noatime,noexec
+- defaults：使用默认挂载选项；
+- 如果要同时指明多个挂载选项，彼此间以事情分隔；
+- defaults,acl,noatime,noexec
 5. 转储频率
-	0：从不备份
-	1：每天备份
-	2：每隔一天备份
+- 0：从不备份
+- 1：每天备份
+- 2：每隔一天备份
 6. 自检次序（自检系统文件系统是否有损坏）
-	0：不自检
-	1：首先自检，通常只能是根文件系统可用1
-	2：次级自检
+- 0：不自检
+- 1：首先自检，通常只能是根文件系统可用1
+- 2：次级自检
 
 `# mount -a` 可自动挂载定义在此文件中的所支持自动挂载的设备；
 			
@@ -606,7 +605,7 @@ du [OPTION]... [FILE]...
 		* dentry
 - 文件名：上级目录；
 
-- 删除文件：将此文件指向的所有data block标记为未使用状态；将此文件的inode标记为未使用；
+- 删除文件：将此文件指向的所有 data block 标记为未使用状态；将此文件的inode标记为未使用；
 - 复制和移动文件：
 	+ 复制：新建文件；
 	+ 移动文件：
@@ -616,7 +615,6 @@ du [OPTION]... [FILE]...
 - 符号链接：
 	+ 权限：lrwxrwxrwx，其指向链接的文件
 - 硬链接：指向同一个inode；
-
 
 # RAID 
 - Redundant Arrays of Inexpensive Disks 廉价磁盘冗余阵列
