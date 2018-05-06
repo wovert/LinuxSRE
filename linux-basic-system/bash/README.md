@@ -470,7 +470,7 @@
 - `VAR=$((expression))`
 - `VAR=$(expr argu1 $op argu2)`
 
-- 注意：乘法符号有些场景中需要使用转义符；
+- 注意：乘法符号有些场景中需要使用转义符
 
 ### 增强型赋值：变量做某种算术运算后回存至此变量中；
 - `let i=$i+#`
@@ -481,7 +481,7 @@
 - `VAR=$[$VAR+1]`
 - `let VAR+=1`
 - `let VAR++`
-			
+
 ### 自减
 - `VAR=$[$VAR-1]`
 - `let VAR-=1`
@@ -495,7 +495,7 @@
 	+ `grep "^[[:space:]]*$"   /etc/rc.d/init.d/functions | wc -l`
 
 ##　条件测试
-> 判断某需求是否满足，需要由测试机制来实现；
+> 判断某需求是否满足，需要由测试机制来实现
 
 ### 如何编写测试表达式以实现所需的测试：
 1. 执行命令并利用命令状态返回值来判断
@@ -507,7 +507,7 @@
 - `[ EXPRESSION ]`
 - `[[ EXPRESSION ]]`
 
-- 注意：`EXPRESSION`两端必须有空白字符，否则为语法错误；
+- 注意：`EXPRESSION` 两端必须有空白字符，否则为语法错误
 
 ### bash的测试类型
 - 数值比较测试：`-eq, -ne, -gt, -ge, -lt, -le, `
@@ -538,7 +538,6 @@
 - 注意：
 	+ 字符串一定要加**引用**；
 	+ 要使用**[[ ]]**； 使用`[]`的`<,>`需要转移,`\>`,`\<`
-
 	+ `"a" > "b" > "1"`
 
 ### 文件测试
@@ -576,8 +575,7 @@
 	+ `-G  FILE`：当前用户是否属于文件的属组；
 
 - 双目测试：
-	+ `FILE1  -ef  FILE2`：FILE1与FILE2是否指向同一个文件系统的相同inode的硬链接；
-	
+	+ `FILE1  -ef  FILE2`：FILE1与FILE2是否指向同一个文件系统的相同 inode的硬链接；
 	+ `FILE1  -nt  FILE2`：FILE1是否新于FILE2；
 	+ `FILE1  -ot  FILE2`：FILE1是否旧于FILE2；
 
@@ -594,10 +592,10 @@
 		* `! EXPRESSION`
 		* `[ -O FILE -a -x FILE ]`
 						
-### 练习：将当前主机名称保存至hostName变量中；
-`# 主机名如果为空，或者为localhost.localdomain，则将其设置为www.magedu.com；`
+### 练习：将当前主机名称保存至 hostName 变量中
+- `# 主机名如果为空，或者为localhost.localdomain，则将其设置为www.magedu.com；`
 `hostName=$(hostname)`
-`[ -z "$hostName" -o "$hostName" == "localhost.localdomain" -o "$hostName" == "localhost" ] && hostname www.magedu.com `
+- `[ -z "$hostName" -o "$hostName" == "localhost.localdomain" -o "$hostName" == "localhost" ] && hostname www.magedu.com `
 					
 ## 脚本的状态返回值
 > 默认是脚本中执行的最后一条件命令的状态返回值；
@@ -613,11 +611,12 @@
 - 轮替：`shift  [n]`：位置参数轮替；
 
 ### 练习：写一脚本，通过命令传递两个文本文件路径给脚本，计算其空白行数之和；
-`#!/bin/bash`
-`file1_lines=$(grep "^$" $1 | wc -l)`
-`file2_lines=$(grep "^$" $2 | wc -l)`
-`echo "Total blank lines: $[$file1_lines+$file2_lines]"	`
-
+```
+#!/bin/bash
+file1_lines=$(grep "^$" $1 | wc -l)
+file2_lines=$(grep "^$" $2 | wc -l)
+echo "Total blank lines: $[$file1_lines+$file2_lines]"
+```
 - 特殊变量：
 	+ `$0`：脚本文件路径本身
 	+ `$#`：脚本参数的个数
@@ -633,95 +632,107 @@
 	+ 代码片断（循环体）要执行0、1或多个来回；
 
 # 选择执行
-- 单分支的if语句：
-`if  测试条件
+## 单分支的 if 语句
+```
+if  测试条件
 then
 	代码分支
-fi`
-
-- 双分支的if语句
-`if  测试条件; then
+fi
+```
+## 双分支的if语句
+```
+if  测试条件; then
 	条件为真时执行的分支
 else
 	条件为假时执行的分支
-fi`
-				
+fi
+```				
+
 ## 示例：通过参数传递一个用户名给脚本，此用户不存时，则添加之；
-`#!/bin/bash`
-`if ! grep "^$1\>" /etc/passwd &> /dev/null; then`
-`	useradd $1`
-`	echo $1 | passwd --stdin $1 &> /dev/null`
-`	echo "Add user $1 finished."`
-`fi`
+```
+#!/bin/bash
+if ! grep "^$1\>" /etc/passwd &> /dev/null; then
+	useradd $1
+	echo $1 | passwd --stdin $1 &> /dev/null
+	echo "Add user $1 finished."
+fi
 			
-`#!/bin/bash`
-`	if [ $# -lt 1 ]; then`
-`		echo "At least one username."`
-`		exit 2`
-`fi`
-`if ! grep "^$1\>" /etc/passwd &> /dev/null; then`
-`	useradd $1`
-`	echo $1 | passwd --stdin $1 &> /dev/null`
-`	echo "Add user $1 finished."`
-`fi`
-				
-`#!/bin/bash`
-`if [ $# -lt 1 ]; then`
-`	echo "At least one username."`
-`	exit 2`
-`fi`
-`if grep "^$1\>" /etc/passwd &> /dev/null; then`
-`	echo "User $1 exists."`
-`else`
-`	useradd $1`
-`	echo $1 | passwd --stdin $1 &> /dev/null`
-`	echo "Add user $1 finished."`
-`fi`				
+#!/bin/bash
+	if [ $# -lt 1 ]; then
+		echo "At least one username."
+		exit 2
+fi
+if ! grep "^$1\>" /etc/passwd &> /dev/null; then
+	useradd $1
+	echo $1 | passwd --stdin $1 &> /dev/null
+	echo "Add user $1 finished."
+fi
+```
+
+```				
+#!/bin/bash
+if [ $# -lt 1 ]; then
+	echo "At least one username."
+	exit 2
+fi
+if grep "^$1\>" /etc/passwd &> /dev/null; then
+	echo "User $1 exists."
+else
+	useradd $1
+	echo $1 | passwd --stdin $1 &> /dev/null
+	echo "Add user $1 finished."
+fi
+```
 
 ### 练习：通过命令行参数给定两个数字，输出其中较大的数值；
-`#!/bin/bash`
-`if [ $# -lt 2 ]; then`
-`	echo "Two integers."`
-`	exit 2`
-`fi`
+```
+#!/bin/bash
+if [ $# -lt 2 ]; then
+	echo "Two integers."
+	exit 2
+fi
 
-`if [ $1 -ge $2 ]; then`
-`	echo "Max number: $1."`
-`else`
-`	echo "Max number: $2."`
-`fi`
+if [ $1 -ge $2 ]; then
+	echo "Max number: $1."
+else
+	echo "Max number: $2."
+fi
+```
 
-`#!/bin/bash`
-`if [ $# -lt 2 ]; then`
-`	echo "Two integers."`
-`	exit 2`
-`fi`
-`declare -i max=$1`
-`if [ $1 -lt $2 ]; then`
-`	max=$2`
-`fi`
-`echo "Max number: $max."`
+```
+#!/bin/bash
+if [ $# -lt 2 ]; then
+	echo "Two integers."
+	exit 2
+fi
+declare -i max=$1
+if [ $1 -lt $2 ]; then
+	max=$2
+fi
+echo "Max number: $max."
+```
 
-### 练习2：通过命令行参数给定一个用户名，判断其ID号是偶数还是奇数；
-### 练习3：通过命令行参数给定两个文本文件名，如果某文件不存在，则结束脚本执行；都存在时返回每个文件的行数，并说明其中行数较多的文件；
+### 练习2：通过命令行参数给定一个用户名，判断其ID号是偶数还是奇数
+### 练习3：通过命令行参数给定两个文本文件名，如果某文件不存在，则结束脚本执行；都存在时返回每个文件的行数，并说明其中行数较多的文件
 
-### 练习：
-1. 创建一个20G的文件系统，块大小为2048，文件系统ext4，卷标为TEST，要求此分区开机后自动挂载至/testing目录，且默认有acl挂载选项；
-	+ 创建20G分区；
+### 练习
+1. 创建一个 20G 的文件系统，块大小为 2048，文件系统 ext4，卷标为 TEST，要求此分区开机后自动挂载至 /testing 目录，且默认有 acl 挂载选项；
+	+ 创建 20G 分区；
 	+ 格式化：mke2fs -t ext4 -b 2048 -L 'TEST' /dev/DEVICE
-	+ 编辑/etc/fstab文件
+	+ 编辑 /etc/fstab 文件
 		LABEL='TEST' 	/testing 	ext4 	defaults,acl 	0 0
-2. 创建一个5G的文件系统，卷标HUGE，要求此分区开机自动挂载至/mogdata目录，文件系统类型为ext3；
+2. 创建一个 5G 的文件系统，卷标HUGE，要求此分区开机自动挂载至 /mogdata 目录，文件系统类型为ext3；
 3. 写一个脚本，完成如下功能：
 	+ 列出当前系统识别到的所有磁盘设备；
 	+ 如磁盘数量为1，则显示其空间使用信息；否则，则显示最后一个磁盘上的空间使用信息；
-`if [ $disks -eq 1 ]; then`
-`	fdisk -l /dev/[hs]da`
-`else `
-`	fdisk -l $(fdisk -l /dev/[sh]d[a-z] | grep -o "^Disk /dev/[sh]d[a-]" | tail -1 | cut -d' ' -f2)`
-`fi`
 
-
+```
+if [ $disks -eq 1 ]; then
+	fdisk -l /dev/[hs]da
+else
+	fdisk -l $(fdisk -l /dev/[sh]d[a-z] | grep -o "^Disk /dev/[sh]d[a-]" | tail -1 | cut -d' ' -f2)
+fi
+```
 
 ## bash脚本编程之用户交互
 
@@ -730,98 +741,108 @@ fi`
 - -t TIMEOUT
 
 #### 检测脚本中的语法错误
-`$ bash -n /path/to/some_script `
+- `$ bash -n /path/to/some_script `
 
 #### 调试执行
-`$ bash -x /path/to/some_script `
+- `$ bash -x /path/to/some_script `
 
 ### 示例
-`#!/bin/bash`
-`# Version: 0.0.1`
-`# Author: MageEdu`
-`# Description: read testing`
-`read -p "Enter a disk special file: " diskfile`
-`[ -z "$diskfile" ] && echo "Fool" && exit 1`
-`if fdisk -l | grep "^Disk $diskfile" &> /dev/null; then`
-`	fdisk -l $diskfile`
-`else`
-`	echo "Wrong disk special file."`
-`	exit 2`
-`Fi`
+```
+#!/bin/bash
+# Version: 0.0.1
+# Author: MageEdu
+# Description: read testing
+read -p "Enter a disk special file: " diskfile
+[ -z "$diskfile" ] && echo "Fool" && exit 1
+if fdisk -l | grep "^Disk $diskfile" &> /dev/null; then
+	fdisk -l $diskfile
+else
+	echo "Wrong disk special file."
+	exit 2
+fi
+```
 
 ### 脚本参数
 > 用户交互：通过键盘输入数据，从而完成变量赋值操作
-`#!/bin/bash`
-`read -p "Enter a username: " name`
-`[ -z "$name" ] && echo "a username is needed." && exit 2`
-`read -p "Enter password for $name, [password]: " password`
-`[ -z "$password" ] && password="password"`
-`if id $name &> /dev/null; then`
-`	echo "$name exists."`
-`else`
-`	useradd $name`
-`	echo "$password" | passwd --stdin $name &> /dev/null`
-`	echo "Add user $name finished."`
-`fi`
+```
+#!/bin/bash
+read -p "Enter a username: " name
+[ -z "$name" ] && echo "a username is needed." && exit 2
+read -p "Enter password for $name, [password]: " password
+[ -z "$password" ] && password="password"
+if id $name &> /dev/null; then
+	echo "$name exists."
+else
+	useradd $name
+	echo "$password" | passwd --stdin $name &> /dev/null
+	echo "Add user $name finished."
+fi
+```
 
-
-## 选择执行：
-+ &&, ||
-+ if语句
-+ case语句
+## 选择执行
+- &&, ||
+- if语句
+- case语句
 
 ### if语句：三种格式
 - 单分支的if语句
-`	if  CONDITION; then`
-`		if-true-分支;`
-`	fi`
+```
+if  CONDITION; then
+if-true-分支
+fi
+```
 
 - 双分支的if语句
-`if  CONDITION; then`
-`	if-true-分支`
-`else`
-`	if-false-分支`
-`fi`
+```
+if  CONDITION; then
+	if-true-分支
+else
+	if-false-分支
+fi
+```
 
 - 多分支的if语句
-`if  CONDITION1; then`
-`	条件1为真分支`
-`elif  CONDITION2; then`
-`	条件2为真分支`
-`else`
-`	所有条件均不满足时的分支`
-`fi`
+```
+if  CONDITION1; then
+	条件1为真分支
+elif  CONDITION2; then
+	条件2为真分支
+else
+	所有条件均不满足时的分支
+fi
+```
 
 **注意**：即便多个条件可能同时都能满足，分支只会执行中其中一个，首先测试为“真”；
 
-
 ### 示例：脚本参数传递一个文件路径给脚本，判断此文件的类型；				
-`#!/bin/bash`
-`if [ $# -lt 1 ]; then`
-	`echo "At least on path."`
-	`exit 1`
-`fi`
+```
+#!/bin/bash
+if [ $# -lt 1 ]; then
+	echo "At least on path."
+	exit 1
+fi
 
-`if ! [ -e $1 ]; then`
-	`echo "No such file."`
-	`exit 2`
-`fi`
+if ! [ -e $1 ]; then
+	echo "No such file."
+	exit 2
+fi
 
-`if [ -f $1 ]; then`
-	`echo "Common file."`
-`elif [ -d $1 ]; then`
-	`echo "Directory."`
-`elif [ -L $1 ]; then`
-	`echo "Symbolic link."`
-`elif [ -b $1 ]; then`
-	`echo "block special file."`
-`elif [ -c $1 ]; then`
-	`echo "character special file."`
-`elif [ -S $1 ]; then`
-	`echo "Socket file."`
-`else`
-	`echo "Unkown."`
-`fi`
+if [ -f $1 ]; then
+	echo "Common file."
+elif [ -d $1 ]; then
+	echo "Directory."
+elif [ -L $1 ]; then
+	echo "Symbolic link."
+elif [ -b $1 ]; then
+	echo "block special file."
+elif [ -c $1 ]; then
+	echo "character special file."
+elif [ -S $1 ]; then
+	echo "Socket file."
+else
+	echo "Unkown."
+fi
+```
 
 ### 写一个脚本
 1. 传递一个参数给脚本，此参数为用户名；
@@ -830,43 +851,49 @@ fi`
 	+ 1-999：系统用户
 	+ 1000+：登录用户
 
-`#!/bin/bash`
-`[ $# -lt 1 ] && echo "At least on user name." && exit 1`
-`! id $1 &> /dev/null && echo "No such user." && exit 2`
-`userid=$(id -u $1)`
-`if [ $userid -eq 0 ]; then`
-	`echo "root"`
-`elif [ $userid -ge 1000 ]; then`
-	`echo "login user."`
-`else`
-	`echo "System user."`
-`fi`
+```
+#!/bin/bash
+[ $# -lt 1 ] && echo "At least on user name." && exit 1
+! id $1 &> /dev/null && echo "No such user." && exit 2
+userid=$(id -u $1)
+if [ $userid -eq 0 ]; then
+	echo "root"
+elif [ $userid -ge 1000 ]; then
+	echo "login user."
+else
+	echo "System user."
+fi
+```
 
 ### 写一个脚本
-1. 列出如下菜单给用户：
-`disk) show disks info;`
-`mem) show memory info;`
-`cpu) show cpu info;`
-`*) quit;`
+1. 列出如下菜单给用户
+```
+disk) show disks info;
+mem) show memory info;
+cpu) show cpu info;
+*) quit;
+```
 2. 提示用户给出自己的选择，而后显示对应其选择的相应系统信息；
-`#!/bin/bash`
-`cat << EOF`
-`	disk) show disks info`
-`	mem) show memory info`
-`	cpu) show cpu info`
-`	*) QUIT`
-`EOF`
-`read -p "Your choice: " option`
-`if [[ "$option" == "disk" ]]; then`
-`	fdisk -l /dev/[sh]d[a-z]`
-`elif [[ "$option" == "mem" ]]; then`
-`	free -m`
-`elif [[ "$option" == "cpu" ]];then`
-`	lscpu`
-`else`
-`	echo "Unkown option."`
-`exit 3`
-`fi`
+```
+#!/bin/bash
+cat << EOF
+	disk) show disks info
+	mem) show memory info
+	cpu) show cpu info
+	*) QUIT
+EOF
+read -p "Your choice: " option
+if [[ "$option" == "disk" ]]; then
+	fdisk -l /dev/[sh]d[a-z]
+elif [[ "$option" == "mem" ]]; then
+	free -m
+elif [[ "$option" == "cpu" ]];then
+	lscpu
+else
+	echo "Unkown option."
+exit 3
+fi
+```
 
 ## 循环执行： 将一段代码重复执行0、1或多次；
 - 进入条件：条件满足时才进入循环；
@@ -881,10 +908,12 @@ fi`
 	+ 遍历列表
 	+ 控制变量
 
-- 遍历列表：
-`for  VARAIBLE  in  LIST; do`
-`	循环体`
-`done`
+- 遍历列表
+```
+for  VARAIBLE  in  LIST; do
+	循环体
+done
+```
 - 进入条件：只要列表有元素，即可进入循环
 - 退出条件：列表中的元素遍历完成
 
@@ -899,43 +928,49 @@ fi`
 - 变量引用: $@, $*
 
 #### 直接给出列表		
-`#!/bin/bash`
-`for username in user21 user22 user23; do`
-`	if id $username &> /dev/null; then`
-`		echo "$username exists."`
-`	else`
-`		useradd $username && echo "Add user $username finished."`
-`	fi`
-`done`
+```
+#!/bin/bash
+for username in user21 user22 user23; do
+	if id $username &> /dev/null; then
+		echo "$username exists."
+	else
+		useradd $username && echo "Add user $username finished."
+	fi
+done
+```
 
 #### 求100以内所有正整数之和；
-`#!/bin/bash`
-`declare -i sum=0`
-`for i in {1..100}; do`
-`	echo "\$sum is $sum, \$i is $i"`
-`	sum=$[$sum+$i]`
-`done`
-`echo $sum`
+```
+#!/bin/bash
+declare -i sum=0
+for i in {1..100}; do
+	echo "\$sum is $sum, \$i is $i"
+	sum=$[$sum+$i]
+done
+echo $sum
+```
 
 ##### 判断/var/log目录下的每一个文件的内容类型
-`#!/bin/bash`
-`for filename in /var/log/*; do`
-	`if [ -f $filename ]; then`
-	`	echo "Common file."`
-	`elif [ -d $filename ]; then`
-	`	echo "Directory."`
-	`elif [ -L $filename ]; then`
-	`	echo "Symbolic link."`
-	`elif [ -b $filename ]; then`
-	`	echo "block special file."`
-	`elif [ -c $filename ]; then`
-	`	echo "character special file."`
-	`elif [ -S $filename ]; then`
-	`	echo "Socket file."`
-	`else`
-	`	echo "Unkown."`
-	`fi`
-`done`
+```
+#!/bin/bash
+for filename in /var/log/*; do
+	if [ -f $filename ]; then
+		echo "Common file."
+	elif [ -d $filename ]; then
+		echo "Directory."
+	elif [ -L $filename ]; then
+		echo "Symbolic link."
+	elif [ -b $filename ]; then
+		echo "block special file."
+	elif [ -c $filename ]; then
+		echo "character special file."
+	elif [ -S $filename ]; then
+		echo "Socket file."
+	else
+		echo "Unkown."
+	fi
+done
+```
 
 ### 练习：
 - 1. 分别求100以内所有偶数之和，以及所有奇数之和；
@@ -943,114 +978,140 @@ fi`
 - 3. 通过脚本参数传递一个目录给脚本，而后计算此目录下所有文本文件的行数之和；并说明此类文件的总数；
 
 - 选择执行： if, case
-- 循环执行：for, while, until 
-	for循环格式：
-		for  VARAIBLE  in  LIST; do
-			循环体
-		done	
-	while循环：
-		while  CONDITION; do
-			循环体
-			循环控制变量修正表达式
-		done		
-		进入条件：CONDITION测试为”真“
-		退出条件：CONDITION测试为”假“
-	until循环：
-		until  CONDITION; do
-			循环体
-			循环控制变量修正表达式
-		done
-		进入条件：CONDITION测试为”假“
-		退出条件：CONDITION测试为”真“		
-		示例：求100以内所有正整数之和；	
-			#!/bin/bash
-			#
-			declare -i sum=0
-			declare -i i=1
+- 循环执行：for, while, until
+- for循环格式：
+``` 
+for  VARAIBLE  in  LIST; do
+	循环体
+done	
+```
 
-			until [ $i -gt 100 ]; do
-				let sum+=$i
-				let i++
-			done
-			echo $sum			
-			#!/bin/bash
-			#
-			declare -i sum=0
-			declare -i i=1
+- while循环
+```
+while  CONDITION; do
+	循环体
+	循环控制变量修正表达式
+done		
+进入条件：CONDITION测试为”真“
+退出条件：CONDITION测试为”假“
+```
 
-			while [ $i -le 100 ]; do
-				let sum+=$i
-				let i++
-			done
-			echo $sum			
+- until循环：
+```
+until  CONDITION; do
+	循环体
+	循环控制变量修正表达式
+done
+进入条件：CONDITION测试为”假“
+退出条件：CONDITION测试为”真“		
+```
 
-	练习：分别使用for, while, until实现
-		1、分别求100以内所有偶数之和，100以内所奇数之和；
-		2、创建10个用户，user101-user110；密码同用户名；
-		3、打印九九乘法表；
-		4、打印逆序的九九乘法表；
-		
-		1X1=1
-		1X2=2  2X2=4
-		1X3=3  2X3=6  3X3=9
-		外循环控制乘数，内循环控制被乘数；
-			#!/bin/bash
-			#
-			for j in {1..9}; do
-				for i in $(seq 1 $j); do
-					echo -n -e "${i}X${j}=$[${i}*${j}]\t"
-				done
-				echo 
-			done	
-
-for：列表元素非空；
-while：条件测试结果为“真”
-unitl：条件测试结果为“假”
-退出条件：
-		for：列表元素遍历完成；
-		while：条件测试结果为“假”
-		until：条件测试结果为“真”
-			
-	循环控制语句：
-		continue：提前结束本轮循环，而直接进入下一轮循环判断；
-		while  CONDITION1; do
-			CMD1
-				...
-			if  CONDITION2; then
-				continue
-			fi
-			CMDn
-			...
-		done
-示例：求100以内所有偶数之和；										
+## 示例：求100以内所有正整数之和；	
+```
 #!/bin/bash
-	declare -i evensum=0
-	declare -i i=0
+#
+declare -i sum=0
+declare -i i=1
+
+until [ $i -gt 100 ]; do
+	let sum+=$i
+	let i++
+done
+echo $sum			
+#!/bin/bash
+#
+declare -i sum=0
+declare -i i=1
+
 while [ $i -le 100 ]; do
-		let i++
-		if [ $[$i%2] -eq 1 ]; then
-			continue
-		fi
-		let evensum+=$i
+	let sum+=$i
+	let i++
+done
+echo $sum			
+```
+
+## 练习：分别使用for, while, until实现
+1. 分别求100以内所有偶数之和，100以内所奇数之和；
+2. 创建10个用户，user101-user110；密码同用户名；
+3. 打印九九乘法表；
+4. 打印逆序的九九乘法表；
+
+```
+1X1=1
+1X2=2  2X2=4
+1X3=3  2X3=6  3X3=9
+```
+- 外循环控制乘数，内循环控制被乘数；
+```
+#!/bin/bash
+for j in {1..9}; do
+	for i in $(seq 1 $j); do
+		echo -n -e "${i}X${j}=$[${i}*${j}]\t"
 	done
+	echo 
+done	
+```
+
+- for：列表元素非空；
+- while：条件测试结果为“真”
+- unitl：条件测试结果为“假”
+- 退出条件：
+		+ for：列表元素遍历完成；
+		+ while：条件测试结果为“假”
+		+ until：条件测试结果为“真”
+			
+- 循环控制语句：
+```
+continue：提前结束本轮循环，而直接进入下一轮循环判断；
+```
+```
+while  CONDITION1; do
+	CMD1
+		...
+	if  CONDITION2; then
+		continue
+	fi
+	CMDn
+	...
+done
+```
+
+## 示例：求100以内所有偶数之和；										
+```
+#!/bin/bash
+declare -i evensum=0
+declare -i i=0
+while [ $i -le 100 ]; do
+	let i++
+	if [ $[$i%2] -eq 1 ]; then
+		continue
+	fi
+	let evensum+=$i
+done
 echo "Even sum: $evensum"				
 
 break：提前跳出循环, break n (层次)
 while  CONDITION1; do
-		CMD1
-		...
-		if  CONDITION2; then
-			break
-		fi
-	done
-				
-创建死循环：
+	CMD1
+	...
+	if  CONDITION2; then
+		break
+	fi
+done
+```
+
+## 创建死循环
+```
 while true; do
 		循环体
 	done
 	退出方式：
 某个测试条件满足时，让循环体执行break命令；
-示例：求100以内所奇数之和
+```
+
+
+## 示例：求100以内所奇数之和
+```
 #!/bin/bash
 declare -i oddsum=0
 declare -i i=1
@@ -1061,20 +1122,24 @@ let oddsum+=$i
 		break
 	fi
 Done
+```
 
 ## sleep命令：delay for a specified amount of time
-`sleep NUMBER`
+- `sleep NUMBER`
 
 ### 练习：每隔3秒钟到系统上获取已经登录用户的用户的信息；其中，如果logstash用户登录了系统，则记录于日志中，并退出；
-`#!/bin/bash`
-`while true; do`
-`	if who | grep "^logstash\>" &> /dev/null; then`
-`		break`
-`	fi`
-`	sleep 3`
-`done`
-`echo "$(date +"%F %T") logstash logged on" >> /tmp/users.log	`
+```
+#!/bin/bash
+while true; do
+	if who | grep "^logstash\>" &> /dev/null; then
+		break
+	fi
+	sleep 3
+done
+echo "$(date +"%F %T") logstash logged on" >> /tmp/users.log
+```
 
+```
 #!/bin/bash
 until who | grep "^logstash\>" &> /dev/null; do
 sleep 3
@@ -1085,9 +1150,11 @@ while循环的特殊用法（遍历文件的行）：
 while  read  VARIABLE; do
 		循环体；
 done  <  /PATH/FROM/SOMEFILE
-
 依次读取/PATH/FROM/SOMEFILE文件中的每一行，且将基赋值给VARIABLE变量；
-示例：找出ID号为偶数的用户，显示其用户名、ID及默认shell；
+```
+
+## 示例：找出ID号为偶数的用户，显示其用户名、ID及默认shell；
+```
 #!/bin/bash
 	while read line; do
 		userid=$(echo $line | cut -d: -f3)
@@ -1097,21 +1164,29 @@ if [ $[$userid%2] -eq 0 ]; then
 			echo "$username, $userid, $usershell."
 		fi
 	done < /etc/passwd				
-							
-for循环的特殊用法：
+```
+
+- for循环的特殊用法：
+```
 for  ((控制变量初始化;条件判断表达式;控制变量的修正语句)); do
-		循环体
-	done
-	控制变量初始化：仅在循环代码开始运行时执行一次；
-	控制变量的修正语句：每轮循环结束会先进行控制变量修正运算，而后再做条件判断；
-	示例：求100以内所有正整数之和
-	#!/bin/bash
-	declare -i sum=0
+	循环体
+done
+控制变量初始化：仅在循环代码开始运行时执行一次；
+控制变量的修正语句：每轮循环结束会先进行控制变量修正运算，而后再做条件判断；
+```
+
+## 示例：求100以内所有正整数之和
+```
+#!/bin/bash
+declare -i sum=0
 for ((i=1;i<=100;i++)); do
-		let sum+=$i
+	let sum+=$i
 done
 echo "Sum: $sum."
-示例：打印九九乘法表
+```
+
+## 示例：打印九九乘法表
+```
 #!/bin/bash
 	for ((j=1;j<=9;j++)); do
 		for ((i=1;i<=j;i++)); do
@@ -1130,44 +1205,50 @@ case语句：
 	else CONDITION; then
 		分支n
 	fi	
+```
 
 ### 示例1：显示一个菜单给用户；
+```
 cpu) display cpu information
 mem) display memory information
 disk) display disks information
 quit) quit
+```
 
-要求：
-(1) 提示用户给出自己的选择；
-(2) 正确的选择则给出相应的信息；否则，则提示重新选择正确的选项；			   
-`#!/bin/bash`
-`cat << EOF`
-`cpu) display cpu information`
-`mem) display memory infomation`
-`disk) display disks information`
-`quit) quit`
+## 要求：
+1. 提示用户给出自己的选择；
+2. 正确的选择则给出相应的信息；否则，则提示重新选择正确的选项；			   
+```
+#!/bin/bash
+cat << EOF
+cpu) display cpu information
+mem) display memory infomation
+disk) display disks information
+quit) quit
 ===============================
-`EOF`
+EOF
 
-`read -p "Enter your option: " option`
+read -p "Enter your option: " option
 
-`while [ "$option" != "cpu" -a "$option" != "mem" -a "$option" != "disk" -a "$option" != "quit" ]; do`
-`	echo "cpu, mem, disk, quit"`
-`	read -p "Enter your option again: " option`
-`done`
+while [ "$option" != "cpu" -a "$option" != "mem" -a "$option" != "disk" -a "$option" != "quit" ]; do
+	echo "cpu, mem, disk, quit"
+	read -p "Enter your option again: " option
+done
 
-`if [ "$option" == "cpu" ]; then`
-`	lscpu`
-`elif [ "$option" == "mem" ]; then`
-`	free -m`
-`elif [ "$option" == "disk" ]; then`
-`	fdisk -l /dev/[hs]d[a-z]`
-`else`
-`	echo "quit"`
-`	exit 0`
-`fi`
+if [ "$option" == "cpu" ]; then
+	lscpu
+elif [ "$option" == "mem" ]; then
+	free -m
+elif [ "$option" == "disk" ]; then
+	fdisk -l /dev/[hs]d[a-z]
+else
+	echo "quit"
+	exit 0
+fi
+```
 
-### case语句的语法格式：
+### case语句的语法格式
+```
 case  $VARAIBLE  in
 PAT1)
 	分支1
@@ -1180,6 +1261,7 @@ PAT2)
 	分支n
 	;;
 esac
+```
 
 ### case支持glob风格的通配符：
 - *：任意长度的任意字符；
@@ -1187,58 +1269,60 @@ esac
 - []：范围内任意单个字符；
 - a|b：a或b；
 				
-### 示例：写一个服务框架脚本；
-$lockfile,  值/var/lock/subsys/SCRIPT_NAME
-(1) 此脚本可接受start, stop, restart, status四个参数之一；
-(2) 如果参数非此四者，则提示使用帮助后退出；
-(3) start，则创建lockfile，并显示启动；stop，则删除lockfile，并显示停止；restart，则先删除此文件再创建此文件，而后显示重启完成；status，如果lockfile存在，则显示running，否则，则显示为stopped.
-				
-`#!/bin/bash`
-`#`
-`# chkconfig: - 50 50`
-`# description: test service script`
-`#`
-`prog=$(basename $0)`
-`lockfile=/var/lock/subsys/$prog`
+### 示例：写一个服务框架脚本
+- $lockfile,  值/var/lock/subsys/SCRIPT_NAME
+1. 此脚本可接受start, stop, restart, status四个参数之一；
+2. 如果参数非此四者，则提示使用帮助后退出；
+3. start，则创建 lockfile，并显示启动；stop，则删除lockfile，并显示停止；restart，则先删除此文件再创建此文件，而后显示重启完成；status，如果lockfile存在，则显示running，否则，则显示为stopped.
 
-`case $1  in`
-`start)`
-`	if [ -f $lockfile ]; then`
-`		echo "$prog is running yet."`
-`	else`
-`		touch $lockfile`
-`		[ $? -eq 0 ] && echo "start $prog finshed."`
-`	fi`
-`	;;`
-`stop)`
-`	if [ -f $lockfile ]; then`
-`		rm -f $lockfile`
-`		[ $? -eq 0 ] && echo "stop $prog finished."`
-`	else`
-`		echo "$prog is not running."`
-`	fi`
-`	;;`
-`restart)`
-`	if [ -f $lockfile ]; then`
-`		rm -f $lockfile`
-`		touch $lockfile`
-`		echo "restart $prog finished."`
-`	else`
-`		touch -f $lockfile`
-`		echo "start $prog finished."`
-`	fi`
-`	;;`
-`status)`
-`	if [ -f $lockfile ]; then`
-`		echo "$prog is running"`
-`	else`
-`		echo "$prog is stopped."`
-`	fi`
-`	;;`
-`*)`
-`	echo "Usage: $prog {start|stop|restart|status}"`
-`	exit 1`
-`esac`
+```
+#!/bin/bash
+#
+# chkconfig: - 50 50
+# description: test service script
+#
+prog=$(basename $0)
+lockfile=/var/lock/subsys/$prog
+
+case $1  in
+start)
+	if [ -f $lockfile ]; then
+		echo "$prog is running yet."
+	else
+		touch $lockfile
+		[ $? -eq 0 ] && echo "start $prog finshed."
+	fi
+	;;
+stop)
+	if [ -f $lockfile ]; then
+		rm -f $lockfile
+		[ $? -eq 0 ] && echo "stop $prog finished."
+	else
+		echo "$prog is not running."
+	fi
+	;;
+restart)
+	if [ -f $lockfile ]; then
+		rm -f $lockfile
+		touch $lockfile
+		echo "restart $prog finished."
+	else
+		touch -f $lockfile
+		echo "start $prog finished."
+	fi
+	;;
+status)
+	if [ -f $lockfile ]; then
+		echo "$prog is running"
+	else
+		echo "$prog is stopped."
+	fi
+	;;
+*)
+	echo "Usage: $prog {start|stop|restart|status}"
+	exit 1
+esac
+```
 
 ## 函数：function 
 > 把一段独立功能的代码当作一个整体，并为之一个名字；命名的代码段，此即为函数；
@@ -1250,16 +1334,20 @@ $lockfile,  值/var/lock/subsys/SCRIPT_NAME
 - 注意：定义函数的代码段不会自动执行，在调用时执行；所谓调用函数，在代码中给定函数名即可；
 - 函数名出现的任何位置，在代码执行时，都会被自动替换为函数代码；
 				
-### 语法一：
+### 语法一
+```
 function  f_name  {
 	...函数体...
 }
-			
+```
+
 ### 语法二：
+```
 f_name()  {
 	...函数体...
 }
-			
+```
+
 - 函数的生命周期：每次被调用时创建，返回时终止；
 - 其状态返回结果为函数体中运行的最后一条命令的状态结果；
 - 自定义状态返回值，需要使用：return
@@ -1268,72 +1356,76 @@ f_name()  {
 		* 1-255: 失败
 
 ### 示例：给定一个用户名，取得用户的id号和默认shell；
-`#!/bin/bash`
-`userinfo() {`
-`	if id "$username" &> /dev/null; then`
-`		grep "^$username\>" /etc/passwd | cut -d: -f3,7`
-`	else`
-`		echo "No such user."`
-`	fi`
-`}`
-`username=$1`
-`userinfo`
-`username=$2`
-`userinfo`
+```
+#!/bin/bash
+userinfo() {
+	if id "$username" &> /dev/null; then
+		grep "^$username\>" /etc/passwd | cut -d: -f3,7
+	else
+		echo "No such user."
+	fi
+}
+username=$1
+userinfo
+username=$2
+userinfo
+```
 
 ### 示例2：服务脚本框架
-`#!/bin/bash`
-`#`
-`# chkconfig: - 50 50`
-`# description: test service script`
-`#`
-`prog=$(basename $0)`
-`lockfile=/var/lock/subsys/$prog`
+```
+#!/bin/bash
+#
+# chkconfig: - 50 50
+# description: test service script
+#
+prog=$(basename $0)
+lockfile=/var/lock/subsys/$prog
 
-`start() {`
-`	if [ -f $lockfile ]; then`
-`		echo "$prog is running yet."`
-`	else`
-`		touch $lockfile`
-`		[ $? -eq 0 ] && echo "start $prog finshed."`
-`	fi`
-`}`
+start() {
+	if [ -f $lockfile ]; then
+		echo "$prog is running yet."
+	else
+		touch $lockfile
+		[ $? -eq 0 ] && echo "start $prog finshed."
+	fi
+}
 
-`stop() {`
-`	if [ -f $lockfile ]; then`
-`		rm -f $lockfile`
-`		[ $? -eq 0 ] && echo "stop $prog finished."`
-`	else`
-`		echo "$prog is not running."`
-`	fi`
-`}`
-`status() {`
-`	if [ -f $lockfile ]; then`
-`		echo "$prog is running"`
-`	else`
-`		echo "$prog is stopped."`
-`	fi`
-`}`
+stop() {
+	if [ -f $lockfile ]; then
+		rm -f $lockfile
+		[ $? -eq 0 ] && echo "stop $prog finished."
+	else
+		echo "$prog is not running."
+	fi
+}
+status() {
+	if [ -f $lockfile ]; then
+		echo "$prog is running"
+	else
+		echo "$prog is stopped."
+	fi
+}
 
-`usage() {`
-`	echo "Usage: $prog {start|stop|restart|status}"`
-`}`
+usage() {
+	echo "Usage: $prog {start|stop|restart|status}"
+}
 
-`case $1 in`
-`start)`
-`	start ;;`
-`stop)`
-`	stop ;;`
-`restart)`
-`	stop`
-`	start ;;`
-`status)`
-`	status ;;`
-`*)`
-`	usage`
-`	exit 1 ;;`
-`esac`
-			
+case $1 in
+start)
+	start ;;
+stop)
+	stop ;;
+restart)
+	stop
+	start ;;
+status)
+	status ;;
+*)
+	usage
+	exit 1 ;;
+esac
+```
+
 ### 函数返回值：
 - 函数的执行结果返回值：
 	+ (1) 使用echo或printf命令进行输出；
@@ -1349,31 +1441,32 @@ f_name()  {
 		
 ### 示例：添加10个用户，
 > 添加用户的功能使用函数实现，用户名做为参数传递给函数；
-	
-`#!/bin/bash`
-`# 5: user exists`
+```	
+#!/bin/bash
+# 5: user exists
 
-`addusers() {`
-`	if id $1 &> /dev/null; then`
-`		return 5`
-`	else`
-`		useradd $1`
-`		retval=$?`
-`		return $retval`
-`	fi`
-`}`
+addusers() {
+	if id $1 &> /dev/null; then
+		return 5
+	else
+		useradd $1
+		retval=$?
+		return $retval
+	fi
+}
 
-`for i in {1..10}; do`
-`	addusers ${1}${i}`
-`	retval=$?`
-`	if [ $retval -eq 0 ]; then`
-`		echo "Add user ${1}${i} finished."`
-`	elif [ $retval -eq 5 ]; then`
-`		echo "user ${1}${i} exists."`
-`	else`
-`		echo "Unkown Error."`
-`	fi`
-`done`
+for i in {1..10}; do
+	addusers ${1}${i}
+	retval=$?
+	if [ $retval -eq 0 ]; then
+		echo "Add user ${1}${i} finished."
+	elif [ $retval -eq 5 ]; then
+		echo "user ${1}${i} exists."
+	else
+		echo "Unkown Error."
+	fi
+done
+```
 		
 ### 练习：写一个脚本；
 - 使用函数实现ping一个主机来测试主机的在线状态；主机地址通过参数传递给函数；
@@ -1387,46 +1480,51 @@ f_name()  {
 	+ 定义局部变量的方法：local VARIABLE=VALUE
 - 本地变量：作用域是运行脚本的shell进程的生命周期；因此，其作用范围为当前shell脚本程序文件；
 
-### 示例程序：
-`#!/bin/bash`
-`name=tom`
+### 示例程序
+```
+#!/bin/bash
+name=tom
 
-`setname() {`
-`	local name=jerry`
-`	echo "Function: $name"`
-`}`
-`setname`
-`echo "Shell: $name"`
-		
+setname() {
+	local name=jerry
+	echo "Function: $name"
+}
+setname
+echo "Shell: $name"
+```
+
 ### 函数递归：
 > 函数直接或间接调用自身
 
-`#!/bin/bash`
-`fact() {`
-`	if [ $1 -eq 0 -o $1 -eq 1 ]; then`
-`		echo 1`
-`	else`
-`		echo $[$1*$(fact $[$1-1])]`
-`	fi`
-`}`
+```
+#!/bin/bash
+fact() {
+	if [ $1 -eq 0 -o $1 -eq 1 ]; then
+		echo 1
+	else
+		echo $[$1*$(fact $[$1-1])]
+	fi
+}
 
-`fact $1`
-		
-						
-`#!/bin/bash`
-`fab() {`
-`	if [ $1 -eq 1 ]; then`
-`		echo -n "1 "`
-`	elif [ $1 -eq 2 ]; then`
-`		echo -n "1 "`
-`	else`
-`		echo -n "$[$(fab $[$1-1])+$(fab $[$1-2])] "`
-`	fi`
-`}`
+fact $1
+```		
 
-`for i in $(seq 1 $1); do`
-`	fab $i`
-`done`
+```	
+#!/bin/bash
+fab() {
+	if [ $1 -eq 1 ]; then
+		echo -n "1 "
+	elif [ $1 -eq 2 ]; then
+		echo -n "1 "
+	else
+		echo -n "$[$(fab $[$1-1])+$(fab $[$1-2])] "
+	fi
+}
+
+for i in $(seq 1 $1); do
+	fab $i
+done
+```
 
 # 数组：
 - 变量：存储单个元素的内存空间；
@@ -1456,227 +1554,244 @@ f_name()  {
 - 注意：引用时，只给数组名，表示引用下标为0的元素；
 
 ## 数组的长度（数组中元素的个数）:
-`${#ARRAY_NAME[*]}`
-`${#ARRAY_NAME[@]}`
+- `${#ARRAY_NAME[*]}`
+- `${#ARRAY_NAME[@]}`
 		
 ### 示例：生成10个随机数，并找出其中的最大值和最小值；
-`#!/bin/bash`
-`declare -a  rand`
-`declare -i max=0`
+```
+#!/bin/bash
+declare -a  rand
+declare -i max=0
 
-`for i in {0..9}; do`
-`	rand[$i]=$RANDOM`
-`	echo ${rand[$i]}`
-`	[ ${rand[$i]} -gt $max ] && max=${rand[$i]}`
-`done`
-`echo "MAX: $max"`
-	
+for i in {0..9}; do
+	rand[$i]=$RANDOM
+	echo ${rand[$i]}
+	[ ${rand[$i]} -gt $max ] && max=${rand[$i]}
+done
+echo "MAX: $max"
+```
+
 ### 练习：生成10个随机数，而后由小到大进行排序；
 
 ### 练习：写一个脚本
-> 定义一个数组，数组中的元素是/var/log目录下所有以.log结尾的文件；统计其下标为偶数的文件中的行数之和；
-	
-`#!/bin/bash`
-`declare -a files`
-`files=(/var/log/*.log)`
+> 定义一个数组，数组中的元素是/var/log目录下所有以.log结尾的文件；统计其下标为偶数的文件中的行数之和
 
-`declare -i lines=0`
+```	
+#!/bin/bash
+declare -a files
+files=(/var/log/*.log)
 
-`for i in $(seq 0 $[${#files[*]}-1]); do`
-`	if [ $[$i%2] -eq 0 ]; then`
-`		let lines+=$(wc -l ${files[$i]} | cut -d' ' -f1)`
-`	fi`
-`done`
-`echo "Lines: $lines."`
+declare -i lines=0
+
+for i in $(seq 0 $[${#files[*]}-1]); do
+	if [ $[$i%2] -eq 0 ]; then
+		let lines+=$(wc -l ${files[$i]} | cut -d' ' -f1)
+	fi
+done
+echo "Lines: $lines."
+```
 
 ## 引用数组中的所有元素：
-`${ARRAY_NAME[*]}`
-`${ARRAY_NAME[@]}` 
+- `${ARRAY_NAME[*]}`
+- `${ARRAY_NAME[@]}` 
 
 ## 数组元素切片： `${ARRAY_NAME[@]:offset:number}`
 - offset：要路过的元素个数；
 - number：要取出的元素个数；省略number时，表示取偏移量之后的所有元素；
 
 ## 向非稀疏格式数组中追加元素：
-`ARRAY_NAME[${#ARRAY_NAME[*]}]=`
+- `ARRAY_NAME[${#ARRAY_NAME[*]}]=`
 
 ## 删除数组中的某元素：
-`unset  ARRAY[INDEX]`
+- `unset  ARRAY[INDEX]`
+
 ## 关联数组：
-`declare  -A  ARRAY_NAME`
-`ARRAY_NAME=([index_name1]="value1"  [index_name2]="value2" ...`	
+- `declare  -A  ARRAY_NAME`
+- `ARRAY_NAME=([index_name1]="value1"  [index_name2]="value2" ...`	
 	
 # bash的内置字符串处理工具：
 		
 ## 字符串切片：
+```
 ${var:offset:number}
 	取字符串的子串
 	取字符串的最右侧的几个字符：${var: -length}
 		注意：冒号后必须有一个空白字符；
+```
 
 ## 基于模式取子串：
 - ${var#*word}：其中word是指定的分隔符；功能：自左而右，查找var变量所存储的字符串中，第一次出现的word分隔符，删除字符串开头至此分隔符之间的所有字符；
 
 - ${var##*word}：其中word是指定的分隔符；功能：自左而右，查找var变量所存储的字符串中，最后一次出现的word分隔符，删除字符串开头至此分隔符之间的所有字符；
-	
-	mypath="/etc/init.d/functions"
-	${mypath##*/}:   functions
-	${mypath#*/}:  etc/init.d/functions
-	
+```	
+mypath="/etc/init.d/functions"
+${mypath##*/}:   functions
+${mypath#*/}:  etc/init.d/functions
+```	
 - ${var%word*}：其中word是指定的分隔符；功能：自右而左，查找var变量所存储的字符串中，第一次出现的word分隔符，删除此分隔符至字符串尾部之间的所有字符；
 
 - ${var%%word*}：其中word是指定的分隔符；功能：自右而左，查找var变量所存储的字符串中，最后一次出现的word分隔符，删除此分隔符至字符串尾部之间的所有字符；
 
+```
 mypath="/etc/init.d/functions"
-	${mypath%/*}:  /etc/init.d
-	url=http://www.magedu.com:80
-	${url##*:}
-	${url%%:*}
-					
-## 查找替换：
-${var/PATTERN/SUBSTI}：查找var所表示的字符串中，第一次被PATTERN所匹配到的字符串，将其替换为SUBSTI所表示的字符串；
-${var//PATTERN/SUBSTI}：查找var所表示的字符串中，所有被PATTERN所匹配到的字符串，并将其全部替换为SUBSTI所表示的字符串；
+${mypath%/*}:  /etc/init.d
+url=http://www.magedu.com:80
+${url##*:}
+${url%%:*}
+```
 
-${var/#PATTERN/SUBSTI}：查找var所表示的字符串中，行首被PATTERN所匹配到的字符串，将其替换为SUBSTI所表示的字符串；
-${var/%PATTERN/SUBSTI}：查找var所表示的字符串中，行尾被PATTERN所匹配到的字符串，将其替换为SUBSTI所表示的字符串；
-注意：PATTERN中使用glob风格和通配符；
+## 查找替换：
+- ${var/PATTERN/SUBSTI}：查找var所表示的字符串中，第一次被PATTERN所匹配到的字符串，将其替换为SUBSTI所表示的字符串；
+- ${var//PATTERN/SUBSTI}：查找var所表示的字符串中，所有被PATTERN所匹配到的字符串，并将其全部替换为SUBSTI所表示的字符串；
+
+- ${var/#PATTERN/SUBSTI}：查找var所表示的字符串中，行首被PATTERN所匹配到的字符串，将其替换为SUBSTI所表示的字符串；
+- ${var/%PATTERN/SUBSTI}：查找var所表示的字符串中，行尾被PATTERN所匹配到的字符串，将其替换为SUBSTI所表示的字符串；
+- 注意：PATTERN中使用glob风格和通配符；
 		
 ## 查找删除：
-${var/PATTERN}：以PATTERN为模式查找var字符串中第一次的匹配，并删除之；
-${var//PATERN}
-${var/#PATTERN}
-${var/%PATTERN}		
+- ${var/PATTERN}：以PATTERN为模式查找var字符串中第一次的匹配，并删除之；
+- ${var//PATERN}
+- ${var/#PATTERN}
+- ${var/%PATTERN}		
 		
 ## 字符大小写转换：
-${var^^}：把var中的所有小写字符转换为大写
-${var,,}：把var中的所有大写字符转换为小写
+- ${var^^}：把var中的所有小写字符转换为大写
+- ${var,,}：把var中的所有大写字符转换为小写
 		
 ## 变量赋值：
-${var:-VALUE}：如果var变量为空或未设置，那么返回VALUE；否则，则返回var变量的值； 
-${var:=VALUE}：如果var变量为空或未设置，那么返回VALUE，并将VALUE赋值给var变量；否则，则返回var变量的值； 
-${var:+VALUE}：如果var变量不空，则返回VALUE；
-${var:?ERROR_INFO}：如果var为空或未设置，那么返回ERROR_INFO为错误提示；否则，返回var值； 
+- ${var:-VALUE}：如果var变量为空或未设置，那么返回VALUE；否则，则返回var变量的值； 
+- ${var:=VALUE}：如果var变量为空或未设置，那么返回VALUE，并将VALUE赋值给var变量；否则，则返回var变量的值； 
+- ${var:+VALUE}：如果var变量不空，则返回VALUE；
+- ${var:?ERROR_INFO}：如果var为空或未设置，那么返回ERROR_INFO为错误提示；否则，返回var值； 
 			
 ### 练习：写一个脚本，完成如下功能
-(1) 提示用户输入一个可执 行命令的名称；
-(2) 获取此命令所依赖到的所有库文件列表；
-(3) 复制命令至某目标目录（例如/mnt/sysroot，即把此目录当作根）下的对应的路径中
-	bash,  /bin/bash  ==> /mnt/sysroot/bin/bash
-	useradd, /usr/sbin/useradd  ==>  /mnt/sysroot/usr/sbin/useradd
-(4) 复制此命令依赖到的所有库文件至目标目录下的对应路径下；
-	/lib64/ld-linux-x8664.so.2  ==>  /mnt/sysroot/lib64/ld-linux-x8664.so.2
+1. 提示用户输入一个可执 行命令的名称；
+2. 获取此命令所依赖到的所有库文件列表；
+3. 复制命令至某目标目录（例如/mnt/sysroot，即把此目录当作根）下的对应的路径中
+```
+bash,  /bin/bash  ==> /mnt/sysroot/bin/bash
+useradd, /usr/sbin/useradd  ==>  /mnt/sysroot/usr/sbin/useradd
+```
+4. 复制此命令依赖到的所有库文件至目标目录下的对应路径下；
+`/lib64/ld-linux-x8664.so.2  ==>  /mnt/sysroot/lib64/ld-linux-x8664.so.2`
 			
-进一步：
-	每次复制完成一个命令后，不要退出，而是提示用户继续输入要复制的其它命令，并重复完成如上所描述的功能；直到用户输入“quit”退出脚本；
+## 进一步：
+- 每次复制完成一个命令后，不要退出，而是提示用户继续输入要复制的其它命令，并重复完成如上所描述的功能；直到用户输入“quit”退出脚本；
 
-### 写一个脚本：
+### 写一个脚本
 > ping命令去查看172.16.1.1-172.16.67.1范围内的所有主机是否在线；在线的显示为up, 不在线的显示down，分别统计在线主机，及不在线主机数；
-分别使用for, while和until循环实现。
-		
-`#!/bin/bash`
 
-`declare -i uphosts=0`
-`declare -i downhosts=0`
+- 分别使用for, while和until循环实现。
+```		
+#!/bin/bash
 
-`for i in {1..17}; do`
-`	if ping -W 1 -c 1 172.16.$i.1 &> /dev/null; then`
-`		echo "172.16.$i.1 is up."`
-`		let uphosts+=1`
-`	else`
-`		echo "172.16.$i.1 is down."`
-`		let downhosts+=1`
-`	fi`
-`done`
-`echo "Up hosts: $uphosts, Down hosts: $downhosts."	`
-`#!/bin/bash`
-`declare -i uphosts=0`
-`declare -i downhosts=0`
-`declare -i i=1`
+declare -i uphosts=0
+declare -i downhosts=0
 
-`hostping() {`
-`	if ping -W 1 -c 1 $1 &> /dev/null; then`
-`		echo "$1 is up."`
-`		return 0`
-`	else`
-`		echo "$1 is down."`
-`		return 1`
-`	fi`
-`}`
+for i in {1..17}; do
+	if ping -W 1 -c 1 172.16.$i.1 &> /dev/null; then
+		echo "172.16.$i.1 is up."
+		let uphosts+=1
+	else
+		echo "172.16.$i.1 is down."
+		let downhosts+=1
+	fi
+done
+echo "Up hosts: $uphosts, Down hosts: $downhosts."	
+```
 
-`while [ $i -le 67 ]; do`
-`	hostping 172.16.$i.1`
-`	[ $? -eq 0 ] && let uphosts++ || let downhosts++`
-`	let i++`
-`done`
+```
+#!/bin/bash
+declare -i uphosts=0
+declare -i downhosts=0
+declare -i i=1
 
-`echo "Up hosts: $uphosts, Down hosts: $downhosts."`
+hostping() {
+	if ping -W 1 -c 1 $1 &> /dev/null; then
+		echo "$1 is up."
+		return 0
+	else
+		echo "$1 is down."
+		return 1
+	fi
+}
+
+while [ $i -le 67 ]; do
+	hostping 172.16.$i.1
+	[ $? -eq 0 ] && let uphosts++ || let downhosts++
+	let i++
+done
+
+echo "Up hosts: $uphosts, Down hosts: $downhosts."
+```
 	
 ### 写一个脚本，实现：能探测C类、B类或A类网络中的所有主机是否在线；
-			
-`#!/bin/bash`
-`cping() {`
-`	local i=1`
-`	while [ $i -le 5 ]; do`
-`		if ping -W 1 -c 1 $1.$i &> /dev/null; then`
-`			echo "$1.$i is up"`
-`		else`
-`			echo "$1.$i is down."`
-`		fi`
-`		let i++`
-`	done`
-`}`
-`bping() {`
-`	local j=0`
-`	while [ $j -le 5 ]; do`
-`		cping $1.$j`
-`		let j++`
-`	done`
-`}`
-`aping() {`
-`	local x=0`
-`	while [ $x -le 255 ]; do`
-`		bping $1.$x`
-`		let x++`
-`	done`
-`}`
-
+```
+#!/bin/bash
+cping() {
+	local i=1
+	while [ $i -le 5 ]; do
+		if ping -W 1 -c 1 $1.$i &> /dev/null; then
+			echo "$1.$i is up"
+		else
+			echo "$1.$i is down."
+		fi
+		let i++
+	done
+}
+bping() {
+	local j=0
+	while [ $j -le 5 ]; do
+		cping $1.$j
+		let j++
+	done
+}
+aping() {
+	local x=0
+	while [ $x -le 255 ]; do
+		bping $1.$x
+		let x++
+	done
+}
+```
 
 ## 提示用户输入一个IP地址或网络地址；获取其网络，并扫描其网段
-
 
 # 信号捕捉
 >信号：进程间通信
 
-- 列出信号：
-	+ `# trap  -l`
-	+ `# kill  -l`
-	+ `# man  7  signal`
+- 列出信号
+```
+# trap  -l
+# kill  -l
+# man  7  signal
+# trap  'COMMAND'  SIGNALS
+```
 
-`# trap  'COMMAND'  SIGNALS`
-常可以进行捕捉的信号：HUP， INT
+- 常可以进行捕捉的信号：HUP， INT
 
 ### 示例
-`#!/bin/bash`
-`declare -a hosttmpfiles`
-`trap  'mytrap'  INT`
+```
+#!/bin/bash
+declare -a hosttmpfiles
+trap  'mytrap'  INT
 
-`mytrap()  {`
-`	echo "Quit"`
-`	rm -f ${hosttmpfiles[@]}`
-`	exit 1`
-`}`
-`for i in {1..50}; do`
-`	tmpfile=$(mktemp /tmp/ping.XXXXXX)`
-`	if ping -W 1 -c 1 172.16.$i.1 &> /dev/null; then`
-`		echo "172.16.$i.1 is up" | tee $tmpfile`
-`	else`
-`		echo "172.16.$i.1 is down" | tee $tmpfile`
-`	fi`
-`	hosttmpfiles[${#hosttmpfiles[*]}]=$tmpfile`
-`done`
-`rm -f ${hosttmpfiles[@]}`
-	
-
+mytrap()  {
+	echo "Quit"
+	rm -f ${hosttmpfiles[@]}
+	exit 1
+}
+for i in {1..50}; do
+	tmpfile=$(mktemp /tmp/ping.XXXXXX)
+	if ping -W 1 -c 1 172.16.$i.1 &> /dev/null; then
+		echo "172.16.$i.1 is up" | tee $tmpfile
+	else
+		echo "172.16.$i.1 is down" | tee $tmpfile
+	fi
+	hosttmpfiles[${#hosttmpfiles[*]}]=$tmpfile
+done
+rm -f ${hosttmpfiles[@]}
+```	
 
 ## dialog命令可实现窗口化编程；
 - 各窗体控件使用方式；
@@ -1684,5 +1799,5 @@ ${var:?ERROR_INFO}：如果var为空或未设置，那么返回ERROR_INFO为错�
 - 默认，其输出信息被定向到了错误输出流；
 - a=$(dialog)
 
-《高级bash编程指南》
-《Linux命令行和shell脚本编程宝典》
+-《高级 bash 编程指南》
+-《Linux 命令行和 shell 脚本编程宝典》

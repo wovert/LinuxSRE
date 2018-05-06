@@ -616,358 +616,6 @@ du [OPTION]... [FILE]...
 	+ 权限：lrwxrwxrwx，其指向链接的文件
 - 硬链接：指向同一个inode；
 
-# RAID 
-- Redundant Arrays of Inexpensive Disks 廉价磁盘冗余阵列
-- Redundant Arrays of Independent Disks 独立磁盘冗余陈列
-- Berkeley: A case for Redundent Arrays of Inexpensive Disks RAID
-> 多块硬盘按照某种组织格式形成一个硬盘使用
-- 作用
-	+ 提高IO能力
-		* 磁盘并行读写（内置raid内存,额外供电防止断电导致数据丢失）
-	+ 提高耐用性
-		* 磁盘冗余来实现
-
-- 级别：多块磁盘组织在一起的工作方式有所不同
-
-## RAID实现方式：
-- 外界式磁盘阵列：通过扩展卡适配能力
-- 内接式RAID：主板集成RAID控制器
-- Software RAID
-- BIOS:外界式/内接式，安装OS之前配置好
-
-## 级别：level
->磁盘组织形式不同，0-7
-
-### RAID-0：0，条带卷，strip
-- 若干个chunk平均分散存储
-- 磁盘上一块由若干个地址连接的磁盘块构成的大小固定的区域
-- chunk：块
-
-- 读、写性能提升
-- 可用空间：N*min(S1,S2,...) 10G, 20G, 30G => 10G,10G,10G
-- 无容错能力
-- 最少磁盘数：2,2+
-
-- 优点：提供IO并行
-- 缺点：减低耐用性，任何一块硬盘损坏全部损毁
-- 用途：非关键性数据，临时文件系统、交互数据等
-
-### RAID-1: 1, 镜像卷，mirror
-- 若干个chunk分别存储
-
-- 读性能提升：不同的磁盘上读取
-- 写性能略有下降：同一个数据分别不同的磁盘上
-- 可用空间：1*min(S1,S2,S3,...)10G,20G => 10G最少硬盘决定可用空间
-- 有冗余能力
-- 最少磁盘数：2,2+
-
-### RAID-4: 4
-- 至少三个磁盘，2个数据盘，1个校验盘
-- 2个数据盘(RAID0)
-- 1个校验盘(2个数据盘上的数据^运算结果)
-- 例如：
-	+ 1101^0110 => 1011
-	+ 一个硬盘损坏，降级工作模式；及时更换硬盘
-	+ 有灯来指示是否损坏
-	+ 监控工具监听数据
-	+ 硬件接口API
-
-- 使用热备份(备胎)
-- 总结：性能差、有冗余能力
-
-### RAID-5: 5
-- 校验码轮流放入不同的磁盘上
-- 数据布局：左称线
-
-- 读、写性能提升
-- 可用空间：(N-1)*min(S1,S2,S3,...) 
-- 10G 20G 30G
-- 10G
-- 有容错能力：1块磁盘
-- 最少磁盘数：3,3+
-
-### RAID-6: 6
-- 2个校验盘、2个数据盘
-- 读、写性能提升
-- 可用空间：（N-2）*min(S1,S2,...)
-- 有容错能力：2块磁盘
-- 最少磁盘数：4，4+
-
-### RAID-10
-- 先做1，后做0（从下往上）
-- 读、写性能提升
-- 可用空间：N*min(S1,S2,...)/2
-- 有容错能力：每组镜像最多只能坏一块
-- 最少磁盘数：4,4+
-
-### RAID-01:
-- 先做0，后做1（从下往上）
-
-### RAID-50:
-- 先做0，后做1（从下往上）
-- 至少6个
-- 最多只能坏一个
-
-### RAID-7:
-- IO能力非常好，价格昂贵
-
-### JBOD: Just a Bunch Of Disks
-- 单个文件3.5T
-- 4个每个1T
-- 功能：将多块磁盘的空间合并一个大的连续空间使用
-- 可用空间：sum(S1,S2,...)
-
-### 常用级别：RAID-0, RAID-1, RAID-5, RAID-10, RAID-50， JBOD
-### 实现方式：
-- 硬件实现方式
-- 软件实现方式
-
-# CentOS 6上的软件 RAID 的实现
-> 结合内核中的**md模块**（multi deviced）
-
-- mdadm命令与内核中进行通信，与系统调用通信
-
-## mdadm：模式化的工具，CentOS 6,7之后md有变化
-- 命令语法格式：`mdadm [mode] <raiddevice> [options] <component-devices>`
-		
-- 支持的RAID级别：LINER,RAID0，RAID1，RAID4， RAID5， RAID6， RAID10
-- 模式：
-	+ 创建：-C
-	+ 装配：-A
-	+ 监控：-F follow
-	+ 管理：-f, -r, -a 
-- raiddevice: /dev/md#
-- component-devices：任意块设备，整个磁盘或分区
-
-### -C：创建模式
-- -n #：使用#块设备来创建此RAID
-- -l #：指明要创建的RAID的级别
-- -a {yes|no} 是否自动创建目标RAID设备的设备文件
-- -c CHUNK_SIZE：指明块大小，默认512kb
-- -x #：指明空闲盘的个数；有冗余能力的；热备份，备胎
-- 例如：创建一个10G可用空间的RAID5
-	+ $ fdisk /dev/sda{6,7,8,9}
-	+ 设备类型：fd Linux raid auto
-
-### -D：显示raid的详细信息
-- `$ mdadm -D /dev/md[0-9]+`
-
-### 管理模式：
-- -f: 标记指定磁盘为损坏
-- -a：添加磁盘
-- -r：移动磁盘
-
-### 观察md状态：
-- `$ cat /proc/mdstat`
-- `$ watch -n1 'cat /proc/mdstat'`
-
-### 停止md设备：
-- `$ mdadm -S /dev/md0`
-
-#### 彻底删除raid设备文件
-1. 卸载设备
-2. 删除raid
-```
-$ mdadm /dev/md0 --fail /dev/sdb5 --remove /dev/sdb5
-$ mdadm /dev/md0 --fail /dev/sdb6 --remove /dev/sdb6
-$ mdadm /dev/md0 --fail /dev/sdb7 --remove /dev/sdb7
-$ mdadm /dev/md0 --fail /dev/sdb8 --remove /dev/sdb8
-```
-3. 停止运行raid
-```
-$ mdadm -S /dev/md0
-$ mdadm --remove /dev/md0
-$ mdadm --misc --zero-superblock /dev/sdb5
-$ mdadm --misc --zero-superblock /dev/sdb6
-$ mdadm --misc --zero-superblock /dev/sdb7
-$ mdadm --misc --zero-superblock /dev/sdb8
-```
-
-- 先删除RAID中的所有设备，然后停止该RAID即可
-
-- 为了防止系统启动时候启动raid
-```
-$ rm -f /etc/mdadm.conf
-$ rm -f /etc/raidtab
-```
-
-- 检查系统启动文件中是否还有其他mdad启动方式
-```
-$ vi /etc/rc.sysinit+/raid\c
-```
-
-## watch options 'COMMAND'
-- -n #：刷新间隔，单位是秒
-
-#### 创建一个 10G 可用的 RAID5
-> 3个5G或5个2.5G
-- 磁盘个数越多浪费空间越小，当组织处理多
-- 练习 10G 可用的 RAID5，还有一个冗余磁盘
-
-1. Raid 分区必须使用 System ID 为 fd
-2. $ cat /proc/mdstat 查看 md 设备
-`$ ls -l /dev/ | grep md*`
-3. $ mdadm -C /dev/md0 -a yes -l 5 -x 1 -n 3 /dev/sdb{5,6,7,8}
-4. $ cat /proc/mdstat
-5. $ mke2fs -t ext /dev/md0
-6. $ mkdir /mydata
-7. $ mount /dev/md0 /mydata
-8. $ df -hl
-9. $ blkid /dev/md0
-10. 使用 UUID 或 LABEL 挂载到 /etc/fstab
-11. $ mdadm -D /dev/md0
-- D:Detail 信息
-
-#### 损坏磁盘：自动热备份
-1. $ mdadm /dev/md0 -f /dev/sdb5 标记为损坏
-2. 每一秒钟刷新一次
-`$ watch -n1 'cat /proc/mdstat'`
-3. $ mdadm -D /dev/md0
-
-#### 再次损坏磁盘
-1. $ cat /etc/fstab /mydata
-2. $ mdadm /dev/md0 -f /dev/sdb7
-3. $ mdadm -D /dev/md0
-4. $ cat /mydata/fstab
-
-#### 移除磁盘
-1. $ mdadm /dev/md0 -r /dev/两个丢失的磁盘
-2. $ mdadm -D /dev/md0
-	State: clean, degraded（降级状态）
-	Layout: left-symmetric（左对称）
-
-#### 添加磁盘
-1. $ mdadm /dev/md0 -a /dev/sda?
-2. $ mdadm -D /dev/md0
-	State: clean, degraded, recovering
-
-- 在添加磁盘成为空闲盘使用，做冗余磁盘
-
-## 练习
-1. 创建一个可用空间为10G的RAID0设备，要求其chunnk大小128k,文件系统为ext4，开机可自动挂载至/backup目录
-2. 创建一个可用空间为10G的RAID10设备，要求其chunk大小为256k，文件系统为ext4，开机自动挂载至/my目录
-
-## 磁盘损坏导致数据丢失，但备份数据不能少
-
-# LVM
-- **LVM**：Logical Volume Manager, Version: 2
-- **dm模块**：device mapper，将一个或多个底层设备组织成一个逻辑设备的模块
-- 设备文件：/dev/md-#
-
-- LV(Logical Volume) 
-	+ LE (Logic Extend)
-- VG(Volume Group)包含
-	+ PE(Physical extend)，默认4MB
-- PV(physical Volume)，逻辑卷，多个分区
-
-/dev/mapper/VG_NAME-LV_NAME 
-	<-- /dev/VG_NAME/LV_NAME
-/dev/mapper/vol0-root 
-	<-- /dev/vol0/root
-    <-- /dev/dm-0
-
-## 创建步骤
-1. create pv(pe)
-2. create vg
-3. create lv(le)
-
-## LVM系统分区ID：**8e, Linux LVM**
-
-## pvcreate：创建 pv
-- `$ pvcreate /dev/DEVICE`
-	+ `-v:verbose`
-	+ `-f:force 覆盖数据`
-
-## pvremove：移除pv
-- `$ pvremove /dev/DEVICE`
-
-## pvs,pvdisplay：查看pv
-- `$ pvs /dev/DEVICE` 		简要显示信息
-- `$ pvdisplay /dev/DEVICE` 详细显示信息
-		
-## 其他pv管理工具
-- pvmove
-- pvscan
-- pvresize
-- pvck
-- pvchange
-
-## vgs,vgdisplay: 查看vg
-`$ vgs`
-`$ vgdisplay [vgName]`
-
-## vgcreate: 创建vg, 默认PE 4MB
-`$ vgcreate -s #[kKmMgGtTpPeE] vgName /dev/DEVICE ...`
-
-## vgremove: 移除vg
-`$ vgremove -s #[kKmMgGtTpPeE] vgName /dev/DEVICE`
-
-## vgextend: 扩展vg
-`$ vgextend vgname /dev/DEVICES`
-
-## vgreduce: 缩减vg
-- `$ pvmove /dev/DEVICE`			移动数据
-- `$ vgreduce vgname /dev/DEVICE` 后缩减vg
-
-## lvs,lvdisplay: 查看lv
-```
-$ lvs
-$ lvdisplay [/dev/vg0/root]
-$ lvdisplay [/dev/mapper/vg0-root]
-```
-
-## lvcreate, 创建lv
-```
-$ lvcreate -L #[mMgGtTpPeE] -n lvName vgName
-$ lcreate -L 8G -n lv0 vg0
-$ ls -l /dev/mapper/vg0-lv0 --> ../dm-0
-```
-
-## lvremove，移除lv
-`$ lvremove lvName vgName`
-
-## lextend, 扩展lv
-```
-$ lvextend -L +#[mMgGtT] /dev/vg0/lv0
-$ lvextend -L +2G /dev/vg0/lv0
-加多少
-目标大小直接写大小
-$ umount /lvdata
-$ mount /dev/vg0/lv0 /lvdata
-大小还是没有变化？
-文件系统没有扩展，所以没有显示增加的大小
-$ resize2fs /dev/vg0/lv0 扩展文件系统占用空间
-$ df -hl
-```
-
-## 缩减逻辑卷
-1. `# umount /dev/VG_NAME/LV_NAME`
-2. `# e2fsck -f /dev/VG_NAME/LV_NAME` 文件系统强制检测
-3. `# resize2fs /dev/VG_NAME/LV_NAME #[mMgGtT]` 缩减文件系统大小
-4. `# lvreduce -L [-]#[mMgGtT] /dev/VG_NAME/LV_NAME`
-5. `# mount`
-
-#　快照：snapshot
-- 访问原卷的路径
-- 原卷发生变化时，把数据存储到快照卷上，然后修改原数据
-- 目的：文件的另一个访问路径，与硬链接相似
-
-## 创建快照,r只读
-`# lvcreate -L sieze -p r -s -n snapshot_lv_name orginal_lv_name`
-`# lvcreate -s -L 512M -n lv0-snap -p r /dev/vg0/lv0` 
-`# mount /dev/vg0/lv0-snap /mnt`
-
-## 删除快照：
-`# umount /mnt`
-`# lvremove /dev/vg0/lv0-snap`
-
-## 练习：
-1. 创建一个至少有两个PV组成的大小为20G的名为testvg的VG；要求PE大小为16MB，而后在卷组中创建大小为5G的逻辑卷testlv；挂载至/users目录
-2. 新建用户archlinux，其家目录为/users/archlinux，而后su切换至archlinux用户，复制/etc/pam.d目录至自己的家目录
-3. 扩展testlv至7G，要求archlinux用户的文件不能丢失
-4. 收缩testlv至3G，要求archilnux用户的文件不能丢失
-5. 对testlv创建快照，并尝试基于快照备份数据，验证快照的功能；
-
 ## BRTFS 文件系统
 - BTRfs(B-tree, Butter FS, Better FS), GPL,2007年 Oracle, 支持CoW(写时复制)
 - 支持大容量单文件
@@ -996,105 +644,108 @@ $ df -hl
 	+ -O：features
 
 ### 查看特定命令, 列出支持的所有 features
-`# mkfs.btrfs -O list-all`
+- `# mkfs.btrfs -O list-all`
 
 ### 关闭图形界面
-`# systemctl set-default multi-user.target`
+- `# systemctl set-default multi-user.target`
 
 ### 创建3个磁盘，并创建 BTRFS
 > 不建议同一磁盘上使用raid，使用多块硬盘使用raid
-`# fdisk -l`
-`# mkfs.btrfs -L BTRDATA /dev/sdc /dev/sdd`
+- `# fdisk -l`
+- `# mkfs.btrfs -L BTRDATA /dev/sdc /dev/sdd`
 
 ### 显示 btrfs 文件系统
-`# man btrfs-filesystem 子命令`
-`# btrfs filesystem show	--all-devices(默认)`
-`# btrfs filesystem show	LABEL	`
-`# btrfs filesystem show	/dev/sdc`
-`# btrfs filesystem show	/dev/sdd`	
+```
+# man btrfs-filesystem 子命令
+# btrfs filesystem show	--all-devices(默认)
+# btrfs filesystem show	LABEL	
+# btrfs filesystem show	/dev/sdc
+# btrfs filesystem show	/dev/sdd`
+```
 
 ### Label: 'BTRDATA'
-`# btrfs /dev/sdc`
-`# btr /dev/sdd`
-`/dev/sdc和/dev/sdd的UUID是一样，UUID_SUB不一样`
+```
+# btrfs /dev/sdc
+# btr /dev/sdd
+/dev/sdc和/dev/sdd的UUID是一样，UUID_SUB不一样
+```
 
 ### 查看卷标名
-`# btrfs filessytem label /dev/sdd`
+- `# btrfs filessytem label /dev/sdd`
 
 ### 挂载文件系统
-`# mkdir /btrdata`
-`# mount -t btrfs /dev/sdd /btrdata`
+- `# mkdir /btrdata`
+- `# mount -t btrfs /dev/sdd /btrdata`
 
 ### 透明压缩机制：
-`# mount -o compress={lzo|zlib} DEVICE MOUNT_POINT`
+- `# mount -o compress={lzo|zlib} DEVICE MOUNT_POINT`
 
 ### 扩展/缩减设备空间大小：
-`# btrfs filesystem resize +10G /btrdata`
-`# btrfs filesystem resize -10G /btrdata`
+- `# btrfs filesystem resize +10G /btrdata`
+- `# btrfs filesystem resize -10G /btrdata`
 
 ### 查看
-`# btrfs filesystem df /btrdata`
+- `# btrfs filesystem df /btrdata`
 
 ### 添加物理卷
-`# btrfs device add|delete|scan|stat 挂载点`
+- `# btrfs device add|delete|scan|stat 挂载点`
 
 ### 均衡分摊：把已有数新增硬盘数据均衡操作
-`# btrfs balance start /btrdata`
-`# btrfs balance pause /btrdata`
-`# Btrfs balance resume /btrdata`
-`# btrfs balance cancle /btrdata`
-`# btrfs balance status /btrdata`
+- `# btrfs balance start /btrdata`
+- `# btrfs balance pause /btrdata`
+- `# Btrfs balance resume /btrdata`
+- `# btrfs balance cancle /btrdata`
+- `# btrfs balance status /btrdata`
  
-`# btrfs balance start -mconvert=raid5 /btrdata`
+- `# btrfs balance start -mconvert=raid5 /btrdata`
  > m:metadata
 - 磁盘不够时不能修改
 
 ## 创建子卷
-`# man btrfs-subvolume`
-`# btrfs subvolume <subcommand>`
-`#　btrfs subvolum delete /btrdata/logs 删除子卷`
-`#　btrfs subvolume list /btrdata 显示子卷列表`
+- `# man btrfs-subvolume`
+- `# btrfs subvolume <subcommand>`
+- `#　btrfs subvolum delete /btrdata/logs 删除子卷`
+- `#　btrfs subvolume list /btrdata 显示子卷列表`
 
 ###　创建子卷,生成子卷ID
-`#　btrfs subvoluem create /btrdata/logs `
-`#　btrfs subvoluem create /btrdata/cache`
+- `#　btrfs subvoluem create /btrdata/logs `
+- `#　btrfs subvoluem create /btrdata/cache`
 
 ### 挂载子卷：单独挂在子卷，父卷不能访问
-`# umount /btrdata	卸载父卷`
-`# mount -o subvol=logs /dev/sdc /mnt`
-`# mount -o subvol=子卷ID /dev/sdc /mnt`
-`# cp /etc/fstab `
-`# btrfs subvolume show /mnt	详细子卷`
+- `# umount /btrdata	卸载父卷`
+- `# mount -o subvol=logs /dev/sdc /mnt`
+- `# mount -o subvol=子卷ID /dev/sdc /mnt`
+- `# cp /etc/fstab `
+- `# btrfs subvolume show /mnt	详细子卷`
 
 ### 挂载父卷，子卷不能访问
-`# umount /mnt`
-`# mount /dev/sdc /btrdata`
-`# ls /btrdata/logs`
-
-`#　btrfs subvolume create /btrdata/data`
-`# cp /etc/gruf.conf /btrdata/data`
+- `# umount /mnt`
+- `# mount /dev/sdc /btrdata`
+- `# ls /btrdata/logs`
+- `#　btrfs subvolume create /btrdata/data`
+- `# cp /etc/gruf.conf /btrdata/data`
 
 ### 快照必须在原卷中(/btrdata/data)，也就是同一个卷组中，父卷中
-`# btrfs subvolume snapshot /btrdata/data /btrdata/data_snap 必须在父卷中`
-`# btrfs subvolume list /btrdata`
-`# cd /btrdata/data`
-`# vim /btrdata/data/grub.conf`
+- `# btrfs subvolume snapshot /btrdata/data /btrdata/data_snap 必须在父卷中`
+- `# btrfs subvolume list /btrdata`
+- `# cd /btrdata/data`
+- `# vim /btrdata/data/grub.conf`
 
 ### 添加 how are you?
-`# cat grub2.conf`
-`# btrfs subvolume delete /btrdata/data_snap`
+- `# cat grub2.conf`
+- `# btrfs subvolume delete /btrdata/data_snap`
 
 ### 单个文件快照：
-`# cd /btrdata/data`
-`# cp --reflink grub2.cfg grub2.cfg_snap 单独文件快照`
-`# vim grub2.cfg`
+- `# cd /btrdata/data`
+- `# cp --reflink grub2.cfg grub2.cfg_snap 单独文件快照`
+- `# vim grub2.cfg`
 > 修改内容
 
 ### ext文件系统转换成btrfs文件系统
-`# btrfs balance start -dconvert=single /btrdata`
-`# btrfs device delete /dev/sdd /btrdata`
+- `# btrfs balance start -dconvert=single /btrdata`
+- `# btrfs device delete /dev/sdd /btrdata`
 
-`# fsck -f /dev/sdd1`
-`# btrfs-conver /dev/sdd1` 
-`# btrfs filesystem show`
-`# btrfs-conver -r /dev/sdd1 (rollback)`
+- `# fsck -f /dev/sdd1`
+- `# btrfs-conver /dev/sdd1` 
+- `# btrfs filesystem show`
+- `# btrfs-conver -r /dev/sdd1 (rollback)`
