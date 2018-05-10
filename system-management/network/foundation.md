@@ -33,8 +33,6 @@
   + 4 messages for tearing down TCP connection
 
 
-
-
 ## Network Connectivity
 
 ## Network Architecture
