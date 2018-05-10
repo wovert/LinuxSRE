@@ -1,6 +1,6 @@
 # 程序包管理
 ## 单片机
->单片机又称单片微控制器,它不是完成某一个逻辑功能的芯片,而是把一个计算机系统集成到一个芯片上。相当于一个微型的计算机，和计算机相比，单片机只缺少了I/O设备。一块芯片就成了一台计算机。它的体积小、质量轻、价格便宜、为学习、应用和开发提供了便利条件。同时，学习使用单片机是了解计算机原理与结构的最佳选择
+> 单片机又称单片微控制器,它不是完成某一个逻辑功能的芯片,而是把一个计算机系统集成到一个芯片上。相当于一个微型的计算机，和计算机相比，单片机只缺少了I/O设备。一块芯片就成了一台计算机。它的体积小、质量轻、价格便宜、为学习、应用和开发提供了便利条件。同时，学习使用单片机是了解计算机原理与结构的最佳选择
 
 - API：Application Program Interface
 - ABI：Application Binary Interface
@@ -27,85 +27,86 @@
 	+ 二进制格式：文本格式的程序代码->编译器->二进制格式（binary、lib、etc、man）
 		* 二进制程序文件、库文件、配置文件、帮助文件		
 
-- java/python程序格式：
+- Java/python程序格式：
 	+ 源代码：编译成能够在其虚拟机(jvm/pvm)运行的格式；
 		* 开发环境：编译器、开发库
 	+ 二进制
 			
 - 项目构建工具：
-	+ c/c++: make
-	+ java: maven
+	+ C/C++: make
+	+ Java: maven
 	+ Web: gulp, grunt, webpack, rollup
 			
-- 程序包管理器：
-	+ 源代码 -> 目标二进制格式（bin,lib,etc,man->组织成为一个或有限几个“包”文件；
-		* 安装、升级、卸载、查询、校验
+## 程序包管理器
+- 源代码 -> 目标二进制格式（bin,lib,etc,man->组织成为一个或有限几个“包”文件；
+-  安装、升级、卸载、查询、校验
 			
-	+ 程序包管理器：
-		* debian：		dpt, dpkg, .deb
-		* redhat：		redhat package manager, rpm, .rpm(rpm is package manager)
-		* S.u.S.E：		rpm, .rpm
-		* Gentoo：		ports
-		* ArchLinux：	pacman
+## 程序包管理器种类
+- debian：		dpt, dpkg, .deb
+- redhat：		redhat package manager, rpm, .rpm(rpm is package manager)
+- S.u.S.E：		rpm, .rpm
+- Gentoo：		ports
+- ArchLinux：	pacman
 			
-	+ 源代码：name-VERSION.tar.gz, VERSION：major.minor.release
-		* 主版本号：	架构
-		* 次版本号：	功能
-		* 发行号：	修复
+## 源代码：name-VERSION.tar.gz, VERSION：major.minor.release
+- 主版本号：	架构
+- 次版本号：	功能
+- 发行号：	修复
 
-	+ rpm包命名格式：name-VERSION-release.os.arch.rpm 
-		* VERSION：		major.minor.release(程序发行号)
-		* release：		rpm包的发行号
-		* os: 			操作系统
-		* archetecture：系统架构；i386, x64(amd64), ppc, noarch
-		* noarch：		有些程序基于java,python虚拟机上编写的
+## rpm包命名格式：name-VERSION-release.os.arch.rpm 
+- VERSION：		major.minor.release(程序发行号)
+- release：		rpm包的发行号
+- os: 			操作系统
+- archetecture：系统架构；i386, x64(amd64), ppc, noarch
+- noarch：		有些程序基于java,python虚拟机上编写的
 
-	+ VERSION-2.el7.i386.rpm	
-		*　redis-3.0.2.targz --> redis-3.0.2-1.centos7.x64.rpm 
+- VERSION-2.el7.i386.rpm	
+	+ redis-3.0.2.targz --> redis-3.0.2-1.centos7.x64.rpm 
 			
-	＋　拆包：主包和支包
-		* 主包：name-VERSION-release.arch.rpm 
-		* 支包：name-function-VERSION-release.arch.rpm 
-			function：devel, utils, libs, ...
+- 拆包：主包和支包
+	+ 主包：name-VERSION-release.arch.rpm 
+	+ 支包：name-function-VERSION-release.arch.rpm 
+	+ function：devel, utils, libs, ...
 
-	+　依赖关系：
-		*　X, Y, Z
-		* X --> Y,Z
-			* Y --> A, B, C
-				* C --> Y
+## 依赖关系
+- X, Y, Z
+- X --> Y,Z
+	+ Y --> A, B, C
+		* C --> Y
 					
-	+ 前端工具：自动解决依赖关系
-		* **yum**：rhel系列系统上rpm包管理器的前端工具
-		* **apt-get**(apt-cache)：deb包管理器的前端工具
-		* **zypper**：suse的rpm管理器前端工具
-		* **dnf**：Fedora 22+系统上rpm包管理器的前端工具
+## 前端工具：自动解决依赖关系
+- **yum**：rhel系列系统上rpm包管理器的前端工具
+- **apt-get**(apt-cache)：deb包管理器的前端工具
+- **zypper**：suse的rpm管理器前端工具
+- **dnf**：Fedora 22+系统上rpm包管理器的前端工具
 				
-## 程序包管理器：
+## 程序包管理器
 > 功能：将编译好的应用程序的各组成文件打包成一个或几个程序包文件，从而更方便地实现程序包的安装、升级、卸载和查询等管理操作 
 			
 1. 程序包的组成清单（每个程序包都单独实现）
-	+ 文件清单
-	+ 安装或卸载时运行的脚本
+	1.1 文件清单
+	1.2 安装或卸载时运行的脚本
 2. 数据库（公共）
-	+ 程序包的名称和版本
-	+ 依赖关系
-	+ 功能说明
-	+ 安装生成的各文件的文件路径及校验码信息
+	2.1 程序包的名称和版本
+	2.2 依赖关系
+	2.3 功能说明
+	2.4 安装生成的各文件的文件路径及校验码信息
 
-rpm数据库文件路径：**/var/lib/rpm/**
+- rpm数据库文件路径：`# ls /var/lib/rpm/`
 				
 ### 获取程序包的途径
 1. 系统发行版的光盘或官方的文件服务器（或镜像站点）
-	+ http://mirrors.aliyun.com, 
-	+ http://mirrors.sohu.com,
-	+ http://mirrors.163.com 
+- http://mirrors.aliyun.com 
+- http://mirrors.sohu.com
+- http://mirrors.163.com 
+
 2. 项目的官方站点
 3. 第三方组织
-	+ EPEL
-	+ 搜索引擎
-		* http://pkgs.org
-		* http://rpmfind.net 
-		* http://rpm.pbone.net 
+- EPEL
+- 搜索引擎
+	+ http://pkgs.org
+	+ http://rpmfind.net 
+	+ http://rpm.pbone.net 
 4. 自动动手，丰衣足食
 
 - 建议：检查其合法性-依赖于签名密钥
@@ -115,7 +116,8 @@ rpm数据库文件路径：**/var/lib/rpm/**
 ### CentOS系统上rpm命令管理程序包
 > 安装、升级、卸载、查询、校验、数据库维护
 
-#### rpm命令：rpm [OPTIONS] [PACAGE_FILE]
+#### rpm命令：
+> rpm [OPTIONS] [PACAGE_FILE]
 
 - 安装：-i, --install
 - 升级：-U,--update, -F, --freshen
@@ -172,34 +174,34 @@ rpm数据库文件路径：**/var/lib/rpm/**
 	+ --test：		测试卸载，dry run模式
 
 ### 查询：-q, --query
-- rpm {-q|--query} {select-options} {query-options} PACKAGE_NAME
-	+ {select-options}
-		* PACKAGE_NAME：	查询指定的程序包是否已经安装及其版本
-		* -a,--all：		查询所有已经安装过的包
-		* -f, --file FILE：查询指定的文件由哪个包生成
-		* -p,--package PACKAGE_FILE：未安装的程序包执行查询操作
-			- `# rpm -qpl zsh-5.0.2-7.el7_1.2.x86_64.rpm`
-			- `# rpm -qpi zsh-5.0.2-7.el7_1.2.x86_64.rpm`
-			- `# rpm -qpc zsh-5.0.2-7.el7_1.2.x86_64.rpm`
-			- `# rpm -qpd zsh-5.0.2-7.el7_1.2.x86_64.rpm`
-			- `# rpm -q --scripts zsh-5.0.2-7.el7_1.2.x86_64.rpm`
-		* --whatprovides CAPABILITY：查询指定的CAPABILITY由哪个程序包提供
-		* --whatrequires CAPABILITY：查询指定的CAPABILITY被哪个包所依赖
+> rpm {-q|--query} {select-options} {query-options} PACKAGE_NAME
+- {select-options}
+	+ PACKAGE_NAME：	查询指定的程序包是否已经安装及其版本
+	+ -a,--all：		查询所有已经安装过的包
+	+ -f, --file FILE：查询指定的文件由哪个包生成
+	+ -p,--package PACKAGE_FILE：未安装的程序包执行查询操作
+		* `# rpm -qpl zsh-5.0.2-7.el7_1.2.x86_64.rpm`
+		* `# rpm -qpi zsh-5.0.2-7.el7_1.2.x86_64.rpm`
+		* `# rpm -qpc zsh-5.0.2-7.el7_1.2.x86_64.rpm`
+		* `# rpm -qpd zsh-5.0.2-7.el7_1.2.x86_64.rpm`
+		* `# rpm -q --scripts zsh-5.0.2-7.el7_1.2.x86_64.rpm`
+	+ --whatprovides CAPABILITY：查询指定的CAPABILITY由哪个程序包提供
+	+ --whatrequires CAPABILITY：查询指定的CAPABILITY被哪个包所依赖
 
-	+ [query-options]
-		* --changelog：rpm包的changelog,版本迭代信息
-		* -l, --list：程序包安装生成的所有文件列表
-		* -i,--info：查询程序包信息，版本号、大小、所属的包组等
-		* -c,--configfiles：查询指定程序包提供的配置文件
-		* -d, --docfile：查询指定的程序包的帮助文档
-		
+- [query-options]
+	+ --changelog：rpm包的changelog,版本迭代信息
+	+ -l, --list：程序包安装生成的所有文件列表
+	+ -i,--info：查询程序包信息，版本号、大小、所属的包组等
+	+ -c,--configfiles：查询指定程序包提供的配置文件
+	+ -d, --docfile：查询指定的程序包的帮助文档
+	
 
-		* --provides：列出指定的程序包提供的CAPABILITY
-			- `rpm -q --whatprovides bash`
-			- `rpm -q --whatprovides 'config(bash)'`
-		* -R，--requires：查询指定程序包所依赖关系，依赖关系先解决
-		* --script：查询程序包的脚本代码
-		* Relocations: 重新定位到新的路径下安装
+	+ --provides：列出指定的程序包提供的CAPABILITY
+		* `rpm -q --whatprovides bash`
+		* `rpm -q --whatprovides 'config(bash)'`
+	+ -R，--requires：查询指定程序包所依赖关系，依赖关系先解决
+	+ --script：查询程序包的脚本代码
+	+ Relocations: 重新定位到新的路径下安装
 
 - 已安装包查询操作
 	+ -qi PCK
@@ -228,7 +230,7 @@ rpm数据库文件路径：**/var/lib/rpm/**
 - --nouser
 - --nogroup
 
-`rpm -V zsh`
+- `# rpm -V zsh`
 > 修改包的某个文件只有 # rpm -V zsh
 
 - S: file **Size** differs
@@ -246,16 +248,21 @@ rpm数据库文件路径：**/var/lib/rpm/**
 - 包的后面添加(私钥)数字签名(digital signature)
 - 公钥提供给所有人
 
-包的制作者使用**单向加密**计算出**程序包的特征码**定长输出
-然后在用自己的**私钥加密**这个**特征码（数字签名）**，并且把加密后的特征码附加在**包的后面**
-包使用者使用**公钥解密**附加在包后面的**数字签名**，取出**特征码（来源合法性得到验证）**，并使用**单向加密**技术**对包计算出特征码**，在与其上**特征码进行比较**是否相等（**包完整性得到验证**）。
+1. 包的制作者使用**单向加密**计算出**程序包的特征码**定长输出
+2. 然后在用自己的**私钥加密**这个**特征码（数字签名）**，并且把加密后的特征码附加在**包的后面**
+3. 包使用者使用**公钥解密**附加在包后面的**数字签名**，取出**特征码（来源合法性得到验证）**，并使用**单向加密**技术**对包计算出特征码**，在与其上**特征码进行比较**是否相等（**包完整性得到验证**）。
 
 
 #### 获取并导入信任的包作者的公钥：
 1. 对于CentOS发行版
-`# rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7`
+```
+rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+```
+
 2. RPM-GPG-KEY-CentOS-7(在光盘里有RPM公钥)
-`# rpm --import /media/cdrom/RPM-GPG-KEY-CentOS-7`
+```
+rpm --import /media/cdrom/RPM-GPG-KEY-CentOS-7
+```
 
 #### 验证
 1. 安装此组织签名的程序时，会自动执行验证
@@ -268,7 +275,7 @@ rpm数据库文件路径：**/var/lib/rpm/**
 - RSA: 公开密钥密码体制就是使用不同的加密密钥与解密密钥，是一种“由已知加密密钥推导出解密密钥在计算上是不可行的”密码体制
 - GPG: (Pretty Good Privacy，更好地保护隐私)，是一个基于RSA公钥加密体系的邮件加密软件。
 
-**数字签名**：使用私钥加密对应数据单向加密的特征码
+- **数字签名**：使用私钥加密对应数据单向加密的特征码
 
 ### 数据库重建：--builddb, --initdb
 ####　rpm管理器数据库路径：**/var/lib/rpm/**
@@ -279,16 +286,20 @@ rpm数据库文件路径：**/var/lib/rpm/**
 - CentOS 7: `# man rpmdb`
 
 #### 数据库损坏解决方案：
-`rpm {--initdb | --rebuilddb}`
+```
+rpm {--initdb | --rebuilddb}
+```
 
 - --initdb：初始化数据库，当前无任何数据库可初始化创建一个新的；当前有时不执行任何操作
 - --rebuilddb：重新构建，通过读取当前系统上所有已经安装过的程序包进行重新创建
 - --dbpath/tmp/rpm：指明新的路径下初始化数据库
 
-`# mkdir /tmp/rpm`
-`# rpm --initdb --dbpath=/tmp/rpm`
-`# ls /tmp/rpm/`
-`# rpm --rebuilddb --dbpath=/tmp/rpm`
+```
+# mkdir /tmp/rpm
+# rpm --initdb --dbpath=/tmp/rpm
+# ls /tmp/rpm/
+# rpm --rebuilddb --dbpath=/tmp/rpm
+```
 
 ## yun管理器
 - C/S架构
@@ -303,7 +314,6 @@ rpm数据库文件路径：**/var/lib/rpm/**
 - 远程下载的源数据跟本地的源数据文件校验码进行比较，如果不相等就再次下载源数据文件
 
 - YUM: yellow dog update modifier
-
 > yum repository: yum repo
 > 存储了众多rpm包，以及包的相关的**元数据**文件（放置于特定目录下：**repodata**）
 
@@ -313,13 +323,14 @@ rpm数据库文件路径：**/var/lib/rpm/**
 	+ nfs://
 	+ file:///
 
-###yum客户端：
+### yum 客户端
 
 - 配置文件：`# rpm -qc yum`
 	+ 主配置文件(为所有仓库提供公共配置) ：		/etc/yum.conf
 	+ 为仓库的指向提供配置：					/etc/yum.repo.d/*.repo
 
->/etc/yum.conf
+- /etc/yum.conf
+```
 cachedir=/var/cache/yum/$basearch/$releasever 	缓存目录
 keepcache=0 				是否本地保留缓存
 debuglevel=2				调试级别
@@ -331,11 +342,13 @@ plugins=1					插件机制
 installonly_limit=5
 bugtracker_url=http://bugs.centos.org/set_project.php?project_id=19&ref=http://bugs.centos.org/bug_report_page.php?category=yum
 distroverpgk=centos-release	发行版号
+```
 
-`# whatis yum.conf`
-`# man 5 yum.conf`
+- `# whatis yum.conf`
+- `# man 5 yum.conf`
 
 #### 仓库指向的定义
+```
 	[repositoryID]
 	name=Some name for this repository
 	baseurl=url://server1/path/to/repository/
@@ -353,7 +366,7 @@ distroverpgk=centos-release	发行版号
 	password
 	cost						开销,默认1000
 	mirrorlist					必须支持plugin
-
+```
 
 ### 创建YUM
 - [base]
@@ -368,82 +381,107 @@ distroverpgk=centos-release	发行版号
 - gpgcheck=0
 
 ### yum 命令
-`yum [opitons] [command] [package ...]`
-`yum help [command]`
+```
+yum [opitons] [command] [package ...]
+yum help [command]
+```
 
 ### 显示仓库列表
-`yum repolist [all | enabled | disabled]`
+```
+yum repolist [all | enabled | disabled]
+```
 
 ### 显示程序包
-`yum list [all | glob_exp] [glob_exp2]`
-`yum list installed [glob_exp1] [...]`		yum安装的包
-`yum list available [glob_exp1] [...]`		可安装的包
-`yum list updates [glob_exp1] [...]`		可升级的包
+```
+yum list [all | glob_exp] [glob_exp2]
+yum list installed [glob_exp1] [...]		yum安装的包
+yum list available [glob_exp1] [...]		可安装的包
+yum list updates [glob_exp1] [...]		可升级的包
 
-`yum list extras [glob_exp1] [...]`	 		额外的
-`yum list obsoletes [glob_exp1] [...]` 		废弃的
-
+yum list extras [glob_exp1] [...]	 		额外的
+yum list obsoletes [glob_exp1] [...] 		废弃的
+```
 - @anaconda...		操作系统安装的包
 - installed
 - avalible
 
 ### 安装程序包
-`yum -y install package[-version] ...`
+```
+yum -y install package[-version] ...
+```
 
 ### 重新安装：
-`yum reinstall package`
+```
+yum reinstall package
+```
 
 ### 查看指定包所依赖胡capabilities：
-`yum deplist package`
+```
+yum deplist package
+```
 
 ###　降级程序包
-`yum downgrade package`
+```
+yum downgrade package
+```
 
 ### 升级程序包：
-`yum update package ...`
-`yum update-to package ...`
+```
+yum update package ...
+yum update-to package ...
+```
 
 ### 检查可用升级：
-`yum check-update`
+```
+yum check-update
+```
 
 ### 卸载程序包：
-`yum remove | erase package1...`
+```
+yum remove | erase package1...
+```
 
 ### 查看程序包信息：
-`yum info package1...`
+```
+yum info package1...
+```
 
 ### 查看指定的特性（可以是某文件）是由哪个程序包所提供：
-`yum provides | whatprovides feature1 ...`
->相似-qf
+```
+yum provides | whatprovides feature1 ...
+```
+- 相似-qf
 
 ### 清理本地缓存：
-`yum clean [ package | metadata | expire-cache | rpmdb | plugins | all]`
+```
+yum clean [ package | metadata | expire-cache | rpmdb | plugins | all]
+```
 
-###　构建缓存：
-`yum makecache`
+###　构建缓存：`yum makecache`
 > 取各各仓库获取元数据到本地
 
-###　搜索：模糊匹配
-`yum search package_name`
+###　搜索：模糊匹配: `yum search package_name`
 > 以指定的关键字搜索程序包名及summary信息
 
-### yum事务历史（安装、升级、卸载）：
-`yum history [list | info | stats]`
+### yum事务历史（安装、升级、卸载）：`yum history [list | info | stats]`
 
 ### 安装及升级本地程序包（自动解决依赖关系包）：
-`yum localinstall rpmfile`
-`yum localupdate rpmfile`
+```
+yum localinstall rpmfile
+yum localupdate rpmfile
+```
 
-###　包组相关命令：
-`yum grouplist`
-`yum -y groupinstall "group_package_name"`
-`yum groupupdate "group_package_name"`
-`yum groupremove "group_package_name"`
-`yum groupinfo "group_package_name"`
+###　包组相关命令
+```
+yum grouplist
+yum -y groupinstall "group_package_name"
+yum groupupdate "group_package_name"
+yum groupremove "group_package_name"
+yum groupinfo "group_package_name"
+```
 
 ### 如何使用光盘当作本地yun仓库：
-1. 挂载光盘至某目录，例如/media/cdrom
-`# mount -r -t iso9660 /dev/cdrom /media/cdrom`
+1. 挂载光盘至某目录，例如/media/cdrom `# mount -r -t iso9660 /dev/cdrom /media/cdrom`
 
 2. 创建配置文件 
 - [CentOS7-CDROM]
@@ -472,22 +510,25 @@ distroverpgk=centos-release	发行版号
 > http://mirrors.lingyima.com/centos/7/x86_64/os
 
 ### 创建yum仓库：
-#### 1. 安装createrepo包
-`# yum -y install createrepo`
+#### 1. 安装createrepo包 `# yum -y install createrepo`
 
 #### 2. ftp里连接发送rpm文件
-`!mkdir -p /yum/repo`
-`lcd /yum/repo`
-`mget *.rpm`
+```
+!mkdir -p /yum/repo
+lcd /yum/repo
+mget *.rpm
+```
 #### 3. 创建yum仓库
-`# cd /yum/repo`
-`# createrepo ./`
+```
+# cd /yum/repo
+# createrepo ./
 
-`[xen4entos]`
-`name=Xen 4 CentOS `
-`baseurl=file:///yum/repo`
-`gpgcheck=0`
-`enabled=1`
+[xen4entos]
+name=Xen 4 CentOS 
+baseurl=file:///yum/repo
+gpgcheck=0
+enabled=1
+```
 
 ## 程序包编译安装
 - testapp-VERSION-release.src.rpm 
@@ -525,7 +566,6 @@ distroverpgk=centos-release	发行版号
 - Github.com
 - code.google.com
 
-
 ### 编译C源代码：
 - 前提：提供开发工具及开发环境
 	+ 开发工具：make, gcc等
@@ -533,8 +573,10 @@ distroverpgk=centos-release	发行版号
 		* glibc：标准库
 
 #### 1.通过包组提供开发组件 CentOS 6
-`# yum -y groupinstall "Development Tools"`
-`# yum -y groupinstall "Server Platform Development"`
+```
+# yum -y groupinstall "Development Tools"
+# yum -y groupinstall "Server Platform Development"
+```
 
 #### 2. configure脚本
 > 选项：指定安装位置、指定启用的特性
@@ -545,15 +587,15 @@ distroverpgk=centos-release	发行版号
 	+ `--sysconfdir=/PATH/TO/SOMEWHERE：配置文件安装路径`
 
 - System types：交叉编译使用这里的选项
-	--build=BUILD
-	--host=HOST
-	--target=TARGET
+	+	--build=BUILD
+	+ --host=HOST
+	+ --target=TARGET
 
--  Optional Features: 可选特性
+- Optional Features: 可选特性
 	+ `--disable-FEATURE`
 	+ `--enable-FEATURE[=ARG]`
 
--  Optional Packages：依赖的可选程序包
+- Optional Packages：依赖的可选程序包
 	+ `--with-PACKAGE[=ARG]`
 	+ `--without-PACKAGE`
 
@@ -574,15 +616,19 @@ distroverpgk=centos-release	发行版号
 3. 导出头文件
 
 > 基于链接的方式实现：
-`# ln -sv /usr/local/apache2/include/ /usr/include/apache`
+```
+# ln -sv /usr/local/apache2/include/ /usr/include/apache
+```
 
 4. 导出帮助手册
 - 编辑**/etc/man.config**文件
 	+ `MANPATH /usr/local/apache2/man`
 
 #### 安装httpd-2.2.29
-`# ./configure --prefix=/usr/local/apache2`
-`# apachectl [ start | stop | restart ] 脚本文件 `
+```
+# ./configure --prefix=/usr/local/apache2
+# apachectl [ start | stop | restart ] 脚本文件 
+```
 
 - 练习：
 	+ yum的配置和使用：包括yum repository的创建
