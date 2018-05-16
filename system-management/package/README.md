@@ -319,7 +319,7 @@ rpm -V zsh
 
 1. 对于CentOS发行版
 
-``` 导入包的公钥
+``` command
 rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
 ```
 
@@ -357,7 +357,7 @@ rpm --import /media/cdrom/RPM-GPG-KEY-CentOS-7
 
 #### 数据库损坏解决方案
 
-``` solution
+``` command
 rpm {--initdb | --rebuilddb}
 
 --initdb：初始化数据库，当前无任何数据库可初始化创建一个新的；当前有时不执行任何操作
@@ -366,23 +366,23 @@ rpm {--initdb | --rebuilddb}
 
 ```
 
-```
+``` shell
 # mkdir /tmp/rpm
 # rpm --initdb --dbpath=/tmp/rpm
 # ls /tmp/rpm/
 # rpm --rebuilddb --dbpath=/tmp/rpm
 ```
 
-## yun管理器
+## yun 管理器
 
-- C/S架构
-- Server
-  - 支持ftp和http, createrepo创建仓库
-- Client
-  - 1.yum命令读取配置文件远程访问yum源
-  - 2.读取Server的依赖关系的数据缓存到本地当中
-  - 3.根据依赖关系从远程下载依赖关系的程序包并安装程序包
-  - 4.删除cache源数据依赖关系，保留程序包
+- C/S 架构
+  - Server
+    - 支持 ftp 和 http, createrepo 创建仓库
+  - Client
+    1. yum 命令读取配置文件远程访问 yum 源
+    2. 读取 Server 的依赖关系的数据缓存到本地当中
+    3. 根据依赖关系从远程下载依赖关系的程序包并安装程序包
+    4. 删除 cache 源数据依赖关系，保留程序包
 
 - 远程下载的源数据跟本地的源数据文件校验码进行比较，如果不相等就再次下载源数据文件
 
@@ -390,7 +390,7 @@ rpm {--initdb | --rebuilddb}
 > yum repository: yum repo
 > 存储了众多rpm包，以及包的相关的**元数据**文件（放置于特定目录下：**repodata**）
 
-- 仓库文件服务器：
+- 仓库文件服务器
   - ftp://
   - http://
   - nfs://
@@ -399,28 +399,28 @@ rpm {--initdb | --rebuilddb}
 ### yum 客户端
 
 - 配置文件：`# rpm -qc yum`
-  - 主配置文件(为所有仓库提供公共配置) ：`/etc/yum.conf`
-  - 为仓库的指向提供配置：`/etc/yum.repo.d/*.repo`
+  - `/etc/yum.conf`: 主配置文件(为所有仓库提供公共配置)
+  - `/etc/yum.repo.d/*.repo`: 为仓库的指向提供配置
 
 - `/etc/yum.conf`
 
-``` SOURCE
-cachedir=/var/cache/yum/$basearch/$releasever 	缓存目录
+``` yum.conf
+cachedir=/var/cache/yum/$basearch/$releasever 缓存目录
 keepcache=0  是否本地保留缓存
 debuglevel=2 调试级别
-logfile=/var/log/yum.log 	安装日志文件
+logfile=/var/log/yum.log 安装日志文件
 exactarch=1 精确严格平台匹配
 obsoletes=1 过时的
 gpgcheck=1 来源合法性和包完整性
 plugins=1 插件机制
 installonly_limit=5
 bugtracker_url=http://bugs.centos.org/set_project.php?project_id=19&ref=http://bugs.centos.org/bug_report_page.php?category=yum
-distroverpgk=centos-release	发行版号
+distroverpgk=centos-release 发行版号
 ```
 
 ``` SOURCE
-# whatis yum.conf`
-# man 5 yum.conf`
+# whatis yum.conf
+# man 5 yum.conf
 ```
 
 #### 仓库指向的定义
@@ -435,9 +435,9 @@ enable={1|0}
 gpgcheck={1|0}
 
 repo_gpgcheck={1|0}  元数据文件数字签名验证
-gpgkey=URL gpg的密钥文件 
+gpgkey=URL gpg的密钥文件
 enablegroups={1|0} 是否使用组管理程序包
-failovermethod= {roundrobin or priority}	轮循(随机) 优先级
+failovermethod= {roundrobin or priority} 轮循(随机) 优先级
 roundrobin 默认
 username
 password
@@ -469,18 +469,20 @@ gpgcheck=0
 
 ### 显示仓库列表
 
-` yum repolist [all | enabled | disabled]`
+``` command
+# yum repolist [all | enabled | disabled]
+```
 
 ### 显示程序包
 
-``` SOURCE
-yum list [all | glob_exp] [glob_exp2]
-yum list installed [glob_exp1] [...]		yum安装的包
-yum list available [glob_exp1] [...]		可安装的包
-yum list updates [glob_exp1] [...]		可升级的包
+``` command
+# yum list [all | glob_exp] [glob_exp2]
+# yum list installed [glob_exp1] [...] yum安装的包
+# yum list available [glob_exp1] [...] 可安装的包
+# yum list updates [glob_exp1] [...] 可升级的包
 
-yum list extras [glob_exp1] [...]	 		额外的
-yum list obsoletes [glob_exp1] [...] 		废弃的
+# yum list extras [glob_exp1] [...] 额外的
+# yum list obsoletes [glob_exp1] [...] 废弃的
 ```
 
 - @anaconda... 操作系统安装的包
@@ -489,19 +491,27 @@ yum list obsoletes [glob_exp1] [...] 		废弃的
 
 ### 安装程序包
 
-`# yum -y install package[-version] ...`
+``` command
+# yum -y install package[-version] ...
+```
 
 ### 重新安装
 
-`# yum reinstall package`
+``` command
+# yum reinstall package
+```
 
 ### 查看指定包所依赖胡capabilities：
 
-`# yum deplist package`
+``` command
+# yum deplist package
+```
 
 ###　降级程序包
 
-`# yum downgrade package`
+``` command
+# yum downgrade package
+```
 
 ### 升级程序包：
 
@@ -510,54 +520,65 @@ yum list obsoletes [glob_exp1] [...] 		废弃的
 # yum update-to package ...
 ```
 
-### 检查可用升级：
+### 检查可用升级
 
-`# yum check-update`
+``` command
+# yum check-update
+```
 
 ### 卸载程序包：
 
-` # yum remove | erase package1...`
+``` command
+# yum remove | erase package1...
+```
 
 ### 查看程序包信息：
 
-`# yum info package1...`
+``` command
+# yum info package1...
+```
 
 ### 查看指定的特性（可以是某文件）是由哪个程序包所提供：
 
-`# yum provides | whatprovides feature1 ...`
+``` command
+# yum provides | whatprovides feature1 ...
+```
 
 - 相似-qf
 
 ### 清理本地缓存
 
-```
+``` command
 yum clean [ package | metadata | expire-cache | rpmdb | plugins | all]
 ```
 
-### 构建缓存: 
+### 构建缓存:
+
 > 取各各仓库获取元数据到本地
-```
-yum makecache
+
+``` command
+# yum makecache
 ```
 
 ### 搜索：模糊匹配
+
 > 以指定的关键字搜索程序包名及summary信息
 
 ``` source
-yum search package_name
+# yum search package_name
 ```
 
 ### yum事务历史（安装、升级、卸载）
 
 ``` SOURCE
-yum history [list | info | stats]
+# yum history [list | info | stats]
 ```
 
 ### 安装及升级本地程序包（自动解决依赖关系包）
 
 ``` SOURCE
-yum localinstall rpmfile
-yum localupdate rpmfile
+# yum localinstall rpmfile
+# yum localupdate rpmfile
 ```
 
 ###　包组相关命令
