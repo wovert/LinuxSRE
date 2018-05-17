@@ -1,28 +1,38 @@
-# 程序包管理
+# Program package Management 程序包管理
 
 ## 单片机
 
 > 单片机又称单片微控制器,它不是完成某一个逻辑功能的芯片,而是把一个计算机系统集成到一个芯片上。相当于一个微型的计算机，和计算机相比，单片机只缺少了I/O设备。一块芯片就成了一台计算机。它的体积小、质量轻、价格便宜、为学习、应用和开发提供了便利条件。同时，学习使用单片机是了解计算机原理与结构的最佳选择
+
+---
 
 ## 接口
 
 - API：Application Program Interface
 - ABI：Application Binary Interface
 
+--
+
 ## 系统文件格式
 
 - Unix-like文件内容格式：ELF
 - Windows：exe, msi
+
+---
 
 ## 库级别的虚拟化
 
 - Linux: WinE
 - Windows: Cywin
 
+---
+
 ## 系统级开发
 
 - C/C++：httpd, vsftpd, nginx
 - Go
+
+---
 
 ## 应用级开发
 
@@ -32,6 +42,8 @@
 - Ruby: (依赖于rvm)
 - PHP: (依赖于php解释器)
 
+---
+
 ## C/C++程序格式
 
 - 源代码：文本格式的程序代码；
@@ -39,17 +51,23 @@
 - 二进制格式：文本格式的程序代码 -> 编译器 -> 二进制格式（binary、lib、etc、man）
   - 二进制程序文件、库文件、配置文件、帮助文件
 
+--
+
 ## Java/Python程序格式
 
 - 源代码：编译成能够在其虚拟机(jvm/pvm)运行的格式；
   - 开发环境：编译器、开发库
 - 二进制
 
+---
+
 ## 项目构建工具
 
 - C/C++: make
 - Java: maven
 - Web: gulp, grunt, webpack, rollup
+
+---
 
 ## 程序包管理器
 
@@ -636,7 +654,11 @@ $YUM0-$YUM9
 
 ### 创建yum仓库
 
-#### 1. 安装createrepo包 `# yum -y install createrepo`
+#### 1. 安装createrepo包
+
+``` source
+# yum -y install createrepo
+```
 
 #### 2. ftp里连接发送rpm文件
 
@@ -653,15 +675,18 @@ $YUM0-$YUM9
 # createrepo ./
 
 [xen4entos]
-name=Xen 4 CentOS 
+name=Xen 4 CentOS
 baseurl=file:///yum/repo
 gpgcheck=0
 enabled=1
 ```
 
+---
+
 ## 程序包编译安装
 
-- testapp-VERSION-release.src.rpm 
+- testapp-VERSION-release.src.rpm
+- 源代码 -> 预处理 -> 编译(gcc) -> 汇编 -> 连接 -> 执行
 - 安装后，使用**rpmbuild命令**制作成二进制格式的rpm包，而后再安装
 
 ### 源代码组织格式
@@ -674,21 +699,21 @@ enabled=1
   - configure —> Makefile.in模板 —> makefile
 - Java: maven
 
-### C代码编译安装三步骤：
+### C代码编译安装三步骤
 
-1. `./configure`
+1. `# ./configure`
 - 通过选项传递参数，指定启用特性、安装路径等；执行时会参考用户的指定以及Makefile.in文件生成makefile
-- 检查依赖到的外部环境 
+- 检查依赖到的外部环境
 
-2. `make`
+2. `# make`
 - 根据makefile文件，构建应用程序
 
-3. `make install`
+3. `# make install`
 
-### 开发工具：以下两个工具依赖其程序包的配置文件 
+### 开发工具：以下两个工具依赖其程序包的配置文件
 
-- autoconf：生成configure脚本
-- automake：生成Makefile.in
+- autoconf：生成 configure 脚本
+- automake：生成 Makefile.in
 
 > 建议：安装前查看INSTALL，README
 
@@ -705,7 +730,7 @@ enabled=1
 - Github.com
 - code.google.com
 
-### 编译C源代码
+### 编译 C 源代码
 
 - 前提：提供开发工具及开发环境
   - 开发工具：make, gcc等
@@ -719,27 +744,39 @@ enabled=1
 # yum -y groupinstall "Server Platform Development"
 ```
 
-#### 2. configure脚本
+#### 2. configure 脚本
 
 > 选项：指定安装位置、指定启用的特性
 
-- `./configure --help：获取其支持的使用的选项`
+- `# ./configure --help`：获取其支持的使用的选项
 - 安装路径设定：
-  - `--prefix=/PATH/TO/SOMEWHERE：指定默认安装位置;默认为/usr/local/APPNAME`
-  - `--sysconfdir=/PATH/TO/SOMEWHERE：配置文件安装路径`
+
+``` options
+--prefix=/PATH/TO/SOMEWHERE`：指定默认安装位置;默认为/usr/local/APPNAME
+--sysconfdir=/PATH/TO/SOMEWHERE`：配置文件安装路径`
+```
 
 - System types：交叉编译使用这里的选项
-  - --build=BUILD
-  - --host=HOST
-  - --target=TARGET
+
+``` options
+--build=BUILD
+--host=HOST
+--target=TARGET
+```
 
 - Optional Features: 可选特性
-  - `--disable-FEATURE`
-  - `--enable-FEATURE[=ARG]`
+
+``` options
+--disable-FEATURE
+--enable-FEATURE[=ARG]
+```
 
 - Optional Packages：依赖的可选程序包
-  - `--with-PACKAGE[=ARG]`
-  - `--without-PACKAGE`
+
+``` options
+--with-PACKAGE[=ARG]
+--without-PACKAGE
+```
 
 #### 3. make && make install
 
