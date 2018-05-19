@@ -4,58 +4,58 @@
 
 # 正则表达式：Regular Expression, RegExp
 > 由一类特殊字符及文本字符所编写的模式，其中有些字符不表示其字面意义，而是用于表示控制或通配的功能；
-	
+
 ## 正则表达式分两类
 - 基本正则表达式：BRE
 - 扩展在正则表达式：ERE
 
-### 基本正则表达式
+## 基本正则表达式
 - 字符匹配
-	+ 元字符：
-		* . : 任意单个字符
-		* [a-z]：匹配指定范围内的任意单个字符				
-		* [^a-z]：匹配指定范围外的任意单个字符
-		* [:digit:]
-		* [:lower:]
-		* [:upper:]
-		* [:alpha:]
-		* [:alnum:]
-		* [:punct:]
-		* [:space:]
+  - 元字符：
+    - . : 任意单个字符
+    - [a-z]：匹配指定范围内的任意单个字符				
+    - [^a-z]：匹配指定范围外的任意单个字符
+    - [:digit:]
+    - [:lower:]
+    - [:upper:]
+    - [:alpha:]
+    - [:alnum:]
+    - [:punct:]
+    - [:space:]
 
 - 匹配次数：限制前面字符出现的次数；默认工作于贪婪模式
-	+ `*`：匹配其前面的字符任意次，多次
-	+ `.*`：匹配任意长度的任意的字符
-	+ `\?`：匹配其前面的至多1次 {0,1}
-	+ `\+`：匹配其前面的字符1次或多次；即至少匹配1次；
-	+ `\{m\}`
-	+ `\{m,n\}`
-	+ `\{0,n\}` 至多n次
-	+ `\{m,\}` 至少m次
+  - `*`：匹配其前面的字符任意次，多次
+  - `.*`：匹配任意长度的任意的字符
+  - `\?`：匹配其前面的至多1次 {0,1}
+  - `\+`：匹配其前面的字符1次或多次；即至少匹配1次；
+  - `\{m\}`
+  - `\{m,n\}`
+  - `\{0,n\}` 至多n次
+  - `\{m,\}` 至少m次
 
 - 位置锚定：
-	+ `$`：行首锚定
-	+ `^`：行尾锚定
-	+ `^PATTERN$`：匹配PATTERN来匹配整行
-	+ `^$`：空白行
-	+ `^[[:space:]]*$`：空白行或空白字符的行
+  - `$`：行首锚定
+  - `^`：行尾锚定
+  - `^PATTERN$`：匹配PATTERN来匹配整行
+  - `^$`：空白行
+  - `^[[:space:]]*$`：空白行或空白字符的行
 
-	+ 单词：非特殊字符组成的连续字符（字符串）都称为单词；
+  - 单词：非特殊字符组成的连续字符（字符串）都称为单词；
 
-	+ `\<,\b`：词首锚定
-	+ `\>,\b`：词尾锚定
-	+ `\<PATTERN\>`：匹配完整单词
+  - `\<,\b`：词首锚定
+  - `\>,\b`：词尾锚定
+  - `\<PATTERN\>`：匹配完整单词
 
 - 分组及引用：
-	+ `\(\)`：讲一个或多个字符捆绑在一起，当作一个整体进行处理
-	
-	+ `Note`: 分组；括号内的模式匹配到字符会被记录于正则表达式引擎的内部变量中
-	
-	+ `反向引用`：
-		* `\1`：模式从左侧起，第一个左括号以及与之匹配的右括号之间的模式所匹配到的字符
-		* `\2`
-	
-	+ 注意：括号可嵌套，但不可交叉
+  - `\(\)`：讲一个或多个字符捆绑在一起，当作一个整体进行处理
+
+  - `Note`: 分组；括号内的模式匹配到字符会被记录于正则表达式引擎的内部变量中
+
+  - `反向引用`：
+    - `\1`：模式从左侧起，第一个左括号以及与之匹配的右括号之间的模式所匹配到的字符
+    - `\2`
+
+  -  注意：括号可嵌套，但不可交叉
 
 ### 扩展正则表达式
 - `+`
@@ -69,8 +69,8 @@
 - 模式：由正则表达式的元字符及文本字符所编写的过滤条件
 
 - 正则表达式引擎：
-	+ `grep [OPTIONS] PATTERN [FILE...]`
-	+ `grep [OPTIONS] [-e PATTERN | -f FILE] [FILE...]`
+  - `grep [OPTIONS] PATTERN [FILE...]`
+  - `grep [OPTIONS] [-e PATTERN | -f FILE] [FILE...]`
 
 ### OPTIONS:
 - 匹配方式："纯文本格式"或pattern
@@ -103,84 +103,101 @@
 - -C # : context n line
 
 ## grep -e PATTERN [FILE...]
+
 ## egrep PATTERN [FILE...]
+
 - `-G` 基本正则表达式
 - `-F` 不支持正则表达式
 - 字符匹配：
-	+ `.`：任意单个字符
-	+ `[]`：指定范围内的任意单个字符
-	+ `[^]`：指定范围外的任意单个字符						
+  - `.`：任意单个字符
+  - `[]`：指定范围内的任意单个字符
+  - `[^]`：指定范围外的任意单个字符						
 
 - 次数匹配：
-	+ `*`：任意次，0,1或多次；
-	+ `?`：0次或1次，其前的字符是可有可无的；
-	+ `+`：其前字符至少1次；
-	+ `{m}`：其前的字符m次；
-	+ `{m,n}`：至少m次，至多n次; 
-	+ `{0,n}`
-	+ `{m,}`
+  - `*`：任意次，0,1或多次；
+  - `?`：0次或1次，其前的字符是可有可无的；
+  - `+`：其前字符至少1次；
+  - `{m}`：其前的字符m次；
+  - `{m,n}`：至少m次，至多n次; 
+  - `{0,n}`
+  - `{m,}`
 
 - 位置锚定
-	+ `^`：行首锚定
-	+ `$`：行尾锚定
-	+ `\<, \b`：词首锚定
-	+ `\>, \b`：词尾锚定；
+  - `^`：行首锚定
+  - `$`：行尾锚定
+  - `\<, \b`：词首锚定
+  - `\>, \b`：词尾锚定；
 
 - 分组及引用：
-	+ `()`：分组；括号内的模式匹配到的字符会被记录于正则表达式引擎的内部变量中；
-	
+  - `()`：分组；括号内的模式匹配到的字符会被记录于正则表达式引擎的内部变量中；
+
 - 后向引用：`\1, \2`, ...
 
 - 或：
-	+ `a|b`：a或者b；
-	+ `C|cat`：C或cat
-	+ `(c|C)at`：cat或Cat	
+  - `a|b`：a或者b；
+  - `C|cat`：C或cat
+  - `(c|C)at`：cat或Cat	
 
 ## fgrep 字符串 [FILE...] 不支持正则表达式
-- -E 扩展正则表达式
-- -G 基本正则表达式
+
+-E 扩展正则表达式
+
+-G 基本正则表达式
 
 ## 练习：
+
 1. 找出/proc/meminfo文件中，所有以大写或小写S开头的行；至少有三种实现方式
-`# grep -i ^s /proc/meminfo`
-`# grep  ^[sS] /proc/meminfo`
-`# egrep -i ^s /proc/meminfo`
-`# egrep ^[sS] /proc/meminfo`
+```
+# grep -i ^s /proc/meminfo
+# grep  ^[sS] /proc/meminfo
+# egrep -i ^s /proc/meminfo
+# egrep ^[sS] /proc/meminfo
+```
 
 2. 显示当前系统上root、centos或user1用户的信息
+
 `# grep -E “^(root|centos|user1)\>" /etc/passwd`
 
 3. 找出/etc/rc.d/init.d/functions文件中单词后面跟一个小括号的行
+
 `# grep -o -E  "\<[_[:alnum:]]+\>\(\)" /etc/rc.d/init.d/functions`
 
 4. 找出ifconfig命令结果中的1-255之间的数值
+
 `# ifconfig | grep -E -o "\<([1-9]|[0-9][1-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\>"`
 
 5. 使用echo输出一绝对路径，使用egrep取出基名
+
 `# echo /etc/sysconfig | grep -E -o "[^/]+/?$"`
 
 6. 找出ifconfig命令结果中的IP地址
+
 `# ifconfig | egrep "\<([0-9]{1,2}|1[0-9]{1,2}|2[0-4][0-9]|25[0-5])\.([0-9]{1,2}|1[0-9]{1,2}|2[0-4][0-9]|25[0-5])\.([0-9]{1,2}|1[0-9]{1,2}|2[0-4][0-9]|25[0-5])\.([0-9]{1,2}|1[0-9]{1,2}|2[0-4][0-9]|25[0-5])"`
 
 7. 添加用户bash、testbash、basher以及nologin(其shell为/sbin/nologin)；而后找出/etc/passwd文件中用户名同shell名的行
+
 `# grep -E "^([^:]+\>).*\1$" /etc/passwd`
 
 ## nl查看命令：
+
 - `-b` 显示行
 - `-b a`：显示空白行行号
 - `-b t`：不显示空白行行号，默认
 
 ## wc命令：
+
 - `-l`：lines
 - `-w`：words
 - `-c`：characters
 
 ## cut命令：
+
 - `-d, --delimiter`：分隔符
 - `-f, --fields`：n,m, n-m
 - `--output-delimiter=string` 输出结果的分隔符
 
 ## sort命令：，sort=>tk,rn,fu
+
 - `-n, --numeric-sort`
 - `-r, --reverse`
 
@@ -193,117 +210,166 @@
 - `cut -d: -f7 /etc/passwd | sort -u | wc -l`
 
 ## uniq命令
+
 > 报告或移除重复的行, 优衣库=》鸭子
 
-- `-u, --unique`：只显示唯一的行
-	+ `cut -d: -f7 /etc/passwd | sort | uniq -u` 
+`-u, --unique`：只显示唯一的行
+
+`cut -d: -f7 /etc/passwd | sort | uniq -u` 
 
 `-c, --count`：显示每行的重复次数
-	+ `cut -d: -f7 /etc/passwd | sort | uniq -c`
 
-- `-d, --repeated`：仅显示重复过的行
-	+ `only print duplicate lines, one for each group`
+`cut -d: -f7 /etc/passwd | sort | uniq -c`
+
+`-d, --repeated`：仅显示重复过的行
+
+`only print duplicate lines, one for each group`
 
 ## diff命令：逐行比较两个文件不同之处
-- OPTIONS:
-	+ `old new > file.patch`
-	+ `-i patch old`：老文件打补丁
-		* `old < patch`
-	+ `-R -i patch old`: 还原老文件
 
-	+ `# diff fstab fstab.new > fstab.patch` （生成补丁文件）
-	+ `-u`：使用unfield机制，即显示要修改的行的上下文，默认为3行；
-		
-`2c2,3 第一文件2行跟第二文件2，3行
-	< hi? 第一文件hi?
-	---
-	> hello? 第二文件hello?
-	> 第二文件空白`
+- OPTIONS:
+
+`old new > file.patch`
+
+`-i patch old`：老文件打补丁
+
+`old < patch`
+
+`-R -i patch old`: 还原老文件
+
+`# diff fstab fstab.new > fstab.patch` （生成补丁文件）
+
+`-u`：使用unfield机制，即显示要修改的行的上下文，默认为3行；
+
+```
+2c2,3 第一文件2行跟第二文件2，3行
+< hi? 第一文件hi?
+---
+> hello? 第二文件hello?
+> 第二文件空白`
 
 `5c6 第一文件5行，第二文件6行
-	< I'm OK. 第一文件I'm OK
-	---
-	> I'm ok. 第二文件I'm ok.`
-	
+< I'm OK. 第一文件I'm OK
+---
+> I'm ok. 第二文件I'm ok.`
+```
+
 `# patch -i fstab.patch fstab 给老文件打补丁`
+
 `# patch fstab.patch < fstab`
 
 `# diff fstab fstab.new`
+
 `# patch -R -i fstab.patch fstab 还原文件`
 
 `-u：格式`
-`--- hello.txt 2016-10-24 22:35:05.684794237 +0800
+
+```
+--- hello.txt 2016-10-24 22:35:05.684794237 +0800
 +++ hello.txt2 2016-10-24 22:28:11.474780941 +0800
-@@ -1,5 +1,6 @@ 
-				-第一文件的1行到5行，+第二文件的1行到5行
-hi? 			同样内容
--hi? 			第一文件内容hi?
-+hello?			第二文件内容hello?
-+ 				第二文件空白内容
-How are you? 	同样内容
+@@ -1,5 +1,6 @@ -第一文件的1行到5行，+第二文件的1行到5行
+hi? 同样内容
+-hi? 第一文件内容hi?
++hello? 第二文件内容hello?
++ 第二文件空白内容
+How are you? 同样内容
 I'm fine.And you? 同样内容
--I'm OK. 		第一文件内容
-+I'm ok. 		第二文件内容`
+-I'm OK. 第一文件内容
++I'm ok. 第二文件内容
+```
 
 ## 获取帮助
+
 `:help subject`
 
-
 # sed命令
+
 > 不修改源文件，读取一行放置**pattern space内存空间**
+
 模式匹配之后编辑之后的结果输出到标准输出，也可以把模式编辑的结果保存到**hold space内存空间**与pattern space空间交换数据
 默认不能模式匹配的结果直接输出到标准输出，也可以不能模式匹配到的不输出
 然后依次读取下一行
 
-## 流程：
+## 流程
+
 1. 取每行
 2. pattern space内存空间
 3. 匹配模式
-	+ NO => stdout (-n不输出次内容)
-	+ YES => edit => stdout
-	+ YES => edit <--> hold space => stdout
+
+NO => stdout (-n不输出次内容)
+
+YES => edit => stdout
+
+YES => edit <--> hold space => stdout
 
 `sed [OPTION]...  'script'  [input-file] ...`
+
 > script：地址定界 编辑命令(没有空白字符分割)
 
 ## 常用选项：rinfe
-- -n：不输出模式空间中的编辑匹配的内容至屏幕
-- -e script, --expression=script：多个编辑命令
-- -f  /PATH/TO/SED_SCRIPT_FIL：每行一个编辑命令			
-- -r, --regexp-extended：支持使用扩展正则表达式，默认支持标准正则表达式
-- -i[SUFFIX], --in-place[=SUFFIX]：直接编辑原文件 
+
+-n：不输出模式空间中的编辑匹配的内容至屏幕
+
+-e script, --expression=script：多个编辑命令
+
+-f  /PATH/TO/SED_SCRIPT_FIL：每行一个编辑命令
+
+-r, --regexp-extended：支持使用扩展正则表达式，默认支持标准正则表达式
+
+-i[SUFFIX], --in-place[=SUFFIX]：直接编辑原文件 
 
 `# sed -e 's@^#[[:space:]]*@@' -e '/^UUID/d'  /etc/fstab`
-		
+
 ## 地址定界：
-- 1. 空地址：对全文进行处理；
-- 2. 单地址：
-	+ #：指定行
-	+ /pattern/：被此模式所匹配到的每一行；
-- 3. 地址范围
-	+ #,#：
-	+ #,+#：
-	+ #，/pat1/
-	+ /pat1/,/pat2/
-	+ $：最后一行
-- 4. 步进：~
-	+ 1~2：所有奇数行
-	+ 2~2：所有偶数行
+
+1. 空地址：对全文进行处理；
+
+2. 单地址：
+
+`#`：指定行
+
+`/pattern/`：被此模式所匹配到的每一行；
+
+3. 地址范围
+`#,#`：
+
+`+ #,+#`：
+
+`#，/pat1/`
+
+`/pat1/,/pat2/`
+
+`$`：最后一行
+
+4. 步进：
+
+1~2：所有奇数行
+
+2~2：所有偶数行
 
 ## 编辑命令：
-- d：删除模式空间的行
-	+ `# sed '1,5d' /etc/fstab`
-	+ `# sed '/^UUID/d' /etc/fstab`
-	+ `# sed '1,5d' /etc/fstab`
-	+ `# sed '3d' /etc/fstab 删除第三行`
-	+ `# sed -n '1~2' /etc/fstab`
 
-- p：显示模式空间中的内容
-	+ `# sed '1~2p' /etc/fstab` 显示所有行奇数行显示两遍， 
-	+ `# sed -n '1~2p' /etc/fstab` 只显示奇数行，默认匹配的都不显示-n效果
+d：删除模式空间的行
 
-- a  \text：在行后面追加文本“text"，支持使用\n实现多行追加； 
-	+ `# sed '/^UUID/a \# add new sed on UUID' /etc/fstab`
+`# sed '1,5d' /etc/fstab`
+
+`# sed '/^UUID/d' /etc/fstab`
+
+`# sed '1,5d' /etc/fstab`
+
+`# sed '3d' /etc/fstab 删除第三行`
+
+`# sed -n '1~2' /etc/fstab`
+
+p：显示模式空间中的内容
+
+`# sed '1~2p' /etc/fstab` 显示所有行奇数行显示两遍，
+
+`# sed -n '1~2p' /etc/fstab` 只显示奇数行，默认匹配的都不显示-n效果
+
+a  \text：在行后面追加文本“text"，支持使用\n实现多行追加；
+
+`# sed '/^UUID/a \# add new sed on UUID' /etc/fstab`
 
 - i  \text：在行前面插入文本“text"，支持使用\n实现多行插入；
 	+ `# sed '3i \new line' /etc/fstab`
