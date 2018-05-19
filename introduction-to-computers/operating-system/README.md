@@ -2,8 +2,6 @@
 
 操作系统时有两个主要部分组成的：硬件和软件。硬件是计算机的物理设备。软件则是使得硬件能够正常工作的程序的集合。计算机软件分成两大类：操作系统和应用程序。应用程序使用计算机硬件来解决用户的问题。操作系统则控制用户对硬件访问。
 
-
-
 ## 操作系统发展史
 
 - 手工处理
@@ -45,52 +43,77 @@ AT&T: System v, 1979
 - 1977, BSRG distribution BSD(Berkeley System Distribution) 
 
 ### 1980, DARPA => 实现 TCP/IP 
-- 本来 VMS 系统上实现（商业）
-- BSD 上实现
-- 1983 => Unix in TCP/IP
 
+本来 VMS 系统上实现（商业）
+
+BSD 上实现
+
+1983 => Unix in TCP/IP
 
 ### 1981, Microsoft, Bill Gate
-- SCP 公司 程序员研发小系统 QDOS(Quick and Dirty Operating System)
-- IBM 发售 PC 机
-- DOS 2.0 => CP/M
-- 1990: Unix 开发环境
-- VMS 领导入职微软 => 开发 Windows NT(New Technolegy)
+
+SCP 公司 程序员研发小系统 QDOS(Quick and Dirty Operating System)
+
+IBM 发售 PC 机
+
+DOS 2.0 => CP/M
+
+1990: Unix 开发环境
+
+VMS 领导入职微软 => 开发 Windows NT(New Technolegy)
 
 ### SUN： Bill Joy
-- workstation： 非常复杂的任务
-- BSD 系统：Solaris
+
+workstation： 非常复杂的任务
+
+BSD 系统：Solaris
 
 ### Apple
-- Xerox: park(star图形界面)
-- 卖给 乔布斯
-- Bill Gates复制park系统(上成代码) => Windows(蓝屏问题)
+
+Xerox: park(star图形界面)
+
+卖给 乔布斯
+
+Bill Gates复制park系统(上成代码) => Windows(蓝屏问题)
 
 ### 1985: Unix 商业化
-- 一份拷贝4万美元
+
+一份拷贝4万美元
 
 ### MIT: Richard Stallman
-- GNU: GNU is Not Unix
-- GPL: General Pulibc License(freedom 自由软件)
-- FSF：Free Software Foundation
-- X-Window: GPL
-- gcc: GNU C Compiler
-- vi: Visual interface
 
-- Andrew: Minix, 4000+行
+GNU: GNU is Not Unix
+
+GPL: General Pulibc License(freedom 自由软件)
+
+FSF：Free Software Foundation
+
+X-Window: GPL
+
+gcc: GNU C Compiler
+
+vi: Visual interface
+
+Andrew: Minix, 4000+行
 
 ### System V(Bell Lab)
-- AIX(IBM)
-- Solaris(SUN->Oracle)
-- HP-UX(HP)
+
+AIX(IBM)
+
+Solaris(SUN->Oracle)
+
+HP-UX(HP)
 
 ### BSD(Berkeley System Distribution), BSRG 组织研发
 
-- NetBSD
-- OpenBSD
-- FreeBSD
+NetBSD
+
+OpenBSD
+
+FreeBSD
 
 ### System V vs BSD
+
 - 1990, BSD 完全独立
   - Jolitz, BSD 移植到 X86, 商业化后，推出项目
   - 386-BSD
@@ -99,11 +122,13 @@ AT&T: System v, 1979
 - Larry Wall => diff, patch
 
 ## 完整的OS
+
 - Kernel + Application
 - 狭义上的OS: Kernel
 - GNU/Linux
 
 ## OS 的功能
+
 - 驱动程序
 - 进程管理
 - 安全
@@ -131,7 +156,6 @@ AT&T: System v, 1979
     - OpenSUSE
   - Gentoo
   - ArchLinux
-
 
 ## 软件程序：版本号
 
@@ -515,70 +539,83 @@ MIT是和BSD一样宽范的许可协议,作者只想保留版权,而无任何其
 尽管Linus Torvalds的初衷不是使Linux成为一个可移植的操作系统，今天的Linux却是全球被最广泛移植的操作系统内核。从掌上电脑iPad到巨型电脑IBM S/390，甚至于微软出品的游戏机XBOX都可以看到Linux内核的踪迹。Linux也是IBM超级计算机Blue Gene的操作系统。
 
 - Linux可以在以下CPU架构上运行：
-	+ X86,x64, amd64(CISC)
-	+ m6800, m68k摩托罗拉
-	+ ARM系列(移动终端设备、功耗相对低，三星、华为、高通）
-	+ SPARC和UltraSPARC：太阳微系统的工作站, solaris
-	+ Power(IBM, aix, RISC指令集)
-	+ PowerPC,ppc：(简装版的Power)所有较新的苹果电脑
-	+ 康柏：Alpha， hp-ux
-	+ MIPS
-	+ 惠普：PA-RISC
-	+ 索尼公司: PlayStation 2
-	+ 微软公司: Xbox
-	+ Hitachi SuperH: SEGA Dreamcast
-	+ Acorn：Archimedes,A5000和RiscPC系列
+  - X86,x64, amd64(CISC)
+  - m6800, m68k摩托罗拉
+  - ARM系列(移动终端设备、功耗相对低，三星、华为、高通）
+  - SPARC和UltraSPARC：太阳微系统的工作站, solaris
+  - Power(IBM, aix, RISC指令集)
+  - PowerPC,ppc：(简装版的Power)所有较新的苹果电脑
+  - 康柏：Alpha， hp-ux
+  - MIPS
+  - 惠普：PA-RISC
+  - 索尼公司: PlayStation 2
+  - 微软公司: Xbox
+  - Hitachi SuperH: SEGA Dreamcast
+  - Acorn：Archimedes,A5000和RiscPC系列
 
-- 网络支持
+网络支持
+
 作为一个生产操作系统和开源软件，Linux 是测试新协议及其增强的良好平台。Linux 支持大量网络协议，包括典型的 TCP/IP，以及高速网络的扩展（大于 1 Gigabit Ethernet [GbE] 和 10 GbE）。Linux 也可以支持诸如流控制传输协议（SCTP）之类的协议，它提供了很多比 TCP 更高级的特性（是传输层协议的接替者）。
 
-- 动态内核
+动态内核
+
 Linux 还是一个动态内核，支持动态添加或删除软件组件。被称为动态可加载内核模块，它们可以在引导时根据需要（当前特定设备需要这个模块）或在任何时候由用户插入。
 
-- 系统管理程序
+系统管理程序
+
 Linux 最新的一个增强是可以用作其他操作系统的操作系统（称为系统管理程序）。该系统对内核进行了修改，称为基于内核的虚拟机（KVM）。这个修改为用户空间启用了一个新的接口，它可以允许其他操作系统在启用了 KVM 的内核之上运行。除了运行 Linux 的其他实例之外， Microsoft&reg; Windows&reg; 也可以进行虚拟化。惟一的限制是底层处理器必须支持新的虚拟化指令
 
 ### Linux 子系统
-- 系统调用接口
+
+系统调用接口
+
 SCI 层提供了某些机制执行从用户空间到内核的函数调用。正如前面讨论的一样，这个接口依赖于体系结构，甚至在相同的处理器家族内也是如此。SCI 实际上是一个非常有用的函数调用多路复用和多路分解服务。在 ./linux/kernel 中您可以找到 SCI 的实现，并在 ./linux/arch 中找到依赖于体系结构的部分。
 
-- 进程管理
+进程管理
+
 进程管理的重点是进程的执行。在内核中，这些进程称为线程，代表了单独的处理器虚拟化（线程代码、数据、堆栈和 CPU寄存器）。在用户空间，通常使用进程 这个术语，不过 Linux 实现并没有区分这两个概念（进程和线程）。内核通过 SCI 提供了一个应用程序编程接口（API）来创建一个新进程（fork、exec 或 Portable Operating System Interface [POSⅨ] 函数），停止进程（kill、exit），并在它们之间进行通信和同步（signal 或者 POSⅨ 机制）。
 进程管理还包括处理活动进程之间共享 CPU 的需求。内核实现了一种新型的调度算法，不管有多少个线程在竞争 CPU，这种算法都可以在固定时间内进行操作。这种算法就称为 O⑴ 调度程序，这个名字就表示它调度多个线程所使用的时间和调度一个线程所使用的时间是相同的。O⑴ 调度程序也可以支持多处理器（称为对称多处理器或 SMP）。您可以在 ./linux/kernel 中找到进程管理的源代码，在 ./linux/arch 中可以找到依赖于体系结构的源代码。
 
-- 内存管理
+内存管理
+
 内核所管理的另外一个重要资源是内存。为了提高效率，如果由硬件管理虚拟内存，内存是按照所谓的内存页 方式进行管理的（对于大部分体系结构来说都是 4KB）。Linux 包括了管理可用内存的方式，以及物理和虚拟映射所使用的硬件机制。
 不过内存管理要管理的可不止 4KB缓冲区。Linux 提供了对 4KB缓冲区的抽象，例如 slab 分配器。这种内存管理模式使用 4KB缓冲区为基数，然后从中分配结构，并跟踪内存页使用情况，比如哪些内存页是满的，哪些页面没有完全使用，哪些页面为空。这样就允许该模式根据系统需要来动态调整内存使用。
 为了支持多个用户使用内存，有时会出现可用内存被消耗光的情况。由于这个原因，页面可以移出内存并放入磁盘中。这个过程称为交换，因为页面会被从内存交换到硬盘上。内存管理的源代码可以在 ./linux/mm 中找到
 
-- 虚拟文件系统
+虚拟文件系统
+
 虚拟文件系统（VFS）是 Linux 内核中非常有用的一个方面，因为它为文件系统提供了一个通用的接口抽象。VFS 在 SCI 和内核所支持的文件系统之间提供了一个交换层。
 VFS 在用户和文件系统之间提供了一个交换层
 在 VFS 上面，是对诸如 open、close、read 和 write 之类的函数的一个通用 API 抽象。在 VFS 下面是文件系统抽象，它定义了上层函数的实现方式。它们是给定文件系统（超过 50 个）的插件。文件系统的源代码可以在 ./linux/fs 中找到。
 文件系统层之下是缓冲区缓存，它为文件系统层提供了一个通用函数集（与具体文件系统无关）。这个缓存层通过将数据保留一段时间（或者随即预先读取数据以便在需要是就可用）优化了对物理设备的访问。缓冲区缓存之下是设备驱动程序，它实现了特定物理设备的接口。
 
 ### Linux 版本号
+
 什么Linux发行版？
+
 > 由 GNU 项目提供的 Linux 内核 GNU/Linux 源代码、各个商业发行商开发的各种应用程序源代码和可安装操作系统的程序源代码编译成不同平台架构的完整的操作系统程序进行打包发行，提供给用户。
 
 - 开源收入来源？
 1. 双线授权：
-- Community：遵循开源授权
-- Enterprise：商业授权(付费)，额外功能,买服务(提供bug编译代码之后提供，如RedHat)
+
+Community：遵循开源授权
+
+Enterprise：商业授权(付费)，额外功能,买服务(提供bug编译代码之后提供，如RedHat)
+
 2. 捐赠：自由捐赠
 
 - 版本
-	+ Alpha：内测版
-	+ Beta：公测版
-	+ Mainline：主线
-	+ rc：Release Candidate,候选版（准备发行正式版）
-	+ Stable：稳定版
-	+ Longterm：长期维护版
+  - Alpha：内测版
+  - Beta：公测版
+  - Mainline：主线
+  - rc：Release Candidate,候选版（准备发行正式版）
+  - Stable：稳定版
+  - Longterm：长期维护版
 
-- major.minor.release主版本(架构).次版本(功能).发行号(bug)
-0.99, 2.0, 2.4, 2.6, 3.0, 4.0
+major.minor.release主版本(架构).次版本(功能).发行号(bug) 0.99, 2.0, 2.4, 2.6, 3.0, 4.0
 
 ### Linux 发行版
+
 - RHEL：5.x, 6.x, 7.x
 - Fedora 23
 - Debian: 8.x
@@ -588,77 +625,82 @@ VFS 在用户和文件系统之间提供了一个交换层
 - Linux发行版：slackware, Redhat, Debian, Fedora, TurboLinux, Mandrake, SUSE, CentOS, Ubunte, 红旗（挂），麒麟
 
 #### 主流Linux发行版
+
 - RedHat	自由但不免费，提供源代码，不提供编译后的代码。
-rpm包管理器
-	+ yum前段工具(事务有问题) =>dnf(参考zypper)
-	+ CentOS redhat商标和版权去掉，重新编译生成。CentOS已经被RedHat收购。
+- rpm包管理器
+  - yum前段工具(事务有问题) =>dnf(参考zypper)
+  - CentOS redhat商标和版权去掉，重新编译生成。CentOS已经被RedHat收购。
 - Fedora Core: 每6发行一次，新技术、新功能用于RedHat测试版或预发布版
 
-	+ Debian (.deb包命)：社区办，没有商业公司支持；8.x版本
-		* dpkg包管理器
-		* apt-get前段工具
-	+ Ubuntu
-		* mint(笔记本) 
-		* knopix(安全)
+  - Debian (.deb包命)：社区办，没有商业公司支持；8.x版本
+    - dpkg包管理器
+    - apt-get前段工具
+  - Ubuntu
+    - mint(笔记本) 
+    - knopix(安全)
 - Slackware
-	+ S.u.S.E 数据库高级服务和电子邮件网络应用的用户，商业公司支持（Novell）S.u.S.U: 	rpm包管理器
-		* zypper前段工具
-	+ SLES
-	+ OpenSUSE(13.x版本)
+  - S.u.S.E 数据库高级服务和电子邮件网络应用的用户，商业公司支持（Novell）S.u.S.U: 	rpm包管理器
+    - zypper前段工具
+  - SLES
+  - OpenSUSE(13.x版本)
 
 - ArchLinux 
-	+ 使用简单、系统轻量、软件更新速度快的GNU/Linux发行版
-	+ 特点：
-		* 软件更新速度快
-		* 包管理简易高效
-	+ 包管理器
-		* pacman
+  - 使用简单、系统轻量、软件更新速度快的GNU/Linux发行版
+  - 特点：
+    - 软件更新速度快
+    - 包管理简易高效
+  - 包管理器
+    - pacman
 - Gentoo 
-	+ 边编译边安装，自由操作系统
-	+ Gentoo的哲学是自由和选择
-	+ Portage软件包管理系统
+  - 边编译边安装，自由操作系统
+  - Gentoo的哲学是自由和选择
+  - Portage软件包管理系统
 
-- Kali
+Kali
+
 Kali Linux是前身是BackTrack基于Debian的Linux发行版，设计用于数字取证和渗透测试和黑客攻防。
+
 Kali Linux预装了许多渗透测试软件，包括nmap(端口扫描器)、Wireshark(数据包分析器)、John the Ripper(密码破解器),以及Aircrack-ng(一套用于对无线局域网进行渗透测试的软件)用户可通过硬盘、live CD或live USB运行Kali Linux。
 
-- LFS：Linux From Scratch编译安装指南
+LFS：Linux From Scratch编译安装指南
+
 就是一种从网上直接下载源码，从头编译LINUX的安装方式。它不是发行版，只是一个菜谱，告诉你到哪里去买菜（下载源码），怎么把这些生东西( raw code) 作成符合自己口味的菜肴──个性化的linux，不单单是个性的桌面。
 
-- Android：Linux kernel + busybox + jvm(java) + android(GUI)
+Android：Linux kernel + busybox + jvm(java) + android(GUI)
 
 ### Linux 程序包管理器
+
 - Linux内核：
-	+ Kernel+Application
-	+ GNU/Linux：通常以源码（文本格式）方式提供
-	+ 自由、灵活
+  - Kernel+Application
+  - GNU/Linux：通常以源码（文本格式）方式提供
+  - 自由、灵活
 
 - GCC(GNU Compiler Collection,编译器套装)：
-	+ C版本			gcc命令行选项		
-	+ GNU 89		无，-std=gnu89
-	+ ANSI,ISO 90 	-ansi, -std=c89
-	+ ISO 90		-std=c99
-	+ GNU 99		-std=gnu99
+  - C版本 gcc命令行选项
+  - GNU 89 无，-std=gnu89
+  - ANSI,ISO 90 -ansi, -std=c89
+  - ISO 90 -std=c99
+  - GNU 99 -std=gnu99
 
-- rpm 
- 	+ redhat package manager --> perl语言开发
- 	+ rpm package manager（工业标准） --> C语言开发
+- rpm
+  - redhat package manager --> perl语言开发
+  - rpm package manager（工业标准） --> C语言开发
 
 - 选择系统
-	+ Ubuntu（桌面开发系统）
-	+ CentOS（服务器系统）
+  - Ubuntu（桌面开发系统）
+  - CentOS（服务器系统）
 
 - 程序的组成部分：bin、etc、lib64、man
 
 - 程序包管理器: 有数据库列表统一管理
-	+ 程序名、配置文件、库文件等
-    + X: 程序的组成文件打包成一个或有限几个文件
-    + 安装；卸载；查询；升级；
-	+ X86-64, CentOS 6.4 32bits, test-1.3.2.el5.x86_64.rpm
+  - 程序名、配置文件、库文件等
+    - X: 程序的组成文件打包成一个或有限几个文件
+    - 安装；卸载；查询；升级；
+  - X86-64, CentOS 6.4 32bits, test-1.3.2.el5.x86_64.rpm
 
 - 程序包管理器种类：
-	+ Redhat: rpm, yum => dnf
-	+ S.u.S.E: rpm, zypper
-	+ Debian: deb(.dpkg), apt-get
-	+ ArchLinux: pacman
-	+ Gentoo: portage
+  - Redhat: rpm, yum => dnf
+  - S.u.S.E: rpm, zypper
+  - Debian: deb(.dpkg), apt-get
+  - ArchLinux: pacman
+  - Gentoo: portage
