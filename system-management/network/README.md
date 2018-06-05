@@ -52,7 +52,7 @@ OSI:Open System Interconnect Reference Model，开放式系统互联参考模型
   - 默认子网掩码：255.0.0.0，/8
     - 用于与IP地址按位进行“与”运算，从而取出其网络地址；
     - 1.3.2.1/255.0.0.0 = 1.0.0.0
-    - 1.3.2.1/255.255.0.0= 1.3.0.0	
+    - 1.3.2.1/255.255.0.0= 1.3.0.0
   - 私网地址：10.0.0.0/255.0.0.0
 
 ### B类
@@ -82,7 +82,7 @@ OSI:Open System Interconnect Reference Model，开放式系统互联参考模型
 
 - 240-255
 
-## 路由器：router
+## 路由器 router
 
 ### 路由表
 
@@ -95,7 +95,7 @@ OSI:Open System Interconnect Reference Model，开放式系统互联参考模型
 - 目标地址的类别：
   - 主机：主机路由
   - 网络：网络路由
-  - 0.0.0.0/0.0.0.0：默认路由	
+  - 0.0.0.0/0.0.0.0：默认路由
 
 - 三个路由同时满足的时候优先级顺序：主机路由 < 网络路由 < 默认路由
 
@@ -111,12 +111,13 @@ OSI:Open System Interconnect Reference Model，开放式系统互联参考模型
 
 每个主机广播ARP通告，其他主机更新缓存
 
-1.发送分组数据包
+1. 发送分组数据包
 
 - ARP广播方式获取目标MAC地址，动态学习
 - 可以手动设置目标MAC地址
 
-# OS：多用户，多任务
+## OS：多用户，多任务
+
 - 多任务：多进程
   - chrome：
   - QQ
@@ -129,8 +130,13 @@ OSI:Open System Interconnect Reference Model，开放式系统互联参考模型
 
 - 进程地址：IP:PORT => socket
 - 进程是靠套接字(socket)实现的
+- 总结：
+  - MAC 地址：本地通信，范围：本地局域网
+  - IP: 界定通信主机，源和目标，范围：互联网
+  - PORT: 界定进程，范围：主机
 
 ## 常用端口
+
 - 25(发送mail)
 - 22(ssh)
 - 80(http)
@@ -150,6 +156,7 @@ OSI:Open System Interconnect Reference Model，开放式系统互联参考模型
 - 网关：网络关口，本地网络的默认路由，数据转发到其他网络
 
 ## 将Linux主机接入到网络中
+
 1. IP/NETMASK：本地通信
 2. 路由（网关）：跨网络通信
 3. DNS服务器地址：基于主机名的通信
@@ -161,19 +168,23 @@ OSI:Open System Interconnect Reference Model，开放式系统互联参考模型
 第三备份DNS服务器地址, 备用DNS服务器宕机时使用	
 
 ## 配置方式
+
 - 动态分配
 - 静态指定
 
 ###　动态分配：依赖于本地网络中有DHCP服务
+
 - DHCP：Dynamic Host Configure Procotol
 - IP/NETMASK,GATEWAY,DNS
 - DHCP没有响应时候，169.254.X.Y自动分配，可以再本地联网
 
 ### 静态分配：
+
 1. 配置文件：不会立即生效，重启生效(启动时配置文件)
 2. 使用命令：立即生效，写入内核，重启失效
 
 #### 使用命令：
+
 - ifcfg家族：net-tools 包
   - ifconfig：配置IP，NETMASK
   - route：路由
@@ -199,10 +210,13 @@ OSI:Open System Interconnect Reference Model，开放式系统互联参考模型
     - CentOS 7：`# hostnamectl`
 
 #### 配置文件
+
 - RedHat及相关发行版 `/etc/sysconfig/network-scripts/ifcfg-NETCARD_NAME`
 
 ### 网络接口命名方式
+
 #### 传统命名
+
 - 以太网：ethX, [0,oo)，例如eth0, eth1, ...
 - PPP网络：pppX, [0,...], 例如，ppp0, ppp1, ...
 
@@ -226,14 +240,17 @@ Fireware(固件,硬件方式)命名, 拓扑结构命名
   - ww：wwan(无线广域网)
 
 - 名称类型：
-  - o<index>：集成设备的设备索引号
-  - s<slot>：扩展槽的索引号
-  - x<MAC>：基于MAC地址的命名
-  - p<bus>s<slot>：基于总线及槽的拓扑结构进行命名
+  - `o<index>`：集成设备的设备索引号
+  - `s<slot>`：扩展槽的索引号
+  - `x<MAC>`：基于MAC地址的命名
+  - `p<bus>s<slot>`：基于总线及槽的拓扑结构进行命名
 
-# ifcfg命令家族：ifconfig, route, netstat
+## ifcfg命令家族
 
-## ifconfig命令：接口及地址查看和管理
+`ifconfig, route, netstat`
+
+### ifconfig命令：接口及地址查看和管理
+
 - ifconfig  [INTERFACE]
 - ifconfig interface [aftype] options | address ...
 
@@ -252,50 +269,53 @@ Fireware(固件,硬件方式)命名, 拓扑结构命名
 
 `# ifconfig <interface> del IPV6/prefixlen`
 
-down 关闭指定的网络设备。
+`down` 关闭指定的网络设备。
 
-<hw<网络设备类型><硬件地址> 设置网络设备的类型与硬件地址。
+`<hw<网络设备类型><硬件地址>` 设置网络设备的类型与硬件地址。
 
-io_addr<I/O地址> 设置网络设备的I/O地址。
+`io_addr<I/O地址>` 设置网络设备的I/O地址。
 
-irq<IRQ地址> 设置网络设备的IRQ
+`irq<IRQ地址>` 设置网络设备的IRQ
 
 中断请求（Interrupt Request）
 
-media<网络媒介类型> 设置网络设备的媒介类型。
+`media<网络媒介类型>` 设置网络设备的媒介类型。
 
-mem_start<内存地址> 设置网络设备在主内存所占用的起始地址。
+`mem_start<内存地址>` 设置网络设备在主内存所占用的起始地址。
 
-metric<数目> 指定在计算数据包的转送次数时，所要加上的数目。
+`metric<数目>` 指定在计算数据包的转送次数时，所要加上的数目。
 
-mtu<字节> 设置网络设备的MTU。
+`mtu<字节>` 设置网络设备的MTU。
 
-netmask<子网掩码> 设置网络设备的子网掩码。
+`netmask<子网掩码>` 设置网络设备的子网掩码。
 
-tunnel<地址> 建立IPv4与IPv6之间的隧道通信地址。
+`tunnel<地址>` 建立IPv4与IPv6之间的隧道通信地址。
 
-up 启动指定的网络设备。
+`up` 启动指定的网络设备。
 
--broadcast<地址> 将要送往指定地址的数据包当成广播数据包来处理。
+`-broadcast<地址>` 将要送往指定地址的数据包当成广播数据包来处理。
 
--pointopoint<地址> 与指定地址的网络设备建立直接连线，此模式具有保密功能。
+`-pointopoint<地址>` 与指定地址的网络设备建立直接连线，此模式具有保密功能
 
--promisc 关闭或启动指定网络设备的promiscuous模式。
+`-promisc` 关闭或启动指定网络设备的promiscuous模式。
 
-[IP地址] 指定网络设备的IP地址。
+`[IP地址]` 指定网络设备的IP地址。
 
-[网络设备] 指定网络设备的名称。
+`[网络设备]` 指定网络设备的名称。
 
 ### options
+
 - [-]arp
 - [-]promisc 混杂模式
 - [-]allmulti 启动组播或多播
 
 `# ifconfig eth1 promisc` 启用
+
 `# ifconfig eth1 -promisc` 禁用
 
 - **注意**：立即送往内核中的TCP/IP协议栈并生效
-```
+
+``` shell
 Link encap:Ethernet  HWaddr 00:0C:29:BA:8B:52  
 inet addr:192.168.1.61  Bcast:192.168.1.255  Mask:255.255.255.0
         inet6 addr: fe80::20c:29ff:feba:8b52/64 Scope:Link
@@ -307,7 +327,8 @@ inet addr:192.168.1.61  Bcast:192.168.1.255  Mask:255.255.255.0
 ```
 
 CentOS 7:
-```
+
+``` shell
 eno16777736: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
 inet 192.168.1.71  netmask 255.255.255.0  broadcast 192.168.1.255
     inet6 fe80::20c:29ff:fe4e:2155  prefixlen 64  scopeid 0x20<link>
@@ -318,56 +339,60 @@ inet 192.168.1.71  netmask 255.255.255.0  broadcast 192.168.1.255
     TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
 ```
 
-flags：标志位（用以表明储存数据特征的）
+`flags`：标志位（用以表明储存数据特征的）
 
-UP（代表网卡开启状态）
+`UP`（代表网卡开启状态）
 
-RUNNING（代表网卡的网线被接上）
+`RUNNING`（代表网卡的网线被接上）
 
-MULTICAST（支持组播）
+`MULTICAST`（支持组播）
 
-BROADCAST（支持广播）
+`BROADCAST`（支持广播）
 
-MTU: 最大传输单元（maximum transmission unit）
+`MTU`: 最大传输单元（maximum transmission unit）
 
-Inet:IPv4 netmask 子网掩码 broadcast 广播地址
+`Inet:IPv4 netmask 子网掩码 broadcast 广播地址`
 
-Ether 以太网地址 txqueuelen 1000 (Ethernet)
+`Ether 以太网地址 txqueuelen 1000 (Ethernet)`
 
-RX表示接收数据包的情况
+`RX`表示接收数据包的情况
 
-RX packets 55022  bytes 48564958 (46.3 MiB)
+`RX packets 55022  bytes 48564958 (46.3 MiB)`
 
-分组包数量，总大小字节(MiB)
+`分组包数量，总大小字节(MiB)`
 
-TX表示发送数据包的情况
+`TX`表示发送数据包的情况
 
-errors: 错误个数
+`errors`: 错误个数
 
-dropped: 丢包个数
+`dropped`: 丢包个数
 
-overruns: 溢出
+`overruns`: 溢出
 
-collisions：网络讯号碰撞的情况说明
+`collisions`：网络讯号碰撞的情况说明
 
-	txqueuelen：传输队列长度大小
+`txqueuelen`：传输队列长度大小
 
-carrier: CSMA的C是载波。它的值很高表示出错很多，导致网络性能下降。通常是物理层的错误造成的，比如电缆问题、强电干扰、等等
- 传输的 IO 大于 kernel 能够处理的 IO 导致的，而 Ring Buffer 则是指在发起 IRQ 请求之前的那块 buffer。很明显，overruns 的增大意味着数据包没到 Ring Buffer 就被网卡物理层给丢弃了，而 CPU 无法即使的处理中断是造成 Ring Buffer 满的原因之一，上面那台有问题的机器就是因为 interruprs 分布的不均匀(都压在 core0)，没有做 affinity 而造成的丢包。 
+`carrier`: CSMA的C是载波。它的值很高表示出错很多，导致网络性能下降。通常是物理层的错误造成的，比如电缆问题、强电干扰、等等
+ 传输的 IO 大于 kernel 能够处理的 IO 导致的，而 Ring Buffer 则是指在发起 IRQ 请求之前的那块 buffer。很明显，overruns 的增大意味着数据包没到 Ring Buffer 就被网卡物理层给丢弃了，而 CPU 无法即使的处理中断是造成 Ring Buffer 满的原因之一，上面那台有问题的机器就是因为 interruprs 分布的不均匀(都压在 core0)，没有做 affinity 而造成的丢包。
 
-### 管理IPv6地址：
+### 管理IPv6地址
+
 - add addr/prefixlen
 - del addr/prefixlen
 
 ## route命令：路由查看及管理
 
 ### 路由条目类型：
+
 - 主机路由：目标地址为单个IP
 - 网络路由：目标地址为IP网络
 - 默认路由：目标为任意网络，0.0.0.0/0.0.0.0
 
 ### 查看
+
 `# route  -n`
+
 > n: numerical
 
 主机名显示方式
@@ -376,18 +401,22 @@ carrier: CSMA的C是载波。它的值很高表示出错很多，导致网络性
 
 不建议使用名称方式显示路由条目
 
-### 添加：route add [-net|-host] target [netmask Nm] [gw GW] [[dev] If]
-```
+### 添加
+
+`route add [-net|-host] target [netmask Nm] [gw GW] [[dev] If]`
+
+``` shell
 # route add -net 0.0.0.0/0.0.0.0 gw 172.16.1.1  
 # route add default gw 172.16.1.1
 ```
 
 目标地址     下一跳网关    目标地址掩码
-```
+
+``` shell
 Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
-0.0.0.0         192.168.1.1     0.0.0.0         UG    100    0      0 		eno16777736
-0.0.0.0         192.168.1.1     0.0.0.0         UG    101    0      0 		eno33554984
-0.0.0.0   默认网关		
+0.0.0.0         192.168.1.1     0.0.0.0         UG    100    0      0 eno16777736
+0.0.0.0         192.168.1.1     0.0.0.0         UG    101    0      0 eno33554984
+0.0.0.0   默认网关
 
 172.16.0.0      0.0.0.0         255.255.0.0     U     100    0        0 eno33554984
 本地主机网络地址 本地主机无需网关(本地所在网络，所以不需要网关地址)
@@ -402,16 +431,21 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 - Metric：要经过的开销
 - Iface：
 
-#### 添加示例：
+#### 添加示例
+
 - CentOS 6(Hostid: 192.168.1.61/24)
 - CentOS 7(Hostid: 192.168.1.71/24， 172.16.7.1/16)
 
 #### CentOS 6
-`# route add -net 172.16.0.0/16 gw 192.168.1.71 dev eth0`
-`# ping 172.16.7.1`
 
-#### CentOS 6：
+``` shell
+# route add -net 172.16.0.0/16 gw 192.168.1.71 dev eth0
+# ping 172.16.7.1
 ```
+
+#### CentOS 6
+
+``` shell
 Destination     Gateway         Genmask         Flags Metric Ref    Use 	Iface
 192.168.1.0     0.0.0.0         255.255.255.0   U     0      0      0 		eth0
 192.168.1.0     0.0.0.0         255.255.255.0   U     1      0      0 		eth1
@@ -420,21 +454,25 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use 	Iface
 0.0.0.0         192.168.1.1     0.0.0.0         UG    0      0      0 		eth0
 ```
 
-### 删除：
-```
+### 删除
+
+``` shell
 # route del [-net|-host] target [gw Gw] [netmask Nm] [[dev] If]
 # route del -net 10.0.0.0/8 gw 192.168.10.1
 # route del default
 ```
 
-## netstat命令：
+## netstat命令
+
 > Print network connections, routing tables, interface statistics, masquerade(伪装) connections, and multicast  memberships（组员关系)
 
 ### 显示路由表：netstat  -rn
+
 - -r：routing，显示内核路由表
 - -n：numerical, 不要反解
 
 ### 显示网络连接选项：
+
 - [--all|-a] 所有状态连接TCP/UDP/SCTP/RAW
 - [--tcp|-t] TCP协议的相关连接
 - [--udp|-u] UDP相关的连接
@@ -453,15 +491,17 @@ FSM（Finate State Machine）
 
 State: LISTEN状态
 
-#### tcp：
+#### tcp
+
 - 面向连接的协议；
 - 通信开始之前，要建立一个虚链路；
 - 通信完成后还要拆除连接；
 
-#### udp：
+#### udp
+
 - 无连接的协议；直接发送数据报文
 
-```
+``` shell
 # netstat -t
 Active Internet connections (w/o servers)
 Proto Recv-Q Send-Q Local Address               Foreign Address             State
@@ -487,7 +527,7 @@ Proto Recv-Q Send-Q Local Address Foreign Address State PID/Program name tcp  0 
 
 ### 显示接口的统计数据：
 
-```
+``` shell
 # netstat {--interfaces|-I|-i} [iface]
 [--all|-a] [--extend|-e]
 [--verbose|-v] [--program|-p] [--numeric|-n]
@@ -533,9 +573,11 @@ Proto Recv-Q Send-Q Local Address Foreign Address State PID/Program name tcp  0 
 - 最多可以设置3个
 
 ## 如何 DNS 测试 (host/nslookup/dig)：能不能解析（不测试本地/etc/hosts）
+
 - FQDN = DOMAIN
 - 包命：**bind-utils(dig)**
-```
+
+``` shell
 # dig -t A FQDN
 >A: Address,主机名解析成IP
 FQDN -> IP
@@ -543,11 +585,11 @@ FQDN -> IP
 >IP -> FQDN 反向解析
 ```
 
-# iproute家族
+## iproute家族
 
 - 包名：**iproute2**,与内核版本相应 `uname -r`
 
-## ip命令：show / manipulate routing, devices, policy routing and tunnels
+### ip命令：show / manipulate routing, devices, policy routing and tunnels
 
 `ip [ OPTIONS ] OBJECT { COMMAND | help }`
 
@@ -564,7 +606,7 @@ link/ether，brd：都是不是IP地址
 
 2成设备信息
 
-```
+``` shell
 # ip link show
 # ip link list
 # ip li li
@@ -579,7 +621,7 @@ link/ether，brd：都是不是IP地址
 - mtu NUMBER：设置MTU的大小，默认为1500
 - netns PID：ns为namespace，用于将接口移动到指定的网络名称空间
 
-```
+``` shell
 # ip link set eth1 down
 # ip link set eth1 netns mynet
 ```
@@ -593,7 +635,7 @@ link/ether，brd：都是不是IP地址
 - ip netns del NAME：删除指定的netns
 - ip netns exec NAME COMMAND：在指定的netns中运行命令
 
-```
+``` shell
 # ip netns add mynet
 # ip link set eth1 netns mynet
 # ip netns exec mynet ip link show
@@ -610,9 +652,10 @@ link/ether，brd：都是不是IP地址
   - [scope SCOPE_VALUE]：
     - global：全局可用(与其他主机通信可以用)
     - link：接口可用(自己只能ping自己，不跟别人通信)
-    - host：仅本机可用(外界不知道有这个接口地址)							
-- ip address delete IFADDR dev IFACE 删除接口地址 
+    - host：仅本机可用(外界不知道有这个接口地址)
+- ip address delete IFADDR dev IFACE 删除接口地址
 - ip address flush dev IFACE 清空接口的地址
+
 `# ip address add 10.0.7.0/8 label eno33554984:1 dev eno33554984`
 
 ### ip route - routing table management
@@ -631,14 +674,14 @@ link/ether，brd：都是不是IP地址
 
 src: 一个接口中的多个地址当中选一个地址作为原地址
 
-```
+``` shell
 # ip route add 192.168.0.0/24 via 10.0.0.1 dev eth1 src  10.0.20.100
 # ip route add default via GW
 ```
 
 > 设置默认网关
 
-```
+``` shell
 # ip route delete 192.168.1.0/24
 # ip route get 192.168.0.0/24
 ```
@@ -684,27 +727,29 @@ dport: 客户端端口
 
 sport: 服务器端端口
 
-# 配置文件
+## 配置文件
 
 > IP/NETMASK/GW/DNS等属性的配置文件：
 
-## 路由的相关配置文件：
+### 路由的相关配置文件
 
 `/etc/sysconfig/networkj-scripts/route-IFACE`
 
-## 接口配置文件：
+### 接口配置文件
 
 `/etc/sysconfig/network-scripts/ifcfg-IFACE(接口名称)`
 
-## 配置文件/etc/sysconfig/network-scripts/ifcfg-IFACE通过大量参数来定义接口的属性，其可通过vim等文本编辑器直接修改，使用专用的命令的进行修改
+### 配置文件
 
-## CentOS 6
+`/etc/sysconfig/network-scripts/ifcfg-IFACE`通过大量参数来定义接口的属性，其可通过vim等文本编辑器直接修改，使用专用的命令的进行修改
+
+### CentOS 6
 
 > system-config-network（system-config-network-tui包名）
 
 `# setup`
 
-## CentOS 7
+### CentOS 7
 
 `# nmtui`
 
@@ -785,7 +830,7 @@ BOOTPROTO：网上别名不支持动态获取地址；
 
 只支持static, none
 
-# nmcli命令：`nmcli  [ OPTIONS ] OBJECT { COMMAND | help }`	
+## nmcli命令：`nmcli  [ OPTIONS ] OBJECT { COMMAND | help }`	
 
 > CentOS 7 专有命令：device - show and manage network interfaces
 
@@ -794,7 +839,7 @@ BOOTPROTO：网上别名不支持动态获取地址；
 - COMMAND := { show | up | down | add | edit | modify | delete | reload | load }
 - modify [ id | uuid | path ] <ID> [+|-]<setting>.<property> <value>
 
-## 如何修改IP地址等属性：
+### 如何修改IP地址等属性：
 
 `# nmcli  conn  modify  IFACE  [+|-]setting.property  value`
 
