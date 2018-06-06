@@ -101,20 +101,21 @@ OSI:Open System Interconnect Reference Model，开放式系统互联参考模型
 
 ## 发送分组数据流程
 
-1. 在本地查找/etc/hosts本地应解析服务器; 设置DNS IP地址
-2. 通过互联网获取域名对应的IP地址; 通过DNS获取IP地址
-3. 本地网络广播方式获取目标地址MAC（ARP地址解析协议发送broadcast）
-4. 目标地址主机回应请求MAC地址
-5. 响应目标MAC地址收到之后封装数据帧
+1. 在本地查找 `/etc/hosts` 本地应解析服务器; 设置 DNS IP 地址
+2. 通过互联网获取域名对应的 IP 地址; 通过 DNS 获取 IP 地址
+3. 本地网络广播方式获取目标地址 MAC（ARP 地址解析协议发送 broadcast）
+4. 目标地址主机回应请求 MAC 地址
+5. 响应目标 MAC 地址收到之后封装数据帧
 
-同时缓存目标MAC地址，有可能目标MAC地址改变，因此缓存MAC地址设置TTL(Time To Live) 生命周期时间
+同时缓存目标 MAC 地址，有可能目标 MAC 地址改变，因此缓存 MAC 地址设置 TTL(Time To Live) 生命周期时间
 
-每个主机广播ARP通告，其他主机更新缓存
+每个主机广播 ARP 通告，其他主机更新缓存
 
-1. 发送分组数据包
+发送分组数据包
 
-- ARP广播方式获取目标MAC地址，动态学习
-- 可以手动设置目标MAC地址
+ARP 广播方式获取目标 MAC 地址，动态学习
+
+可以手动设置目标 MAC 地址
 
 ## OS：多用户，多任务
 
@@ -146,6 +147,7 @@ OSI:Open System Interconnect Reference Model，开放式系统互联参考模型
 - 110(pop3邮件)
 - 421(TCP Wrappers)
 - 3306(mysql)
+- 27017(memcache)
 
 - 用户空间(资源子网)：应用程序的进程
 - 内核空间(通信子网)：进程管理、内存管理、驱动管理、网络协议栈
@@ -155,59 +157,58 @@ OSI:Open System Interconnect Reference Model，开放式系统互联参考模型
 - Port：界定进程；范围：主机
 - 网关：网络关口，本地网络的默认路由，数据转发到其他网络
 
-## 将Linux主机接入到网络中
+## 将 Linux 主机接入到网络中
 
 1. IP/NETMASK：本地通信
 2. 路由（网关）：跨网络通信
-3. DNS服务器地址：基于主机名的通信
+3. DNS 服务器地址：基于主机名的通信
 
-主DNS服务器地址
+- 主 DNS 服务器地址
+- 备用 DNS 服务器地址，主 DNS 服务器宕机时使用
+- 第三备份 DNS 服务器地址, 备用 DNS 服务器宕机时使用
 
-备用DNS服务器地址，主DNS服务器宕机时使用
-
-第三备份DNS服务器地址, 备用DNS服务器宕机时使用	
-
-## 配置方式
+### 配置方式
 
 - 动态分配
 - 静态指定
 
-###　动态分配：依赖于本地网络中有DHCP服务
+###　动态分配：依赖于本地网络中有 DHCP 服务
 
 - DHCP：Dynamic Host Configure Procotol
-- IP/NETMASK,GATEWAY,DNS
-- DHCP没有响应时候，169.254.X.Y自动分配，可以再本地联网
+- IP/NETMASK, GATEWAY, DNS
+- DHCP 没有响应时候，169.254.X.Y自动分配，可以再本地联网
 
-### 静态分配：
+### 静态分配
 
 1. 配置文件：不会立即生效，重启生效(启动时配置文件)
 2. 使用命令：立即生效，写入内核，重启失效
 
-#### 使用命令：
+#### 使用命令
 
-- ifcfg家族：net-tools 包
+- ifcfg 家族：net-tools 包
   - ifconfig：配置IP，NETMASK
   - route：路由
   - netstat：状态及统计数据查看
 
-- iproute2家族：ip-route 包
+- iproute2 家族：ip-route 包
   - ip OBJECT
     - addr：地址和掩码
     - link：接口
     - route：路由
   - ss：状态及统计数据查看
 
-- nm家族:Network Manager
+- CentOS 7: nm(Network Manager) 家族
   - nmcli：命令行工具 NetworkManager包
   - nmtui：text window 工具 NetworkManager-tui包
 
-- DNS服务器配置
-  - 配置文件：`/etc/resolv.conf`
+1. DNS服务器配置(DNS 服务器指定)
+- 配置文件：`/etc/resolv.conf`
 
-- 本地主机名配置:标识本地主机
-  - 临时生效：`# hostname` 
-  - 配置文件：`/etc/sysconfig/network`
-    - CentOS 7：`# hostnamectl`
+2. 本地主机名配置:标识本地主机
+
+- 临时生效：`# hostname`
+- 配置文件：`/etc/sysconfig/network`
+- CentOS 7：`# hostnamectl`
 
 #### 配置文件
 
@@ -218,19 +219,19 @@ OSI:Open System Interconnect Reference Model，开放式系统互联参考模型
 #### 传统命名
 
 - 以太网：ethX, [0,oo)，例如eth0, eth1, ...
-- PPP网络：pppX, [0,...], 例如，ppp0, ppp1, ...
+- PPP 网络：pppX, [0,...], 例如，ppp0, ppp1, ...
 
 #### 可预测命名方案（CentOS）： 支持多种不同的命名机制：
 
 Fireware(固件,硬件方式)命名, 拓扑结构命名
   
-如果Firmware或BIOS为主板上集成的设备提供的索引信息(三块网卡，每个网卡都有唯一的标识)可用，则根据此索引进行命名，如eno1, eno2, ...
+1. 如果 Firmware或BIOS 为主板上集成的设备提供的索引信息(三块网卡，每个网卡都有唯一的标识)可用，则根据此索引进行命名，如eno1, eno2, ...
 
-如果Firmware或BIOS为PCI-E扩展槽所提供的索引信息可用，且可预测，则根据此索引进行命名，如ens1, ens2, ...
+2. 如果 Firmware 或 BIOS 为 PCI-E 扩展槽所提供的索引信息可用，且可预测，则根据此索引进行命名，如ens1, ens2, ...
 
-如果硬件接口的物理位置信息可用，则根据此信息命名，如enp2s0, ...
+3. 如果硬件接口的物理位置信息可用，则根据此信息命名，如enp2s0, ...
 
-如果用户显式定义，也可根据MAC地址命名，例如enx122161ab2e10, ...
+4. 如果用户显式定义，也可根据MAC地址命名，例如enx122161ab2e10, ...
 
 述均不可用，则仍使用传统方式命名
 
