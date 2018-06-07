@@ -40,6 +40,17 @@ OSI:Open System Interconnect Reference Model，开放式系统互联参考模型
     - 0:0:0:0:0:0:0:1 → ::1
     - 0:0:0:0:0:0:0:0 → ::
 
+## 计算机网络基础
+
+- 互联网层：IP协议，IP 报文
+- 传输层：TCP, UDP
+- 应用层：http, https, fpt, ldap,...
+
+- 链接路层：以太网帧
+
+- 以太网帧：MTU（1500 bytes）
+- IP 报文 (1460 bytes)
+
 ## IP地址分类
 
 ### A类
@@ -176,41 +187,39 @@ ARP 广播方式获取目标 MAC 地址，动态学习
 
 - DHCP：Dynamic Host Configure Procotol
 - IP/NETMASK, GATEWAY, DNS
-- DHCP 没有响应时候，169.254.X.Y自动分配，可以再本地联网
+- DHCP 没有响应时候，169.254.X.Y 自动分配，可以再本地联网
 
 ### 静态分配
 
 1. 配置文件：不会立即生效，重启生效(启动时配置文件)
 2. 使用命令：立即生效，写入内核，重启失效
 
-#### 使用命令
+#### 网络常用命令
 
-- ifcfg 家族：net-tools 包
-  - ifconfig：配置IP，NETMASK
-  - route：路由
-  - netstat：状态及统计数据查看
+- ifcfg 家族：`net-tools 包`
+  - `ifconfig`：配置IP，NETMASK
+  - `route`：路由
+  - `netstat`：状态及统计数据查看
 
-- iproute2 家族：ip-route 包
-  - ip OBJECT
-    - addr：地址和掩码
-    - link：接口
-    - route：路由
-  - ss：状态及统计数据查看
+- iproute2 家族：`ip-route 包`
+  - `ip OBJECT`
+    - `addr`：地址和掩码
+    - `link`：接口
+    - `route`：路由
+  - `ss`：状态及统计数据查看
 
 - CentOS 7: nm(Network Manager) 家族
-  - nmcli：命令行工具 NetworkManager包
-  - nmtui：text window 工具 NetworkManager-tui包
+  - `nmcli`：命令行工具 `NetworkManager` 包
+  - `nmtui`：text window 工具 `NetworkManager-tui`包
 
-1. DNS服务器配置(DNS 服务器指定)
-- 配置文件：`/etc/resolv.conf`
-
-2. 本地主机名配置:标识本地主机
+1. DNS服务器配置(DNS 服务器指定) 配置文件：`/etc/resolv.conf`
+2. 本地主机名配置: 标识本地主机
 
 - 临时生效：`# hostname`
 - 配置文件：`/etc/sysconfig/network`
 - CentOS 7：`# hostnamectl`
 
-#### 配置文件
+#### 网络配置文件
 
 - RedHat及相关发行版 `/etc/sysconfig/network-scripts/ifcfg-NETCARD_NAME`
 
@@ -274,29 +283,29 @@ Fireware(固件,硬件方式)命名, 拓扑结构命名
 
 `<hw<网络设备类型><硬件地址>` 设置网络设备的类型与硬件地址。
 
-`io_addr<I/O地址>` 设置网络设备的I/O地址。
+`io_addr <I/O地址>` 设置网络设备的I/O地址。
 
-`irq<IRQ地址>` 设置网络设备的IRQ
+`irq <IRQ地址>` 设置网络设备的IRQ
 
 中断请求（Interrupt Request）
 
-`media<网络媒介类型>` 设置网络设备的媒介类型。
+`media <网络媒介类型>` 设置网络设备的媒介类型。
 
-`mem_start<内存地址>` 设置网络设备在主内存所占用的起始地址。
+`mem_start <内存地址>` 设置网络设备在主内存所占用的起始地址。
 
-`metric<数目>` 指定在计算数据包的转送次数时，所要加上的数目。
+`metric <数目>` 指定在计算数据包的转送次数时，所要加上的数目。
 
-`mtu<字节>` 设置网络设备的MTU。
+`mtu <字节>` 设置网络设备的MTU。
 
-`netmask<子网掩码>` 设置网络设备的子网掩码。
+`netmask <子网掩码>` 设置网络设备的子网掩码。
 
-`tunnel<地址>` 建立IPv4与IPv6之间的隧道通信地址。
+`tunnel <地址>` 建立IPv4与IPv6之间的隧道通信地址。
 
 `up` 启动指定的网络设备。
 
-`-broadcast<地址>` 将要送往指定地址的数据包当成广播数据包来处理。
+`-broadcast <地址>` 将要送往指定地址的数据包当成广播数据包来处理。
 
-`-pointopoint<地址>` 与指定地址的网络设备建立直接连线，此模式具有保密功能
+`-pointopoint <地址>` 与指定地址的网络设备建立直接连线，此模式具有保密功能
 
 `-promisc` 关闭或启动指定网络设备的promiscuous模式。
 
@@ -356,13 +365,13 @@ inet 192.168.1.71  netmask 255.255.255.0  broadcast 192.168.1.255
 
 `Ether 以太网地址 txqueuelen 1000 (Ethernet)`
 
-`RX`表示接收数据包的情况
+`RX` 表示接收数据包的情况
 
 `RX packets 55022  bytes 48564958 (46.3 MiB)`
 
 `分组包数量，总大小字节(MiB)`
 
-`TX`表示发送数据包的情况
+`TX` 表示发送数据包的情况
 
 `errors`: 错误个数
 
