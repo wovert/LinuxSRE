@@ -255,11 +255,11 @@ Fireware(固件,硬件方式)命名, 拓扑结构命名
   - `x<MAC>`：基于MAC地址的命名
   - `p<bus>s<slot>`：基于总线及槽的拓扑结构进行命名
 
-## ifcfg命令家族
+## ifcfg 命令家族
 
 `ifconfig, route, netstat`
 
-### ifconfig命令：接口及地址查看和管理
+### ifconfig 命令：接口及地址查看和管理
 
 - ifconfig  [INTERFACE]
 - ifconfig interface [aftype] options | address ...
@@ -319,9 +319,9 @@ Fireware(固件,硬件方式)命名, 拓扑结构命名
 - [-]promisc 混杂模式
 - [-]allmulti 启动组播或多播
 
-`# ifconfig eth1 promisc` 启用
+`# ifconfig eth1 promisc` 启用 promisc 功能
 
-`# ifconfig eth1 -promisc` 禁用
+`# ifconfig eth1 -promisc` 禁用 promisc 功能
 
 - **注意**：立即送往内核中的TCP/IP协议栈并生效
 
@@ -386,32 +386,34 @@ inet 192.168.1.71  netmask 255.255.255.0  broadcast 192.168.1.255
 `carrier`: CSMA的C是载波。它的值很高表示出错很多，导致网络性能下降。通常是物理层的错误造成的，比如电缆问题、强电干扰、等等
  传输的 IO 大于 kernel 能够处理的 IO 导致的，而 Ring Buffer 则是指在发起 IRQ 请求之前的那块 buffer。很明显，overruns 的增大意味着数据包没到 Ring Buffer 就被网卡物理层给丢弃了，而 CPU 无法即使的处理中断是造成 Ring Buffer 满的原因之一，上面那台有问题的机器就是因为 interruprs 分布的不均匀(都压在 core0)，没有做 affinity 而造成的丢包。
 
-### 管理IPv6地址
+### 管理 IPv6 地址
 
-- add addr/prefixlen
-- del addr/prefixlen
+- `add addr/prefixlen` 添加 ipv6 地址
+- `del addr/prefixlen` 移除 ipv6 地址
 
-## route命令：路由查看及管理
+### route命令
 
-### 路由条目类型：
+> 路由查看及管理
 
-- 主机路由：目标地址为单个IP
-- 网络路由：目标地址为IP网络
-- 默认路由：目标为任意网络，0.0.0.0/0.0.0.0
+#### 路由条目类型
 
-### 查看
+- 主机路由：目标地址为单个 IP
+- 网络路由：目标地址为 IP 网络
+- 默认路由：目标为任意网络，`0.0.0.0/0.0.0.0`
+
+#### 查看路由
 
 `# route  -n`
 
-> n: numerical
+n: numerical
 
 主机名显示方式
 
-有大量反解路由条目时，指向单机，泛解消耗时间。
+有大量反解路由条目时，指向单机，泛解消耗时间
 
 不建议使用名称方式显示路由条目
 
-### 添加
+### 添加路由
 
 `route add [-net|-host] target [netmask Nm] [gw GW] [[dev] If]`
 
@@ -441,19 +443,17 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 - Metric：要经过的开销
 - Iface：
 
-#### 添加示例
+#### 添加路由示例
 
 - CentOS 6(Hostid: 192.168.1.61/24)
 - CentOS 7(Hostid: 192.168.1.71/24， 172.16.7.1/16)
 
-#### CentOS 6
+#### CentOS 6 添加网络路由
 
 ``` shell
 # route add -net 172.16.0.0/16 gw 192.168.1.71 dev eth0
 # ping 172.16.7.1
 ```
-
-#### CentOS 6
 
 ``` shell
 Destination     Gateway         Genmask         Flags Metric Ref    Use 	Iface
@@ -464,7 +464,7 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use 	Iface
 0.0.0.0         192.168.1.1     0.0.0.0         UG    0      0      0 		eth0
 ```
 
-### 删除
+#### 删除路由
 
 ``` shell
 # route del [-net|-host] target [gw Gw] [netmask Nm] [[dev] If]
@@ -472,16 +472,16 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use 	Iface
 # route del default
 ```
 
-## netstat命令
+### netstat 命令
 
 > Print network connections, routing tables, interface statistics, masquerade(伪装) connections, and multicast  memberships（组员关系)
 
-### 显示路由表：netstat  -rn
+#### 显示路由表：netstat  -rn
 
 - -r：routing，显示内核路由表
 - -n：numerical, 不要反解
 
-### 显示网络连接选项：
+#### 显示网络连接选项：
 
 - [--all|-a] 所有状态连接TCP/UDP/SCTP/RAW
 - [--tcp|-t] TCP协议的相关连接
@@ -526,11 +526,11 @@ tcp        0      0 192.168.1.61:22             192.168.1.104:2242          ESTA
 Proto Recv-Q Send-Q Local Address Foreign Address State PID/Program name tcp  0 52 192.168.1.71:22 192.168.1.104:5041 ESTABLISHED 4696/sshd: root@pts
 ```
 
-### 常用组合
+### 常用网络查看组合
 
 - -tan：所有TCP所有状态数字格式现实
-- -tn: 只显示当前处于连接的TCP 
-- -tnl: 所有TCP所有状态数字格式现实 
+- -tn: 只显示当前处于连接的TCP
+- -tnl: 所有TCP所有状态数字格式现实
 - -uan：所有UDP数字格式现实
 - -unl：所有UDP监听数字格式现实
 - -tunlp：所有TCP和UDP监听进程数字格式现实
