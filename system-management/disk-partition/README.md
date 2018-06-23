@@ -17,30 +17,30 @@
 - 并口：IDE,SCSI
 - 串口：SATA, SAS, USB
 - IDE(早期为ata，但并不相同)：并口
-	+ 速率：133MB/s
-	+ 接口名：/dev/hd[a-z]
+  - 速率：133MB/s
+  - 接口名：/dev/hd[a-z]
 - SCSI：并口
-	+ 接口名：/dev/sd[a-z]
-	+ UltraSCSI320, 320MB/s
-	+ UltraSCSI640, 640MB/s
+  - 接口名：/dev/sd[a-z]
+  - UltraSCSI320, 320MB/s
+  - UltraSCSI640, 640MB/s
 - SATA：串口
-	+ 速率：6Gbps, 
-	+ 接口名：/dev/sd[a-z]
+  - 速率：6Gbps, 
+  - 接口名：/dev/sd[a-z]
 - SAS：串口（SCSI），
-	+ 速率：6Gbps 
-	+ 接口名：/dev/sd[a-z]
+  - 速率：6Gbps 
+  - 接口名：/dev/sd[a-z]
 - USB：串口
-	+ 速率：3.1v 480MB/s
-	+ 接口名：/dev/sd[a-z]
+  - 速率：3.1v 480MB/s
+  - 接口名：/dev/sd[a-z]
 - 并口：同一线缆可以接多块设备
-	+ IDE：两个，主设备，从设备
-	+ SCSI：
-		* 宽带：16-1
-		* 窄带：8-1
-+ 串口：同一线缆只可以接一个设备
+  - IDE：两个，主设备，从设备
+  - SCSI：
+    - 宽带：16-1
+    - 窄带：8-1
+- 串口：同一线缆只可以接一个设备
 
 > IOPS (Input/Output Operations Per Second)，即每秒进行读写（I/O）操作的次数，多用于数据库等场合，衡量随机访问的性能。存储端的IOPS性能和主机端的IO是不同的，IOPS是指存储每秒可接受多少次主机发出的访问，主机的一次IO需要多次访问存储才可以完成。例如，主机写入一个最小的数据块，也要经过“发送写入请求、写入数据、收到写入确认”等三个步骤，也就是3个存储端访问
-		
+
 ## IOPS理论值
 - IDE: 100
 - SCSI: 150
@@ -57,17 +57,19 @@
 - 固定角速度
 - 机械臂
 - 磁头悬浮在盘面上
-	
+
 ## 读取数据：
+
 1. 挪动磁头固定到磁道上
 2. 等待数据转过来
-	
+
 ## 平均寻到时间
 1. 磁头挪动时间
 2. 盘片转速
-	+ 5400rpm,笔记本
-	+ 7200rpm, 10000rpm, 15000rpm(SCSI) PC
-	+ 离心机：30000rpm/m
+
+- 5400rpm,笔记本
+- 7200rpm, 10000rpm, 15000rpm(SCSI) PC
+- 离心机：30000rpm/m
 
 
 ## 固态硬盘：多个并行的USB盘，电气设备
@@ -80,85 +82,92 @@
 
 ## 设备文件：FHS
 - 设备文件的作用：
-	+ 关联至设备驱动程序（内核中的程序文件）；
-	+ 设备的访问入口
+  - 关联至设备驱动程序（内核中的程序文件）；
+  - 设备的访问入口
 - 设备号：
-	+ major：主设备号，区分**设备类型**；用于标明设备所需要的驱动程序
-	+ minor：次设备号，区分**同种类型下的不同的设备**;是特定设备的访问入口
+  - major：主设备号，区分**设备类型**；用于标明设备所需要的驱动程序
+  - minor：次设备号，区分**同种类型下的不同的设备**;是特定设备的访问入口
 
 ## mknod 命令
+
 > make block or charactoer special files
 
 - `mknod [OPTION]... NAME TYPE [MAJOR MINOR]`
 - 选项
-	+ `TYPE: c | b`
-	+ `-m, --mode` 创建设备文件的访问权限，**系统调用**来实现的
+  - `TYPE: c | b`
+  - `-m, --mode` 创建设备文件的访问权限，**系统调用**来实现的
 
 `~]# mknod /dev/testdev/ c 111 1`
+
 `~]# ls -l /dev/testdev`
+
 `~]# install -m` 复制同时修改权限
 
 `~]# cp /usr/bin/chmod /tmp/`
+
 `~]# chmod a-x /tmp/chmod`
+
 `~]# install -m 755 /tmp/chmod /tmp/test/`
 
 - 设备文件名：**ICANN** 机构分配
 
 ## 磁盘命令
+
 - IDE: /dev/hd[a-z]
 - SCSI,SATA,SAS,USB: /dev/sd[a-z]
 - 分区：
-	+ /dev/sda#
-	+ /dev/sda1,...
+  - /dev/sda#
+  - /dev/sda1,...
 - 注意：CentOS 6和7统统将硬盘设备文件标识为/dev/sd[a-z]#
 - 引用设备的方式：
-	+ 设备文件名
-	+ 卷标
-	+ UUID：128位的编号
+  - 设备文件名
+  - 卷标
+  - UUID：128位的编号
 
 ## 磁盘分区：MBR，GPT
 - MBR: Master Boot Recored,主引导记录
-	+ 位置：0 sector，512byte, 0编号扇区
+  - 位置：0 sector，512byte, 0编号扇区
 
-	+ 分为三部分：
-		* 446byte: bootloader, 引导启动操作系统的程序
-		* 64byte: 分表表，每16byte表示一个分区，一共只能有4个分区
-			- 4主分区
-			- 3主1扩展（n逻辑分区）
-		* 2bytes: MBR区域的有效性校验；55AA为有效
+  - 分为三部分：
+    - 446byte: bootloader, 引导启动操作系统的程序
+    - 64byte: 分表表，每16byte表示一个分区，一共只能有4个分区
+      - 4主分区
+      - 3主1扩展（n逻辑分区）
+    - 2bytes: MBR区域的有效性校验；55AA为有效
 
-	+ 主分区和扩展分区的表示：1-4
-	+ 逻辑分区：5+
+  - 主分区和扩展分区的表示：1-4
+  - 逻辑分区：5+
 
 - 课外作业：GTP是什么，怎么使用？
 
-## fdisk 
+## fdisk
+
 > manipulate disk partion table
 
 1. 查看分区
 - fdisk -l -u [device...] 列出指定磁盘设备上的分区情况
-	+ 实际内核查看分区表：`# cat /proc/partitions `
+  - 实际内核查看分区表：`# cat /proc/partitions `
 
 - CentOS 7 扇区标识： Start End
 - CentOS 6 柱面标识: Start End
 
 - 分区类型：16进制
-	+ Linux标识主分区：		83
-	+ Extended标识主分区：	5
-	+ Swap标识交换分区：		82
+  - Linux标识主分区：83
+  - Extended标识主分区：5
+  - Swap标识交换分区：82
 
 2. 管理分区
 - `~]# fidsk device`
 - fidsk提供了一个交互式接口管理分区，有很多子命令，分别用于不同的管理功能；
 - 所有的操作均在内存中完成，没有直接同步到磁盘；
 - 直到使用w命令保存至磁盘上；
-		
+
 ## 常用命令
 - n: add a new partition
-	+ p(主分区) or e(扩展分区) or l(逻辑分区)
-		* number {1-4}
-	+ start sector
-		* +10G
+  - p(主分区) or e(扩展分区) or l(逻辑分区)
+    - number {1-4}
+  - start sector
+    - +10G
 - d：delete partition
 - t: modify partition type
 
@@ -170,39 +179,42 @@
 - m: help
 
 - 注意：在**已经分区并且已经挂载**其中某个**分区**的磁盘设备上的**创建的新分区**，**内核**可能在完成之后**无法直接识别**
-	+ 查看内核识别的分区：`~]# cat /proc/partitions`
+  - 查看内核识别的分区：`~]# cat /proc/partitions`
 
 ### 通知内核强制重读分区表
 - CentOS 5: `# partprob [device]`
 - CentOS 6|7:
-	+ `~]# partx -a device` 读取所有分区并添加分区（有时需要执行两次命令）
-		* -a: Add the specified partitions, or read the disk and add all partitions
-	+ `~]# kpartx -af device`
-		* -a: append partition mapping
-		* -f: force creations of mapping; overrides 'no_partitions' feature
+  - `~]# partx -a device` 读取所有分区并添加分区（有时需要执行两次命令）
+    - -a: Add the specified partitions, or read the disk and add all partitions
+  - `~]# kpartx -af device`
+    - -a: append partition mapping
+    - -f: force creations of mapping; overrides 'no_partitions' feature
 
 - 分区创建工具：`parted, sfdisk`
 
-# 创建文件系统
-## 格式化
+## 创建文件系统
+
+### 格式化
+
 1. 低级格式化（分区之前进行 =>划分磁道）
 2. 高级格式化（分区之后对分区进行 => 创建文件系统）
 
-## 元数据和数据区
-### 元数据区
+### 元数据和数据区
+#### 元数据区
 - 文件元数据：大小、权限、属主属组、时间戳、数据块指针（占据了哪些数据块，单个文件大小有限）
-	+ inode(index node) 是索引节点 
-	+ inode 大小固定
-	+ 文件名不在元数据存储，而是在目录当中保存文件名
-	+ inode 数量少，浪费数据空间
-	+ inode 数量多，浪费 inode 空间
+  -inode(index node) 是索引节点
+  - inode 大小固定
+  - 文件名不在元数据存储，而是在目录当中保存文件名
+  - inode 数量少，浪费数据空间
+  - inode 数量多，浪费 inode 空间
 
 - 元数据还包含
-	+ inode data
-	+ bitmap inode index
-	+ bitmap block index
-	
+  - inode data
+  - bitmap inode index
+  - bitmap block index
+
 ### 数据区
+
 - block:磁盘块大小，n*512bytes
 - 文件块不连续，说明有碎片
 
@@ -219,16 +231,16 @@
 
 ### 磁盘块组（逻辑分区）
 - 元数据区/每个块组
-	+ inode table
-	+ 磁盘块位图索引
-	+ inode 位图索引
-	+ 有超级块（所有块组）+ 块组描述符（当前块组的）
+  - inode table
+  - 磁盘块位图索引
+  - inode 位图索引
+  - 有超级块（所有块组）+ 块组描述符（当前块组的）
 - 数据区/每个块组
 
 - 超级块：管理磁盘块组
-	+ 超级块也在块组当中
-	+ 管理块分组
-	+ 备份超级块便于某个超级快损坏时适应该超级快作为管理块组
+  - 超级块也在块组当中
+  - 管理块分组
+  - 备份超级块便于某个超级快损坏时适应该超级快作为管理块组
 
 **先分块，然后分元数据块和数据块**
 
@@ -237,15 +249,17 @@
 - /var/log/messages
 
 1. 根（/）查找inode，找到磁盘块（目录下所有的文件名和inode的对应关系）
-	文件名	inode
-	+ var		0x1023930
-	+ bin		0x2093902
-	+ sbin	0x2d92392
-	+ ...
+
+- 文件名 inode
+- var 0x1023930
+- bin 0x2093902
+- sbin 0x2d92392
+- ...
+
 2. var 文件所对应的 inode 编号 0x1023930
 3. var 文件磁盘块（目录下所有的文件名和 inode 对应关系）
-	+ log 	0x2309230
-	+ cache	0x2039203
+  - log 0x2309230
+  - cache	0x2039203
 4. log 文件的 inode 编号 0x2309230，在磁盘块中查找 log 磁盘块(目录下所有的文件名inode对应关系)
 	+ message 0x2930239
 5. message 文件的 inode 编号 0x2930239，在磁盘块中找到文件内容
