@@ -380,21 +380,23 @@ man1, man5, man8 等
 - 官方站点上的 **Document**
 
 #### 7. 搜索引擎
-- google
+- google0
 	+ `filetype: pdf`
-	+ `site:lingyima.com`  
+	+ `................................0site:lingyima.com`  
 		* domain.tld(top level domain)
 	+ `intitle: `
 	+ `inurl:`
 	+ `intext:`
 		
 #### 8. 书籍出版社
+
 - 外文书籍
 - O'reiley
 - Wrox
 - 机械工业、电子工业、人邮、清华大学、水利水电
 
 ### 练习：获取 useradd 命令的用法
+
 1. 添加用户 gentoo
 `~]# useradd gentoo`
 `~]# id gentoo`
@@ -406,14 +408,19 @@ man1, man5, man8 等
 ## 常用命令
 
 ### 目录命令
+
 #### 查看当前目录 - print working directory
+
 `~]# pwd`
 
 #### 切换工作目录 -  change directory
-`~]# cd [/PATH/TO/SOMEDIR]` 切换到自定目录
-`~]# cd ~` 				切换到当前用户家目录
-`~]# cd ~USERNAME` 		切换至指定用户的家目录
-`~]# cd -` 				切换到上次目录
+
+``` shell
+~]# cd [/PATH/TO/SOMEDIR] 切换到自定目录
+~]# cd ~` 切换到当前用户家目录
+~]# cd ~USERNAME` 切换至指定用户的家目录
+~]# cd -` 切换到上次目录
+```
 
 - 环境变量
 `~]# echo $HOME`
@@ -421,44 +428,59 @@ man1, man5, man8 等
 `~]# echo $OLDPWD`
 
 #### 列出指定目录下的文件列表 - list
+
 `ls [OPTIONS]... [FILE]...`
-- 选项
-`-a` 显示所有文件，包括隐藏文件
-`-A` 显示所有文件，除了.和..的所有隐藏文件
-`-r,--reverse` 逆序显示
-`-R,--recursive` 递归显示
-`-i, --inode`
-`--file-type：/`
 
-`-lc` ctime
-`-lu` atime
-`-t` 按修改时间先后显示
-`-m` 填满宽度的逗号分隔列表条目
-`-S` 以文件大小排序显示
+`ls` options
+```
+-a : 显示所有文件，包括隐藏文件
+-A :  显示所有文件，除了.和..的所有隐藏文件
+-r,--reverse : 逆序显示
+-R,--recursive : 递归显示
+-i, --inode
+--file-type：/
 
-`-d, --directory` 查看目录自身属性信息，结合使用l选项，-ld
-`-h, --human-readable` 人为可读的格式显示，换算后的结果会丢失精度
-`-l，--long` 长格式列表，即显示文件的详细属性信息
-	
+-lc ctime
+-lu atime
+-t : 按修改时间先后显示
+-m : 填满宽度的逗号分隔列表条目
+-S : 以文件大小排序显示
+
+-d, --directory : 查看目录自身属性信息，结合使用l选项，-ld
+-h, --human-readable : 人为可读的格式显示，换算后的结果会丢失精度
+-l，--long : 长格式列表，即显示文件的详细属性信息
+```
+
 - 文件类型：属主权限：属组权限：其他权限：隐藏属性：硬链接数：文件的属主:文件的属组：文件大小（字节）：最近一次被修改日期：文件名
 - drwxr-xr-x. 2 root root    4096 Sep 17  2016 anaconda
 - drwxr-x---. 2 root root      22 Sep 17  2016 audit
 - -rw-r--r--  1 root root    8659 Jul  2 10:38 boot.log
 
+---
 
 #### mkdir：make directories
+
 `mkdir [OPTION]... DIRECTORY...`
+
 `-p` 自动按需创建父目录
+
 `-v` verbose，显示详细过程
+
 `-m MODE` 直接给定权限
 
 - 注意：路径基名方为命令的作用对象；基名之前的路径必须得存在；
 
-#### rmdir：remove empty directories
-`rmdir [OPTION]... DIRECTORY...`
-`p` 删除某目录后，如果其父目录为空，则一并删除之；
- `v` verbose
+---
 
+#### rmdir：remove empty directories
+
+`rmdir [OPTION]... DIRECTORY...`
+
+`p` 删除某目录后，如果其父目录为空，则一并删除之；
+
+`v` verbose
+
+---
 
 #### mktemp 命令：create a temporary file or directory
 `mktemp [OPTION]... [TEMPLATE]`
@@ -468,12 +490,15 @@ man1, man5, man8 等
 `~]# mktemp XXX.ab`
 - 注意：mktemp 会将创建的临时文件名直接返回，因此，可直接通过命令引用保存起来
 
+---
 
 ### 文件查看工具
 
 #### 查看文件内容类型
 `file [FILE]...`
-ASCII, ELF 
+ASCII, ELF
+
+---
 
 #### 查看文件内容
 1. `cat [OPTION]... [FILE]..`
@@ -496,46 +521,68 @@ ASCII, ELF
 `n #` 或者 `-#`
 `-f` 查看文件尾部内容结束后不退出，跟随显示新增的行
 
+---
+
+#### 从标准输入获取内容创建和执行命令
+
+`xargs -n 数字` 一行显示列数(空白字符分割)
+
+``` shell
+# echo 1 2 3 4 5 > file.txt
+# xargs -n 4 < file.txt
+```
+
+---
+
 #### 回显
+
 `echo [SHORT-OPTION]... [STRING]...`
 
-- OPTIONS
-`-n` do not output the trailing newline
-`-e` 转义符生效
-	`\r: 回车符
-	\n： 换行符
-	\t：制表符
-	\v：纵向制表符
-	\b：退格符 
-	\\：反斜线`
-- `\033[31m  \033[0m`
+`echo` OPTIONS
+```
+-n : do not output the trailing newline
+-e : 转义符生效
+  \r: 回车符
+  \n： 换行符
+  \t：制表符
+  \v：纵向制表符
+  \b：退格符
+  \\：反斜线`
+  `\033[31m  \033[0m
 
-- 第一个 `#`
-	+ **1** 加粗
-	+ **3** 前景
-	+ **4** 背景色
-	+ **5** 闪烁
-	+ **7** 前景背景互换 
 
-- 第二个 `#`：
-	+ **颜色**，1-7
+第一个 `#`
+1 加粗
+3 前景
+4 背景色
+5 闪烁
+7 前景背景互换
 
-- `\033[0m` 控制结束符
-`~]#  echo -e "\033[31;1;42mHello\033[0m"`
+
+第二个 `#`：颜色，1-7
+
+`\033[0m` 控制结束符
+
+#  echo -e "\033[31;1;42mHello\033[0m"
+
+```
 
 - STRING 可以使用引号，单引号和双引号
-	+ 单引号：**强引用**，变量不会被替换
-	+ 双引号：**弱引用**，变量引用会替换
-	+ 反引号：**命令解析**，$(COMMAND)=`COMMAND`
+  - 单引号：**强引用**，变量不会被替换
+  - 双引号：**弱引用**，变量引用会替换
+  - 反引号：**命令解析**，$(COMMAND)=`COMMAND`
 
-- 注意：变量引用的正规符号
-	+ `${变量名}`
+- 注意：变量引用的正规符号 `${变量名}`
 
+---
 
 ### 日期相关命令
+
 > 系统启动时从硬件读取日期和时间信息；读取完成以后，就不在与硬件相关联
 - 系统时钟
 - 硬件时钟
+
+---
 
 #### date：系统时钟
 - 显示日期时间：`date [OPTIONS]... [+FORMAT]`
@@ -555,8 +602,12 @@ ASCII, ELF
 
 - 设定日期时间：`date [-u|--utc|--universal] [MMDDhhmm[[CC]YY][.ss]]`
 
+---
+
 #### clock 硬件时钟
 > 是 hwclcok 的软链接
+
+---
 
 #### hwclock - query or set the hardware clock(RTC)
 `-s, --hctosys`
@@ -565,53 +616,76 @@ Set the System Time from the Hardware Clock.
 `-w, --systohc`
 Set the Hardware Clock to the current System Time.
 
-#### cal
+---
+
+#### cal 命令
 `cal [options] [[[day] month] year]`
 
-### `which`
+---
+
+### which 命令
 `--skip-alias` 忽略别名
 
-### `whereis`
+---
+
+### whereis 命令
 `-b` binary path
+
 `-m` man path
 
-### `who`
+---
+
+### who 命令
 `-b` 最近一次系统启动时间
+
 `-r` runlevel
+
 `-u` 显示进程号
+
+---
 
 ### `w` 增强版的 who 命令
 - IDEL
 - JCPU 与该tty终端连接的所有进程占用的时间，不包括过去的后台作业时间
 - PCPU 当前进程(即w项中显示的)所占用的时间
-	
+
+---
 
 ### 文件管理
+
 #### stat 命令
+
 > 显示文件系统状态的文件
 
 - 文件
-	+ 元数据：metadata，inode
-	+ 数据: data, block
+  - 元数据：metadata，inode
+  - 数据: data, block
 
 - 时间戳：
-	+ access time
-	+ modify time(数据)
-	+ change time(元数据)
+  - access time
+  - modify time(数据)
+  - change time(元数据)
 
 #### touch 命令 - change file timestamps
-`-c` 指定的文件路径不存在时不予创建
-`-a` 修改access time
-`-m` 修改modify time
-`-t` [[CC]YY]MMDDhhmm[.ss]
+
+`touch` options
+```
+-c : 指定的文件路径不存在时不予创建
+-a : 修改access time
+-m : 修改modify time
+-t [[CC]YY]MMDDhhmm[.ss]
+```
 
 #### mv 命令
 `mv [OPTION]... SOURCE... DIRECTORY`
+
 `mv [OPTION]... -t DIRECTORY SOURCE...`
 
-- options
-`-i` interactive
-`-f` force
+`mv` options
+```
+-i : interactive
+-f : force
+```
 
 #### rm 命令 - remove
 - options
@@ -623,58 +697,66 @@ Set the Hardware Clock to the current System Time.
 #### cp 命令 - copy
 - 单源复制：`cp [OPTION]... [-T] SOURCE DEST`
 - 多源复制：`cp [OPTION]... SOURCE... DIRECTORY`
-	
-`cp [OPTION]... -t DIRECTORY SOURCE...`
+
+``` shell
+# cp [OPTION]... -t DIRECTORY SOURCE...
+```
 
 - 源复制：`cp [OPTION]... [-T] SOURCE DEST`
-	+ 如果 **DEST**  不存在：则事先创建此文件，并复制源文件的数据流至 **DEST** 中；
-	+ 如果 **DEST** 存在：
-		+ 如果 **DEST** 是非目录文件：则覆盖目标文件；
-		+ 如果 **DEST** 是目录文件：则先在 **DEST** 目录下创建一个与源文件同名的文件，并复制其数据流；
-	
+  - 如果 **DEST**  不存在：则事先创建此文件，并复制源文件的数据流至 **DEST** 中；
+  - 如果 **DEST** 存在：
+    - 如果 **DEST** 是非目录文件：则覆盖目标文件；
+    - 如果 **DEST** 是目录文件：则先在 **DEST** 目录下创建一个与源文件同名的文件，并复制其数据流；
+
 - 多源复制：`cp [OPTION]... SOURCE... DIRECTORY
- 		cp [OPTION]... -t DIRECTORY SOURCE...`
- 	+ 如果 **DEST** 不存在：错误；
-	+ 如果 **DEST** 存在：
-		* 如果 **DEST** 是非目录文件：错误；
-	    * 如果 **DEST** 是目录文件：分别复制每个文件至目标目录中，并保持原名；
-	
-- 常用选项
-	+ `-i` interactive，覆盖文件时提醒信息
-	+ `-f` force，强制覆盖目标文件
-	+ `-r, -R` recursive，递归复制目录
-	+ `-d` 复制符号链接文件本身，而非其指向的源文件；--preserver=links
-	+ `-a` -dR --preserve=all, archive，用于实现归档；
-	+ `--preserve=`
-		* mode：权限
-		* ownership：属主和属组
-		* timestamps: 时间戳
-		* context：安全标签
-		* xattr：扩展属性
-		* links：符号链接
-		* all：上述所有属性
+  - cp [OPTION]... -t DIRECTORY SOURCE...`
+  - 如果 **DEST** 不存在：错误；
+  - 如果 **DEST** 存在：
+    - 如果 **DEST** 是非目录文件：错误；
+    - 如果 **DEST** 是目录文件：分别复制每个文件至目标目录中，并保持原名；
+
+**copy 常用选项**
+``` shell
+-i interactive : 覆盖文件时提醒信息
+-f force : 强制覆盖目标文件
+-r, -R recursive : 递归复制目录
+-d : 复制符号链接文件本身，而非其指向的源文件；--preserver=links
+-p： 连同档案的属性一起复制过去，而非使用默认属性
+-a -pdR --preserve=all, archive 用于实现归档
+  --preserve=
+    mode：权限
+    ownership：属主和属组
+    timestamps: 时间戳
+    context：安全标签
+    xattr：扩展属性
+    links：符号链接
+    all：上述所有属性
+```
 
 #### install 命令
-- 单源复制
-`install [OPTION]... [-t] SOURCE DEST` 
+- 单源复制 : `install [OPTION]... [-t] SOURCE DEST` 
 
 - 多源复制
-`install [OPTION]... SOURCE... DIRECTORY`
-`install [OPTION]... -t DIRECTORY SOURCE...`
-	
-- 创建空目录：
-`install [OPTION]... -d DIRECTORY...`
-	
-- 选项
-`-m, --mode=MODE` 设定目标文件权限，默认为 755
-`-o, --owner=OWNER` 设定文件的属主
-`-g, --group=GROUP` 设定文件的属组
-`-d` 创建空目录
-`-t` 指定目标目录
+  - `install [OPTION]... SOURCE... DIRECTORY`
+  - `install [OPTION]... -t DIRECTORY SOURCE...`
 
-- 注意：install命令不能复制目录
-`# install -d demo demo3`
-`# install -m 770 -o redhat -g linux -t /tmp/etc/ /etc/*`
+- 创建空目录：`install [OPTION]... -d DIRECTORY...`
+
+**install 选项**
+```
+-m, --mode=MODE : 设定目标文件权限，默认为 755
+-o, --owner=OWNER : 设定文件的属主
+-g, --group=GROUP : 设定文件的属组
+-d : 创建空目录
+-t : 指定目标目录
+```
+
+**注意**：`install` 命令不能复制目录
+
+``` shell
+# install -d demo demo3
+# install -m 770 -o redhat -g linux -t /tmp/etc/ /etc/*
+```
 
 #### dd 命令 - convert and copy a file
 `dd if=/PATH/FROM/SRC of=/PATH/TO/DEST bs=block size count=数量`
