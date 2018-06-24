@@ -502,63 +502,78 @@ mkswap [options] device
 	+ `relatime/norelatime`：是否参考修改或更新来更新访问时间
 	
 	+ `defaults`：rw, suid, dev, exec, auto, nouser, async, and relatime.
-				
+
 - 可以实现将目录绑定至另一个目录上，作为其临时访问入口；
 `# mount --bind  源目录  目标目录`
-					
+
 ## 查看当前系统所有已挂载的设备：
 ```
-# mount 
+# mount
 # cat  /etc/mtab
 # cat  /proc/mounts
-```				
-- 挂载光盘：`# mount  -r  /dev/cdrom  mount_point`
+```
+
+## 挂载光盘
+
 - 光盘设备文件
-	+ IDE：/dev/hdc
-	+ SATA: /dev/sr0
+  - IDE 接口：`/dev/hdc`
+  - SATA 接口: `/dev/sr0`
 
 - 符号链接文件
-	+ /dev/cdrom
-	+ /dev/cdrw
-	+ /dev/dvd
-	+ /dev/dvdrw
+  - `/dev/cdrom`
+  - `/dev/cdrw`
+  - `/dev/dvd`
+  - `/dev/dvdrw`
 
-```
-# mount -r device mount_point
-# mount /dev/cdrom
-```
+`# mount  -r  /dev/cdrom  mount_point`
 
-- 挂载U盘：事先识别U盘的设备文件
-- 保证你的U盘的格式是fat格式
+`# mount -r device mount_point`
+
+`# mount /dev/cdrom`
+
+---
+
+## 挂载U盘：事先识别U盘的设备文件
+
+保证你的U盘的格式是fat格式:
+`# fdisk -l` 大小判断 U 盘
 `# mount -t vfat /dev/sdb /mnt/usb`
 
+---
+
 ## 挂载本地的回环设备：光盘镜像文件
-```
+
+``` shelll
 # mount -o loop /PATH/TO/SOME_LOOP_FILE MOUNT_POINT 
 # mount -o loop /XXX.iso或img	/media
 ```
 
+---
+
 ## umount 命令
+
 `# umount  device|dir`
-		
+
 - 注意：正在被进程访问到的挂载点无法被卸载；
 - 查看被哪个或哪些进程所战用：
-	+ `# lsof  MOUNT_POINT`
-	+ `# fuser -v  MOUNT_POINT`
-			
+  -`# lsof  MOUNT_POINT`
+  -`# fuser -v  MOUNT_POINT`
+
 - 终止所有正在访问某挂载点的进程：
-	+ `# fuser  -km  MOUNT_POINT`
-					
+  - `# fuser  -km  MOUNT_POINT`
+
 ## 交换分区的启用和禁用
-- 创建交换分区的命令：mkswap		
+- 创建交换分区的命令：mkswap
 - 启用：swapon
-```
-swapon  [OPTION]  [DEVICE]
-	-a：定义在/etc/fstab文件中的所有swap设备；
-```				
+
+# swapon  [OPTION]  [DEVICE]
+
+-a：定义在/etc/fstab文件中的所有swap设备；
+
 - 禁用：swapoff
-`swapoff DEVICE`
-			
+
+`# swapoff DEVICE`
+
 ## 设定除根文件系统以外的其它文件系统能够开机时自动挂载：/etc/fstab文件 
 - 每行定义一个要挂载的文件系统及相关属性：6个字段
 1. 要挂载的设备
