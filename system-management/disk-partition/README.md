@@ -1,4 +1,4 @@
-# 系统管理
+**系统管理**
 
 - 磁盘分区及文件系统管理
 - RAID
@@ -26,10 +26,10 @@
   - UltraSCSI320, 320MB/s
   - UltraSCSI640, 640MB/s
 - SATA：串口
-  - 速率：6Gbps, 
+  - 速率：6Gbps
   - 接口名：/dev/sd[a-z]
 - SAS：串口（SCSI），
-  - 速率：6Gbps 
+  - 速率：6Gbps
   - 接口名：/dev/sd[a-z]
 - USB：串口
   - 速率：3.1v 480MB/s
@@ -435,7 +435,9 @@ message 0x2930239
 ## tune2fs 命令
 
 > 查看或修改ext系列文件系统的某些属性；**块大小创建后不可修改**
+
 - `tune2fs [OPTIONS] device`
+
 ``` options
 -l: 查看超级块信息
   FileSystem magic number: 文件系统类型标识
