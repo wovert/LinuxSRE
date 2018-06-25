@@ -1330,8 +1330,10 @@ set @@global.autocommit='off'
 
 - 查看全局变量: `select @@global.autocommit;`
 
+## MySQL Arch
 
-# MySQL Arch
+Connection -> Coonection Pool -> SQL Interface -> Parser -> Optimizer -> Caches & Buffers -> Pluggable Storage Engine
+
 - Connectors
   - Native C API
   - JDBC
@@ -1346,7 +1348,7 @@ set @@global.autocommit='off'
 - 单进程多线程
   - 用户连接：连接线程
 
-- Connection Pool （线程池）
+- Connection Pool （线程池：客户端并发请求处理）
   - Authentication 连接认证
   - Thread Reuse 线程重用（销毁之后，如线程池，变为空闲线程）
   - Connection Limits（连接限制）
@@ -1387,7 +1389,6 @@ set @@global.autocommit='off'
 - 数据文件、索引文件
 - 重做日志、撤销日志、二进制日志、错误日志、查询日志、慢查询日志、中继日志
 
-
 ## MySQL架构流程
 
 用户-> 连接管理器-线程管理器-用户模块
@@ -1405,7 +1406,9 @@ set @@global.autocommit='off'
 - 状态报告模块
 
 访问控制模块
+
 表管理器
+
 存储引擎接口
 
 - MyISAM
@@ -1420,11 +1423,12 @@ set @@global.autocommit='off'
 - 存储引擎
 - 文件系统
 
-# 索引
+## 索引
 
 > 按特定数据（排序的数据）结构存储的数据
 
-## 索引类型
+### 索引类型
+
 - 聚集索引、非聚集索引：数据是否与索引存储在一起
 - 主键索引、辅助索引
 - 稠密索引、稀疏索引：是否索引了每一个数据项
@@ -1434,7 +1438,8 @@ set @@global.autocommit='off'
   - LIKE "abc%"
 - 覆盖索引
 
-## 管理索引
+### 管理索引
+
 - 创建索引：创建表时指定
 - 创建或删除索引：修改表的命令
 - 删除索引：drop index
@@ -1446,21 +1451,23 @@ set @@global.autocommit='off'
   - const (1对1)
   - ALL
 
-# 视图
+## 视图
+
 - 虚表：存储的select语句
 - 创建视图：`create view v_name as select_statement`
 - 删除视图：`drop view v_name`
 
 - 生意： 视图中的数据事实上存储于“基表”中，因此，其修改操作也会针对基表实现；其修改操作受基表限制
 
-# select: Query Cache
-- `select now();`
+### select: Query Cache
+
+`select now();`
 
 - 查询执行路径中的组件：查询缓存、解析器、预处理器、优化器、查询执行引擎、存储引擎
 
 - memcache（哈希算法）
 
-## select语句的执行流程
+### select 语句的执行流程
 
 1. from
 2. where
@@ -1470,7 +1477,7 @@ set @@global.autocommit='off'
 6. select: selects columns
 7. limit
 
-## 单表查询
+### 单表查询
 
 `select [ALL |　DISTINCT |DISTINCTRON]
 [SQL_CACHE] [SQL_NO_CACHE]
@@ -1498,7 +1505,8 @@ set @@global.autocommit='off'
 
 `field as newName`
 
-### where子句：指明过滤条件以实现“选择”的功能
+### where 子句：指明过滤条件以实现“选择”的功能
+
 - 过滤条件：布尔型表达式
 - 算术操作符：+,-,*,/,%
 - 比较操作符：=,!=,<>,<=,>=,<,>
@@ -1511,6 +1519,7 @@ set @@global.autocommit='off'
   - 逻辑操作符：NOT,and, or ,xor
 
 ### group by：根据指定的条件的查询结果进行“分组”以用于做“聚合”运算
+
 - avg(),min(),max(),sum(),count()
 - having：对分组聚合运算后的记过指定的过滤条件
 - order by：根据指定的字段对查询结构进行排序
@@ -1519,10 +1528,12 @@ set @@global.autocommit='off'
 - limit [ofsset,row_count]：对查询的结果进行输出行数数量限制
 
 ### 对查询结果中的数据请施加“锁”：
+
 - `for update`: 写锁，排他锁 （不能读写）
 - `lock in share mode`：读锁，共享锁
 
-## 多表查询
+### 多表查询
+
 - 交叉连接：笛卡尔乘积
 - 内连接：
   - 等值连接：让表之间的字段以“等值”尽力连接关系
@@ -1533,27 +1544,27 @@ set @@global.autocommit='off'
     - 左外链接：from tb1 left join tb2 on tb1.col=tb2.col
     - 右外链接：from tb1 right joing tb2 on tb1.col=tb2.col
 
-## 子查询：嵌套的的语句叫做子查询
+### 子查询：嵌套的的语句叫做子查询
+
 > 基于其语句的查询结构再次进行的查询
 
 ### where子句子查询
+
 - 用于比较表达式中的子查询：资产讯仅能返回单个数 : `SELECT Name，Age from students where Age>(select avg(Age) from students)`
 - in中的子查询：子查询应该单键查询并返回一个或多个值从构成列表 : `SELECT Name，Age from students where Age IN(select Age from students)`
 - 用于`exists`
 
-### 用于from子句中的子查询
+#### 用于from子句中的子查询
 
 使用格式：`select tb_alias.col1,... from (select clause) as tb_alias Clause;`
 
 `select a,classID (select avg(Age) as a from students where ClassID is not null group by ClassID) as t where t.a>30`
 
-
-## 联合查询：union
+### 联合查询：union
 
 `select Name,Age From teacher union select Name,Age from teachers`
 
-
-# Storage Engine
+## Storage Engine
 
 表类型
 ``` mysql
@@ -1562,6 +1573,7 @@ show table status [like|where]
 ```
 
 ## InnoDB：数据存储于“表空间（table space）”中
+
 1. 所有InnDB表的数据和索引存储于同一个表空间中
 
 - 表空间文件：datadir定义的目录下
@@ -1591,6 +1603,7 @@ show table status [like|where]
 - 备份：支持热备（xtrabackup）
 
 ## MyISAM
+
 - 支持全文索引(fulltext index)、压缩、空间函数（GIS）
 - 不支持事务
 - 锁粒度：表级锁
@@ -1623,6 +1636,7 @@ show table status [like|where]
 `show engines`
 
 ## 其他的存储引擎
+
 - CSV: 将普通的CSV文件（字段基于逗号分隔）作为MySQL表使用
 - MRG_MYISAM: 由多个MyISAM表合并形成的虚拟表
 - BLACKHOLE: 类似于dev/null，不真正存储任何数值
@@ -1632,6 +1646,7 @@ show table status [like|where]
 - federated: 用于访问其他的远程的MySQL Server的代理接口，它通过创建一个到远程MySQL Server的客户端连接，并将查询语句传输至远程服务器执行
 
 ## MariaDB支持的其他存储引擎
+
 - OQGraph
 - SphinxSE
 - TokuDB
@@ -1640,10 +1655,12 @@ show table status [like|where]
 - SQUENCE
 
 ## 搜索引擎
+
 - Lucene (Java)
 - sphinx (C++)
 
 ## 并发控制：
+
 - 锁类型：
   - 读锁：共享锁，可共享给其他的读操作
   - 写锁：独占锁(不能select语句)
@@ -1667,7 +1684,8 @@ show table status [like|where]
   - 3. select
     - `select clause [for update] [with read lock]`
 
-# MySQL事务
+## MySQL事务
+
 - 事务：一组原子性的SQL查询，或者多个SQL语句组成了一个独立的工作单元
 - 事务日志：将随机写转化为顺序写
   - `SHOW GLOBAL variables like 'innodb%log%'`
@@ -1678,12 +1696,14 @@ show table status [like|where]
   - innodb_log_group_home_dir ./ 
 
 ## ACID测试
+
 - A:automicity，原子性；整个事务中的所有操作要么全部成功执行，要么全部失败后回滚
 - C:consistency，一致性；数据库总是从一个一致性状态转换为另一致性状态
 - I:isolation,隔离性，一个事务所做出的操作在提交之前，是不能为其他事务所见；隔离有多重级别，主要是为了并发
 - D: durability，持久性，事务一旦提交，其所做的修改会永久保存于数据库中
 
 ## 事务流程
+
 - 启动事务：`start transaction`
 - 结束事务：
   - 完成，提交：`commit`
@@ -1697,7 +1717,7 @@ show table status [like|where]
 
 - `show global variables like '%commit%'`
   - autocommit = on
-- `set session autocommit = off` 	临时有效
+- `set session autocommit = off` 临时有效
 - `show variables like '%commit%'`
 
 ```
@@ -1721,6 +1741,7 @@ mysql> commit;
 ```
 
 ## 事务的隔离级别
+
 - read uncommitted (读未提交，别还没提交就可以读)
   - 问题：脏读
 - read committed (读提交)
@@ -1730,6 +1751,7 @@ mysql> commit;
 - seriablizable (可串行化)，默认
 
 ### IP1-session1(read-uncommitted)
+
 - `show variables like 'tx_iso%';`
 - `set tx_isolation='READ-UNCOMMITTED';`
 - `set autocommit=0;`
@@ -1738,8 +1760,8 @@ mysql> commit;
 - `select * from tb1; -- 4 看不到6,hello` 
 - `commit`
 
-
 ### IP1-session2(read-uncommitted)
+
 - `show variables like 'tx_iso%';`
 - `set tx_isolation='READ-UNCOMMITTED';`
 - `set autocommit=0;`
@@ -1748,6 +1770,7 @@ mysql> commit;
 - `rollback; ; --3 `
 
 ### IP1-session1(read-uommitted)
+
 - `show variables like 'tx_iso%';`
 - `set tx_isolation='READ-COMMITTED';`
 - `set autocommit=0;`
@@ -1756,8 +1779,8 @@ mysql> commit;
 - `select * from tb1; -- 4 看到6,hello` 
 - `commit`
 
-
 ### IP1-session2(read-committed)
+
 - `show variables like 'tx_iso%';`
 - `set tx_isolation='READ-COMMITTED';`
 - `set autocommit=0;`
@@ -1765,8 +1788,8 @@ mysql> commit;
 - `insert into tb1 values(6, 'hello'); --1`
 - `commit; ; --3 `
 
-
 ### IP1-session1(repeatable-read)
+
 - `show variables like 'tx_iso%';`
 - `set tx_isolation='repeatable-read';`
 - `set autocommit=0;`
@@ -1776,8 +1799,8 @@ mysql> commit;
 - `commit`
 - `select * from tb1; -- 5 看不到6,hello` 
 
-
 ### IP1-session2(repeatable-read)
+
 - `show variables like 'tx_iso%';`
 - `set tx_isolation='repeatable-read';`
 - `set autocommit=0;`
@@ -1786,6 +1809,7 @@ mysql> commit;
 - `commit; ; --3 `
 
 ### IP1-session1（seriablizable)
+
 - `show variables like 'tx_iso%';`
 - `set tx_isolation='seriablizable';`
 - `set autocommit=0;`
@@ -1795,8 +1819,8 @@ mysql> commit;
 - `commit`
 - `select * from tb1; -- 6 看不到6,hello` 
 
-
 ### IP1-session2(seriablizable)
+
 - `show variables like 'tx_iso%';`
 - `set tx_isolation='seriablizable';`
 - `set autocommit=0;`
@@ -1805,8 +1829,8 @@ mysql> commit;
 - `update form tb1 where id=6; --3`
 - `commit; ; --5 `
 
-
 ### 设置隔离级别：tx_isolation，默认为第三级别
+
 - READ-UNCOMMITTED
 - READ-COMMITTED
 - REPEATABLE-READ
@@ -1821,9 +1845,13 @@ P1,P2
 ```
 
 ### 查看innodb存储引擎状态信息
+
 - `show engine innodb status`
 
-# MariaDB程序的组成：`/usr/local/mysql/bin`
+## MariaDB 程序的组成：
+
+`/usr/local/mysql/bin`
+
 - C：Client
   - `mysql`：CLI交互式客户端程序
   - `mysqldump`：备份工具
@@ -1836,11 +1864,13 @@ P1,P2
   - `mysqld_multi`：多实例
 
 ## 三类套接字地址：
+
 - IPv4, 3306/tcp
 - Unix Sock：/var/lib/mysql/mysql.sock, /tmp/mysql.sock
 - C <--> S: localhost, 127.0.0.1
 
 ## 命令行交互式客户端程序：mysql
+
 `mysql [OPTIONS] [database]`
 
 - options：
@@ -1858,6 +1888,7 @@ P1,P2
     - 172.16.%.%,  172.16.0.0/16
 
 ## 命令：
+
 - 客户端命令：本地执行
 
 - mysql> help 或 \h
@@ -1875,6 +1906,7 @@ P1,P2
 - 注意：每个语句必须有语句结束符，默认为分号(;)
 
 ## 数据类型：
+
 - 表：行和列
 
 - 定义字段时，关键的一步即为确定其数据类型；
@@ -1884,26 +1916,26 @@ P1,P2
   - 码表：在字符和二进制数字之间建立映射关系；
 
 - 种类：
-	- 字符型：
-	 * 定长字符型：max 255
-		- CHAR(#)：不区分字符大小写
-		- BINARY(#)：区分字符大小写
-	 * 变长字符型：max 65535,有一个结束符，表示结束字符
-		- VARCHAR(#)：不区分字符大小写
-		- VARBINARY(#)：区分字符大小写
-	- 对象存储：存储的是指针
-		* TEXT：max 2^32(40G)，不区分大小写 
-		* BLOB：tinyblog,smallblob,mediumblob,blob,bigblob区分大小写
-	- 内置类型：SET(集合), ENUM(枚举)						
-	- 数值型：
-		* 精确数值型：INT（TINYINT，SMALLINT，MEDIUMINT，INT，BIGINT） 
-		* 近似数值型：FLOAT，DOBULE
-		* 日期时间型：
-			- 日期型：DATE
-			- 时间型：TIME
-			- 日期时间型：DATETIME
-			- 时间戳：TIMESTAMP
-			- 年份：YEAR(2), YEAR(4)
+  - 字符型：
+    - 定长字符型：max 255
+    - CHAR(#)：不区分字符大小写
+    - BINARY(#)：区分字符大小写
+    - 变长字符型：max 65535,有一个结束符，表示结束字符
+    - VARCHAR(#)：不区分字符大小写
+    - VARBINARY(#)：区分字符大小写
+  - 对象存储：存储的是指针
+    - TEXT：max 2^32(40G)，不区分大小写
+    - BLOB：tinyblog,smallblob,mediumblob,blob,bigblob区分大小写
+  - 内置类型：SET(集合), ENUM(枚举)
+  - 数值型：
+    - 精确数值型：INT（TINYINT，SMALLINT，MEDIUMINT，INT，BIGINT） 
+    - 近似数值型：FLOAT，DOBULE
+    - 日期时间型：
+      - 日期型：DATE
+      - 时间型：TIME
+      - 日期时间型：DATETIME
+      - 时间戳：TIMESTAMP
+      - 年份：YEAR(2), YEAR(4)
 
 - 数据类型有修饰符：
   - UNSIGNED：无符号
@@ -1918,18 +1950,21 @@ P1,P2
   - 获取命令帮助：`mysql> help  KEYWORD`
 
 ## 数据库管理：
+
 - 查看：`SHOW DATABASES LIKE ''`;
-- 查看支持的所有字符集：`SHOW CHARACTER SET` 
+- 查看支持的所有字符集：`SHOW CHARACTER SET`
 - 查看支持的所有排序规则：`SHOW COLLATION`
 - 创建数据库：`CREATE  {DATABASE | SCHEMA}  [IF NOT EXISTS]  db_name;`
 `[DEFAULT]  CHARACTER SET [=] charset_name`
-`[DEFAULT]  COLLATE [=] collation_name`	
-- 修改：`ALTER	{DATABASE | SCHEMA}  [db_name]`
+`[DEFAULT]  COLLATE [=] collation_name`
+
+- 修改：`ALTER {DATABASE | SCHEMA}  [db_name]`
 `[DEFAULT]  CHARACTER SET [=] charset_name`
 `[DEFAULT]  COLLATE [=] collation_name`
 - 删除：`DROP {DATABASE | SCHEMA} [IF EXISTS] db_name`
 
 ## TABLE MANAGEMENT：
+
 - 查看表结构：`mysql> desc tbl_name`
 - 查看数据库支持的所有存储引擎类型：`mysql> SHOW ENGINES;`
 -查看某表的存储引擎类型：`mysql> SHOW TABLES STATUS [LIKE 'tbl_name']`
@@ -1942,6 +1977,7 @@ P1,P2
 CREATE：CREATE TABLE [IF NOT EXISTS] tbl_name (create_defination) [table_options]
 
 ### create_defination:
+
 - field：col_name  data_type
 - key：
   - PRIMARY KEY (col1, col2, ...)
@@ -1952,16 +1988,18 @@ CREATE：CREATE TABLE [IF NOT EXISTS] tbl_name (create_defination) [table_option
 - table_options
   - ENGINE [=] engine_name
 
-# 用户账号及权限管理
+## 用户账号及权限管理
 
-## 权限类别
+### 权限类别
+
 - 库级别
 - 表级别
 - 字段级别
 - 管理类（创建其他用户，并且其他用户转赠给其他用户）
 - 程序类（存储过程，存储函数）
 
-## 管理类
+### 管理类
+
 - create temporary tables 创建临时表 （空间：16M ）
 - create user
 - file （导出文件，加载文件）
@@ -1975,11 +2013,13 @@ CREATE：CREATE TABLE [IF NOT EXISTS] tbl_name (create_defination) [table_option
 - process
 
 ## 程序类 - create,alter,drop,excute
+
 - procedure
 - function
 - trigger
 
 ## 库和表级别: database or table
+
 - alter database | table
 - create database | table
 - drop database | table
@@ -1988,26 +2028,30 @@ CREATE：CREATE TABLE [IF NOT EXISTS] tbl_name (create_defination) [table_option
 - grant option 能够把自己获得的权限赠给其他用户一个副本
 
 ## 数据操作
+
 - select
 - insert
 - update
 - delete
 
 ## 字段级别
+
 - select(col1,col2,...)
 - update(col1,col2,...)
 - insert(col1,col2,...)
 
 ## 所有权限: 
+
 - all [privileges]
 
 ## 元数据数据库：mysql
+
 - 授权表
   - db,host,user
   - columns,priv, tables_priv, proces_priv, proxies_priv
 
-
 ## 用户账号
+
 - `'username'@'host'`
   - `@host`
     - 主机名 （可以反解）
@@ -2038,6 +2082,7 @@ mysql> flush status;
 ```
 
 ## 忘记管理员密码
+
 1. 启动mysqld进程时，为其使用： --skip-grant-tables --skip-networking 禁止远程登录  
 2. 使用update命令修改管理员密码: `update mysql.user set password=PASSWORD('password') where user='root';`
 3. 关闭mysql进程，移除上述两个选项，重启mysqld
@@ -2069,8 +2114,8 @@ skip-grant-tables
 
 `> create database sina default character set utf8mb4 collate utf8mb4_unicode_ci`
 
-
 ## 授权:grant
+
 `grant priv_type[,...] on [{table|function|procedure}] db.{table|routine} to 'username'@'host' [identified by 'password'] [require ssl] [with with_option]`
 
 - with_option
@@ -2124,13 +2169,15 @@ skip-grant-tables
 - 实现安全设定，用户账号空秘密删除等操作
 
 ## 图形管理组件：
+
 - Mysql-Front
 - ToadForMySQL
 - SQLyog
 - phpMyAdmin(运行于lamp)
 - Navicat
 
-# 查询缓存
+## 查询缓存
+
 - 如何判断是否命中：通过查询语句的哈希值判断；哈希值考虑的因素包括
   - 查询本身、要查询的数据库、客户端使用协议版本,...
   - 查询语句任何字符上的不同，都会导致缓存不能命中
@@ -2161,10 +2208,10 @@ skip-grant-tables
 
 - 缓存命中率的评估：**Qcache_hits/(Qcache_hits+Com_select)**
 
-# 索引
+## 索引
 - 基本法则：索引应该构建在被用作查询条件的字段上
 
-## 索引类型：
+### 索引类型：
 
 ### B+ Tree索引（数据结构）：顺序存储，每一个叶子节点到根节点的距离是相同的
 - 根节点->子节点1指针->子节点2指针->数据指针->行数据
@@ -2191,17 +2238,21 @@ skip-grant-tables
   - 只支持等值比较查询：包括=,in(),<=>
 
 ### 空间索引(R-Tree)
+
 - MyISAM支持空间索引
 
 ### 全文索引(FULLTEXT)
+
 - 在文本中查找关键词
 
 ## 索引优点
+
 - 降低服务器需要扫描的数据量，减少了IO次数
 - 可以帮助服务器避免排序和使用临时表
 - 可以帮助将随机IO转为顺序IO
 
 ## 高性能索引策略
+
 - 独立使用列，尽量避免使用在其参与运算
 - 左前缀索引，索引构建于字段的左侧的多少个字符，要通过索引选择性来评估
   - 索引选择性，不重复的索引值和数据表的记录总数的比值
@@ -2210,11 +2261,14 @@ skip-grant-tables
 - 选择合适的索引列次序；将选择性最高放左侧
 
 ## 冗余和重复索引
+
 - 不好的索引使用策略
   - (Name), (Name,Age)
 
 ## explain来分析索引的有效性
+
 - explain select clause
+
 获取查询执行计划信息，用来查看查询优化器如何执行查询
 
 - 输出
@@ -2252,31 +2306,35 @@ skip-grant-tables
   - Using temporary: MySQL对结果排序时会使用临时表
   - Using filesort: 对结果使用一个外部索引排序
 
-# 存储过程
+## 存储过程
 
 - 多个SQL语句组合一个存储过程，类似函数
 
-## 创建存储过程
+### 创建存储过程
+
+```
 1. 选择数据库：`use db1;`
 2. 改变语句分隔符：`delimiter $$`
 3. 创建语句：
-```
 create procedure pro_name()
 begin
 select 'hello';
 select 'world';
 end
 $$
-```
+
 4. 恢复分隔符：`delimter ;`
 5. 调用存储过程：`call pro_name;`
+```
 
-## 局部变量：
+## 局部变量
+
 - 存储过程定义局部变量：`declare varName datatype default 默认值`
 - 显示变量：`select varName`
 - 赋值变量：`set varName = 10;`
 
 ## 参数
+
 ```
 create procedure p_test(in p_int int)
 begin
@@ -2305,4 +2363,5 @@ select @p_int; -- 3
 4. 在存储过程外的变量是存储过程修改的值
 
 ### inout: 输入输出参数
+
 > inout参数的值可以在调用时指定，并可修改和返回
