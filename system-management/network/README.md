@@ -743,7 +743,7 @@ sport: 服务器端端口
 
 ### 路由的相关配置文件
 
-`/etc/sysconfig/networkj-scripts/route-IFACE`
+`/etc/sysconfig/network-scripts/route-IFACE`
 
 ### 接口配置文件
 
@@ -763,7 +763,7 @@ sport: 服务器端端口
 
 `# nmtui`
 
-## ifcfg-IFACE配置文件参数：
+## ifcfg-IFACE 配置文件参数：
 
 - NAME：此配置文件对应的设备的名称（CentOS 7）
 - DEVICE：此配置文件对应的设备的名称（与ifcfg-IFACE保持一致）
@@ -771,28 +771,28 @@ sport: 服务器端端口
 - UUID：此设备的惟一标识
 
 - BOOTPROTO：激活此接口时使用什么协议来配置接口属性
-  - 常用的有dhcp、bootp、sta tic、none
-- TYPE：接口类型，常见的有Ethernet, Bridge
+  - 常用的有 dhcp、bootp、sta tic、none
+- TYPE：接口类型，常见的有 Ethernet, Bridge
 
-- DNS1：第一DNS服务器指向
-- DNS2：备用DNS服务器指向
-- DOMAIN：DNS搜索域
+- DNS1：第一 DNS 服务器指向
+- DNS2：备用 DNS 服务器指向
+- DOMAIN：DNS 搜索域
 
-- IPADDR： IP地址
+- IPADDR： IP 地址
 - NETMASK：子网掩码
-- PREFIX: CentOS 7支持使用PREFIX以长度方式指明子网掩码
+- PREFIX: CentOS 7 支持使用 PREFIX 以长度方式指明子网掩码
 - GATEWAY：默认网关
-- HWADDR：设备的MAC地址
+- HWADDR：设备的 MAC 地址
 
 - USERCTL：是否允许普通用户控制此设备
 
-- PEERDNS：如果BOOTPROTO的值为“dhcp”，是否允许dhcp server分配的dns服务器指向覆盖本地手动指定的DNS服务器指向；默认为YES
+- PEERDNS：如果 BOOTPROTO 的值为“dhcp”，是否允许 dhcp server 分配的 dns 服务器指向覆盖本地手动指定的 DNS 服务器指向；默认为YES
 
-- NM_CONTROLLED：是否使用NetworkManager服务来控制接口（CentOS 6）
+- NM_CONTROLLED：是否使用 NetworkManager 服务来控制接口（CentOS 6）
   - YES：各种高级功能不能使用
-  - NO：只有NetworkManager服务关闭
+  - NO：只有 NetworkManager 服务关闭
 
-- IPV6INIT：是否初始化IPv6
+- IPV6INIT：是否初始化 IPv6
 
 - 网络服务：
   - network（常用）
@@ -830,9 +830,9 @@ GATEWAY[0-9]=NEXTHOP
 
 1. `ifconfig  IFACE_LABEL  IPADDR/NETMASK`
 
- IFACE_LABEL：eth0:0, eth0:1, ...		
+ IFACE_LABEL：eth0:0, eth0:1, ...
 
-2. 为别名添加配置文件；
+2. 为别名添加配置文件
 
 DEVICE=IFACE_LABEL
 
@@ -840,7 +840,7 @@ BOOTPROTO：网上别名不支持动态获取地址；
 
 只支持static, none
 
-## nmcli命令：`nmcli  [ OPTIONS ] OBJECT { COMMAND | help }`	
+## nmcli 命令：`nmcli  [ OPTIONS ] OBJECT { COMMAND | help }`
 
 > CentOS 7 专有命令：device - show and manage network interfaces
 
@@ -849,7 +849,7 @@ BOOTPROTO：网上别名不支持动态获取地址；
 - COMMAND := { show | up | down | add | edit | modify | delete | reload | load }
 - modify [ id | uuid | path ] <ID> [+|-]<setting>.<property> <value>
 
-### 如何修改IP地址等属性：
+### 如何修改 IP 地址等属性：
 
 `# nmcli  conn  modify  IFACE  [+|-]setting.property  value`
 

@@ -1501,6 +1501,8 @@ Connection -> Coonection Pool -> SQL Interface -> Parser -> Optimizer -> Caches 
 - `SHOW global variables like 'Com_se%`
   - Com_select 43 查询次数
 
+命中次数/查询次数
+
 ### 字段别名
 
 `field as newName`
@@ -2040,7 +2042,7 @@ CREATE：CREATE TABLE [IF NOT EXISTS] tbl_name (create_defination) [table_option
 - update(col1,col2,...)
 - insert(col1,col2,...)
 
-## 所有权限: 
+## 所有权限
 
 - all [privileges]
 
@@ -2064,7 +2066,7 @@ CREATE：CREATE TABLE [IF NOT EXISTS] tbl_name (create_defination) [table_option
 - 删除用户：`drop user 'username'@'host'`
 
 - 修改密码：
-```
+``` mysql
 set password for
 
 update  mysql.user set password=password('you_password') where clause  不会重读授权表，因此执行`mysql> flush privileges`
@@ -2209,11 +2211,13 @@ skip-grant-tables
 - 缓存命中率的评估：**Qcache_hits/(Qcache_hits+Com_select)**
 
 ## 索引
+
 - 基本法则：索引应该构建在被用作查询条件的字段上
 
 ### 索引类型：
 
 ### B+ Tree索引（数据结构）：顺序存储，每一个叶子节点到根节点的距离是相同的
+
 - 根节点->子节点1指针->子节点2指针->数据指针->行数据
 
 - 使用B-Tree索引的查询类型：全键值、键值方位或键前缀查找
@@ -2229,6 +2233,7 @@ skip-grant-tables
   - 如果查询中某个列是为范围查询，那么其右侧的列都无法再使用索引优化查询：（StuID,Name）
 
 ### 哈希索引 
+
 - 基于哈希索引实现，特别适用于精确匹配索引中的所有列
 - Memory存储引擎支持显示hash索引
 - 不适合使用hash索引的场景：
