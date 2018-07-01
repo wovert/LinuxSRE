@@ -1,5 +1,47 @@
 # HTTP 协议
 
+> Hyper Text Transfer Protocol, 应用层协议，80/tcp
+
+HTML: Hyper Text Mark Language, 编程语言，超文本标记语言
+
+## 协议版本
+
+- http/0.9: 原型版本，功能简陋
+- http/1.0: cache, MIME, method
+  - MIME: Multipurpose Internet Mail Extension
+  - method: GET, POST, HEAD, PUT, DELETE, TRACE, OPTIONS
+- http/1.1: 增强了缓存功能
+  - SPDY
+- http/2.0:
+  - rfc 文档
+
+## http 工作模式
+
+- http 请求报文: http request
+- http 响应报文: http response
+
+一次 http 事务: 请求 <-> 响应
+
+- Web 资源：web resource
+  - 静态资源(无需服务器端做出额外处理)：.jpg, .png, .gif, .html, .txt, .js, .css, .mp3, .avi
+  - 动态资源(服务端需要通过执行程序做出处理，发送给客户端的是程序的运行结果)：.php, .jsp
+
+  - 注意：一个页面中展示的资源可能有多个；每个资源都需要单独请求；
+  - 资源的标识机制：URL
+    - Uniform Resource Locator: 用于描述服务器某特定资源的位置
+      - 例如：http://www.wovert.cm/index.html
+        - Schema://Server[:Port]/PATH/TO/SOME_RESOURCE
+
+## 一次完整的 htp 请求处理过程
+
+1. 建立或处理连接：接受请求或拒绝请求；
+2. 接受请求：接受来自于网络上的主机请求报文中对某特定资源的一次请求的过程；
+3. 处理请求：对请求报文进行解析，获取客户端请求的资源及请求方法等相关系信息；
+4. 访问资源：获取请求报文中请求的资源；
+5. 构建响应报文；
+6. 发送响应报文；
+7. 记录日志；
+
 ## 用户访问网站基本流程
 
 1. 用户使用客户端浏览器里输入网站地址(https://lingyima.com)回车后，用户系统首先查找系统本地的DNS缓存及hosts文件信息，确实是否存在该域名对应的IP解析记录(Linux:/etc/hosts)，如果有直接获取IP地址，然后去访问这个IP地址对应的域名的服务器。一般第一次请求时，DNS缓存是没有解析记录的，而 hosts 文件在本地测试时使用
