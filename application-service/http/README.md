@@ -32,6 +32,8 @@ HTML: Hyper Text Mark Language, 编程语言，超文本标记语言
       - 例如：http://www.wovert.cm/index.html
         - Schema://Server[:Port]/PATH/TO/SOME_RESOURCE
 
+**注意**：通过日志文件分析用户行为
+
 ## 一次完整的 htp 请求处理过程
 
 1. 建立或处理连接：接受请求或拒绝请求；
