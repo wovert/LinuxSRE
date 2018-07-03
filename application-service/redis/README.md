@@ -186,7 +186,9 @@ redis-3.0.0.2-1.el6....
 > CLIENT LIST
 ```
 
-## Keys
+## Data Type
+
+### Keys
 
 - Arbitrary ASCII strings
   - Define some format convention and adhere to it
@@ -205,7 +207,7 @@ redis-3.0.0.2-1.el6....
 
 ```
 
-## Strings
+### Strings
 
 ``` REDIS
 > help set
@@ -268,7 +270,7 @@ key seconds value
 > EXISTS foo
 ```
 
-## List
+### List
 
 ['A','B','C']
 
@@ -301,7 +303,7 @@ key seconds value
 
 ```
 
-## Set
+### Set
 
 > 无序数据结构
 
@@ -335,7 +337,7 @@ key seconds value
 
 ```
 
-## Sorted Set
+### Sorted Set
 
 > 有序集合
 
@@ -358,7 +360,7 @@ key score memer : score 排序分数
 > ZRANGE weekday1 0 2 起始索引和结束索引 
 ```
 
-## Hash
+### Hash
 
 {key:value}
 
@@ -387,3 +389,94 @@ key score memer : score 排序分数
 (integer) 2
 
 ```
+
+### Bitmpas
+
+用于数据统计
+
+### HyperLogLog
+
+## 认证实现方法
+
+``` REDIS
+# vim redis.conf
+  requirepass 123456
+# service redis restart
+# redis-cli -h 172.16.100.5
+> SELECT 0
+> AUTH 123456
+> exit
+```
+
+## 清空数据库
+
+``` REDIS
+> FLUSHDB: 清空当前数据库
+> FLUSHALL: 清空所有库
+```
+
+## 事务
+
+通过 MULTI, EXEC, WATCH 等命令实现事务功能；将一个或多个命令归并为一个操作提请服务器按顺序执行的机制；不支持回滚操作
+
+执行事务的时候，客户端等待执行事务的完之后才会接受其他客户端请求
+
+- MULTI：启动一个事务
+- EXEC：执行事务；一次性将事务中的所有操作执行完成返回给客户端
+
+- WATCH: 乐观锁，在 EXEC 命令执行之前，用于监视指定数量键，如果监视中的某任意键数据被修改，则服务器拒绝执行事务；
+
+``` redis
+> MULTI
+> SET ip 192.168.1.1
+> GET ip
+> SET port 8080
+> GET port
+> EXEC
+```
+
+### watch 监视
+
+第一步
+``` 连接 redis1
+# redis-cli
+> WATCH ip
+> MULTI
+> SET ip 10.0.0.1
+> GET ip
+```
+
+第二步
+``` 连接 redis2
+# redis-cli
+> get ip
+> SET ip 172.16.100.99
+```
+
+第三步
+``` 连接 redis1
+> EXEC
+(nil)
+```
+
+## Connectin 相关命令
+
+- AUTH
+- ECHO
+- PING
+- QUIT
+- SELECT
+
+``` REDIS
+AUTH
+> help ping
+> ECHO "hello world"
+> HELP @connection
+> HELP @server 服务器常用命令
+```
+
+## Server 相关的命令
+
+- CLIENT SETNAME localconn
+- CLIENT GETNAME
+- CLIENT KILL ip:port
