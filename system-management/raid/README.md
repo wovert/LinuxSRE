@@ -154,9 +154,75 @@
 -c CHUNK_SIZE：指明块大小，默认 512kb
 -x #：指明空闲盘的个数；有冗余能力的；热备份，备胎
 
-74:例如：创建一个 10G 可用空间的 RAID5
+例如：创建一个 10G 可用空间的 RAID5
 # fdisk /dev/sda{6,7,8,9}
+
+# fidsk /dev/sda
+n
++5G
+n
++5G
+n
++5G
+n
++5G
+
 设备类型：fd Linux raid auto
+t
+7
+fd
+t
+8
+fd
+t
+9
+fd
+t
+10
+fd
+# partx -a /dev/sda
+# partx -a /ev/sda
+# fdisk /dev/sda
+
+# cat /proc/mdstat
+# ls /dev/ | grep "md"
+
+磁盘3，空闲盘1， raid5
+# mdsdm -C /dev/md0 -a yes -n 3 -x 1 -l 5 /dev/sda{7,8,9,10}
+# cat /rpoc/mdstat
+# mke2fs -t ext4 /dev/md0
+
+# mkdir /mydata
+# mount /dev/md0 /mydata
+# mount
+# df -lh
+# blkid /dev/md0
+
+md0 信息
+# mdadm -D /dev/md0
+
+搞坏磁盘(-f sda7 标记损坏)
+# mdadm -f /dev/md0 /dev/sda7
+
+# cat /proc/mdstat
+# watch -n1 'cat /proc/mdstat'
+# mdadm -D /dev/md0
+
+# cp /etc/fstab /mydata/
+# cd /mydata
+# mdadm /dev/md0 -f /dev/sda8
+
+# mdadm -D /dev/md0
+
+移除
+# mdadm /devmd0 -r /dev/sda7
+# mdadm /dev/md0 -r /dev/sda8
+# mdadm -D /dev/md0
+
+# mdadm /dev/md0 -a /dev/sda7
+# mdadm -D /dev/md0 正在修复操作
+
+
 ```
 
 ### -D：显示 raid 的详细信息
@@ -197,7 +263,7 @@
 3. 停止运行raid
 
 ``` shell
-# mdadm -S /dev/md0
+# mdadm -S /dev/md0 停止
 # mdadm --remove /dev/md0
 # mdadm --misc --zero-superblock /dev/sdb5
 # mdadm --misc --zero-superblock /dev/sdb6
@@ -220,7 +286,13 @@
 # vi /etc/rc.sysinit+/raid\c
 ```
 
-`# watch options 'COMMAND'` -n #：刷新间隔，单位是秒
+### watch 命令
+
+`watch options 'COMMAND'`
+
+-n #：刷新间隔，单位是秒
+
+`# watch -n1 'ifconfig eth0'`
 
 #### 创建一个 10G 可用的 RAID5
 

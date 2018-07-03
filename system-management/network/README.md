@@ -42,52 +42,52 @@ OSI:Open System Interconnect Reference Model，开放式系统互联参考模型
 
 ## 计算机网络基础
 
-- 互联网层：IP协议，IP 报文
-- 传输层：TCP, UDP
-- 应用层：http, https, fpt, ldap,...
+- 互联网层：`IP` 协议(IP 报文)
+- 传输层：`TCP, UDP`
+- 应用层：`http, https, fpt, ldap`, ...
 
 - 链接路层：以太网帧
 
-- 以太网帧：MTU（1500 bytes）
-- IP 报文 (1460 bytes)
+- 以太网帧：`MTU`(1500 bytes)
+- `IP 报文`(1460 bytes)
 
-## IP地址分类
+## IP 地址分类
 
 ### A类
 
 - 第一段为网络号，后三段为主机号
 - 网络号：
-  - 0 000 0000 - 0 111 1111：0-127
-  - 网络数量：126(0: 外网地址，127：本地回环地址)
-  - 每个网络中的主机数量：2^24-2(全0:网络地址,全1:广播地址)
-  - 默认子网掩码：255.0.0.0，/8
+  - `0 000 0000 - 0 111 1111`：0-127
+  - 网络数量：**126(0: 外网地址，127：本地回环地址)**
+  - 每个网络中的主机数量：2^24-2(**全0:网络地址,全1:广播地址**)
+  - 默认子网掩码：`255.0.0.0，/8`
     - 用于与IP地址按位进行“与”运算，从而取出其网络地址；
-    - 1.3.2.1/255.0.0.0 = 1.0.0.0
-    - 1.3.2.1/255.255.0.0= 1.3.0.0
-  - 私网地址：10.0.0.0/255.0.0.0
+    - `1.3.2.1/255.0.0.0` = 1.0.0.0
+    - `1.3.2.1/255.255.0.0` = 1.3.0.0
+  - 私网地址：`10.0.0.0/255.0.0.0`
 
 ### B类
 
 - 前两段为网络号，后两段为主机号
 - 网络号：
-  - 10 00 0000 - 10 11 1111：128-191
+  - `10 00 0000 - 10 11 1111：128-191`
   - 网络数：2^14
   - 每个网络中的主机数量：2^16-2
-  - 默认子网掩码：255.255.0.0，/16
-  - 私网地址：172.16.0.0-172.31.0.0
+  - 默认子网掩码：`255.255.0.0，/16`
+  - 私网地址：`172.16.0.0-172.31.0.0`
 
 ### C类
 
 - 前三段为网络号，最后一段为主机号
 - 网络号：
-  - 110 0 0000 - 110 1 1111：192-223
+  - `110 0 0000 - 110 1 1111`：192-223
   - 网络数：2^21
   - 每个网络中的主机数量：2^8-2
-  - 默认子网掩码：255.255.255.0,  /24
+  - 默认子网掩码：`255.255.255.0,  /24`
 
 ### D类：组播
 
-- 1110 0000 - 1110 1111：224-239
+- `1110 0000 - 1110 1111`：224-239
 
 ### E类：科研
 
@@ -98,7 +98,7 @@ OSI:Open System Interconnect Reference Model，开放式系统互联参考模型
 ### 路由表
 
 - 静态指定
-- 动态学习：rip2, ospf
+- 动态学习：`rip2, ospf`
 
 ### 路由条目
 
@@ -106,7 +106,7 @@ OSI:Open System Interconnect Reference Model，开放式系统互联参考模型
 - 目标地址的类别：
   - 主机：主机路由
   - 网络：网络路由
-  - 0.0.0.0/0.0.0.0：默认路由
+  - `0.0.0.0/0.0.0.0`：默认路由
 
 - 三个路由同时满足的时候优先级顺序：主机路由 < 网络路由 < 默认路由
 
@@ -135,12 +135,12 @@ ARP 广播方式获取目标 MAC 地址，动态学习
   - QQ
 
 - 通信时，进程的数字标识：
-  - 16bits： 0-65535：1-65535
+  - 16bits： `0-65535：1-65535`
     - 1-1023：固定分配，而且只有管理员有权限启用
     - 1024-4W：半固定
     - 4W+：临时
 
-- 进程地址：IP:PORT => socket
+- 进程地址：`IP:PORT => socket`
 - 进程是靠套接字(socket)实现的
 - 总结：
   - MAC 地址：本地通信，范围：本地局域网
@@ -149,24 +149,24 @@ ARP 广播方式获取目标 MAC 地址，动态学习
 
 ## 常用端口
 
-- 25(发送mail)
-- 22(ssh)
-- 80(http)
-- 443(https)
-- 21(ftp连接)
-- 20(ftp传输数据)
-- 110(pop3邮件)
-- 421(TCP Wrappers)
-- 3306(mysql)
-- 27017(memcache)
+- `25(发送mail)`
+- `22(ssh)`
+- `80(http)`
+- `443(https)`
+- `21(ftp连接)`
+- `20(ftp传输数据)`
+- `110(pop3邮件)`
+- `421(TCP Wrappers)`
+- `3306(mysql)`
+- `27017(memcache)`
 
-- 用户空间(资源子网)：应用程序的进程
-- 内核空间(通信子网)：进程管理、内存管理、驱动管理、网络协议栈
+- `用户空间(资源子网)`：应用程序的进程
+- `内核空间(通信子网)`：进程管理、内存管理、驱动管理、网络协议栈
 
-- MAC：本地通信；范围：本地局域网
-- IP：界定通信主机，源和目标；范围：互联网
-- Port：界定进程；范围：主机
-- 网关：网络关口，本地网络的默认路由，数据转发到其他网络
+- `MAC`：本地通信；范围：本地局域网
+- `IP`：界定通信主机，源和目标；范围：互联网
+- `Port`：界定进程；范围：主机
+- `网关`：网络关口，本地网络的默认路由，数据转发到其他网络
 
 ## 将 Linux 主机接入到网络中
 
@@ -323,17 +323,17 @@ Fireware(固件,硬件方式)命名, 拓扑结构命名
 
 `# ifconfig eth1 -promisc` 禁用 promisc 功能
 
-- **注意**：立即送往内核中的TCP/IP协议栈并生效
+- **注意**：立即送往内核中的 TCP/IP 协议栈并生效
 
 ``` shell
 Link encap:Ethernet  HWaddr 00:0C:29:BA:8B:52  
 inet addr:192.168.1.61  Bcast:192.168.1.255  Mask:255.255.255.0
-        inet6 addr: fe80::20c:29ff:feba:8b52/64 Scope:Link
-        UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
-        RX packets:31343 errors:0 dropped:0 overruns:0 frame:0
-        TX packets:16014 errors:0 dropped:0 overruns:0 carrier:0
-        collisions:0 txqueuelen:1000 
-        RX bytes:9314883 (8.8 MiB)  TX bytes:2086007 (1.9 MiB)
+inet6 addr: fe80::20c:29ff:feba:8b52/64 Scope:Link
+UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+RX packets:31343 errors:0 dropped:0 overruns:0 frame:0
+TX packets:16014 errors:0 dropped:0 overruns:0 carrier:0
+collisions:0 txqueuelen:1000
+RX bytes:9314883 (8.8 MiB)  TX bytes:2086007 (1.9 MiB)
 ```
 
 CentOS 7:
@@ -341,12 +341,12 @@ CentOS 7:
 ``` shell
 eno16777736: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
 inet 192.168.1.71  netmask 255.255.255.0  broadcast 192.168.1.255
-    inet6 fe80::20c:29ff:fe4e:2155  prefixlen 64  scopeid 0x20<link>
-    ether 00:0c:29:4e:21:55  txqueuelen 1000  (Ethernet)
-    RX packets 55022  bytes 48564958 (46.3 MiB)
-    RX errors 0  dropped 0  overruns 0  frame 0
-    TX packets 25451  bytes 2699801 (2.5 MiB)
-    TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+inet6 fe80::20c:29ff:fe4e:2155  prefixlen 64  scopeid 0x20<link>
+ether 00:0c:29:4e:21:55  txqueuelen 1000  (Ethernet)
+RX packets 55022  bytes 48564958 (46.3 MiB)
+RX errors 0  dropped 0  overruns 0  frame 0
+TX packets 25451  bytes 2699801 (2.5 MiB)
+TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
 ```
 
 `flags`：标志位（用以表明储存数据特征的）
@@ -391,7 +391,7 @@ inet 192.168.1.71  netmask 255.255.255.0  broadcast 192.168.1.255
 - `add addr/prefixlen` 添加 ipv6 地址
 - `del addr/prefixlen` 移除 ipv6 地址
 
-### route命令
+### route 命令
 
 > 路由查看及管理
 
@@ -441,7 +441,7 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 - U：up启用状态
 - G：网关
 - Metric：要经过的开销
-- Iface：
+- Iface: 经过本地的接口
 
 #### 添加路由示例
 
@@ -456,12 +456,12 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 ```
 
 ``` shell
-Destination     Gateway         Genmask         Flags Metric Ref    Use 	Iface
-192.168.1.0     0.0.0.0         255.255.255.0   U     0      0      0 		eth0
-192.168.1.0     0.0.0.0         255.255.255.0   U     1      0      0 		eth1
-172.16.0.0      192.168.1.71    255.255.0.0     UG    0      0      0 		eth0
-169.254.0.0     0.0.0.0         255.255.0.0     U     1002   0      0 		eth0
-0.0.0.0         192.168.1.1     0.0.0.0         UG    0      0      0 		eth0
+Destination     Gateway         Genmask         Flags Metric Ref    Use   Iface
+192.168.1.0     0.0.0.0         255.255.255.0   U     0      0      0     eth0
+192.168.1.0     0.0.0.0         255.255.255.0   U     1      0      0     eth1
+172.16.0.0      192.168.1.71    255.255.0.0     UG    0      0      0     eth0
+169.254.0.0     0.0.0.0         255.255.0.0     U     1002   0      0     eth0
+0.0.0.0         192.168.1.1     0.0.0.0         UG    0      0      0     eth0
 ```
 
 #### 删除路由
@@ -487,7 +487,7 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use 	Iface
 - [--tcp|-t] TCP协议的相关连接
 - [--udp|-u] UDP相关的连接
 - [--udplite|-U]  
-- [--sctp|-S] 
+- [--sctp|-S]
 - [--raw|-w] raw cocket相关的连接
 - [--listening|-l]  监听状态的连接
 - [--numeric|-n] [--numeric-hosts] [--numeric-ports] ][--numeric-program] 数字格式显示IP和PORT
@@ -528,12 +528,12 @@ Proto Recv-Q Send-Q Local Address Foreign Address State PID/Program name tcp  0 
 
 ### 常用网络查看组合
 
-- -tan：所有TCP所有状态数字格式现实
-- -tn: 只显示当前处于连接的TCP
-- -tnl: 所有TCP所有状态数字格式现实
-- -uan：所有UDP数字格式现实
-- -unl：所有UDP监听数字格式现实
-- -tunlp：所有TCP和UDP监听进程数字格式现实
+- -tan：所有 TCP 所有状态数字格式现实
+- -tn: 只显示当前处于连接的 TCP
+- -tnl: 所有 TCP 所有状态数字格式现实
+- -uan：所有 UDP 数字格式现实
+- -unl：所有 UDP 监听数字格式现实
+- -tunlp：所有 TCP 和 UDP 监听进程数字格式现实
 
 ### 显示接口的统计数据：
 
@@ -546,7 +546,7 @@ Proto Recv-Q Send-Q Local Address Foreign Address State PID/Program name tcp  0 
 - 所有接口：`# netstat -i`
 - 指定接口：`# netstat -I<IFace>`
 
-## ifup/ifdown命令
+## ifup/ifdown 命令
 
 > 通过配置文件/etc/sysconfig/network-scripts/ifcfg-IFACE来识别接口并完成配置
 
@@ -554,12 +554,12 @@ Proto Recv-Q Send-Q Local Address Foreign Address State PID/Program name tcp  0 
 
 ## 配置主机名
 
-- hostname命令：
+- hostname 命令：
   - 查看：`hostname`
   - 配置：`hostname HOSTNAME`
   - 当前系统有效，重启后无效
 
-- hostnamectl命令（CentOS 7）：
+- hostnamectl 命令（CentOS 7）：
   - `hostnamectl  status`：显示当前主机名信息
   - `hostnamectl  set-hostname`：设定主机名，永久有效
 
@@ -567,7 +567,7 @@ Proto Recv-Q Send-Q Local Address Foreign Address State PID/Program name tcp  0 
   - `HOSTNAME=<HOSTNAME>`
   - 设置不会立即生效； 但以后会一直有效；
 
-## 配置DNS服务器指向：
+## 配置 DNS 服务器指向：
 
 > 先主机域名解析配置，如果没有再查找DNS服务器配置
 
@@ -576,7 +576,7 @@ Proto Recv-Q Send-Q Local Address Foreign Address State PID/Program name tcp  0 
 `/etc/hosts`
 `172.16.7.1 lingyima.com www.lingyima.com`
 
-### DNS服务器配置
+### DNS 服务器配置
 
 - 配置文件：/etc/resolv.conf
 - nameserver DNS_SERVER_IP
@@ -595,7 +595,7 @@ FQDN -> IP
 >IP -> FQDN 反向解析
 ```
 
-## iproute家族
+## iproute 家族
 
 - 包名：**iproute2**,与内核版本相应 `uname -r`
 
@@ -680,7 +680,7 @@ link/ether，brd：都是不是IP地址
 
 `# ip route add TYPE PREFIX via GW [dev IFACE] [src SOURCE_IP]`
 
->via：nexthop
+> via：nexthop
 
 src: 一个接口中的多个地址当中选一个地址作为原地址
 
@@ -743,13 +743,13 @@ sport: 服务器端端口
 
 ### 路由的相关配置文件
 
-`/etc/sysconfig/networkj-scripts/route-IFACE`
+`/etc/sysconfig/network-scripts/route-IFACE`
 
 ### 接口配置文件
 
 `/etc/sysconfig/network-scripts/ifcfg-IFACE(接口名称)`
 
-### 配置文件
+### 网络配置文件路径
 
 `/etc/sysconfig/network-scripts/ifcfg-IFACE`通过大量参数来定义接口的属性，其可通过vim等文本编辑器直接修改，使用专用的命令的进行修改
 
@@ -763,7 +763,7 @@ sport: 服务器端端口
 
 `# nmtui`
 
-## ifcfg-IFACE配置文件参数：
+## ifcfg-IFACE 配置文件参数：
 
 - NAME：此配置文件对应的设备的名称（CentOS 7）
 - DEVICE：此配置文件对应的设备的名称（与ifcfg-IFACE保持一致）
@@ -771,28 +771,28 @@ sport: 服务器端端口
 - UUID：此设备的惟一标识
 
 - BOOTPROTO：激活此接口时使用什么协议来配置接口属性
-  - 常用的有dhcp、bootp、sta tic、none
-- TYPE：接口类型，常见的有Ethernet, Bridge
+  - 常用的有 dhcp、bootp、sta tic、none
+- TYPE：接口类型，常见的有 Ethernet, Bridge
 
-- DNS1：第一DNS服务器指向
-- DNS2：备用DNS服务器指向
-- DOMAIN：DNS搜索域
+- DNS1：第一 DNS 服务器指向
+- DNS2：备用 DNS 服务器指向
+- DOMAIN：DNS 搜索域
 
-- IPADDR： IP地址
+- IPADDR： IP 地址
 - NETMASK：子网掩码
-- PREFIX: CentOS 7支持使用PREFIX以长度方式指明子网掩码
+- PREFIX: CentOS 7 支持使用 PREFIX 以长度方式指明子网掩码
 - GATEWAY：默认网关
-- HWADDR：设备的MAC地址
+- HWADDR：设备的 MAC 地址
 
 - USERCTL：是否允许普通用户控制此设备
 
-- PEERDNS：如果BOOTPROTO的值为“dhcp”，是否允许dhcp server分配的dns服务器指向覆盖本地手动指定的DNS服务器指向；默认为YES
+- PEERDNS：如果 BOOTPROTO 的值为“dhcp”，是否允许 dhcp server 分配的 dns 服务器指向覆盖本地手动指定的 DNS 服务器指向；默认为YES
 
-- NM_CONTROLLED：是否使用NetworkManager服务来控制接口（CentOS 6）
+- NM_CONTROLLED：是否使用 NetworkManager 服务来控制接口（CentOS 6）
   - YES：各种高级功能不能使用
-  - NO：只有NetworkManager服务关闭
+  - NO：只有 NetworkManager 服务关闭
 
-- IPV6INIT：是否初始化IPv6
+- IPV6INIT：是否初始化 IPv6
 
 - 网络服务：
   - network（常用）
@@ -830,9 +830,9 @@ GATEWAY[0-9]=NEXTHOP
 
 1. `ifconfig  IFACE_LABEL  IPADDR/NETMASK`
 
- IFACE_LABEL：eth0:0, eth0:1, ...		
+ IFACE_LABEL：eth0:0, eth0:1, ...
 
-2. 为别名添加配置文件；
+2. 为别名添加配置文件
 
 DEVICE=IFACE_LABEL
 
@@ -840,7 +840,7 @@ BOOTPROTO：网上别名不支持动态获取地址；
 
 只支持static, none
 
-## nmcli命令：`nmcli  [ OPTIONS ] OBJECT { COMMAND | help }`	
+## nmcli 命令：`nmcli  [ OPTIONS ] OBJECT { COMMAND | help }`
 
 > CentOS 7 专有命令：device - show and manage network interfaces
 
@@ -849,7 +849,7 @@ BOOTPROTO：网上别名不支持动态获取地址；
 - COMMAND := { show | up | down | add | edit | modify | delete | reload | load }
 - modify [ id | uuid | path ] <ID> [+|-]<setting>.<property> <value>
 
-### 如何修改IP地址等属性：
+### 如何修改 IP 地址等属性：
 
 `# nmcli  conn  modify  IFACE  [+|-]setting.property  value`
 

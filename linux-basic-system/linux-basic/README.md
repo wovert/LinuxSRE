@@ -1,31 +1,40 @@
 # Linux 基础入门-[零壹码博客](https://lingyima.com)
 
 ## 终端
+
 > 用户与主机进行交互的设备
+
 早期的大型主机，想使用的用户有很多，但主机只有一个，也不可能做到人手一台，但是可以做到在主机上接上一个分屏器，分屏器的每一个端子上可以接上一套键盘鼠标显示器，就可以直接在主机上面进行一些操作，这就相当于每个人在独立的操作一台计算机一样，像把一个端子上面所接入的鼠标、键盘、显示器所组成的一个组合，称之为终端。
 
 所谓操作系统的多用户概念，就是基于此种模式而诞生的。终端可以说是一个程序，但严格意义上来是一个设备，因为终端所表现的是一些物理设备，如键盘、鼠标、显示器等。
 
-
 ### 终端的类型
+
 - 物理终端
-将显示器、键盘鼠标直接接在主机的接口之上，即本机自带的，直接连入的，我们称之为物理终端。	物理控制台 console 表示 `/dev/console`
+将显示器、键盘鼠标直接接在主机的接口之上，即本机自带的，直接连入的，我们称之为物理终端。物理控制台 console 表示 `/dev/console`
 在系统启动的时候，服务还没有全部起来，这个时候映射的是物理终端，在服务完成启动之后映射的是虚拟终端，当然还有图形终端。
 
 - 虚拟终端
 系统提供的6个虚拟终端，这些终端附加在物理终端之上的，用软件的方式虚拟实现的终端 centos 默认启用 6 个虚拟终端，可以使用快捷键来切换不同虚拟终端
+
 切换方式：`Ctrl+Alt+F[1-6]`
+
 虚拟终端路径文件设备： `/dev/tty/#`
+
 系统启动之后通过虚拟终端来登录系统，即便是在物理设备上。
 
-- 图形终端
+**图形终端**
+
 附加在物理终端之上，用软件方式虚拟实现的终端，但额外会提供桌面环境，切换方式：`Ctrl+Alt+F7`
 
-- 伪终端
+**伪终端**
+
 图形界面下打开的命令行接口，还有基于ssh协议和telnet协议等远程打开的命令行界面
+
 伪终端路径文件设备： `/dev/pts/#`
 
-- 串行终端
+**串行终端**
+
 伪终端路径文件设备：`/dev/ttyS[0-3]` 串口
 
 - 查看当前的终端设备命令
@@ -34,25 +43,29 @@
 - 终端实际上一个设备，一个设备要想与系统进行交互，必须有交互接口，当开启一个终端时，系统会自动在终端上运行一个交互式程序。
 
 ## 交互式程序
+
 ### GUI
+
 > 图形化界面，是基于 [X 协议](https://baike.baidu.com/item/X%E8%A7%86%E7%AA%97%E7%B3%BB%E7%BB%9F%E5%8D%8F%E8%AE%AE)实现的窗口管理器（桌面、按钮的作用等）
+
 - Linux 桌面系统
-	+ [Gnome](https://www.gnome.org/)(C 程序开发，GTK开发库)
-	+ [KDE](https://www.kde.org/)(C++ 程序开发，qt开发库)
-	+ [xcfe](https://xfce.org/)(轻量级桌面)
+  - [Gnome](https://www.gnome.org/)(C 程序开发，GTK开发库)
+  - [KDE](https://www.kde.org/)(C++ 程序开发，qt开发库)
+  - [xcfe](https://xfce.org/)(轻量级桌面)
 
 ### CLI
+
 > 用户与系统交互，必须通过shell，不同的程序员开发的程序不一样。
 - shell 程序：bash, zsh, sh, csh, tcsh, ksh
 
-- 获取当前环境的shell
-`# echo $SHELL`
+获取当前环境的shell : `# echo $SHELL`
 
-- 显示当前系统使用的 shell 是哪种 shell
-`# cat /etc/shells`
+显示当前系统使用的 shell 是哪种 shell : `# cat /etc/shells`
 
 ### TUI
+
 - TUI：Text User Interface
+
 `# nmtui`
 
 - API：Application Program Interface 程序员面对的编程接口
@@ -63,10 +76,13 @@
 - 手动运行服务（占接口）：前台
 
 ## CLI 接口
+
 ### 命令行接口：
+
 `[user@host ~]# COMMAND` prompt
 
-[user@host ~] 称之为PS1, 靠环境变量定义，其组成部分可以使用 cho 命令来显示 echo $PS1
+[user@host ~] 称之为PS1, 靠环境变量定义，其组成部分可以使用 echo 命令来显示 echo $PS1
+
 格式：[\u@\h\W]\$
 
 - user: 当前登陆的用户名
@@ -74,21 +90,28 @@
 - ~: 用户当前所在的目录（current directory），也成为工作目录（working directory）；相对路径
 
 `# 表示命令提示符，提示符有两种`
+
 - #: 管理员账号，为 root；拥有最高权限，能执行所有操作
+
 - $: 普通用户，非 root 用户；不具有管理权限，不能执行系统管理类操作
 
 注意：使用非管理员账号登录；
-	执行管理操作临时切换至管理员，操作完成即退回
+
+执行管理操作临时切换至管理员，操作完成即退回
 
 - 所谓命令提示符，就是提示用户可以在此输入命令，那么输入命令意味着什么？
+
 输入命令，然后回车：shell程序找到键入的命令所对应的可执行程序或代码，并由其分析后提交给内核分配资源将其运行起来，表现为一个或多个进程。
+
 如：键入 ls, 先查找 ls 对应的执行程序：
+
 `# which ls` 可查看 ls 命令所对应的可执行程序
+
 `# whereis ls` 也可以获得 ls 有哪些帮助文件
 有些命令是找不到其对应的可执行程序的，如 `cd`
 
-
 ## 基础命令
+
 - `tty` 查看当前的终端设备
 - `ifconfig`或`ip addr list` 查看活动接口的IP地址
 - `echo` 回显
@@ -398,10 +421,12 @@ man1, man5, man8 等
 ### 练习：获取 useradd 命令的用法
 
 1. 添加用户 gentoo
+
 `~]# useradd gentoo`
 `~]# id gentoo`
 
 2. 添加用户 slackware，要求指定其所用的 shell 为 /bin/tcsh
+
 `~]# useradd -s /bin/tcsh slackware`
 `~]# tail -1 /etc/passwd`
 
@@ -423,8 +448,11 @@ man1, man5, man8 等
 ```
 
 - 环境变量
+
 `~]# echo $HOME`
+
 `~]# echo $PWD`
+
 `~]# echo $OLDPWD`
 
 #### 列出指定目录下的文件列表 - list
@@ -432,6 +460,7 @@ man1, man5, man8 等
 `ls [OPTIONS]... [FILE]...`
 
 `ls` options
+
 ```
 -a : 显示所有文件，包括隐藏文件
 -A :  显示所有文件，除了.和..的所有隐藏文件
@@ -483,6 +512,7 @@ man1, man5, man8 等
 ---
 
 #### mktemp 命令：create a temporary file or directory
+
 `mktemp [OPTION]... [TEMPLATE]`
 `-d, --directory` 创建临时目录
 `-u, --dry-run` do not create anything
@@ -495,30 +525,39 @@ man1, man5, man8 等
 ### 文件查看工具
 
 #### 查看文件内容类型
+
 `file [FILE]...`
 ASCII, ELF
 
 ---
 
 #### 查看文件内容
+
 1. `cat [OPTION]... [FILE]..`
+
 - OPTIONS
-`-n, --number` 显示行号
-`-E, --show-ends` 显示行结束符
-`-v， --show-nonpriting` 显示非打印字符
-`-e = -vE` 显示行结束符及非打印字符
-`-s, --squeeze-blank` suppress repeated empty output lines
-`~]# cat /etc/fstab /etc/issue`
+
+``` options
+-n, --number : 显示行号
+-E, --show-ends : 显示行结束符
+-v， --show-nonpriting : 显示非打印字符
+-e = -vE : 显示行结束符及非打印字符
+-s, --squeeze-blank suppress repeated empty output lines
+~]# cat /etc/fstab /etc/issue
+```
 
 2. `tac [-n] [-E]`
 
 3. `more/less` 命令
 
 4. `head命令` 查看文件的前n行
+
 `n #` 或者 `-#`
 
 5. `tail` 查看文件的后n行
+
 `n #` 或者 `-#`
+
 `-f` 查看文件尾部内容结束后不退出，跟随显示新增的行
 
 ---
@@ -539,7 +578,8 @@ ASCII, ELF
 `echo [SHORT-OPTION]... [STRING]...`
 
 `echo` OPTIONS
-```
+
+``` shell
 -n : do not output the trailing newline
 -e : 转义符生效
   \r: 回车符
@@ -585,6 +625,7 @@ ASCII, ELF
 ---
 
 #### date：系统时钟
+
 - 显示日期时间：`date [OPTIONS]... [+FORMAT]`
 
 - `+FORMAT`:
@@ -605,11 +646,13 @@ ASCII, ELF
 ---
 
 #### clock 硬件时钟
+
 > 是 hwclcok 的软链接
 
 ---
 
 #### hwclock - query or set the hardware clock(RTC)
+
 `-s, --hctosys`
 Set the System Time from the Hardware Clock.
 
@@ -619,16 +662,19 @@ Set the Hardware Clock to the current System Time.
 ---
 
 #### cal 命令
+
 `cal [options] [[[day] month] year]`
 
 ---
 
 ### which 命令
+
 `--skip-alias` 忽略别名
 
 ---
 
 ### whereis 命令
+
 `-b` binary path
 
 `-m` man path
@@ -636,6 +682,7 @@ Set the Hardware Clock to the current System Time.
 ---
 
 ### who 命令
+
 `-b` 最近一次系统启动时间
 
 `-r` runlevel
@@ -645,6 +692,7 @@ Set the Hardware Clock to the current System Time.
 ---
 
 ### `w` 增强版的 who 命令
+
 - IDEL
 - JCPU 与该tty终端连接的所有进程占用的时间，不包括过去的后台作业时间
 - PCPU 当前进程(即w项中显示的)所占用的时间
@@ -669,6 +717,7 @@ Set the Hardware Clock to the current System Time.
 #### touch 命令 - change file timestamps
 
 `touch` options
+
 ```
 -c : 指定的文件路径不存在时不予创建
 -a : 修改access time
@@ -677,17 +726,20 @@ Set the Hardware Clock to the current System Time.
 ```
 
 #### mv 命令
+
 `mv [OPTION]... SOURCE... DIRECTORY`
 
 `mv [OPTION]... -t DIRECTORY SOURCE...`
 
 `mv` options
+
 ```
 -i : interactive
 -f : force
 ```
 
 #### rm 命令 - remove
+
 - options
 `-i` interactive
 `-f` force
@@ -695,6 +747,7 @@ Set the Hardware Clock to the current System Time.
 - 注意：所有不用的文件建议不要直接删除，而是移动至某个专用目录；（模拟回收站
 
 #### cp 命令 - copy
+
 - 单源复制：`cp [OPTION]... [-T] SOURCE DEST`
 - 多源复制：`cp [OPTION]... SOURCE... DIRECTORY`
 
@@ -716,6 +769,7 @@ Set the Hardware Clock to the current System Time.
     - 如果 **DEST** 是目录文件：分别复制每个文件至目标目录中，并保持原名；
 
 **copy 常用选项**
+
 ``` shell
 -i interactive : 覆盖文件时提醒信息
 -f force : 强制覆盖目标文件
@@ -734,6 +788,7 @@ Set the Hardware Clock to the current System Time.
 ```
 
 #### install 命令
+
 - 单源复制 : `install [OPTION]... [-t] SOURCE DEST` 
 
 - 多源复制
@@ -743,7 +798,8 @@ Set the Hardware Clock to the current System Time.
 - 创建空目录：`install [OPTION]... -d DIRECTORY...`
 
 **install 选项**
-```
+
+``` shell
 -m, --mode=MODE : 设定目标文件权限，默认为 755
 -o, --owner=OWNER : 设定文件的属主
 -g, --group=GROUP : 设定文件的属组
@@ -759,7 +815,8 @@ Set the Hardware Clock to the current System Time.
 ```
 
 #### dd 命令 - convert and copy a file
-`dd if=/PATH/FROM/SRC of=/PATH/TO/DEST bs=block size count=数量`
+
+`# dd if=/PATH/FROM/SRC of=/PATH/TO/DEST bs=block size count=数量`
 - bs=#，block size，复制单元大小，单位：byte
 
 - 磁盘对考：`~]# dd if=/dev/sda of=/dev/sdb`
@@ -768,5 +825,5 @@ Set the Hardware Clock to the current System Time.
 - 破坏MBR中的Bootloader：`~]# dd if=/dev/zero of=/dev/sda bs=256 count=1`
 
 - 两个特殊设备
-`/dev/null` 数据黑洞
-`/dev/zero` 吐零机
+  - `/dev/null` 数据黑洞
+  - `/dev/zero` 吐零机
