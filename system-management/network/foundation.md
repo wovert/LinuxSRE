@@ -62,7 +62,85 @@
 - MAN(Metropolitan Area Networks)
 - WAN(Wide Area Networks)
 
+### Cost-Effective Resource Sharing
+
+- Resources: links and nodes
+- How to share a link?
+  - Multiplexing
+    - FDM：Frequence Division Multiplexing
+      - frequency(平带)/time
+    - TDM: Synchronous Time-division Multiplexing
+      - Time slots/data transmitted in predetermined slots
+      - frequency/time
+  - De-multiplexing
+
+![](./imgs/cost-effective.png)
+
+- Statistical Multiplexing
+  - Data is transmitted based on demand of each flow.
+  - What is a flow?
+  - Packets vs. Messages
+  - FIFO(Queue), Round-Robin(轮循), Priorities(优先权 Quality-of-Service(QoS) 服务质量)
+  - Congested? 拥挤的
+
+### Logical Channels
+
+- Logical Channels
+  - Application-to-Application communication path or a pipe
+
+![Logical Channels](./imgs/logical-channels.png)
+
+### Network Reliability
+
+- Network should hide the errors
+- Bits are lost
+  - Bit errors(1 to a 0, and vice versa)
+  - Burst errors - several consecutive errors
+- Packets are lost(Congestion)
+- Links and Node failures
+- Messsages are delayed
+- Messages are delivered out-of-order
+- Third parties eavesdrop
 
 ## Network Architecture
+
+- Application Programs
+- Process-to-process Channels
+- Host-to-Host Connectivity
+- hardware
+
+### protocols
+
+- Protocol defines the interfaces between
+  - the layers in the same system and with
+  - the layers of peer system
+- Building blocks of a network architecture
+- Each protocol ojbect has two different interfaces
+  - Service interface: operations on this protocol
+  - Peer-to-peer interface: message exchanges with peer
+
+![Protocol Interface](./imgs/protocol-interface.png)
+
+- Protocol Specification: pseudo-code, state transition diagram, message format
+- Interoperable: when two or more protocols that implement the specification accurately
+- IETF: Internet Engineering Task Force
+  - Define Internet standard protocols
+
+![Protocol Architecture](./imgs/protocol-architecture.png)
+
+### Encapsulation
+
+![Encapsulation](./imgs/encapsulation.png)
+
+### OSI Architecture
+
+OSI: Open System Interconnection
+
+![OSI Architecture](./imgs/osi-architecture.png)
+
+![OSI Artitecture](./imgs/osi-architecture2.png)
+
+![OSI Artitecture](./imgs/osi-architecture3.png)
+
 
 ## Network Performance
