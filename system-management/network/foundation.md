@@ -142,5 +142,106 @@ OSI: Open System Interconnection
 
 ![OSI Artitecture](./imgs/osi-architecture3.png)
 
+### Description of Layers
+
+- Physical Layer(如何将原始资料在 Link 上传输)
+  - Handles the transmission of raw bits over a communication link
+    - Coaxial cable 同轴线 ![同轴线](./imgs/coaxial-cable.png)
+    - Twisted pair 双绞线 ![双绞线](./imgs/twisted-pair.png)
+    - Optical Fiber 光纤 (不受电磁波干扰)
+    - Air space(wireless radio channel) 无线网路（电磁波传输）
+  - Different Signal Coding schemes ![coding](./imgs/coding.png)
+  - 同轴线和双绞线容易受电磁波干扰
+
+- Data Link Layer(如何将 frame 传给直接相连的主机或设备)
+  - Collects a stream of bits into a frame
+  - How to transmit a frame to a directly conencted hsot(destination)
+  - MAC (Meda Access Control Protocol)
+    - CSMA/CD (IEEE 802.3 Ethernet)
+    - CSMA/CA (IEEE 8.2.11 Wireless LAN)
+  - Layer 2 devices
+  - Switches
+  - Bridges
+
+- Network Layer(如何将封包透过 internet 送给目的主机 )
+  - How to transmit frames to a host via the Internet?
+  - Handles **routing** among nodes within a packet-swiched network
+  - Data exchanged between nodes in this layer is called a **packet**
+  - IP protocol
+  - Routers
+  - Routing protocols
+    - RIP
+    - OSPF
+    - BGP
+  - Routing Tables
+
+- Transport Layer(提供不同主机 processes 之间的资料传送)
+  - implements a process-to-process channel
+  - unit of data exchanges in this layer is called a message
+  - TCP (Transmission Control Protocol) - Reliable service
+  - UDP (User Datagram Protocol) - Unreliable service
+
+![tcp](./imgs/ptp.png)
+
+- Session Layer
+  - Provides a name space that is used **to tie together the potentially different transport streams** that are part of a single application
+
+- Prensentation Layer
+  - Concerned about hte **format of data** exchanged between peers
+
+- Application Layer
+  - Standardize common type of exchanges
+  - FTP/E-mail/DNS/HTTP/Browsers/FB
 
 ## Network Performance
+
+- Defined by IETF
+- Three main features
+  - **Does not imply strict layering**. The application is **free to bypass** the defined transport layers and to directly use IP or other underlying networks.
+
+![internet](./imgs/internet-architecture.png)
+
+- Bandwidth
+  - Width of the **frequency band**
+  - **Number of bits per second** that can be transmitted over a communication link
+- 1 Mbps: 1 x 10^6 bits/second
+- 1 x 10^-6 seconds to transmit each bit or imagine that a timeline, now each bit occupies 1 micro second space.
+- On a 2 Mbps link the width is 0.5 micro second.
+- Smaller the width more will be transmisson per unit time.
+
+![bandwidth](./imgs/bandwidth.png)
+
+Bits transmitted at a particular bandwidth can be regarded as having some width:
+
+a. bits transimitted at 1Mbps (each bit 1 us wide)
+
+b. bits transmitted at 2Mbps(eacg bit 0.5 us wide)
+
+**Latency** = Propagation time + transimission time + queuing time(排队时间)
+
+**Propagation time** = distance/speed of light
+
+**Trasmission time** = size/bandwidth
+
+one bit transmission => propagation is important (短资料很快就送完，但需要长时间才能传到对方，资料已送完，但签到资料还未到达对方) Propagation time >> transmission time
+
+Large bytes transmission => bandwidth is important (长资料很慢才能送完，未送完前，前导资料已到对方) Transmisson time >> propagation time
+
+### Delay X Bandwidth
+
+- The channel between a pair of processes can be viewed as a pipe
+- Latency(delay): length of the pipe
+- Bandwidth: width of the pipe
+- Delay x Bandwidth means how many data can be stored in the pipe
+- For example, delay of 80 ms and bandwidth of 100 Mbps
+
+80 x 10^3 seconds x 100 x 10^6 bits/second
+
+8 * 10^6 bits = 8 Mbits = 1MB data
+
+![delay bandwidth](./imgs/delay-bandwidth.png)
+
+- Relative importance of bandwidth and latency depends on application
+  - For large file tansfer, bandwidth is critical
+  - For small messages(HTTP, NFS, etc.), latency is critical
+  - Variance in latency(jitter) can also affect some applications(e.g., audio/video conferencing)
