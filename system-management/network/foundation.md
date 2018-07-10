@@ -245,3 +245,40 @@ Large bytes transmission => bandwidth is important (长资料很慢才能送完�
   - For large file tansfer, bandwidth is critical
   - For small messages(HTTP, NFS, etc.), latency is critical
   - Variance in latency(jitter) can also affect some applications(e.g., audio/video conferencing)
+
+## Ethernet
+
+### Introduction Ethernet
+
+- Most successfull local area networking technology of last 30 years.
+- First widely used LAN technology
+- Kept up with speed race: 10 Mbps - 100 Gbps
+
+![ethernet-1](./imgs/ethernet-1.png)
+
+- Developed in the mid-1970s by researchers at the Xerox Palo Alto Research Centers(PARC)
+- DEC and Intel joined Xerox to define a 10-Mbps Ethernet standard in 1978.
+- This standard formed the basis for IEEE standard 802.3
+- More recently 802.3 has been extended to include
+  - 100-Mbps version called Fast Ethernet
+  - 1000-Mbps version called Gigabit Ethernet
+  - 10 Gibabit Ethernet, and also
+  - 100 Gibabit Ethernet
+
+- **Connectionless**: No handshaking between sending and receiving NICs
+- **Unreliable**: receiving NIC doesn't send ACKs or NACKs to sending NIC
+- **Ethernets' MAC protocol**: Carrier Sense Multiple Access with Collision Detection (CSMA/CD)
+
+- Bus topology popular throught mid 90s(总线拓扑)
+  - all nodes in same collision domain(can collide with each other)
+
+
+
+### Ethernet Topologies
+
+### Ethernet Frame Format
+
+### Ethernet MAC Protocol - CSMA/CD
+
+### 802.3 Ethernet STandards
+
