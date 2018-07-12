@@ -4,6 +4,32 @@
 
 HTML: Hyper Text Mark Language, 编程语言，超文本标记语言
 
+MIME(Multiple Internet Mail Extension) 多用途互联网邮件协议
+
+major/minor: text/html, text/plain, images/jpeg, ...
+
+Web 资源：URL(SCHEME://SERVER:PORT/PATH/TO/SOURCE)
+
+HTTP METHOD: GET/POST/PUT/DELETE//HEAD/TRACE/OPTIONS/...
+
+http 事务：request <-> response
+
+``` request
+<method> <URL> <version>
+<HEADERS>
+...
+回车换行
+<body>
+```
+
+```response
+<version> <status> <resason phrase>
+<HEADERS>
+...
+回车换行
+<body>
+```
+
 ## 协议版本
 
 - http/0.9: 原型版本，功能简陋
@@ -73,11 +99,11 @@ HTML: Hyper Text Mark Language, 编程语言，超文本标记语言
 
 - web 服务器，即存放了 web 资源的主机，负责向请求者提供对方请求的静态资源，或动态资源运行生成的结果；这些资源通常应该放置于本地文件系统某路径下；此路径称为 `DocRoot`;
 
-```
+``` code
 /var/www/html;
   images/log.jpg
   http://www.wovert.com/images/logo.jpg
-
+```
 
 Web 服务器的资源路径映射方式
 
@@ -85,7 +111,6 @@ Web 服务器的资源路径映射方式
 2. alias(路径别名)
 3. 虚拟主机的 docroot
 4. 用户家目录的 docroot
-```
 
 ## http 请求处理中的连接模式
 
@@ -148,7 +173,8 @@ Web 服务器的资源路径映射方式
 ### DNS 系统架构
 
 > 类似于一棵倒挂着的树，它的顶点时"."
-```
+
+``` dns
 .
 com/gov/org/net/cn/edu/info
 cn
@@ -249,11 +275,11 @@ com
 - 协议查看或分析的工具：`tcpdump,tshark,wireshark`
 
 - status(状态码)
-  - 1xx: 100-101，额外信息提示
-  - 2xx: 200-206，响应成功的信息
-  - 3xx: 300-305，服务器端重定向类信息
-  - 4xx: 400-415，客户端错误信息
-  - 5xx: 500-505，服务器端错误信息
+  - 1xx: 100-101，额外**信息**提示
+  - 2xx: 200-206，响应**成功**的信息
+  - 3xx: 300-305，服务器端**重定向**类信息
+  - 4xx: 400-415，**客户端错误**信息
+  - 5xx: 500-505，**服务器端错误**信息
 
 - 常用状态码：
   - 200: 请求的所有数据通过响应报文的entity-body部分发送；OK
@@ -261,7 +287,7 @@ com
   - 302: 与301相似，但在响应报文中通过Location指明资源现在所处临时新位置；Found
   - 304: 客户端发出了条件式请求，但服务器上的资源未曾发生改变，则通过响应此响应状态码通知客户端；Not Modified
   - 401: 需要输入账号和密码认证方能访问资源；Unauthorized
-  - 403: 请求被禁止；Forbidden
+  - 403: 请求被禁止；Forbidden（用户没有权限）
   - 404: 服务去无法找到客户端请求的资源；Not Found
   - 500: 服务器内部错误；Internal Server Error
   - 502: 代理服务器从后端服务器收到一条伪响应：Bad Gateway
