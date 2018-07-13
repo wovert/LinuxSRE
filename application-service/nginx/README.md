@@ -1,51 +1,146 @@
 # Nginx -[零壹码博客](https://lingyima.com)
-> [Nginx官网](http://nginx.org/en/docs)
+
+> engine X: nginx, Igor Sysoev, Rambler Media 服务器 [Nginx官网](http://nginx.org/en/docs)
 
 - C10K(Connections 10000并发)
-- 解决C10K[Nginx官网](http://nginx.org/)
-- engine X: nginx, Igor Sysoev, Rambler Media
+- 解决 C10K[Nginx官网](http://nginx.org/) 
 - 二次开发：tengine(taobao), openresty
 
 ## 常见HTTP服务器
+
 - httpd-Apache 基金会
 - IIS-Microsoft
 - GWS-Google
 
 ## HTTP请求
 - Request
-	+ 请求行
-	+ 请求头
-	+ 请求体
+  - 请求行
+  - 请求头
+  - 请求体
 - Response
-	+ 状态行
-	+ 响应头
-	+ 响应体
+  - 状态行
+  - 响应头
+  - 响应体
 
 - curl -v https://lingyima.com
-	+ -v: 显示 request/response
+  - -v: 显示 request/response
 
-## Nginx的特性
+
+## I/O模型
+
+### 进程间同步与异步
+
+> 关注的是消息通知机制
+
+- 同步：synchronous
+  - 一个任务的完成依赖于另外一个任务的时候，那么被依赖的任务B完成之后，依赖的任务A才能完成
+- 异步：asynchronous
+  - 调用者A无需等待被调用者B，只是通知被调用者B，依赖的任务A继续执行，被依赖的任务B也继续执行。被依赖者B使用回调函数反映给调用者A
+
+### 同步/异步
+
+> 消息通知（被调用者角度如何处理）
+
+- 同步：被调用者必须完成（在面馆点菜，必须在面馆等待菜完成）
+- 异步：被调用者直接返回，即使不能完成（在面馆点菜，菜做完了会消息通知你）
+
+- 同步消息通知：等待对方返回消息
+- 异步消息通知：被调用者通过状态、通知或回调函数通知调用者
+  - 状态：调用者每隔一段时间就需要检查一次，轮循
+  - 通知：发短信
+  - 回调：与通知相似
+
+### 阻塞/非阻塞（调用者的角度如何处理）
+
+> 调用者等待结果返回之前所处的状态
+
+- 阻塞：block（挂起）：调用结果返回之前，调用者会被挂起（暂停），一直等待消息通知，不能执行其他任务的状态。只有被调用者成功返回消息时，调用者才会被唤醒，并继续完成任务。
+- 非阻塞：nonblock（活动）：调用结果返回之前，调用者不会被挂起
+
+
+- 阻塞：调用者挂起（在面馆点菜，被冷冻不能做其他行为）
+- 非阻塞：调用者继续执行其他任务（在面馆点菜，继续玩儿游戏）
+
+### 阻塞/非阻塞/同步/异步
+
+- 同步阻塞：等待调用者返回之前，不能继续操作，而且要挂起效率最低
+- 同步非阻塞：调用结果完成之前，不能返回。可以做其他事情且不能离开办理事务地方
+- 异步阻塞：等待消息通知时不能做其他事情，阻塞，银行等待；点菜不能离开餐馆（等待消息时阻塞）
+- 异步非阻塞：点菜离开餐馆该干嘛干嘛，做好了之后短信通知客户去领
+
+### I/O 类型
+
+- 网络IO：本质是 socket 读取
+- 磁盘IO：流
+
+《Unix高级网络编程》
+
+### 每次 IO，都会经由两个阶段
+
+- 第一步：**数据**先加载至**内核内存空间**（缓冲区）
+- 第二步：**数据**从内核缓冲区复制到**用户空间**的进程的内存中去
+
+### 一个 read 操作
+1. 等待数据准备完成，wait for data
+2. 数据内核复制到进程, copy data
+
+### I/O 模型
+
+> Comparison of five I/O Models
+
+#### 1. 同步阻塞：blockIO
+
+> 全部忙等
+
+#### 2. 同步非阻塞：nonblockIO
+
+- 第一阶段忙等(数据从磁盘到内核内存，调用者忙等，同步非阻塞，轮循：用户进程询问内核完成没有，不停的相互转换)
+- 第二阶段阻塞（数据从内核内存空间到用户内存空间，阻塞状态）
+- 示例：购买热面，购买之后做其他事情，然后不停的问厨司好没有，厨师查看此用户碗里有没有，反馈给用户。多个用户询问，厨司忙死
+
+#### 3. IO multiplexing（IO复用）：select(BSD，数组1024，prefok)，poll(链表)
+
+- 看屏幕(阻塞),满屏更新，更新有限, 不用轮询
+- 一个用户的好了刷新整个屏幕
+- 一次满屏刷新
+- 屏幕数量有限，即并发有限
+- 第一阶段，系统调用询问，询问状况，看屏幕，变同步阻塞(屏幕)了~~~
+
+#### 4. Signal Driven IO：信号驱动IO (event,epoll,kqueue, /dev/poll)
+
+- 第一阶段非阻塞，信号通知(短信)
+  - 不用忙等、不看屏幕、非阻塞
+- 第二阶段阻塞
+  - 调用多个进程，还是及阻塞等待
+
+#### 5. Asynchronous IO: 异步IO(NodeJS)
+
+- 第一阶段非阻塞
+- 第二阶段非阻塞
+
+## Nginx 的特性
+
 - 模块化设计、较好扩展性(3rd modules)
 - High reliability
-	+ master/worker
+  - master/worker
 - 支持热部署
-	+ 不停机而更新配置文件、更换日志文件、更新服务器程序版本
+  - 不停机而更新配置文件、更换日志文件、更新服务器程序版本
 - 低内存消耗
-	+ 10000个keep-alive连接模式下的非活动连接仅消耗2.5MB内存
-	+ 非活动连接：没有传输数据
+  - 10000个keep-alive连接模式下的非活动连接仅消耗2.5MB内存
+  - 非活动连接：没有传输数据
 - event-driven, aio, mmap(内存映射直接访问磁盘)
 
 ## 基本功能
 - 纯静态资源的web服务器，能缓存打开的文件描述符
 - http, smtp, pop3协议的反向代理服务器，缓存、负载均衡
-	+ 正向代理：本地代理（地址转换）
-	+ 反向代理：远程代理（地址转换）
+  - 正向代理：本地代理（地址转换）
+  - 反向代理：远程代理（地址转换）
 - 支持FastCGI (fpm, lnmp), uWSCGI等协议
 - 模块化（非DSO机制），著名模块有zip，SSI及图像大小调整
 - 支持SSL
 		
 - web服务器相关的功能：
-	+ 虚拟主机、keepalive、访问日志（用户行为分析）、url rewrite、路径别名、基于IP及用户的访问控制、支持速率限制及并发数限制，...
+  - 虚拟主机、keepalive、访问日志（用户行为分析）、url rewrite、路径别名、基于IP及用户的访问控制、支持速率限制及并发数限制，...
 
 ## 扩展功能
 - 基于名称和IP的虚拟主机
@@ -58,18 +153,20 @@
 - 支持速率限制，支持并发数限制
 		
 ## Nginx arch
+
 ### master/worker
 - 一个master进程，可生成一个或多个worker进程，每个worker响应n个请求
-	+ master：加载配置文件、管理worker进程、平滑升级
-	+ worker：http服务、http代理、fastcgi代理
+  - master：加载配置文件、管理worker进程、平滑升级
+  - worker：http服务、http代理、fastcgi代理
 
 - 事件驱动： epoll, kqueue, /dev/poll (event ports)
 - 消息通知：select, poll, rt signals
-- 磁盘IO	
-	+ 支持sendfile, sendfile64
-	+ 支持AIO
-	+ 支持mmap（内存与磁盘映射关系）
+- 磁盘IO
+  - 支持sendfile, sendfile64
+  - 支持AIO
+  - 支持mmap（内存与磁盘映射关系）
 
+Linux 线程性能比进程性能并不更优越，因为 Linux 进程已经很轻量级
 
 ## Nginx用来做什么？
 - 静态资源的web服务器
@@ -79,9 +176,9 @@
 ## Nginx 模块类型
 - 核心模块：Core modules
 - 标准模块：Standard HTTP modules
-	+ Standard HTTP modules
-	+ Optional HTTP modules
-	+ Mail modules
+  - Standard HTTP modules
+  - Optional HTTP modules
+  - Mail modules
 - 第三方模块：3rd party modules
 
 
@@ -91,31 +188,31 @@
 - [openssl下载地址](https://github.com/openssl/openssl)
 
 ## 编译安装Nginx(epel源)：major.minor(偶数，稳定版).release
-`/etc/yum.repos.d/nginx.repo
+``` shell
+~]# vim /etc/yum.repos.d/nginx.repo
 [nginx]
 name=nginx repo
 baseurl=http://nginx.org/packages/OS/OSRELEASE/$basearch/
 gpgcheck=0
 enabled=1`
 
-`yum -y groupinstall "Development Tools" "Server Platform Development"`
+~]# yum -y groupinstall "Development Tools" "Server Platform Development"`
+~]# yum -y install pcre-devel openssl-devel zlib-devel
 
-`yum -y install pcre-devel openssl-devel zlib-devel`
-
-`./configure --prefix=/usr/local/nginx \
+~]# `./configure --prefix=/usr/local/nginx \
 --user=nginx --group=nginx \
 --sbin-path=/usr/sbin/nginx \
 --conf-path=/etc/nginx/nginx.conf \
 --error-log-path=/var/log/nginx/error.log \ 		
 --http-log-path=/var/log/nginx/access.log \
 --pid-path=/var/run/nginx/nginx.pid \
---lock-path=/var/lock/nginx.lock \`
+--lock-path=/var/lock/nginx.lock \
 
 - 编译模块：启用--with, 禁用--without
 --with-http_ssl_module \
 --with-http_stub_status_module \		状态页
 --with-http_gzip_static_module \
---with-http_flv_module \				
+--with-http_flv_module \
 --with-http_mp4_module \
 --with-debug \
 
@@ -131,8 +228,8 @@ enabled=1`
 --http-uwsgi-temp-path=/var/tmp/nginx/uwsgi \
 --http-scgi-temp-path=/var/cahe/nginx/scgi \
 
-`make && make install`
-
+~]# make && make install
+```
 			
 ## Nginx 信号控制
 - TERM,INT: Quick shutdown

@@ -4,6 +4,32 @@
 
 HTML: Hyper Text Mark Language, 编程语言，超文本标记语言
 
+MIME(Multiple Internet Mail Extension) 多用途互联网邮件协议
+
+major/minor: text/html, text/plain, images/jpeg, ...
+
+Web 资源：URL(SCHEME://SERVER:PORT/PATH/TO/SOURCE)
+
+HTTP METHOD: GET/POST/PUT/DELETE//HEAD/TRACE/OPTIONS/...
+
+http 事务：request <-> response
+
+``` request
+<method> <URL> <version>
+<HEADERS>
+...
+回车换行
+<body>
+```
+
+```response
+<version> <status> <resason phrase>
+<HEADERS>
+...
+回车换行
+<body>
+```
+
 ## 协议版本
 
 - http/0.9: 原型版本，功能简陋
@@ -73,11 +99,11 @@ HTML: Hyper Text Mark Language, 编程语言，超文本标记语言
 
 - web 服务器，即存放了 web 资源的主机，负责向请求者提供对方请求的静态资源，或动态资源运行生成的结果；这些资源通常应该放置于本地文件系统某路径下；此路径称为 `DocRoot`;
 
-```
+``` code
 /var/www/html;
   images/log.jpg
   http://www.wovert.com/images/logo.jpg
-
+```
 
 Web 服务器的资源路径映射方式
 
@@ -85,7 +111,6 @@ Web 服务器的资源路径映射方式
 2. alias(路径别名)
 3. 虚拟主机的 docroot
 4. 用户家目录的 docroot
-```
 
 ## http 请求处理中的连接模式
 
@@ -148,7 +173,8 @@ Web 服务器的资源路径映射方式
 ### DNS 系统架构
 
 > 类似于一棵倒挂着的树，它的顶点时"."
-```
+
+``` dns
 .
 com/gov/org/net/cn/edu/info
 cn
@@ -179,3 +205,196 @@ com
 # dig +trace www.lingyima.com
 # yum install bind-utils
 ```
+
+- URL：Uniform Resouce Locator，统一资源定位符
+- https://www.lingyima.com:443/bbs/index.php
+
+## 基本语法
+
+- <scheme>://<user>:<pw>@<host>:<port>/<path>;<params>?<query>#<frag>
+- params: 参数
+- http://www.lingyima.com/bbs/hello;gender=f
+- query: 查询
+- http://www.lingyima.com/bbs/item.php?username=tom&title=article
+- frag: 手雷
+
+- 相对URL：同站访问站点
+- 绝对URL：跨站访问站点
+
+- <schem>://<user>:<passwords>@<host>:<port>/<path>;<params>?<query>#<frag>
+- params
+  - http://www.lingyima.com/bbs/hello;gender=f
+- query
+  - http://www.lingyima.com/bbs/item.php?user=tom&title=abc
+- frag
+  - http://www.lingyima.com/index.html#heaer-2
+
+- http协议 version：
+  - http/0.9, http/1.0, http/1.1,http/2.0
+  - stateless：无状态 
+    - 服务器无法持续追踪访问者来源
+    - 解决方案：cookie（追踪同一个用户）
+
+- http事务
+  - 请求：request
+  - 响应：response
+
+报文的语法格式
+
+``` request报文
+<method> <request-URL> <version>
+<header>
+
+
+<entity-body>
+```
+
+``` response报文
+<version> <status> <reason-phrase>
+<headers>
+
+<entity-body>
+```
+
+- method：请求方法，标明客户端希望服务器对资源执行的动作; GET,HEAD,POST
+- version: HTTP/<majr>.<minor>
+- status: 三位数字，如200,301,302,404,502; 描述请求处理过程中发生的情况
+- reason-phrase: 状态码所标记的状态的简要描述
+- headers: 每个请求或响应报文可包含任意个首部；每个首部都有首部名称，后面跟一个冒号，而后跟上一个可选空格，接着是一个值；
+- entity-body: 请求时附加的数据或响应时附加的数据
+
+- method(方法)：
+  - GET：从服务器获取一个资源
+  - POST: 向服务器发送要处理的数据
+  - HEAD: 只从服务器获取文档响应首部
+  - PUT: 将请求的主体部分存储在服务器上（危险）
+  - DELETE：请求删除服务器上指定的文档
+  - TRACE：跟踪请求到大服务器中间经过的代理服务器
+  - OPTIONS：请求服务器返回对指定资源支持使用的请求方法
+
+- 协议查看或分析的工具：`tcpdump,tshark,wireshark`
+
+- status(状态码)
+  - 1xx: 100-101，额外**信息**提示
+  - 2xx: 200-206，响应**成功**的信息
+  - 3xx: 300-305，服务器端**重定向**类信息
+  - 4xx: 400-415，**客户端错误**信息
+  - 5xx: 500-505，**服务器端错误**信息
+
+- 常用状态码：
+  - 200: 请求的所有数据通过响应报文的entity-body部分发送；OK
+  - 301: 请求的URL指向的资源已经被删除；但在响应报文中通过首部Location指明了资源现在所处的新位置；永久重定向；Moved Permanently
+  - 302: 与301相似，但在响应报文中通过Location指明资源现在所处临时新位置；Found
+  - 304: 客户端发出了条件式请求，但服务器上的资源未曾发生改变，则通过响应此响应状态码通知客户端；Not Modified
+  - 401: 需要输入账号和密码认证方能访问资源；Unauthorized
+  - 403: 请求被禁止；Forbidden（用户没有权限）
+  - 404: 服务去无法找到客户端请求的资源；Not Found
+  - 500: 服务器内部错误；Internal Server Error
+  - 502: 代理服务器从后端服务器收到一条伪响应：Bad Gateway
+
+- headers
+  - 格式：
+    - Name: Value
+
+``` request
+Request Headers:
+GET / HTTP/1.1
+Host: www.qq.com
+Connection: keep-alive 是否保持连接
+Upgrade-Insecure-Requests: 1 
+User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36 
+Accept: text/html,application/xhtml+xml,application/
+xml;q=0.9,image/webp,*/*;q=0.8 
+Accept-Encoding: gzip, deflate, sdch 
+Accept-Language: zh-CN,zh;q=0.8
+Cookie: tvfe_boss_uuid=aead7ae45ac1d686; pac_uid=1_67668283; eas_sid=X1L418a0g0W4z5l2t168w6T2V9; mobileUV=1_158dd38a6b7_391c4; ts_uid=9246952727; ptui_loginuin=67668283; pgv_pvid=6872186886; o_cookie=67668283; ptcz=04ed5113ef85398a5b53ab269f1faa6d8d6d765f31bce6cad37e4383362eaaae; pt2gguin=o0067668283
+```
+
+``` response
+Response Headers:
+HTTP/1.1 200 OK
+Server: squid/3.5.20
+Date: Fri, 30 Dec 2016 09:36:27 GMT
+Content-Type: text/html; charset=GB2312 内容类型
+Transfer-Encoding: chunked
+Connection: keep-alive
+Vary: Accept-Encoding
+Expires: Fri, 30 Dec 2016 09:37:27 GMT
+Cache-Control: max-age=60
+Vary: Accept-Encoding
+Content-Encoding: gzip
+Vary: Accept-Encoding
+X-Cache: HIT from tianjin.qq.com
+```
+
+- 首部的分类：
+  - 通用首部
+
+  - 请求首部
+  - 响应首部
+
+  - 实体首部
+  - 扩展首部
+
+- 通用首部：
+  - Date: 报文的**创建时间**
+  - Connection: **连接状态**，如keep-alive, close
+  - Via：显示报文经过的**中间节点**
+  - Cache-Control: **控制缓存** http 1.0
+  - Pragma: 控制缓存 **http-1.1版本**
+
+- 请求首部：
+  - Accept: 通过服务器自己可接受的**媒体类型** */* 任意类型
+  - Accept-Charset: 接受的**字符集**
+  - Accept-Encoding: 接受**编码格式**，如gzip,deflate,sdch
+  - Accept-Language: 接收的**语言**
+
+  - Client-IP: **客户端IP**
+  - Host: 请求的**服务器名称和端口号**
+  - Referer: 包含当前正在**请求的资源的上一级资源**
+  - User-Agent: **客户端代理**
+
+  - 条件式请求首部：
+    - Expect: 期望发送什么样的信息
+    - If-Modified-Since: 自从指定的时间之后，请求的资源**是否发生过修改**
+    - If-Unmodified-Since:自从指定的时间之后，请求的资源**是否发生过没有修改**
+    - If-None-Match:本地缓冲中存储的文档的**ETag标签是否**与服务器文档的Etag**不匹配**
+    - If-Match:本地缓冲中存储的文档的**ETag标签**是否与服务器文档的Etag**匹配**
+
+  - 安全请求首部：
+    - Authorization: 向服务器发送**认证信息**，如账号和密码
+    - Cookie：客户端向服务器**发送cookie**
+    - Cookie2: **cookie版本**
+
+  - 代理请求服务：
+    - Proxy-Authorization: 向**代理服务器认证**
+
+- 响应首部：
+  - 信息性：
+    - Age: **响应持续时长**
+    - Server: 服务器程序**软件名称和版本**
+
+  - 协商首部：其资源有多重表示方法时使用
+    - Accept-Range: 服务器可接受的**请求范围类型**
+    - Vary: 服务器查看的其他首部列表
+
+  - 安全响应：
+    - Set-Cookie: **向客户端设置cookie**
+    - Set-Cookie2: 向客户端设置cookie
+    - WWW-Authenticate: 来自服务器的对客户端的质询**认证表单**
+
+- 实体首部：
+  - Allow: 列出对此**实体可使用的请求方法**
+  - Location: 告诉客户端真正的**实体位于何处(重定向)**
+
+  - Content-Encoding: 内容**编码格式**
+  - Content-Language: 内容**语言**
+  - Content-Length: 主体的**长度**
+  - Content-Location: 实体真正所处**位置**
+  - Content-Range: 实体**范围**
+  - Content-Type: 主体的**对象类型**
+
+  - 缓存相关：
+    - ETag: 实体的**扩展标签**
+    - Expires: 实体的**过期时间**
+    - Last-Modified: **最后一次修改的时间**
