@@ -491,52 +491,54 @@ Allow from 172.16
 
 > 日志类型：访问日志和错误日志
 
-- 错误日志：ErrorLog指令（进程运行错误、用户访问错误页面）
+
+**错误日志**：`ErrorLog` 指令（进程运行错误、用户访问错误页面）
 ``` log
-ErrorLog logs/error_log (相对于ServerRoot => /etc/httpd)
+ErrorLog logs/error_log (logs 相对于ServerRoot => /etc/httpd)
 LogLevel warn 日志级别
-Possible values include: debug, info, notice, warn, error, crit, alert,emerg
+  Possible values include: debug(所有信息), info(信息), notice(注意), warn(警告), error(错误), crit(严重错误), alert,emerg(紧急错误)
 ```
 
-- 访问日志：CustomLog指令（用户访问页面）
+**访问日志**：`CustomLog` 指令（用户访问页面）
 ``` log
+组合日志格式
 LogFormat %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+
+访问日志指定
 CustomLog logs/access_log combined
 ```
 
-- 日志记录格式：LogFormat
-  - `LogFormat "" 格式名称`
+日志记录格式：`LogFormat "" 格式名称`
 
-- LogFormat format strings:
-  - http://httpd.apache.org/docs/2.2/mod/mod_log_config.html#formats
+[LogFormat format strings](http://httpd.apache.org/docs/2.2/mod/mod_log_config.html#formats)
 
 - `LogFormat %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined`
 
-- %h : **客户端IP地址**
-- %l : 远程登入用户名(remote user), 通常为一个减号（"-"）
-- %u : remote user (from auth; may be bogus if return status(%s) is 401)；非为登录访问时，其为一个减号；
-- %t ：服务器收到**请求时的时间**
-- %r ： First line of request，**请求报文的首行**; **METHOD /URL HTTP/版本**
-- %>s ：**响应的状态码** 
-- %b ：**响应报文的大小**，单位是字节；不包括响应报文的HTTP首部 
-- %{Referer}i ：请求报文中首部**referer的值**；即从哪个页面中的超链接跳转至当前页面的
-- %{User-Agent}i ：请求报文中首部User-Agent的值；发出**请求的应用程序**
+- **%h** : **客户端IP地址**
+- **%l** : 远程登入用户名(remote user), 通常为一个减号（"-"）
+- **%u** : remote user (from auth; may be bogus if return status(%s) is 401)认证名；非为登录访问时，其为一个减号；
+- **%t** ：服务器收到**请求时的时间**
+- **%r** ： First line of request，**请求报文的首行**; **METHOD /URL HTTP/版本**
+- **%>s** ：**响应的状态码**
+- **%b** ：**响应报文的大小**，单位是字节；不包括响应报文的 HTTP 首部
+- **%{Referer}i** ：请求报文中首部**referer的值**；即从哪个页面中的超链接跳转至当前页面的(i表示特定首部的值)
+- **%{User-Agent}i** ：请求报文中首部 User-Agent的值；发出**请求的应用程序**
 
-#### 10.基于用户的访问控制
+#### 10. 基于用户的访问控制
 - 认证方式：
-  - 表单认证
-  - http协议认证
+  - 表单认证(form+db)
+  - http 协议认证(http)
 
-- 1.认证质询：
-  - WWW-Authenticate：响应码为401，拒绝客户端请求，并说明要求客户端提供账号和密码
+1.认证质询：
+  - WWW-Authenticate：响应码为 401，拒绝客户端请求，并说明要求客户端提供账号和密码
 
-- 2.认证：
+2.认证：
   - Authorization：客户端用户填入账号和密码后再次发送请求报文；认证通过时，则服务器发送响应的资源；
   - 认证方式有两种：
-    - basic：明文
-    - digest:信息摘要（很多浏览器可能不支持）
+    - basic : 明文
+    - digest : 信息摘要（很多浏览器可能不支持）
 
-- 3.安全域：需要用户认证后方能访问的路径；应该通过名称对其进行标识，以便于告知用户认证的原因；
+3.安全域：需要用户认证后方能访问的路径；应该通过名称对其进行标识，以便于告知用户认证的原因；
 
 - 用户的账号和密码存放于何处？
   - 虚拟账号：仅用于访问某服务时用到的认证标识
@@ -546,7 +548,8 @@ CustomLog logs/access_log combined
     - SQL数据库
     - ldap目录存储
 
-#### basic认证配置示例：
+##### basic认证配置示例：
+
 1. 定义安全域
 ```
 <Directory "/web/host1/admin">
