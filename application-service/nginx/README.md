@@ -156,7 +156,7 @@ I/O multiplexing: 阻塞在 IO 复用上，而不是阻塞在内核上，而不�
 - 模块化（非DSO机制），著名模块有zip，SSI及图像大小调整
 - 支持 SSL
 
-### web 服务器相关的功能：
+### web 服务器相关的功能
 
 - 虚拟主机、keepalive、访问日志（用户行为分析）、url rewrite、路径别名、基于 IP 及用户的访问控制、支持速率限制及并发数限制 ...
 
@@ -193,15 +193,16 @@ I/O multiplexing: 阻塞在 IO 复用上，而不是阻塞在内核上，而不�
 ## Nginx 用来做什么？
 
 - 静态资源的 web 服务器
-- http 协议反向代理
+- http 协议反向代理服务器
 
 ## Nginx 模块类型
+
 - 核心模块：Core modules
 - 标准模块：Standard HTTP modules
   - Standard HTTP modules
   - Optional HTTP modules
   - Mail modules
-- 第三方模块：3rd party modules
+- 3rd party modules(第三方模块)
 
 ## 安装 Nginx 前提
 
@@ -209,9 +210,14 @@ I/O multiplexing: 阻塞在 IO 复用上，而不是阻塞在内核上，而不�
 - [zlib库](http://www.zlib.net/) 压缩资源
 - [openssl下载地址](https://github.com/openssl/openssl) 安全加密
 
-## 编译安装 Nginx(epel源)：major.minor(偶数，稳定版).release
+## 编译安装 Nginx
+
+> major.minor(偶数，稳定版).release
+
+- Nginx 在 epel 源
 
 ``` shell
+~]# yum search nginx
 ~]# vim /etc/yum.repos.d/nginx.repo
 [nginx]
 name=nginx repo
@@ -221,17 +227,28 @@ enabled=1`
 
 ~]# yum -y groupinstall "Development Tools" "Server Platform Development"`
 ~]# yum -y install pcre-devel openssl-devel zlib-devel
-~]# `./configure --prefix=/usr/local/nginx \
---user=www --group=www \
+~]# `./configure \
+--prefix=/usr/local/nginx \
+--sbin-path=/usr/sbin/nginx \
 --conf-path=/etc/nginx/nginx.conf \
 --error-log-path=/var/log/nginx/error.log \
 --http-log-path=/var/log/nginx/access.log \
 --pid-path=/var/run/nginx/nginx.pid \
 --lock-path=/var/lock/nginx.lock \
 
+--user=www \
+--group=www \
+
+- 临时文件缓冲目录
+--http-client-body-temp-path=/var/tmp/nginx/client \ 上传文件临时缓冲目录(高并发上传大文件临时存放目录)
+--http-proxy-temp-path=/var/tmp/nginx/proxy \ 代理服务器缓冲目录
+--http-fastcgi-temp-path=/var/tmp/nginx/fastcgi \ Fastcgi 临时缓冲目录
+--http-uwsgi-temp-path=/var/tmp/nginx/uwsgi \
+--http-scgi-temp-path=/var/cahe/nginx/scgi
+
 - 编译模块：启用--with, 禁用--without
 --with-http_ssl_module \
---with-http_stub_status_module \		状态页
+--with-http_stub_status_module \ 状态页
 --with-http_gzip_static_module \
 --with-http_flv_module \
 --with-http_mp4_module \
@@ -242,17 +259,12 @@ enabled=1`
 --with-zlib=../zlib-1.2.8 \
 --with-openssl=../openssl-master
 
-- 临时文件缓冲目录
---http-client-body-temp-path=/var/tmp/nginx/client \	上传文件临时缓冲目录
---http-proxy-temp-path=/var/tmp/nginx/proxy \			代理服务器缓冲目录
---http-fastcgi-temp-path=/var/tmp/nginx/fastcgi \		Fastcgi临时缓冲目录
---http-uwsgi-temp-path=/var/tmp/nginx/uwsgi \
---http-scgi-temp-path=/var/cahe/nginx/scgi
-
 ~]# make && make install
 ```
 
 ## Nginx 信号控制
+
+`~]# nginx -s {stop|}`
 
 - TERM,INT: Quick shutdown
 - QUIT： gracefull shutdown，优雅关闭进程，等待请求结束后在关闭
@@ -269,54 +281,57 @@ enabled=1`
   - sbin 二进制程序
 
 - 启动服务: `# /usr/local/nginx/sbin/nginx`
-
 - 重读配置文件: `# nginx -HUB PID`
-
 - 关闭服务-PID(主进程号): `# kill -QUIT pid`
-
 - kill -signal : `# cat /usr/local/nginx/log/nginx.pid`
 
+## Nginx 配置文件
 
-## 配置文件的组成部分
+- 备份 nginx.conf 文件 : `~]# cd /etc/nginx/ && cp nginx.conf{,.bak}`
+
+### 配置文件的组成部分
 
 - 主配置文件：`/etc/nginx/nginx.conf`
-  - `include conf.d/*.conf`
-- fastcgi,scgi,uwscgi的相关配置
-  - fastcgi.conf
-  - fastcgi_params
-  - fastcgif.conf.default 默认配置
+  - 导入其他相关配置文件指令：`include conf.d/*.conf`
+
+- fastcgi,scgi,uwscgi 的相关配置（主配置中引入此类文件）
+  - fastcgi.conf (fastcgi相关配置)
+  - fastcgi_params (fastcgi 参数配置文件)
+  - fastcgi.conf.default (fastcgi 默认配置文件)
+  - uwsgi_params(Pyton 相关参数配置文件)
+
 - mime.types
 
-## 配置指令（必须以分号结尾）
+### 配置指令（必须以分号结尾）
 
-`directive value1 [value2...];`
-		
+> `directive value1 [value2...];`
+
 - 支持使用变量：
   - 内置变量：由模块引入，可直接引用
-  -　自定义变量：`set variable_name value;`
-  - 应用变量：`$variable_name`
+  - 自定义变量：`set variable_name value;`
+    - 引用变量：`$variable_name`
 
-## 配置文件结构
+### 配置文件结构
 
 - main block：全局配置(对http及mail模块均有效)
 - event{ ...}：事件驱动的相关配置
-- http { ... }：http协议的相关配置
-- mail { ... }：mail相关的配置
+- http { ... }：http 协议的相关配置
+- mail { ... }：mail 相关的配置
 
 - http相关的配置
 ``` nginx.conf
 http {
-	...
-	server {
-		server_name
-		root
-		alias
-		location /uri/ {
-			...
-		}
-	}
-	server {...}
-	...
+  ...
+  server {
+    server_name
+    root
+    alias
+    location /uri/ {
+      ...
+    }
+  }
+  server {...}
+  ...
 }
 ```
 
@@ -327,65 +342,92 @@ http {
   - 优化性能的配置；
   - 用于调试、定位问题的配置；
 
-### 正常运行必备的配置
+#### 正常运行必备的配置
 
-#### user USERNAME [GROUPNAME]
+---
 
-- 指定用于运行 worker 进程的用户和组
-- user nginx nginx;
+```
+user USERNAME [GROUPNAME];
+```
 
-#### pid /PATH/TO/PID_FILE
+指定用于运行 worker 进程的用户和组
+`user nginx nginx;`
 
-- 指定nginx进程pid文件路径
-- pid /var/run/nginx.pid;
+---
 
-#### worker_rlimit_nofile number;
+```
+pid /PATH/TO/PID_FILE;
+```
 
-- 单个 worker 进程所能够打开的最大文件数
-- worker_rlimit_nofile 1024;
+指定nginx进程pid文件路径
+
+pid /var/run/nginx.pid;
+
+---
+
+```
+worker_rlimit_nofile number;
+```
+
+单个 worker 进程所能够打开的最大文件数
+`worker_rlimit_nofile 1024;`
 
 每个进程最多可打开的文件数
-```
-# ulimit -a
+
+``` shell
+~]# ulimit -a
   open files: 1024
-# ulimit -n 500 修改
+~]# ulimit -n 500 修改
 ```
 
 配置文件中修改可打开的文件数
 ``` shell
-# vim /etc/security/limits.conf
+~]# vim /etc/security/limits.conf
   soft nofile 65535 默认：默认可打开文件数
   hard nofile 100000 解释：ulimit可最多修改个数
 ```
 
-- 查看最多可打开连接数: `# cat /proc/sys/fs/file-max`
+查看最多可打开连接数: `# cat /proc/sys/fs/file-max`
 
-### 性能优化相关的配置
+---
 
-#### worker_process number | auto
+#### 性能优化相关的配置
 
-> Nginx进程平均耗费10M-12M内存
+---
 
-- worker 进程数；
-- 通常应该为 CPU 的核心数减1（原因操作系统运行一个Core）；
-- auto: nginx 1.8+支持
+```
+worker_process number | auto;
+```
+
+worker 进程数；
+
+通常应该为 CPU 的核心数减1（原因操作系统运行一个Core）；
+
+auto: nginx 1.8+支持
+
+Nginx进程平均耗费10M-12M内存
 
 - 16 core：
 - 15 core: 每个worker进程绑定每个核心（不用进程调度）
 - 1 core：运行操作系统
 
-- worker_process auto;
+`worker_process auto;`
+
+``` shell
+~]# ps aux
+~]# lscpu
+  CPU(s) : 4 (CPU总个数)
+  On-line CPU(s) list: 0-3 (CPU 顺序)
+  座：2 (CPU2个)
+  Core(s) per socket: 2 (每个CPU 有 2 核)
+```
+
+---
 
 ```
-# ps aux
-# lscpu
-  CPU(s) : 4
-  On-line CPU(s) list: 0-3
-  座：2
-  Core(s) per socket: 2
+worker_cpu_affinity cpumask ...;
 ```
-
-#### worker_cpu_affinity cpumask ...;
+Nginx 绑定具体 CPU
 
 - worker_cpu_affinity auto [cpumask];
 - cpumask: 0000 0000 - 1111 1111
@@ -394,60 +436,88 @@ http {
 - 0000 0100：第2颗
 - 0000 1000：第3颗
 
-#### worker_processes 2;
+```
+worker_processes 2;
+worker_cpu_affinity 0010 0100; 第1个和第2个颗
+~]# ps axo command,pid,psr
+```
 
-- worker_cpu_affinity 0010 0100; 第1个和第2个颗
-- `# ps axo command,pid,psr`
+---
 
-#### worker_priority number;
+```
+worker_priority number;
+```
+进程优先级: [-20,19] 100-139
+```
+worker_priority -5;
+~]# ps axo command,pid,psr,ni
+```
 
-- 进程优先级
-- [-20,19] 100-139
-- worker_priority -5;
-- `# ps axo command,pid,psr,ni`
+---
 
-### 调式、定位问题
+#### 调式、定位问题
 
-#### daemon on | off;
+```
+daemon on | off;
+```
+是否守护进程方式启动nginx进程；默认on; 调试是 off，前台查看信息
 
-- 是否守护进程方式启动nginx进程；
-- 默认on
-- 调试是off，前台查看信息
+---
 
-#### master_process on | off;
+```
+master_process on | off;
+```
 
-- 正常：是否以master/worker模型启动nginx进程
-- 调试：off
+正常：是否以`master/worker`模型启动nginx进程; 调试：off
 
-#### error_log file | stderr | syslog:server=address[,parameters=value] | memory:size [debug | info | notice |warn | error | crit | alert | emerg];
+---
 
-- 错误日志文件的记录方式及其日志级别
+```
+error_log file | stderr | syslog:server=address[,parameters=value] | memory:size [debug | info | notice |warn | error | crit | alert | emerg];
+```
 
-- `file /PATH/TO/SOME_LOG_FILE;`
-- `stderr`：发送到错误输出; 当前终端
-- `syslog:server=address[,parameter=value]`:发送给 syslog 服务器
-- `memory:size` （大量并发时性能更佳）
-  - 打开缓冲：写入内存，然后定期写入到磁盘上
+错误日志文件的记录方式及其日志级别
 
-- 日志级别：
-  - debug依赖于configure时的`--with-debug`模块选项;
+- 方式：
+  -`file /PATH/TO/SOME_LOG_FILE;`
+  - `stderr`：发送到错误输出; 当前终端
+  - `syslog:server=address[,parameter=value]`:发送给 syslog 服务器
+  - `memory:size` （大量并发时性能更佳）
+    - 打开缓冲：写入内存，然后定期写入到磁盘上
+- 日志级别:
+  - debug 依赖于 `configure` 时的`--with-debug`模块选项;
+
+---
 
 ### 事件相关的配置
 
-#### worker_connections number;
+---
+
+```
+worker_connections number;
+```
 
 - 每个worker进程所能够**并发**打开的最大连接数: 65535
 - 依赖于：`worker_rlimit_nofile`
 - 最大并发连接数：`worker_processes * worker_connections`
 
-#### use method;
+---
+
+```
+use method;
+```
 
 - 指明并发了请求处理时使用的方法
 - use epoll;  
 
-#### accept_mutex on(default) 或 off;
+---
 
-- 启用时，表示用于让多个worker进程轮流的、序列化的响应新请求
+```
+accept_mutex on(default) 或 off;
+```
+启用时，表示用于让多个worker进程轮流的、序列化的响应新请求
+
+---
 
 ### http配置
 
@@ -456,9 +526,9 @@ http {
 - 配置一个虚拟主机
 ```
 server {
-	listen PORT;
-	server_name HOSTNAME;
-	root /PATH/TO/DOCUMENTROOT;
+  listen PORT;
+  server_name HOSTNAME;
+  root /PATH/TO/DOCUMENTROOT;
 }
 ```
 
