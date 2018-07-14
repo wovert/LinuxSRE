@@ -4,6 +4,8 @@
 
 HTML: Hyper Text Mark Language, 编程语言，超文本标记语言
 
+HTTP 协议的的应用是 WWW
+
 MIME(Multiple Internet Mail Extension) 多用途互联网邮件协议
 
 major/minor: text/html, text/plain, images/jpeg, ...
@@ -30,7 +32,13 @@ http 事务：request <-> response
 <body>
 ```
 
-## 协议版本
+## WWW
+
+> World  Wide Web, 万维网
+
+HTTP服务=WWW服务=Web服务
+
+## HTTP 协议版本
 
 - http/0.9: 原型版本，功能简陋
 - http/1.0: cache, MIME, method
