@@ -10,12 +10,12 @@
 
 ### 终端的类型
 
-- 物理终端
-将显示器、键盘鼠标直接接在主机的接口之上，即本机自带的，直接连入的，我们称之为物理终端。物理控制台 console 表示 `/dev/console`
+物理终端
+> 将显示器、键盘鼠标直接接在主机的接口之上，即本机自带的，直接连入的，我们称之为物理终端。物理控制台 console 表示 `/dev/console`
 在系统启动的时候，服务还没有全部起来，这个时候映射的是物理终端，在服务完成启动之后映射的是虚拟终端，当然还有图形终端。
 
-- 虚拟终端
-系统提供的6个虚拟终端，这些终端附加在物理终端之上的，用软件的方式虚拟实现的终端 centos 默认启用 6 个虚拟终端，可以使用快捷键来切换不同虚拟终端
+虚拟终端
+> 系统提供的6个虚拟终端，这些终端附加在物理终端之上的，用软件的方式虚拟实现的终端 centos 默认启用 6 个虚拟终端，可以使用快捷键来切换不同虚拟终端
 
 切换方式：`Ctrl+Alt+F[1-6]`
 
@@ -23,24 +23,20 @@
 
 系统启动之后通过虚拟终端来登录系统，即便是在物理设备上。
 
-**图形终端**
+图形终端
+> 附加在物理终端之上，用软件方式虚拟实现的终端，但额外会提供桌面环境，切换方式：`Ctrl+Alt+F7`
 
-附加在物理终端之上，用软件方式虚拟实现的终端，但额外会提供桌面环境，切换方式：`Ctrl+Alt+F7`
-
-**伪终端**
-
-图形界面下打开的命令行接口，还有基于ssh协议和telnet协议等远程打开的命令行界面
+伪终端
+> 图形界面下打开的命令行接口，还有基于ssh协议和telnet协议等远程打开的命令行界面
 
 伪终端路径文件设备： `/dev/pts/#`
 
-**串行终端**
+串行终端
+> 伪终端路径文件设备：`/dev/ttyS[0-3]` 串口
 
-伪终端路径文件设备：`/dev/ttyS[0-3]` 串口
+查看当前的终端设备命令: `# tty`
 
-- 查看当前的终端设备命令
-`# tty`
-
-- 终端实际上一个设备，一个设备要想与系统进行交互，必须有交互接口，当开启一个终端时，系统会自动在终端上运行一个交互式程序。
+终端实际上一个设备，一个设备要想与系统进行交互，必须有交互接口，当开启一个终端时，系统会自动在终端上运行一个交互式程序。
 
 ## 交互式程序
 
@@ -117,63 +113,84 @@
 - `echo` 回显
 - `ping` 探测网络上目标主机与当前主机之间的连通性
 
-- 关机命令：
-	+ CentOS 7:
-		`~]# systemctl poweroff`
-		`~]# systemctl reboot`
+关机命令
 
-	+ 通用命令
-		`~]# poweroff`
-		`~]# hatl`
-		`~]# reboot`
+``` CentOS 7
+~]# systemctl poweroff
+~]# systemctl reboot
+```
 
-- shutdown:
-`shutdown [OPTIONS...] [TIME] [WALL...]`
-	+ OPTIONS:
-		* -h: halt
-		* -c: cancle
-		* -r: reboot
-	+ TIME:
-		* now
-		* hh:mm
-		* +m
-		* +0=now
+``` 通用命令
+~]# poweroff
+~]# hatl
+~]# reboot
+```
 
-- `WALL` 向所有终端发送信息
-	
-`# shutdown -r +5 "after 5 minutes shutdown"`
-`# wall "message information"`
+``` shutdown
+shutdown [OPTIONS...] [TIME] [WALL...]
+OPTIONS:
+  -h: halt
+  -c: cancle
+  -r: reboot
+TIME:
+  now
+  hh:mm
+  +m
+  +0=now
+```
+
+```
+WALL
+向所有终端发送信息
+```
+
+```
+# shutdown -r +5 "after 5 minutes shutdown"
+# wall "message information"
+```
 
 **自由含义：自由学习和修改；自由使用；自由分发；自由创建衍生版；**
 
 ## Linux 哲学思想
+
 1. 一切皆文件；
+
 把几乎所有的资源统统抽象为文件形式；包括硬件设备，甚至通信接口等；
 open(), read(), write(), close(), delete(), create()
+
 2. 由众多目的单一的小程序组成；一个程序只做一件事，且做好；
+
 组合目的单一的小程序完成复杂任务；
+
 3. 尽量避免跟用户交互；
+
 易于以编程的方式实现自动化任务；
+
 4. 使用文本文件保存配置信息；
+
 5. 提供机制，而非策略；
 
 ## 文件是什么？众多文件如何有效组织起来？
 
 ### 文件
+
 > 存储空间存储的一段流式数据，对数据可以做到按名存取；
+
 文件必须有名字，文件名与文件内容没有关系，文件名是文件的外围属性。
 所以文件是文件名、大小、属性这些外围属性所组成的
 
 - 文件有两类数据
-	+ 元数据：metadata, 文件名，大小属性等
-	+ 数据：data
+  - 元数据：metadata, 文件名，大小属性等
+  - 数据：data
 
 文件索引信息就是元数据，而元数据所指向的就相当于数据。目录也是一种文件，是一种特殊的文件。
 
 ### 目录
+
 > 是路径映射
 
 ### 文件名使用法则
+
 - 文件名严格区分字符大小写
 - 目录也是文件，在同一路径下，两个文件不能同名；
 - 文件名使用出了 / 以外的任意字符，但不建议使用特殊字符
@@ -183,156 +200,181 @@ open(), read(), write(), close(), delete(), create()
 - .. 当前目录的上一级目录
 
 ### 文件系统： 层级结构；有索引；
+
 - /: 原初起点，根目录
 - 第二层结构，子目录
 - 第三层结构，子目录
 - 倒置树状结构
 
 - /dev/pts/2:
-	+ 最左侧的`/`：表示**根目录**
-	+ 其他的`/`：表示**路径分隔符**
-		* Linux 的路径分隔符是 `/`
-		* Windows 的是 `\`
+  - 最左侧的`/`：表示**根目录**
+  - 其他的`/`：表示**路径分隔符**
+    - Linux 的路径分隔符是 `/`
+    - Windows 的是 `\`
 
 ### 文件的路径表示：
+
 - 绝对路径：从根开始表示出的路径
 - 相对路径：从当前位置开始表示出的路径
 
 ### 用户家目录 home
+
 > 用户的起始目录：普通用户管理文件的位置
 
-### 工作目录：
-`/etc/sysconfig/network-scripts/ifcfg-eno16777736`
+### 工作目录
+
+```
+/etc/sysconfig/network-scripts/ifcfg-eno16777736
 `basename` 最右侧的文件或目录名
 `dirname` basename 左侧的路径
+```
 
-`~]# basename /PATH/TO/SOMEFILE`
-**SOMEFILE**
+`~]# basename /PATH/TO/SOMEFILE` **SOMEFILE**
 
-`~]# dirname /PATH/TO/SOMEFILE`
-**/PATH/TO**
+`~]# dirname /PATH/TO/SOMEFILE` **/PATH/TO**
 
 ## 参考书籍
+
 - 《穿越计算机的迷雾》
 - 《量子物理史话》
-
 
 ## 命令格式
 
 ### 命令的语法通用格式:
-- `COMMAND [OPTIONS...] [ARGUMENTS...]`
-- 命令     选项    参数
+
+```
+COMMAND [OPTIONS...] [ARGUMENTS...]
+命令     选项    参数
+```
 
 ### COMMAND
+
 > 发起一个命令，请求内核将某个二进制程序运行为一个进程：
+
 - 程序转为进程
 - 静态转为动态（有生命周期）
 
 - 命令本身是一个可执行的程序文件：二进制格式的文件，有可能会调用共享库文件
-	+ 多数系统自带程序文件都存放在：**/bin, /sbin, /usr/bin, /usr/sbin**
-	+ 第三方程序文件：**/usr/local/bin, /usr/local/sbin**
+  - 多数系统自带程序文件都存放在：**/bin, /sbin, /usr/bin, /usr/sbin**
+  - 第三方程序文件：**/usr/local/bin, /usr/local/sbin**
 
-	+ 普通命令： **/bin, /usr/bin, /usr/local/bin**
-	+ 管理命令：**/sibn, /usr/sbin, /usr/local/sbin**
+  - 普通命令： **/bin, /usr/bin, /usr/local/bin**
+  - 管理命令：**/sibn, /usr/sbin, /usr/local/sbin**
 
-	+ 注意：并非所有的命令都有一个在某目录与之对应的可执行程序文件（内置命令）
+  - 注意：并非所有的命令都有一个在某目录与之对应的可执行程序文件（内置命令）
 
-	+ 共享库：**/lib, /lib64, /usr/lib, /usr/lib64, /usr/local/lib, /usr/local/lib64**
-		* 32bits 库：**/lib, /usr/lib, /usr/local/lib**
-		* 64bits 库：**/lib64, /usr/lib64, /usr/local/lib64**
+  - 共享库：**/lib, /lib64, /usr/lib, /usr/lib64, /usr/local/lib, /usr/local/lib64**
+    - 32bits 库：**/lib, /usr/lib, /usr/local/lib**
+    - 64bits 库：**/lib64, /usr/lib64, /usr/local/lib64**
 
 ### 命令必须遵循特定格式规范
+
 - Windows: **exe,msi**
 - Linux: **ELF**
 
-- 查看可执行文件格式
-`~]# file /bin/ls`
+查看可执行文件格式: `~]# file /bin/ls`
 
 ### 命令分类
+
 - __内置命令__(builtin)：由shell程序自带的命令
 - __外部命令__：独立的可执行程序文件，文件名即命令名
 
 注意：命令可以有别名，别名可以与原名相同，此时原名被隐藏；此时如果要运行**原命令**，则使用`\command`
 
 ### alias 命令别名
-- 获取所有可用别名的定义：
-`~]# alias`
 
-- 定义别名：仅对当前shell有效
-`~]# alias COMMAND_ALIAS='COMMAND'`
-		
+获取所有可用别名的定义：`~]# alias`
+
+定义别名：仅对当前shell有效：`~]# alias COMMAND_ALIAS='COMMAND'`
+
+更新补丁：`# yum update`
+
+安装常用工具：`# yum -y install lrzsz telnet tree nmap nc`
+
 ### shell程序是独特的程序，负责解析用户提供的命令
+
 - 环境变量
-	+ **PATH**：从哪些路径中查找用户键入的命令字符串所对应的命令文件
-		* `~]# echo $PATH`
-		* /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin
-	+ 查找次序：自左而右
-	+ 注意：只有**外部命令**根据环境变量`$PATH`查找命令文件
+  - **PATH**：从哪些路径中查找用户键入的命令字符串所对应的命令文件
+    - `~]# echo $PATH`
+    - /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin
+  - 查找次序：自左而右
+  - 注意：只有**外部命令**根据环境变量`$PATH`查找命令文件
 
 ### 查看命令类型
+
 `~]# type COMMAND`
 
-###	OPTIONS 选项
+### OPTIONS 选项
+
 > 调整命令的运行特性
 
 - 选项分类
-	+ 短选项：-C，例如：-l, -ld
-		* 同一命令同时使用多个短选项，多数可合并：-l -d = -ld
-		* 注意：有些命令的选项没有-
-		
-	+ 长选项：-word, 例如：--help, --human-reable
-		* 注意：长选项不能合并多个选项
+  - 短选项：-C，例如：-l, -ld
+    - 同一命令同时使用多个短选项，多数可合并：-l -d = -ld
+    - 注意：有些命令的选项没有-
 
-	+ 注意：有些选项可以带参数，称为**选项参数**
+  - 长选项：-word, 例如：--help, --human-reable
+    - 注意：长选项不能合并多个选项
+
+  - 注意：有些选项可以带参数，称为**选项参数**
 
 ### ARGUMENTS 参数
+
 > 命令的作用对象；命令对什么生效
 
 `~]# ls -l /var`
+
 - 注意：不同的命令的参数，有些命令可同时带**多个参数**，多个之间以空白字符分割
+
 `~]# ls -l -l /var /etc` 命令 -选项 -选项 参数 参数
 
 ### 执行多个命令
+
 `~]# command; command; command`
 
 ### 取消命令
-`Ctrl+c` 终止命令执行
 
+`Ctrl+c` 终止命令执行
 
 ## 命令帮助
 
 ### 内建命令 `help COMMAND`
+
 `~]# help cd`
-	
+
 ### 外部命令
+
 #### 1. 简要格式使用帮助
+
 `~]# COMMAND --help`
 
 #### 2. 使用手册：manual
-- 系统手册路径
-`/usr/share/man`
 
-- 查看手册
-`~]# man COMMAND`
+系统手册路径：`/usr/share/man`
+
+查看手册：`~]# man COMMAND`
 
 - SECTION 章节
-	+ NAME: 简要功能性说明
-	+ SYNOPSIS: 命令使用格式; 概要；大纲
-	+ DESCRIPTION: 描述
-	+ OPTIONS: 选项
-	+ EXAMPLES: 使用示例
-	+ AUTHORS: 作者
-	+ BUGS: 报告程序bug的方式
-	+ SELL ALSO: 参见
+  - NAME: 简要功能性说明
+  - SYNOPSIS: 命令使用格式; 概要；大纲
+  - DESCRIPTION: 描述
+  - OPTIONS: 选项
+  - EXAMPLES: 使用示例
+  - AUTHORS: 作者
+  - BUGS: 报告程序bug的方式
+  - SELL ALSO: 参见
 
 ##### SYNOPSIS
+
 - **[]** 可选内容
 - **<>** 必须提供的内容
 - **a|b** 多选一
 - **...** 同类内容可出现多个
 
 #### 使用手册：压缩格式的文件，有章节之分
+
 `/user/share/man`
+
 man1, man2, ...
 
 - **1: Executale programs or shell commands** 	普通用户和管理员可执行的命令
@@ -345,72 +387,83 @@ man1, man2, ...
 - **8： Administrator command；** 管理工具及守护进程
 
 `~]# man [1-8]? COMMAND`
+
 - 注意：并非每个command在所有章节都有手册
 
-- 查看命令有哪些章节：
-`~]# whatis COMMAND`
-`~]# man -f Keyword` 精确查找
+查看命令有哪些章节
+```
+~]# whatis COMMAND
+~]# man -f Keyword 精确查找
+```
 
 - 注意：whatis 执行过程是查询数据库进行
 - 手动更新数据：
-	+ CentOS 6: `~]# makewhatis`
-	+ CentOS 7: `~]# mandb`
+  - CentOS 6: `~]# makewhatis`
+  - CentOS 7: `~]# mandb`
 
 - 指定目录下查找手册
-`~]# man -M /PAHT/TO/SOMEDIR COMMAND`
+
+```
+~]# man -M /PAHT/TO/SOMEDIR COMMAND
 /usr/share/man 目录复制到其他目录下
 man1, man5, man8 等
+```
 
-- 模糊查找
-`~]# man -k Keyword`
+模糊查找: `~]# man -k Keyword`
 
 ##### man命令打开手册以后的操作方法：
+
 - __翻屏__
-	+ `空格键` 向文件尾部翻一屏
-	+ `b` 向文件首部翻一屏
+  - `空格键` 向文件尾部翻一屏
+  - `b` 向文件首部翻一屏
 
-	+ `Ctrl+d` 向文件尾部翻半屏
-	+ `Ctrl+u` 向文件首部翻半屏
-	
-	+ `回车键` 向文件尾部翻一行
-	+ `k` 向文件首部翻一行
+  - `Ctrl+d` 向文件尾部翻半屏
+  - `Ctrl+u` 向文件首部翻半屏
 
-	+ `G` 跳转至最后一行
-	+ `nG` 跳转至指定行
-	+ `1G` 跳转至文件首部
-	
+  - `回车键` 向文件尾部翻一行
+  - `k` 向文件首部翻一行
+
+  - `G` 跳转至最后一行
+  - `nG` 跳转至指定行
+  - `1G` 跳转至文件首部
+
 - __搜索__：查找时不分区大小写
-	+ `/keyword` 从文件首部向文件尾部依次查找
-	+ `?keyword` 从文件尾部向文件首部依次查找
-	+ `n` 同方向查找下一个
-	+ `N` 反方向查找下一个
+  - `/keyword` 从文件首部向文件尾部依次查找
+  - `?keyword` 从文件尾部向文件首部依次查找
+  - `n` 同方向查找下一个
+  - `N` 反方向查找下一个
 
 - __退出__
-	+ `q` 退出
+  - `q` 退出
 
 #### 3. `info COMMAND`
+
 > 获取命令的在线文档
 
 #### 4. 程序自带的帮助文件：`/usr/share/doc/APP-VERSION`
+
 - __README__: 程序的相关的信息
 - __INSTALL__: 安装帮助
 - __CHANGES__: 版本迭代时的改动信息
 
 #### 5. 主流发行版官方文档
+
 - http://www.redhat.com/doc
 
 #### 6. 程序的官方文档
+
 - 官方站点上的 **Document**
 
 #### 7. 搜索引擎
+
 - google0
-	+ `filetype: pdf`
-	+ `................................0site:lingyima.com`  
-		* domain.tld(top level domain)
-	+ `intitle: `
-	+ `inurl:`
-	+ `intext:`
-		
+  - `filetype: pdf`
+  - `................................0site:lingyima.com`  
+    - domain.tld(top level domain)
+  - `intitle: `
+  - `inurl:`
+  = `intext:`
+
 #### 8. 书籍出版社
 
 - 外文书籍
@@ -422,13 +475,17 @@ man1, man5, man8 等
 
 1. 添加用户 gentoo
 
-`~]# useradd gentoo`
-`~]# id gentoo`
+```
+~]# useradd gentoo
+~]# id gentoo
+```
 
 2. 添加用户 slackware，要求指定其所用的 shell 为 /bin/tcsh
 
-`~]# useradd -s /bin/tcsh slackware`
-`~]# tail -1 /etc/passwd`
+```
+~]# useradd -s /bin/tcsh slackware
+~]# tail -1 /etc/passwd
+```
 
 ## 常用命令
 
@@ -449,35 +506,34 @@ man1, man5, man8 等
 
 - 环境变量
 
-`~]# echo $HOME`
-
-`~]# echo $PWD`
-
-`~]# echo $OLDPWD`
+```
+~]# echo $HOME
+~]# echo $PWD
+~]# echo $OLDPWD
+```
 
 #### 列出指定目录下的文件列表 - list
 
-`ls [OPTIONS]... [FILE]...`
-
-`ls` options
-
 ```
--a : 显示所有文件，包括隐藏文件
--A :  显示所有文件，除了.和..的所有隐藏文件
--r,--reverse : 逆序显示
--R,--recursive : 递归显示
--i, --inode
---file-type：/
+ls [OPTIONS]... [FILE]...
 
--lc ctime
--lu atime
--t : 按修改时间先后显示
--m : 填满宽度的逗号分隔列表条目
--S : 以文件大小排序显示
+ls options
+  -a : 显示所有文件，包括隐藏文件
+  -A :  显示所有文件，除了.和..的所有隐藏文件
+  -r,--reverse : 逆序显示
+  -R,--recursive : 递归显示
+  -i, --inode
+  --file-type：/
 
--d, --directory : 查看目录自身属性信息，结合使用l选项，-ld
--h, --human-readable : 人为可读的格式显示，换算后的结果会丢失精度
--l，--long : 长格式列表，即显示文件的详细属性信息
+  -lc ctime
+  -lu atime
+  -t : 按修改时间先后显示
+  -m : 填满宽度的逗号分隔列表条目
+  -S : 以文件大小排序显示
+
+  -d, --directory : 查看目录自身属性信息，结合使用l选项，-ld
+  -h, --human-readable : 人为可读的格式显示，换算后的结果会丢失精度
+  -l，--long : 长格式列表，即显示文件的详细属性信息
 ```
 
 - 文件类型：属主权限：属组权限：其他权限：隐藏属性：硬链接数：文件的属主:文件的属组：文件大小（字节）：最近一次被修改日期：文件名
@@ -489,13 +545,13 @@ man1, man5, man8 等
 
 #### mkdir：make directories
 
-`mkdir [OPTION]... DIRECTORY...`
+```
+mkdir [OPTION]... DIRECTORY...
 
-`-p` 自动按需创建父目录
-
-`-v` verbose，显示详细过程
-
-`-m MODE` 直接给定权限
+-p 自动按需创建父目录
+-v verbose，显示详细过程
+-m MODE 直接给定权限
+```
 
 - 注意：路径基名方为命令的作用对象；基名之前的路径必须得存在；
 
@@ -503,22 +559,26 @@ man1, man5, man8 等
 
 #### rmdir：remove empty directories
 
-`rmdir [OPTION]... DIRECTORY...`
+```
+rmdir [OPTION]... DIRECTORY...
 
-`p` 删除某目录后，如果其父目录为空，则一并删除之；
-
-`v` verbose
+p 删除某目录后，如果其父目录为空，则一并删除之；
+v verbose
+```
 
 ---
 
 #### mktemp 命令：create a temporary file or directory
 
-`mktemp [OPTION]... [TEMPLATE]`
-`-d, --directory` 创建临时目录
-`-u, --dry-run` do not create anything
+```
+mktemp [OPTION]... [TEMPLATE]
+-d, --directory` 创建临时目录
+-u, --dry-run` do not create anything
+```
 
 `~]# mktemp XXX.ab`
-- 注意：mktemp 会将创建的临时文件名直接返回，因此，可直接通过命令引用保存起来
+
+注意：mktemp 会将创建的临时文件名直接返回，因此，可直接通过命令引用保存起来
 
 ---
 
@@ -526,18 +586,16 @@ man1, man5, man8 等
 
 #### 查看文件内容类型
 
-`file [FILE]...`
-ASCII, ELF
+`file [FILE]...` ASCII, ELF
 
 ---
 
 #### 查看文件内容
 
-1. `cat [OPTION]... [FILE]..`
+```
+cat [OPTION]... [FILE]..
 
-- OPTIONS
-
-``` options
+options
 -n, --number : 显示行号
 -E, --show-ends : 显示行结束符
 -v， --show-nonpriting : 显示非打印字符
@@ -546,25 +604,43 @@ ASCII, ELF
 ~]# cat /etc/fstab /etc/issue
 ```
 
-2. `tac [-n] [-E]`
+---
 
-3. `more/less` 命令
-
-4. `head命令` 查看文件的前n行
-
-`n #` 或者 `-#`
-
-5. `tail` 查看文件的后n行
-
-`n #` 或者 `-#`
-
-`-f` 查看文件尾部内容结束后不退出，跟随显示新增的行
+```
+tac [-n] [-E]
+```
 
 ---
 
+```
+more/less
+```
+
+---
+
+```
+head
+查看文件的前n行
+n # 或者 -#
+```
+
+---
+
+```
+tail
+查看文件的后n行
+
+n #  或者 -#
+-f 查看文件尾部内容结束后不退出，跟随显示新增的行
+```
+
 #### 从标准输入获取内容创建和执行命令
 
-`xargs -n 数字` 一行显示列数(空白字符分割)
+```
+xargs -n 数字
+
+一行显示列数(空白字符分割)
+```
 
 ``` shell
 # echo 1 2 3 4 5 > file.txt
@@ -575,11 +651,11 @@ ASCII, ELF
 
 #### 回显
 
-`echo [SHORT-OPTION]... [STRING]...`
+```
+echo [SHORT-OPTION]... [STRING]...
 
-`echo` OPTIONS
+echo OPTIONS
 
-``` shell
 -n : do not output the trailing newline
 -e : 转义符生效
   \r: 回车符
@@ -619,79 +695,93 @@ ASCII, ELF
 ### 日期相关命令
 
 > 系统启动时从硬件读取日期和时间信息；读取完成以后，就不在与硬件相关联
+
 - 系统时钟
 - 硬件时钟
 
 ---
 
-#### date：系统时钟
+```
+date [OPTIONS]... [+FORMAT]
 
-- 显示日期时间：`date [OPTIONS]... [+FORMAT]`
+系统时钟
 
-- `+FORMAT`:
-`%F` fulldate
-`%Y` year
-`%m` month
-`%d` day
-`%T` time
-`%H` hour
-`%M` minute
-`%S` second
-`%s` unixtimestamp, unix元年 1970-1-1 0:0:0之后经过的秒数
++FORMAT:
+  %F fulldate
+  %Y year
+  %m month
+  %d day
+  %T time
+  %H hour
+  %M minute
+  %S second
+  %s unixtimestamp, unix元年 1970-1-1 0:0:0之后经过的秒数
+```
 
 `~]# date +"%F %T"`
 
-- 设定日期时间：`date [-u|--utc|--universal] [MMDDhhmm[[CC]YY][.ss]]`
+设定日期时间：`date [-u|--utc|--universal] [MMDDhhmm[[CC]YY][.ss]]`
 
 ---
 
-#### clock 硬件时钟
+```
+clock 硬件时钟
 
-> 是 hwclcok 的软链接
+是 hwclcok 的软链接
+```
+---
+
+```
+hwclock - query or set the hardware clock(RTC)
+
+-s, --hctosys : Set the System Time from the Hardware Clock.
+-w, --systohc : Set the Hardware Clock to the current System Time.
+```
 
 ---
 
-#### hwclock - query or set the hardware clock(RTC)
-
-`-s, --hctosys`
-Set the System Time from the Hardware Clock.
-
-`-w, --systohc`
-Set the Hardware Clock to the current System Time.
+```
+cal [options] [[[day] month] year]
+```
 
 ---
 
-#### cal 命令
+```
+which OPTIONS
 
-`cal [options] [[[day] month] year]`
-
----
-
-### which 命令
-
-`--skip-alias` 忽略别名
+OPTIONS:
+  --skip-alias 忽略别名
+```
 
 ---
 
-### whereis 命令
+```
+whereis OPTIONS
 
-`-b` binary path
+OPTIONS:
+-b binary path
 
-`-m` man path
-
----
-
-### who 命令
-
-`-b` 最近一次系统启动时间
-
-`-r` runlevel
-
-`-u` 显示进程号
+-m man path
+```
 
 ---
 
-### `w` 增强版的 who 命令
+```
+who options
+
+options:
+  -b 最近一次系统启动时间
+  -r runlevel
+  -u 显示进程号
+```
+
+---
+
+```
+w 
+
+增强版的 who 命令
+```
 
 - IDEL
 - JCPU 与该tty终端连接的所有进程占用的时间，不包括过去的后台作业时间
@@ -727,33 +817,38 @@ Set the Hardware Clock to the current System Time.
 
 #### mv 命令
 
-`mv [OPTION]... SOURCE... DIRECTORY`
-
-`mv [OPTION]... -t DIRECTORY SOURCE...`
-
-`mv` options
-
 ```
--i : interactive
--f : force
+mv [OPTION]... SOURCE... DIRECTORY
+mv [OPTION]... -t DIRECTORY SOURCE...
+
+options
+  -i : interactive
+  -f : force
 ```
 
-#### rm 命令 - remove
+---
 
-- options
-`-i` interactive
-`-f` force
-`-r` recursive
-- 注意：所有不用的文件建议不要直接删除，而是移动至某个专用目录；（模拟回收站
+```
+rm
 
-#### cp 命令 - copy
+options
+ -i interactive
+ -f force
+ -r recursive
+
+注意：所有不用的文件建议不要直接删除，而是移动至某个专用目录；（模拟回收站
+```
+
+---
+
+```
+cp 命令 - copy
+```
 
 - 单源复制：`cp [OPTION]... [-T] SOURCE DEST`
 - 多源复制：`cp [OPTION]... SOURCE... DIRECTORY`
 
-``` shell
-# cp [OPTION]... -t DIRECTORY SOURCE...
-```
+`# cp [OPTION]... -t DIRECTORY SOURCE...`
 
 - 源复制：`cp [OPTION]... [-T] SOURCE DEST`
   - 如果 **DEST**  不存在：则事先创建此文件，并复制源文件的数据流至 **DEST** 中；
@@ -787,7 +882,11 @@ Set the Hardware Clock to the current System Time.
     all：上述所有属性
 ```
 
-#### install 命令
+---
+
+```
+install 命令
+```
 
 - 单源复制 : `install [OPTION]... [-t] SOURCE DEST` 
 
@@ -814,15 +913,20 @@ Set the Hardware Clock to the current System Time.
 # install -m 770 -o redhat -g linux -t /tmp/etc/ /etc/*
 ```
 
-#### dd 命令 - convert and copy a file
+---
 
-`# dd if=/PATH/FROM/SRC of=/PATH/TO/DEST bs=block size count=数量`
-- bs=#，block size，复制单元大小，单位：byte
+```
+dd 命令 - convert and copy a file
 
-- 磁盘对考：`~]# dd if=/dev/sda of=/dev/sdb`
-- 备份 MBR: `~]# dd if=/dev/sda of=/tmp/mbr.bak bs=512 count=1`
-- 清除分区：`~]# dd if=/dev/zero of=/dev/sda bs=512 count=1`
-- 破坏MBR中的Bootloader：`~]# dd if=/dev/zero of=/dev/sda bs=256 count=1`
+# dd if=/PATH/FROM/SRC of=/PATH/TO/DEST bs=block size count=数量`
+
+bs=#，block size，复制单元大小，单位：byte
+
+磁盘对考：`~]# dd if=/dev/sda of=/dev/sdb`
+备份 MBR: `~]# dd if=/dev/sda of=/tmp/mbr.bak bs=512 count=1`
+清除分区：`~]# dd if=/dev/zero of=/dev/sda bs=512 count=1`
+破坏MBR中的Bootloader：`~]# dd if=/dev/zero of=/dev/sda bs=256 count=1`
+```
 
 - 两个特殊设备
   - `/dev/null` 数据黑洞

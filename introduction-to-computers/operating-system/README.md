@@ -699,3 +699,16 @@ Android：Linux kernel + busybox + jvm(java) + android(GUI)
   - Debian: deb(.dpkg), apt-get
   - ArchLinux: pacman
   - Gentoo: portage
+
+## 4G 与 PAE 技术
+
+
+## 查看32位于64位
+
+``` shell
+# uname -a
+# ls -ld /lib64
+# cat /etc/redhat-release 操作系统
+# uname -r 内核版本
+# uname -r 查看系统位数
+```

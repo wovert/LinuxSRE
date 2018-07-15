@@ -195,4 +195,11 @@ find 示例
 刪除修改日期在30天以前，且以 file 名称结尾的目录
 # find /log -type f -name "*file" -mtime +30 | xargs rm -rf
 
+查找*.txt类文件并移动到/tmp目录
+data]# touch {1...10}.txt
+data]# cd ..
+/]# mv `find /data -type f -name  "*.txt"` /tmp/
+
+
+
 ```
