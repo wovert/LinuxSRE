@@ -262,6 +262,77 @@ enabled=1`
 ~]# make && make install
 ```
 
+Nginx不支持动态装载米快，所以要确保编译php工作为fpm机制时将ngx_http_fastcgi_module编译到Nginx程序中，在./configure时候要加入--enable-fpm选项
+
+php-fpm程序包
+
+php-fpm包提供fcgi模式的php程序端，其不能和php程序包同时安装。RPM形式安装完成后提供主配置文件/etc/php-fpm.conf，分段配置文件/etc/php-fpm.d/*。
+
+/etc/php-fpm.d/www.conf配置文件(根据实际情况配置)：
+
+; 表示注释该行信息
+
+listen  = 127.0.0.1:9000 监听端口，0.0.0.0表示本机所有地址;支持远程调用应该监听在本机的远程通信端口
+
+;listen.backlog =  -1 后援等待队列的长度，-1表示无限制(服务器可以接受请求的客户端Socket的最大数量)
+
+listen.allowed_clients = 127.0.0.1 授权允许可请求主机，基于IP的控制机制，注释表示允许所
+
+;listen.owner =  nobody 监听服务进程的主机默认以什么用户身份运行，nobody表示普通用户
+
+;listen.group =  nobody 监听服务进程的主机默认以什么用户组身份运行
+
+;listen.mode =  0666 监听服务进程的主机默认以什么权限运行
+
+user = apache 用户，RPM包制作者修改，编译安装非此结果
+
+group = apache 用户组，RPM包制作者修改，编译安装非此结果
+
+pm  = static|dynamic 进程控制器生成子进程方式
+
+;pm.status_path =  /status 状态机制
+
+;ping.path = /ping ping机制，一般用于提供监控机制
+
+php_admin_value[error_log]  = 连接池错误日志位置
+
+php_admin_flag[log_errors]  = on 是否在错误日志中将于管理相关的标志打开
+
+php_value[session.save_handler]  = files php的session记录存放形式：文件
+
+php_value[session.save_path]  = php的session记录存放路径，集群是关键
+
+pm连接池模式有两种，pm = static|dynamic
+
+static：固定数量的子进程；pm.max_children；
+
+dynamic：子进程数据以动态模式管理；选择该项需呀启用以下配置
+
+pm.start_servers= 开始启用进程数
+
+pm.min_spare_servers= 最小空闲进程数
+
+pm.max_spare_servers=最大空闲进程数
+
+;pm.max_requests = 每个子进程自多允许响应多少请求，超过就kill
+
+
+查看连接状态，发现 SYN_RECV 状态的较多，约500
+
+通过tcpdump 抓包发现，部分80端口的tcp请求没有建立成功。在收到client发送的 SYN 包后，服务器没有响应
+
+综合以上，确定是同时到达80端口的tcp 建立链接的请求过多， 服务器没有及时响应。
+
+问题处理：
+1. 对于服务器不能及时处理建立链接的请求，可能是系统中队列设置过小。
+`/proc/sys/net/ipv4/tcp_max_syn_backlog`  中的值已经修改， 这个不是系统的瓶颈。
+2. nginx监听80端口限制。
+经查阅，发现nginx的listen 命令有参数backlog 用来指定队列大小。 而nginx 默认的值为511， 这就验证了SYN_RECV状态到500左右就会出现问题了。
+
+修改 nginx 配置， 将backlog 参数改大， 重启nginx 。 一切正常
+
+
+
 ## Nginx 信号控制
 
 `~]# nginx -s {stop|}`
@@ -460,7 +531,7 @@ worker_priority -5;
 ```
 daemon on | off;
 ```
-是否守护进程方式启动nginx进程；默认on; 调试是 off，前台查看信息
+是否守护进程方式启动nginx进程；默认on; 调试时 off，前台查看信息
 
 ---
 
@@ -498,28 +569,26 @@ worker_connections number;
 ```
 
 - 每个worker进程所能够**并发**打开的最大连接数: 65535
-- 依赖于：`worker_rlimit_nofile`
-- 最大并发连接数：`worker_processes * worker_connections`
+- 依赖于：`worker_rlimit_nofile` 最大打开
+- 最大并发连接数：`worker_processes x worker_connections <= worker_rlimit_nofile x worker_processes`
 
 ---
 
 ```
 use method;
 ```
-
-- 指明并发了请求处理时使用的方法
-- use epoll;  
+并发请求处理时使用的方法: `use epoll;`
 
 ---
 
 ```
 accept_mutex on(default) 或 off;
 ```
-启用时，表示用于让多个worker进程轮流的、序列化的响应新请求
+启用时，表示用于让多个`worker`进程轮流的、序列化的响应新请求
 
 ---
 
-### http配置
+### http 配置
 
 > 定义套接字相关功能
 
@@ -529,15 +598,13 @@ server {
   listen PORT;
   server_name HOSTNAME;
   root /PATH/TO/DOCUMENTROOT;
+  location / {...}
 }
 ```
 
-- 基于**port**的虚拟主机
-  - listen 指令要使用不同的端口；
-- 基于 **hostname** 的虚拟主机；
-  - server_name指令指向不同的主机名
-- 基于 **ip** 的虚拟主机
-  - listen IP:PORT;
+- 基于**port**的虚拟主机 : `listen` 指令要使用不同的端口
+- 基于 **hostname** 的虚拟主机 : `server_name`指令指向不同的主机名
+- 基于 **ip** 的虚拟主机 : `listen IP:PORT`;
 
 - listen address[:port][default_server][ssl][backlog=number][rcvbuf=size][sndbuf=size]
 - listen port [default_server][ssl];
@@ -561,8 +628,6 @@ server {
 3. 右侧`*`通配符匹配
 4. 正则表达式模式匹配
 
-- www.lingyima.com
-
 ``` config
 server_name www.lingyima.com;
 server_name *.lingyima.com
@@ -574,7 +639,7 @@ mail.lingyima.com, www.lingyima.com
 #### tcp_nodelay on | off;
 
 - 对 **keepalived** 模式下的连接是否启用 TCP_NODELAY 选项；
-- 服务器将小数据多个报文合并起来发送一个，web客户端影响速率。
+- 服务器将小数据多个报文合并起来发送一个，web客户端影响速率
 - 服务器不等待合并报文，直接发送小报文
 - （请求小的报文，服务器不发送了。比如图片...）
 
