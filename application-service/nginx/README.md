@@ -969,24 +969,25 @@ Context: http, server, location
 
 ## ngx_http_access_module模块
 
-> 实现基于 ip 的访问控制功能
+> 实现基于客户端 ip 的访问控制功能
 
-- http_access_module局限性：
+- http_access_module 局限性：
   - $remote_addr: proxy_ip
   - $x_forwarded_for: client_ip, proxy_ip1, proxy_ip2,...
-- http_access_module局限性 solution：
-  - 采用别http头信息控制访问，http_x_forward_for
-  - 结合geo模块
-  - http自定义变量传递
+
+- http_access_module 局限性 solution：
+  - 采用别 http 头信息控制访问，http_x_forward_for
+  - 结合 geo 模块
+  - http 自定义变量传递
 
 ```
 Syntax: allow address | CIDR | unix: | all;
 Context: http, server, location, limit_except
-```
 
-- CIDR: 网段
-- unix: socket
-- all:
+  CIDR: 网段
+  unix: socket
+  all:
+```
 
 ---
 
@@ -997,12 +998,14 @@ Context: http, server, location, limit_except
 
 ---
 
-## ngx_http_auth_basic_module模块:
+## ngx_http_auth_basic_module 模块
 
 > 实现基于用户的信任登录访问控制功能
 
 ```
-auth_basic string | off;
+Syntax: auth_basic string | off;
+Default: auth_basic off;
+Context: http,server,location,limit_except;
 ```
 
 > 使用basic机制进行用户认证
@@ -1012,7 +1015,17 @@ location / {
   auth_basic "closed site";
   auth_basic_user_file conf/htpasswd;
 }
+
 ```
+
+```
+# comment
+name1:password1
+name2:password2:comment
+name3:password3
+```
+
+
 ---
 
 ```
@@ -1022,10 +1035,10 @@ auth_basic_user_file file
 > 认证用的账号密码文件
 
 - 文件格式：明文密码
-  - name:password:comment
+  - `name:password:comment`
 
 - 密码格式：httpd模块
-  - htpasswd命令
+  - `htpasswd` 命令
 
 - 示例：-m=md5, -c=create file
 
@@ -1044,14 +1057,14 @@ location /admin/ {
 ```
 
 - solution
-  - Nginx结合Lua实现高效验证
-  - Nginx和LDAP打通，利用nginx-auth-ldap模块
+  - Nginx 结合 Lua 实现高效验证
+  - Nginx 和 LDAP 打通，利用 nginx-auth-ldap 模块
 
 ---
 
-## ngx_http_stub_status_module模块:
+## ngx_http_stub_status_module 模块
 
-> 用于输出nginx的基本状态信息（脚本获取状态信息）
+> 用于输出 nginx 的基本状态信息（脚本获取状态信息）
 
 ```
 Syntax: stub_status;
@@ -1090,16 +1103,18 @@ location /status {
   - Waiting: 处于等待客户端发出请求的**空闲**连接数
     - 很多参数，keep-alive太长了
 
-
 ## [ngx_http_random_index_module 模块](http://nginx.org/en/docs/http/ngx_http_random_index_module.html)
 
 > 目录中选择一个随机主页
 
-- Syntax: `random_index on | off`;
-- Default: `random_index off`;
-- Context: `location`
+```
+Syntax: random_index on | off;
+Default: random_index off;
+Context: location
+```
 
 实例代码
+
 ``` config
 location /{
   root /usr/share/nginx/html;
@@ -1112,17 +1127,17 @@ location /{
 
 ## Nginx 请求限制
 
-### http协议的连接与请求
+### http 协议的连接与请求
 
-- HTTP协议/连接关系
+- HTTP 协议/连接关系
 - HTTP1.0/tcp 不能复用
-- HTTP1.1/循序性TCP复用
-- HTTP2.0/多路复用TCP复用
+- HTTP1.1/循序性 TCP 复用
+- HTTP2.0/多路复用 TCP 复用
 
 - http 请求建立在一次 TCP 连接基础上
 - 一次 TCP 请求至少产生一次 HTTP 请求
 
-### 连接频率限制(握手数量限制)：limit_conn_module
+### 连接频率限制(握手数量限制)：`limit_conn_module`
 
 - Syntax: limit_conn_zone key zone=name:size;
 - Default: -
@@ -1132,7 +1147,7 @@ location /{
 - Default: -
 - Context: http, server, location
 
-### 请求频率限制(发送数量限制)：limit_req_module
+### 请求频率限制(发送数量限制)：`limit_req_module`
 
 - Syntax: limit_req_zone key zone=name:size rate=rate;
 - Default: -
@@ -1161,9 +1176,7 @@ http {
 }
 ```
 
-- 压力测试：n:总重请求数，c:并发数
-
-`# ab -n 40 -c 20 http://ip/1.html`
+- 压力测试：n:总重请求数，c:并发数 `# ab -n 40 -c 20 http://ip/1.html`
 
 - Non-2xx reponses: 16 响应数量
 
@@ -1183,6 +1196,7 @@ http {
 - Context: http, server, location
 
 ### sub_filter_last_modified
+
 - Syntax: sub_filter_last_modified on `|` off;
   - on: 判断是否更新
   - off: 判断是否更新
@@ -1209,12 +1223,14 @@ http {
 - server_names：其值是主机名，指定下面两个类型
 - arbitrary string：直接字符串，可以使用`*`作为通配符
 - regular expression：被指定的正则表达式模式匹配到的字符串
-- 要使用~起始
+  - 要使用~起始
 
 - 示例：**防盗链**
 
 ```
 valid_referer none blocked server_names *.ligyima.com lingyima.* ~\.google\.;
+# $invalid_referer 哪来的（Embedded Variables内建变量）
+# 不包含以上指定参数返回 403
 if ($invalid_referer) {
   return 403;
 }
