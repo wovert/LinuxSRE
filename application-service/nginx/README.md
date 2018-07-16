@@ -854,17 +854,18 @@ client_body_temp_path path [level1 [ level2 [level3]]]
 ### 对客户端请求进行限制的相关配置
 
 ```
-limit_rate rate;
+Syntax: limit_rate rate;
+Context: http, server, location, if in location
 ```
-
-- limit_rate 0;
-- Context: http, server, location, if in location
 
 > 限制响应给客户端的传输速率，单位是bytes/second，0表示无限制；
 
-示例：`location /donwload/ { limit_rate 20; }`
-
 ``` shell
+# vim nginx.conf
+  location /donwload/ {
+    limit_rate 20;
+    root /web/host1;
+  }
 # nginx -t
 # nginx -s reload
 # mkdir /web/host1/download
@@ -876,10 +877,10 @@ limit_rate rate;
 
 ```
 Syntax: limit_except method ... {...}
+Context: http,server,location if in location
 ```
-> 限制对指定的请求方法之外的其他方法的使用客户端
 
-- Context: http,server,location if in location
+> 限制对指定的请求方法之外的其他方法的使用客户端
 
 ```
 # 表示除了GET和POST之外的其他方法仅允许192.168.1.0/32中主机使用
@@ -899,32 +900,36 @@ limit_except GET POST {
 ### 文件操作优化的配置
 
 ```
-Syntax: aio on | off | threads[=pool];
+Syntax: aio on | off | threads[=pool]多少个线程;
+Default: aio off;
+Context: http, server, location
 ```
 
-> 是否启用aio功能，默认off
+> 是否启用aio功能
 
 ---
 
 ```
-Syntax: directio size | off(default)
+Syntax: directio size | off;
+Default: directio off;
 ```
 
-> 直接IO输入磁盘上，没有缓存到内存上
-> 影响性能，数据可靠性增强
+> 直接IO输入磁盘上，没有缓存到内存上; 影响性能，但数据可靠性增强
 
 ---
 
 ```
-open_file_cache off;
+Syntax: open_file_cache max=N [inactive=time];
+Default: open_file_cache off;
+Context: http, server, location
 ```
+
 > 打开的文件缓存
 
-- `open_file_cache max=N [inactive=time];`
-- nginx可以缓存一下三种信息：
+- nginx可以缓存一下三种信息：缓存文件元数据(非文件内容)
   - (1) 文件的描述符、文件大小和最近一次的修改时间
   - (2) 打开的目录的结构
-  - (3) 没有找到的或没有权限访问的文件的相关信息
+  - (3) 没有找到的文件或没有权限访问的文件的相关信息
 
 - max=N：可缓存的缓存项上限；达到上限后会使用LRU算法实现缓存管理（清除LRU条目）
 - inactive=time：缓存项的超时时长，在此处指定的时长内未被命中的缓存项即为非活动项；
@@ -933,14 +938,19 @@ open_file_cache off;
 ---
 
 ```
-open_file_cache_errors on | off;
+Syntax: open_file_cache_errors on | off;
+Default: open_file_cache_errors off;
+Context: http, server, location
 ```
-> 是否缓存查找是发送错误的文件一类的信息
+
+> 是否缓存查找时发送错误的文件一类的信息
 
 ---
 
 ```
-open_file_cache_min_uses number;
+Syntax: open_file_cache_min_uses number;
+Default: open_file_cache_min_uses 1;
+Context: http, server, location
 ```
 
 > 在 open_file_cache 指令的 inactive 参数指定的时长内，至少命中此处指定的次数方可不被归类到非活动项
@@ -948,7 +958,9 @@ open_file_cache_min_uses number;
 ---
 
 ```
-open_file_cache_valid time;
+Syntax: open_file_cache_valid time;
+Default: open_file_cache_valid 60s;
+Context: http, server, location
 ```
 
 > (什么时候删除)缓存项有效性的检查频率；默认是60s;
@@ -957,7 +969,7 @@ open_file_cache_valid time;
 
 ## ngx_http_access_module模块
 
-> 实现基于ip的访问控制功能：
+> 实现基于 ip 的访问控制功能
 
 - http_access_module局限性：
   - $remote_addr: proxy_ip
