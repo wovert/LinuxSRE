@@ -805,30 +805,30 @@ NameVirtualHost 172.168.6.0:80
 
 > 基于URL语法在**命令行方式**下工作的**文件传输工具**。支持FTP,FTPS,HTTP,HTTPS,GOPHER,TELNET,DICT,FILE及LOAP等协议。curl支持HTTP认证，并且支持HTTP的POST、PUT方法、FTP上传，kerberos认证，HTTP上传，代理服务器，cookies, 用户名/密码认证，下载文件断点续传，http代理服务器管道（proxy tunneling），甚至它还支持IPv6, socks5代理服务器，通过http代理服务器上传文件到FTP服务器等等。
 
-`curl [options] [URL...]`
-
 ``` curl
-curl options：
-  -A/--user-agent <string> 设置用户代理发送给服务器
-  -e/--refere <URL> 来源网址
+curl [options] [URL...]
 
-  --basic 使用http基本认证
-  -u/--user <user[:password]>	设置服务器的用户和密码
+curl options：
+  -A/--user-agent <string> : 设置用户代理发送给服务器
+  -e/--refere <URL> : 来源网址
+
+  --basic : 使用http基本认证
+  -u/--user <user[:password]> : 设置服务器的用户和密码
 
   --tcp-nodelay
-  --cacert <file> CA证书(ssl)
-  --compressed 要求返回是压缩的格式(传输过程压缩)
-  -H/--header <line> 自定义首部信息传递给服务器
-  -I/--head 只显示响应报文首部信息
-  --limit-rate <rate> 设置传输速度
-  -O/--http1.0 使用http1.0
+  --cacert <file> : CA 证书(ssl)
+  --compressed : 要求返回是压缩的格式(传输过程压缩)
+  -H/--header <line> : 自定义首部信息传递给服务器
+  -I/--head : 只显示响应报文首部信息
+  --limit-rate <rate> : 设置传输速度
+  -O/--http1.0 : 使用 http1.0
 ```
 
-MIME: major/minor
-images/png
-image/gif
-text/html
-text/plain
+- MIME: major/minor
+  - images/png
+  - image/gif
+  - text/html
+  - text/plain
 
 ##### elinks [OPTIONS] [URL] ...
 
@@ -849,18 +849,22 @@ Group apache
 `suid`
 `SUexec`
 
-#### 15.mod_deflate
+#### 15. mod_deflate
 
-- 使用 mod_deflat 模块压缩页面优化传输速率
-- 使用场景：
+> 使用 mod_deflat 模块压缩页面优化传输速率
+
+使用场景
+
 1. 节约带宽，额外消耗 CPU；同时，可能有些叫老浏览器不支持
 2. 压缩适于压缩的资源，**文本文件**
 
-- 输出过滤器: `SetOutputFilter DEFLATE`
-
-`~]# mod_deflat configuration`
-
 ``` config
+输出过滤器
+
+SetOutputFilter DEFLATE
+
+# mod_deflat configuration
+
 # Restrict compression to these MIME types
 AddOutputFilterByType DEFLATE text/plain
 AddOutputFilterByType DEFLATE text/html
@@ -870,36 +874,61 @@ AddOutputFilterByType DEFLATE application/xml
 AddOutputFilterByType DEFLATE application/x-javascript
 AddOutputFilterByType DEFLATE text/javascript
 AddOutputFilterByType DEFLATE text/text
+
+# Level of compression (Hightest 9 - Lowest 1) 压缩级别
+DeflateCompressionLevel 9
+
+排除老式浏览器
+# Netscape 4.x has come problems
+BroserMatch ^Mozilla/4 gzip-only-test/html
+# Netscape 4.06-4.08 have some more problems
+BrowserMatch ^Mozilla/4\.0[678] no-gzip
+# MSIE masquerades as Netscape, but it is fine
+BrowserMatch \bMSI[E] !no-gzip !gzip-only-text/html
+
+Content-Encoding: gzip
 ```
 
-- # Level of compression (Hightest 9 - Lowest 1) 
-`DeflateCompressionLevel 9`
+``` http
+# vim httpd.conf
+  # Defalt
+  SetOutputFilter DEFLATE
 
-- 排除老式浏览器
-- # Netscape 4.x has come problems
-`BroserMatch ^Mozilla/4 gzip-only-test/html`
+  # mod_deflat configuration
 
-- # Netscape 4.06-4.08 have some more problems
-`BrowserMatch ^Mozilla/4\.0[678] no-gzip`
+  # Restrict compression to these MIME types
+  AddOutputFilterByType DEFLATE text/plain
+  AddOutputFilterByType DEFLATE text/html
+  AddOutputFilterByType DEFLATE application/xhtml+xml
+  AddOutputFilterByType DEFLATE text/xml
+  AddOutputFilterByType DEFLATE application/xml
+  AddOutputFilterByType DEFLATE application/x-javascript
+  AddOutputFilterByType DEFLATE text/javascript
+  AddOutputFilterByType DEFLATE text/text
 
-- # MSIE masquerades as Netscape, but it is fine
-`BrowserMatch \bMSI[E] !no-gzip !gzip-only-text/html`
+  # Level of compression (Hightest 9 - Lowest 1) 压缩级别
+  DeflateCompressionLevel 9
 
-`Content-Encoding: gzip`
+# systemctl reload httpd.service
+# curl I http://fqsj.com/index.html
+  
+```
 
-#### 16.https(http over ssl)
 
-- SSL会话简化过程：
-1. 客户端发送可供选择的加密方式，并向服务器请求证书；
-2. 服务器端发送证书以及选定的加密方式给客户端；
-3. 客户端取得证书并进行证书验证：
+#### 16. https(http over ssl)
 
-- 如果新人给其他证书的CA：
-  - a) 验证证书来源的合法性；用CA的公钥解密证上的数字签名；
-  - b) 验证证书的内容的合法性；完整性验证；
-  - c) 检查证书的有效期限；
-  - d) 检查证书是否被吊销；
-  - e) 证书中拥有者的名字，与访问的目标主机要一致；
+SSL 会话简化过程
+
+1. 客户端发送可供选择的加密方式，并向服务器请求证书
+2. 服务器端发送证书以及选定的加密方式给客户端
+3. 客户端取得证书并进行证书验证
+
+- 如果新人给其他证书的 CA
+  - a) 验证证书来源的合法性；用CA的公钥解密证上的数字签名
+  - b) 验证证书的内容的合法性；完整性验证
+  - c) 检查证书的有效期限
+  - d) 检查证书是否被吊销
+  - e) 证书中拥有者的名字，与访问的目标主机要一致
 
 4. 客户端生成临时会话密钥（对称加密），并使用服务期端的公钥加密此数据发送给服务器，完成密钥交换；
 
@@ -907,7 +936,7 @@ AddOutputFilterByType DEFLATE text/text
 
 注意：SSL会话是基于**IP地址**创建；所以**单IP**的主机上，仅可以使用**一个https虚拟主机**
 
-- 配置httpd支持https:
+配置 httpd 支持 https:
 1. 为服务器申请数字证书
 - 测试：通过私建CA发证书
   - a) 创建私有CA

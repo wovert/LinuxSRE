@@ -132,3 +132,33 @@ server_name nginx.org www.nginx.org *.nginx.org;
 ```
 sendfile on;
 ```
+
+
+pool：php-fpm池的名称，一般都是应该是www
+process manage：进程的管理方法，php-fpm支持三种管理方法，分别是static,dynamic和ondemand，一般情况下都是dynamic
+start time：php-fpm启动时候的时间，不管是restart或者reload都会更新这里的时间
+start since：php-fpm自启动起来经过的时间，默认为秒
+accepted conn：当前接收的连接数
+listen queue：在队列中等待连接的请求个数，如果这个数字为非0，那么最好增加进程的fpm个数
+max listen queue：从fpm启动以来，在队列中等待连接请求的最大值
+listen queue len：等待连接的套接字队列大小
+idle processes：空闲的进程个数
+active processes：活动的进程个数
+total processes：总共的进程个数
+max active processes：从fpm启动以来，活动进程的最大个数，如果这个值小于当前的max_children，可以调小此值
+max children reached：当pm尝试启动更多的进程，却因为max_children的限制，没有启动更多进程的次数。如果这个值非0，那么可以适当增加fpm的进程数
+slow requests：慢请求的次数，一般如果这个值未非0，那么可能会有慢的php进程，一般一个不好的mysql查询是最大的祸首。
+
+开启php-fpm慢日志
+
+slowlog = /usr/local/php/log/php-fpm.log.slow
+
+request_slowlog_timeout = 5s
+
+8.设置php-fpm单次请求最大执行时间，今天碰到一个问题，测试服务器php-fpm一直是被占满状态，后来发现是set_time_limit(0)，file_get_content()，原因如下:
+
+比如file_get_contents(url)等函数，如果网站反应慢，会一直等在那儿不超时，php-fpm一直被占用。有一个参数 max_execution_time 可以设置 PHP 脚本的最大执行时间，但是，在 php-cgi(php-fpm) 中，该参数不会起效。真正能够控制 PHP 脚本最大执行时间的是 php-fpm.conf 配置文件中的以下参数。
+
+request_terminate_timeout = 10s
+
+默认值为 0 秒，也就是说，PHP 脚本会一直执行下去。这样，当所有的 php-cgi 进程都卡在 file_get_contents() 函数时，这台 Nginx+PHP 的 WebServer 已经无法再处理新的 PHP 请求了，Nginx 将给用户返回“502 Bad Gateway”。可以使用 request_terminate_timeout = 30s，但是如果发生 file_get_contents() 获取网页内容较慢的情况，这就意味着 150 个 php-cgi 进程，每秒钟只能处理 5 个请求，WebServer 同样很难避免“502 Bad Gateway”。php-cgi进程数不够用、php执行时间长、或者是php-cgi进程死掉，都会出现502错误。
