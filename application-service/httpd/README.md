@@ -914,17 +914,19 @@ Content-Encoding: gzip
   
 ```
 
+## https(http over ssl)
 
-#### 16. https(http over ssl)
+- http 文本格式（明文）
+- https 二进制格式（密文）
 
-SSL 会话简化过程
+### SSL 会话简化过程
 
 1. 客户端发送可供选择的加密方式，并向服务器请求证书
 2. 服务器端发送证书以及选定的加密方式给客户端
 3. 客户端取得证书并进行证书验证
 
 - 如果新人给其他证书的 CA
-  - a) 验证证书来源的合法性；用CA的公钥解密证上的数字签名
+  - a) 验证证书来源的合法性；用 CA 的公钥解密证上的数字签名
   - b) 验证证书的内容的合法性；完整性验证
   - c) 检查证书的有效期限
   - d) 检查证书是否被吊销
@@ -936,158 +938,181 @@ SSL 会话简化过程
 
 注意：SSL会话是基于**IP地址**创建；所以**单IP**的主机上，仅可以使用**一个https虚拟主机**
 
-配置 httpd 支持 https:
+### 配置 httpd 支持 https
+
 1. 为服务器申请数字证书
 - 测试：通过私建CA发证书
   - a) 创建私有CA
   - b) 在服务器创建证书签署请求
   - c) CA签证
 
-2. 配置httpd支持使用ssl, 及使用的证书
+2. 配置 httpd 支持使用 ssl, 及使用的证书
 
-`~]# yum -y install mod_ssl`
+``` shell
+# yum -y install mod_ssl
 
-置文件：/etc/httpd/conf.d/ssl.conf
-
-``` config
-DocumentRoot
-ServerName
-SSLCentificateFile
-SSLCertificateKeyFile
+配置文件
+# vim /etc/httpd/conf.d/ssl.conf
+  DocumentRoot
+  ServerName
+  SSLCentificateFile
+  SSLCertificateKeyFile
 ```
 
 3. 测试基于https访问相应的主机
 
-`# openssl s_client [-connect host:port] [-cert filename] [-CApath directory] [-CAfile filename]`
+``` command
+openssl s_client [-connect host:port] [-cert filename] [-CApath directory] [-CAfile filename]
+```
 
-示例：
-
-172.16.100.67
+172.16.100.67(自建 CA证书)
 
 ``` shell
-~]# cd /etc/pki/CA/
-~]# ls
-~] (umask 077; openssl genrsa -out private/cakey.pen 2048)
-~] ll private/
-~] openssl req -new -x509 -key private/cakey.pem -out cacert.pem 自签证书
-CN
-Beijing
-Beijing
-Lingyima
-Ops
-ca.lingyima.com
-caadmin@lingyima.com
-CA]# touch serial index.txt`
-CA]# echo 01 > serial
-#
+# cd /etc/pki/CA/
+# ls
+# (umask 077; openssl genrsa -out private/cakey.pen 2048)
+# ll private/
+# openssl req -new -x509 -key private/cakey.pem -out cacert.pem 自签证书
+  CN
+  Beijing
+  Beijing
+  Lingyima
+  Ops
+  ca.lingyima.com
+  caadmin@lingyima.com
+# touch serial index.txt`
+# echo 01 > serial
 ```
 
 172.16.100.6
 
 ``` shell
-~]# cd /etc/httpd/
-~]# ls
-~]# mkdir ssl
-~]# cd ssl/
-~]# ls
-~]# (umask 077;penssl genrsa -out httpd.key 1024)
-~]# openssl req -new -key httpd.key -out httpd.csr
-CN
-Beijing
-Beijing
-Lingyima
-Ops
-www.lingyima.com
-webadmin@lingyima.com
-~]# scp httpd.csr root@172.16.100.67:/tmp/
+# cd /etc/httpd/
+# ls
+# mkdir ssl
+# cd ssl/
+# ls
+# (umask 077;penssl genrsa -out httpd.key 1024) 生成私钥
+# openssl req -new -key httpd.key -out httpd.csr 创建证书请求
+  CN
+  Beijing
+  Beijing
+  Lingyima
+  Ops
+  www.lingyima.com 真实服务器域名
+  webadmin@lingyima.com
+# scp httpd.csr root@172.16.100.67:/tmp/
 ```
 
-172.16.100.67
+172.16.100.67(签署证书)
 
 ``` shell
 ~]# cd /etc/pki/CA/
 ~]# openssl ca -in /tmp/httpd.csr -out certs/httpd.crt
-y y
-~]# scp certs/httpd.crt 172.16.100.6:/etc/httpd/ssl/
+  y
+  y
+~]# scp certs/httpd.crt 172.16.100.6:/etc/httpd/ssl/ 复制证书到客户端
 ```
 
 第一步完成
 
-----
+---
 
 172.16.100.6
 
 ``` shell
-~]# yum -y install mod_ssl`
-~]# rpm -ql mod_ssl`
-~]# httpd -M | grep ssl`
-~]# cd /etc/httpd/conf.d/`
-~]# cp -pv ssl.conf{,.backup}`
-~]# vim ssl.conf`
+# yum -y install mod_ssl
+# rpm -ql mod_ssl
+  /etc/httpd/confd./ssl.conf
+  /usr/lib64/httpd/module/mod_ssl.so
+  ...
+# httpd -M | grep ssl
+# cd /etc/httpd/conf.d/
+# cp -pv ssl.conf{,.backup}
+# vim ssl.conf
   DcoumentRoot "/var/www/html"
   ServerName www.lingyima.com
-  SSLCertificateFile /etc/httpd/ssl/httpd.crt
-  SSLCertificateKeyFile /etc/httpd/ssl/httpd.key
-~]# httpd -t`
-~]# service httpd restart`
-~]# ss -tln`
+  SSLEngine on
+  SSLProtocol all -SSLv2
+  SSLCertificateFile /etc/httpd/ssl/httpd.crt 服务器证书
+  SSLCertificateKeyFile /etc/httpd/ssl/httpd.key 私钥文件
+# httpd -t
+# service httpd restart
+# ss -tnl
   443
 ```
 
 测试访问：172.16.100.67
 
 ``` shell
-~]# openssl s_client -connect www.lingyima.com:443
-~]# openssl s_client -connect www.lingyima.com:443 -CAfile /etc/pki/CA/cacert.pem
+# openssl s_client -connect www.lingyima.com:443
+# openssl s_client -connect www.lingyima.com:443 -CAfile /etc/pki/CA/cacert.pem
   GET /index.html HTTP/1.1
   Host: www.lingyima.com
+
+-CAfile /etc/pki/CA/cacert.pem 验证客户端证书
 ```
 
-浏览器加载CA证书：
+浏览器加载CA证书
 
-CA服务器
+CA 服务器
 
 ``` shell
-~]# scp root@172.16.100.67:/etc/pki/CA/cacert.pem ./
-~]# mv cacert.pem cacert.crt
+# scp root@172.16.100.67:/etc/pki/CA/cacert.pem ./
+# mv cacert.pem cacert.crt
 ```
 
-证书管理器->授权中心->导入
+浏览器：设置 -> 高级设置 -> HTTPS/SSL -> 证书管理器 -> 授权中心(选项都勾选) -> 导入
 
 https://172.16.100.6
 
-#### 17.httpd自带的工具程序
+``` shell
+# vim /etc/hosts
+  172.16.100.6 www.lingyima.com
+
+访问：https://www.lingyima.com
+
+```
+
+## httpd 自带的工具程序
 
 ``` tools
-htpasswd: basic认证基于文件实现时，用到的账号密码文件生成工具；
-apachectl: httpd自带的服务控制脚本，支持start和stop, gracefulll；
-apxs: 有httpd-devel包提供，扩展httpd使用第三方模块的工具；
-rotatelogs: 日志滚动工具；
-access.log -->
-access.log(新的文件), access.1.log -->
-access.log, access.1.log, access.2.log
+htpasswd: basic 认证基于文件实现时，用到的账号密码文件生成工具；
+apachectl: httpd 自带的服务控制脚本，支持 start 和 stop, gracefulll；
+apxs: 有 httpd-devel 包提供，扩展 httpd 使用第三方模块的工具；
+rotatelogs: 日志滚动工具
+  access.log -->
+    access.log(新的文件), access.1.log(旧的文件1) -->
+      access.log(新的文件), access.1.log(旧的文件2), access.2.log(旧的文件1)
 suexec：访问某些有特殊权限配置的资源时，临时切换至指定用户身份运行；
 ab: apache bench
 ```
 
-#### 18.httpd的压力测试工具
+### httpd 的压力测试工具
 
 - CLI: ab, webbench, http_load, seige
 - GUI: jmeter, loadrunner
-- tcpcopy: 网易开发的，复制生产环境中的真实请求，并将之保存下来；
+- tcpcopy: 网易开发的，复制生产环境中的真实请求，并将之保存下来
 
-``` ab
+``` command
 ab [OPTIONS] URL
-  -n: 总请求数；
-  -c：模拟的并发数；
-  -k：以持久连接模式测试；
+  -n: 总请求数
+  -c：模拟的并发数
+  -k：以持久连接模式测试
 ```
 
-`ab -c 100 -n 1000`
+`# ab -c 100 -n 1000`
 
-### httpd-2.4 的常用配置
+- Time per request : 并发100个请求所花费时间
+- Time per request : 请求1个所花费的时间
+- Connect: 客户端连接服务器时间
+- Processing: 服务器接收请求并处理时间
+- Waiting: 服务器响应给位客户端所花费时间
 
-#### New features：
+
+## httpd-2.4 的常用配置
+
+### New features
 
 1. MPM支持运行为DSO机制；以模块形式按需加载；
 2. Event MPM 生产环境可用
@@ -1101,24 +1126,24 @@ ab [OPTIONS] URL
 10. 支持用户自定义变量
 11. 更低的内存消耗
 
-#### 新模块
+### 新模块
 
 1. mod_proxy_fcgi(驱动fastCGI库) (PHP)
 2. mod_proxy_scgi (Python)
 3. mod_remoteip
 
-#### 安装 httpd-2.4
+### 安装 httpd-2.4
 
 - httpd-2.4依赖于apr-1.4+, apr-util-1.4+, [apr-iconv]
 - apr: apache portable runtime
 
-##### CentOS 6 下安装 httpd-2.4
+#### CentOS 6 下安装 httpd-2.4
 
 - 默认：apr-1.3.9, apr-util-1.3.9
 
 ``` shell
-~]# rpm -q apr
-~]# rpm -q apr-util
+# rpm -q apr
+# rpm -q apr-util
 ```
 
 - 编译安装步骤：
@@ -1130,22 +1155,22 @@ ab [OPTIONS] URL
 1. apr-1.4+
 
 ``` shell
-~]# ./configure --prefix=/usr/local/apr
-~]# make && make install
+# ./configure --prefix=/usr/local/apr
+# make && make install
 ```
 
 2. apr-util-1.4+
 
 ``` shell
-~]# ./configure --prefix=/usr/local/apr-util \
+# ./configure --prefix=/usr/local/apr-util \
 --with-apr=/usr/local/apr
-~]# make -j 2 && make install
+# make -j 2 && make install
 ```
 
 3. httpd-2.4
 
 ``` shell
-~]# ./configure --prefix=/usr/local/apache24 \
+# ./configure --prefix=/usr/local/apache24 \
 --enable-so --enable-ssl --enable-cgi \
 --enable-rewrite \
 --enable-modules=most \
@@ -1155,7 +1180,7 @@ ab [OPTIONS] URL
 --with-zlib --with-pcre \
 --with-apr=/usr/local/apr \
 --with-apr-util=/usr/local/apr-util \
-~]# make && make install
+# make && make install
 ```
 
 - apr-1.5.0.tar.bz2
@@ -1163,23 +1188,23 @@ ab [OPTIONS] URL
 - httpd-2.4.10.tar.bz2
 
 ``` shell
-~] tar xf apr-1.5.0.tar.bz2
-~] cd apr-1.5.0
-~] ./configure --help | less
-~] ./configure --prefix=/usr/local/apr
-~] make && make install
-~] ls -l /usr/local/apr
+# tar xf apr-1.5.0.tar.bz2
+# cd apr-1.5.0
+# ./configure --help | less
+# ./configure --prefix=/usr/local/apr
+# make && make install
+# ls -l /usr/local/apr
 
-~] tar xf apr-util-1.5.3.tar.bz2
-~] cd apr-util-1.5.3
-~] ./configure --prefix=/usr/local/apr-util \
+# tar xf apr-util-1.5.3.tar.bz2
+# cd apr-util-1.5.3
+# ./configure --prefix=/usr/local/apr-util \
 --with-apr=/usr/local/apr
-~] make -j 2 && make install
-~] ls /usr/local/apr-util/
+# make -j 2 && make install
+# ls /usr/local/apr-util/
 
-~] tar xf htpd-2.4.10.tar.bz2
-~] cd httpd-2.4.10
-~] ./configure --prefix=/usr/local/apache24 \
+# tar xf htpd-2.4.10.tar.bz2
+# cd httpd-2.4.10
+# ./configure --prefix=/usr/local/apache24 \
 --enable-so --enable-ssl --enable-cgi \
 --enable-rewrite \
 --enable-modules=most \
@@ -1194,7 +1219,8 @@ ab [OPTIONS] URL
 --enable/disable：启用/禁用特性
 --with-?：依赖于哪些程序包
 worker,event是基于线程模型
-~] make && make install
+
+# make && make install
 ```
 
 启动服务 : `~]# /usr/local/apache24/bin/apachectl start`
@@ -1206,55 +1232,54 @@ worker,event是基于线程模型
 永久生效，但必须重启系统
 
 ``` shell
-~]# vim /etc/profile.d/httpd.sh
+# vim /etc/profile.d/httpd.sh
   export PATH=/usrl/local/apache24/bin:$PATH
-~]# apachectl stop
-~]# hash
+# apachectl stop
+# hash
 ```
 
 导出头文件
 
 ``` shell
-~]# ln -sv /usr/local/apache24/include /usr/include/httpd
-~]# ls /usr/include/httpd/
+# ln -sv /usr/local/apache24/include /usr/include/httpd
+# ls /usr/include/httpd/
 ```
-
 
 导出库文件：
 
 ``` shell
-~]# ldconfig -v	当前系统加载的库
-~]# ldconfig -p	当前系统已经加载的库的所有路径
-~]# vim /etc/ld.so.conf.d/httpd.conf
-/usr/local/apache24/lib
-~]# ldconfig -v 加载库文件
+# ldconfig -v	当前系统加载的库
+# ldconfig -p	当前系统已经加载的库的所有路径
+# vim /etc/ld.so.conf.d/httpd.conf
+  /usr/local/apache24/lib
+# ldconfig -v 加载库文件
 ```
 
 配置http-2.4服务脚本
 
 ``` shell
-~]# chkconfig --add httpd24
-~]# chckconfig --list httpd24
-~]# service httpd24 status|start|stop|reload
+# chkconfig --add httpd24
+# chckconfig --list httpd24
+# service httpd24 status|start|stop|reload
 ```
 
 切换MPM：
 
 ``` shell
-~]# vim /etc/httpd24/httpd.conf
-~]# 导入mpm配置文件
+# vim /etc/httpd24/httpd.conf
+# 导入mpm配置文件
   include /etc/httpd24/extra/httpd-mpm.conf
 ```
 
 后者导入event模块
 
 ``` shell
-~]# vim /etc/httpd.conf
+# vim /etc/httpd.conf
   LoadModule mpm_event_module modules/mod_mpm_event.so
-~]# vim /etc/httpd24/extra/httpd-mpm.conf
+# vim /etc/httpd24/extra/httpd-mpm.conf
 ```
 
-### CentOS 7下安装httpd-2.4：
+### CentOS 7 下安装 httpd-2.4
 
 `# yum -y install httpd`
 
@@ -1264,27 +1289,28 @@ worker,event是基于线程模型
   - 配置文件组成部分：`/etc/httpd/conf.d/*.conf`
 
 ``` shell
-~]# ls /etc/httpd/modules/
-~]# httpd -l
-~]# httpd -M
+# ls /etc/httpd/modules/
+# httpd -l
+# httpd -M
 ```
 
-- 配置应用
+#### httpd-2.4 配置应用
+
 1. 切换MPM
 
 启用要启用的MPM相关的LoadModule指令即可
 
 ``` shell
-~]# httpd -M
-~]# vim /etc/httpd/conf.moduled.d/00-mpm.conf
+# httpd -M
+# vim /etc/httpd/conf.moduled.d/00-mpm.conf
   LoadModule mpm_event_module modules/mod_mpm_event.so
-~]# systemctl restart httpd.service
-~]# httpd -M
+# systemctl restart httpd.service
+# httpd -M
 ```
 
 2. 基于IP人访问控制
 
-`DocumentRoot "/apps/www/htdocs"` 
+`DocumentRoot "/apps/www/htdocs"`
 
 - 允许所有主机访问：`Require all granted`
 - 拒绝所有主机访问：`Require all deny`
@@ -1356,8 +1382,8 @@ worker,event是基于线程模型
 4. ssl
 
 ``` shell
-~]# yum -y install mod_ssl
-~]# rpm -ql mod_ssl
+# yum -y install mod_ssl
+# rpm -ql mod_ssl
 ```
 
 5. 毫秒级持久连接时长
@@ -1386,4 +1412,4 @@ www2.stuX.com，页面文件目录为/web/vhosts/www2；错误日志为/var/log/
 
 2.1 要求使用证书，证书中要求使用国家(CN), 州(Beijing), 城市(Beijing)，组织为(lingyima)
 
-2.2设置部分为Ops，主机名为www2.stux.com
+2.2设置部分为 Ops，主机名为 www2.stux.com
