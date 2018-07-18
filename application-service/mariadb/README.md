@@ -1,7 +1,7 @@
 # 数据库简介
-##　数据库系统
 
 ## 数据库管理系统
+
 - Oracle
 - Sybase
 - Infomix (IBM收购)
@@ -12,6 +12,7 @@
 - mysqlite 文档型（一个文件，通过对文件的赋值完成数据库的赋值）
 
 ## RDBMS：关系型数据库管理系统
+
 - C/S：专有协议
 - 关系模型：表(行、列)，二维关系
 
@@ -20,7 +21,8 @@
   - 逻辑层（内建组件，数据库建立、索引、视图）
   - 视图层 (用户视图，crud,数据库查询操作)
 
-## E-R模型
+## E-R 模型
+
 - E: Entity，实体
   - 一个实体转换为数据库中的一个表
 - R: Relationship，关系
@@ -29,58 +31,58 @@
   - N VS N
 
 ## 关系运算
+
 - 选择
 - 投影
 
 ## 三范式
+
 - 1NF: 列不可拆分
 - 2NF: 唯一标识
 - 3NF: 引用主键
 
-# MySQL数据库
+## MySQL数据库
 
 - 数据库：表、索引，视图(虚表)
 - SQL接口：Structured Query Language
-	- 类似于OS的shell接口
-	- 提供编程功能
-	- ANSI： SQL标准，SQL-86, SQL-89, SQL-92, SQL-99, SQL-03, ...
+  - 类似于OS的shell接口
+  - 提供编程功能
+  - ANSI： SQL标准，SQL-86, SQL-89, SQL-92, SQL-99, SQL-03, ...
     - xml
   - 编程接口：选择，循环
   - SQL代码：
-		* 存储过程：procedure (call procename 没有返回值)
-		* 存储函数：function	(select funcname有返回值)
-		* 触发器：trigger
-		* 事件调度器：event scheduler
+    - 存储过程：procedure (call procename 没有返回值)
+    - 存储函数：function	(select funcname有返回值)
+    - 触发器：trigger
+    - 事件调度器：event scheduler
 
 - 用户和权限：
   - 用户：用户名和密码
   - 权限：管理类、数据库、表、字段
-					
+
 - DBMS：DataBase Management System
 - RDBMS：Relational
 
-- MySQL：单进程，多线程 
+- MySQL：单进程，多线程
   - 用户连接：通过线程来实现；连接线程
   - 线程池：
 
 - 数据字典：元数据数据库（mysql表）
 - 视图层（逻辑层）-映射层-物理层
 
-
 - 事务(Transaction)：组织多个操作为一个整体，要么全部都执行，要么全部都不执行；
 
-“回滚”， rollback
-			
+"回滚"， rollback
+
 - Bob:8000, 8000-2000
 - Alice:5000, 5000+2000
-	
+
 - 一个存储系统是否支持事务，测试标准：
   - ACID：
     - A：atomicity,原子性(不可分割)
     - C：consistent, 一致性（两个事务有一致性,加减）
     - I：isolation, 隔离性(事务彼此之间分割, 线上和线下)
     - D：durability, 持久性(内存中处理中，突然停电，必须得完成)
-			
 
 ## MySQL层次结构
 
@@ -89,9 +91,9 @@
   - 操作求解器：求解如何执行
   - 计划执行器：执行的路径
   - 优化器：选择最优路径
-	
+
 2. 存储引擎
-  - 事务管理器 
+  - 事务管理器
   - 锁管理器
 
   - 文件存取方法 (速度慢)
@@ -103,26 +105,29 @@
 3. 物理数据文件
 
 ### 事务
+
 - 组织多个事务为一个整体，要么全部都执行，要么全部都不执行
 - 回滚：rollback
 
-
 ## MySQL特点
+
 - 开源软件
 - 跨平台
 - 功能强大
 
 ## MySQL版本
+
 - MySQL Enterprise Version
   - 5.1 -> 5.5 -> 5.6 -> 5.7
 - MariaDB Community Version
   - 插件式存储引擎
     - 查看存储引擎：`show engines`
   - 单进程多线程
-		* 连接线程
-		* 守护线程
+    - 连接线程
+    - 守护线程
 
-## mysql	
+## mysql
+
 - Unireg(存储引擎，没有SQL接口)
 - MySQL AB公司 --> MySQL
 - My：作者大女儿的名字
@@ -131,18 +136,19 @@
 - MySQL的发行机制：
   - Enterprise(企业版)：线程池，可视化编程组件，提供了更丰富的功能；
   - Community(社区版)：
-		
+
 ### MariaDB features：
+
 - 插件式存储引擎：
 - 存储管理器有多种实现版本，彼此间的功能和特性可能略有区别；
 - 用户可根据需要灵活选择； 
 - 存储引擎也称为“表类型”；
-				
+
 1. 更多的存储引擎；
   - MyISAM：不支持事务
   - MyISAM --> Aria(改进版)
   - InnoDB --> XtraDB(改进版)：支持事务
-				
+
 - MySQL-5.1默认存储引擎：MyISAM
 - MySQL-5.5+默认存储引擎：InnoDB
 
@@ -151,7 +157,8 @@
 4. truly open source；
 
 ## 安装和使用MariaDB：	
-- 安装方式：
+
+安装方式
 
 1. 包管理器的程序包（rpm,deb包等）
 
@@ -160,16 +167,20 @@
 (b) 程序官方提供
 
 2. 源码包
+
 3. 通用二进制格式的程序包
-			
+
 ### 通用二进制格式安装MariaDB：
+
 1. 准备数据目录,以/mydata/data目录为例
 
-`# mkdir -pv /mydata/data`
+```
+# mkdir -pv /mydata/data
+# chown -R mysql.mysql /mydata/data/
+```
 
-`# chown -R mysql.mysql /mydata/data/`
+2. 安装配置 mariadb
 
-2. 安装配置mariadb						
 ``` SHELL
 # useradd -r mysql
 # tar xf mariadb-VERSION.tar.xz -C /usr/local
@@ -185,9 +196,10 @@
 3. 提供配置文件
 
 ini格式的配置文件；各程序均可通过此配置文件获取配置信息；
-``` 
+
+```
  [program_name]
-								
+
 1. OS Vendor提供mariadb rpm包安装的服务的配置文件查找次序：
  /etc/mysql/my.cnf  --> /etc/my.cnf  --> --default-extra-file=/PATH/TO/CONF_FILE  --> ~/.my.cnf		
 
@@ -199,7 +211,7 @@ ini格式的配置文件；各程序均可通过此配置文件获取配置信�
 # cp  support-files/my-large.cnf  /etc/my.cnf
 
 添加三个选项
-[mysqld]	# mysql服务器端配置
+[mysqld] # mysql服务器端配置
 datadir = /mydata/data
 innodb_file_per_table = ON
 skip_name_resolve = ON
@@ -207,7 +219,8 @@ skip_name_resolve = ON
 
 4. 启动服务: `# service mysqld  start`
 
-## 设计范式：
+## 设计范式
+
 - 第一范式：字段是原子性的；
 - 第二范式：存在可用主键；
 - 第三范式：任何都不应该依赖于其它表的非主属性；
@@ -229,9 +242,10 @@ skip_name_resolve = ON
 `# yum -y install mariadb-server`
 
 ### 安装后的设定
+
 1. root用户设定密码
 
-```
+``` mysql
 mysql> set password （自动重读授权表）
 mysql> update mysql.user SET password = password('password') where cluase;
 mysql> flush privilige
@@ -253,11 +267,9 @@ my.ini文件中修改 `skip_name_resolve=off`
 
 user, host 等
 
-
 ### Windows 下安装 MySQL 5.6
 
 [MySQL](https://dev.mysql.com/downloads/mysql/)官网下载地址
-
 
 ## mysql客户端程序
 
@@ -267,49 +279,46 @@ user, host 等
 - mysqlimport： 数据导入工具
 
 ## 非客户端类的管理工具
+
 - `myisamchk, myisampack`
 
 ## 如何获取程序默认使用的配置
 
-`# mysql --print-defaults`
-
-`# mysqld --print-defaults`
-
-`# mysqld --verbose`
+``` mysql
+# mysql --print-defaults
+# mysqld --print-defaults
+# mysqld --verbose
+```
 
 --no-auto-rehash 不能命令自动补全（性能差，创建hash计算）
 
-
 ## 客户端类应用程序的可用选项：
+
+```
 -u, --user=
-
 -h, --host=
-
 -p, --password=
-
 -P, --port=
-
 --protocol=tcp|sock(同一个主机上)
-
 -S, --socket=统一主机上及，-h localhost，socket文件路径
-
 -D, --database=
-
 -C, --compress 数据传输时是否压缩
-
 mysql -e "SQL"
+```
 
-## mysql使用模式
+## mysql 使用模式
+
 - 交互式模式
   - 可运行命令有两类
-		* 客户端命令：\h, help
-		* 服务器端命令：SQL，需要语句结束符
+    - 客户端命令：\h, help
+    - 服务器端命令：SQL，需要语句结束符
 
 - 脚本模式
   - `# mysql -uUSERNAME -hHOST -pPASSWORD < /path/from/somefile.sql`
   - `mysql> source /path/from/somefile.sql`
 
 ## 服务器端(mysqld)：工作特性有多种定义方式
+
 - 命令行选项
 - 配置文件参数
   - 获取可用参数列表 `# mysqld --version --help`
@@ -322,11 +331,11 @@ mysql -e "SQL"
 - 修改服务器变量的值：
   - `mysql> help SET`
   - 全局：
-		* `mysql> set global system_var_name=value;`
-		* `mysql> set @@global.system_var_name=value;`
+    - `mysql> set global system_var_name=value;`
+    - `mysql> set @@global.system_var_name=value;`
   - 会话：
-		* `mysql> set [session] system_var_name=value`
-		* `mysql> set @@[session.]system_var_name=value`
+    - `mysql> set [session] system_var_name=value`
+    - `mysql> set @@[session.]system_var_name=value`
 
 - 状态变量：用于保存mysqld运行中的统计数据的变量
   - `mysql> show global status;`
@@ -336,6 +345,7 @@ mysql -e "SQL"
     - abored_clients
 
 ## MySQL 5.6 特性
+
 - 提高性能和扩展能力
   - 最多扩展48个CPU线程
   - 与v5.5相比，性能提升了230%（疑问：根据什么判断）
@@ -359,9 +369,9 @@ mysql -e "SQL"
   - 通过Multi-Threaded Slaves, Binlog Group Commit and optimized Row-Based Replication提高赋值能力高达5倍至多
 - 时间延迟赋值，防止主计算机的作业事务
 
-
 ## 配置文件：集中式的配置，能够为mysql的各应用程序提供配置信息
-```
+
+``` config
 [mysqld]
 [mysqld_safe] 线程安全
 [mysqld_multi] 多实例线程
@@ -378,29 +388,31 @@ skip_name_reslve=off
 命令行启动参数与配置文件参数
 ```
 
-### Linux下mysql配置查找路径
-1. /etc/my.cnf 
+### Linux下 mysql 配置查找路径
+
+1. /etc/my.cnf
 2. /etc/mysql/my.cnf
-3. $MYSQL_HOME/my.cnf 
-4. 启动参数 --default-extra-file=/path/to/somedir/my.cnf 
+3. $MYSQL_HOME/my.cnf
+4. 启动参数 --default-extra-file=/path/to/somedir/my.cnf
 5. ~/.my.cnf
 
 相同的参数后面的覆盖前面的
 
-
 ## 什么是SQL
+
 > Structured Query Language简称SQL，结构化查询语言，数据管理系统通过SQL语言来管理数据库的数据
 
 ## SQL语言的组成部分
 
 ### DDL：Data Defination Language
+
 - 数据定义语言，主要用于定义数据、表、视图、索引、触发器
 - DROP, CREATE, ALTER
 - DB组件：数据库、表、索引、视图、用户、存储过程、存储函数、触发器、事件调度器等
 - `mysql> help create`
 
 create相关命令
-```
+``` mysql
 create database
 create event
 create function
@@ -422,18 +434,23 @@ spatial
 ```
 
 ### DML: Data Manipulation Language
+
 - 数据操作语言，主要对数据的增删改查
+
 - `INSERT,UPDATE,DELETE`
 
 ### DQL: Data Query Language
+
 - 数据检索语言，用来从表中获的数据、确定数据怎样在应用程序中给出，
 - `SELECT` 查询数据
 
 ### DCL: Data Control Language
+
 - 数据控制语言，主要用于控制用户的访问权限
 - `GRANT, REVOKE, COMMIT, ROLLBACK`
 
-### 编程接口：
+### 编程接口
+
 - 存储过程
 - 存储函数
 - 触发器
@@ -441,9 +458,11 @@ spatial
 - 过程式编程：选择，循环
 
 ### Windows启动服务和关闭服务
+
 `net start|stop|restart mysql`
 
 ### 设定字符集
+
 > Server characterset: utf8
 > Db characterset: utf8
 > Client characterset: utf8
@@ -452,7 +471,7 @@ spatial
 
 #### my.ini
 
-```
+``` config
 [mysql]
 default-chracter-set=utf8 客户端字符集
 
@@ -482,24 +501,29 @@ charcter-set-server=utf8 服务器端字符集
 `mysql>prompt \n~\u~\D~\d`
 
 ### MySQL常用命令
+
 - `SELECT VERSION();`
 - `SELECT NOW();`
 - `SLEECT USER();`
 
 ### 修改命令分隔符
+
 - `mysql> DELIMITER //`
 - `mysql> SELECT VERSION//`
 
 ### 保存命令历史文件
+
 - `mysql> \T /path/to/file`
 - `mysql> SELECT NOW();		命令和结果都保存于/path/to/file` 
 - `mysql> \T 结束`
 
-
 ## 数据库操作
 
 ### 创建数据
+
+```
 create database | schema [it not exits] db_name [[default] character set [=] 'charset_name']
+```
 
 ```
 CREATE DATABASE IF NOT EXISTS db DEFAULT CHARACTER SET 'UTF8';
@@ -511,12 +535,15 @@ mysql> \h create database
 `mysql> show warnings 查看警告信息`
 
 ### 查看数据库列表
+
 > show database | schemas
 
 ### 查看数据库定义
+
 > show create database | schema db_name
 
 ### 修改数据库编码字符集
+
 > alter database | schema db_name [default] character set[=]charset_name
 
 - charset_name
@@ -524,12 +551,15 @@ mysql> \h create database
   - utf8
 
 ### 获取当前数据名称
+
 > select database() | schema()
 
 ### 删除数据库
+
 > drop databse | schema [if exits] db_name
 
 ### 打开数据
+
 > use db_name
 
 ## 数据类型
@@ -538,6 +568,7 @@ mysql> \h create database
   - SQL-86, SQL-89, SQL-92, SQL-99, SQL-03
 
 ### 整数类型, 精确数值型
+
 - tinyint, 1byte
   - signed : -128~127(-2^7~2^7-1)
   - unsigned : 0~255(0~2^8-1)
@@ -563,6 +594,7 @@ mysql> \h create database
 `mysql> \h int`
 
 ###　浮点类型, 近似数值型
+
 - float（m,d), 4byte
   - -3.40E+38 ~ -1.17E-38
   - 0和1.17E-38 ~ 3.40E+38
@@ -578,6 +610,7 @@ mysql> \h create database
 - bit
 
 ###　字符串类型
+
 - char(m), m个 byte，定长数据类型，不区分字符大小写
   - 0 <= m <= 255
 - binary(m) 区分字符大小写
@@ -617,6 +650,7 @@ mysql> \h create database
 - 中文字符占用一个空间位置
 
 ### 日期时间类型
+
 - time, -838:59:59 ~ 838:59:59, 3 byte
 - date, 100-01-01 ~ 9999-12-31, 3 byte
 - datetime, 1000-01-01 00:00:00 ~ 9999:12-31 23:59:59, 8 byte
@@ -626,9 +660,11 @@ mysql> \h create database
   - year(4) 1901-2155
 
 ## 存储引擎
+
 > 表的类型，表在计算机中的存储方式
 
 ### 完整性约束条件
+
 - UNIQUE KEY
   - NULL不算重复的值
 - FOREIGN KEY
@@ -646,9 +682,10 @@ mysql> \h create database
   - NULL
 - character set 'utf8' 字符集
 - collation 排序规则
+
 默认继承数据库或表
 
-```
+``` mysql
 mysql> show character set
 mysql> show collation
 ```
@@ -660,7 +697,8 @@ mysql> show collation
 - 内建类型SET和ENUM的修饰符：not null, default
 
 ### SQL MODE: 定义mysql对约束等的响应行为
-```
+
+``` mysql
 mysql> set global sql_mode='string'
 mysql> set @@global.sql_mode='string'
 ```
@@ -691,6 +729,7 @@ mysql> show global variables like 'sql_%'
   - 配置文件，全局参数
 
 ### 查看存储引擎
+
 `show engines \G`
 
 - Support：是否支持引擎
@@ -700,12 +739,15 @@ mysql> show global variables like 'sql_%'
 - Savepoints: 是否保存点（事务）
 
 ### 查看支持的存储引擎信息
+
 `show variables like 'have%'`
 
 ### 查看默认的存储引擎
+
 `show variables like 'storage_engine'`
 
 ### MySQL常用存储引擎
+
 - InnoDB存储引擎
   - 事务
   - 外键
@@ -723,7 +765,7 @@ mysql> show global variables like 'sql_%'
 
 ### 创建表
 
-```
+``` mysql
 -- 注释内容
 SET NAMES UTF8
 -- 输入中文的时候，需要临时转换客户端的编码方式
@@ -735,7 +777,7 @@ engine=INNODB AUTO_INCREMENT=100 [DEFAULT] charset=UTF8
 1. 直接创建
 2. 通过查询现存的表创建
 
-```
+``` mysql
 create [temporary] table [if not exists] tbl_name
 [(create_definition,...)]
 [table_options]
@@ -745,7 +787,7 @@ select_statement
 
 3. 通过复制现存的表的表结果创建；不复制数据
 
-```
+``` mysql
 create [temporary] table [it not exists] tbl_name
 { like old_tbl_name | (like old_tbl_name) }
 ```
@@ -766,7 +808,7 @@ create [temporary] table [it not exists] tbl_name
 
 ### 查看表结构
 
-```
+``` mysql
 DESC tbl_name
 DESCRIBE tbl_name
 SHOW COLUMNS FROM tbl_name
@@ -797,7 +839,7 @@ SHOW COLUMNS FROM tbl_name
 
 ## 重命名表
 
-```
+``` mysql
 alter table tbl_name rename to tbl_new_name
 alter table tbl_name rename as tbl_new_name
 alter table tbl_name rename tbl_new_name
@@ -806,7 +848,7 @@ alter table tbl_name to tbl_new_name
 
 ## 修改表格结构
 
-```
+``` mysql
 添加字段
 alter table tbl_name
 add 字段名1  after|before target_filed
@@ -853,20 +895,15 @@ alter table tbl_name auto_increment=100
 
 ## 插入数据
 
-- 不指定字段名
-`insert into tbl_name VALUES|VALUE (val...)`
+不指定字段名: `insert into tbl_name VALUES|VALUE (val...)`
 
-- 列出指定字段
-`insert into tbl_name(f1,...) VALUES|VALUE (val...)`
+列出指定字段: `insert into tbl_name(f1,...) VALUES|VALUE (val...)`
 
-- 同时插入多条记录
-`insert into tbl_name(f1,...) VALUES (val...),(val2...)`
+同时插入多条记录: `insert into tbl_name(f1,...) VALUES (val...),(val2...)`
 
-- 通过SET形式插入记录
-`insert into tbl_name SET 字段名称=值,...`
+通过SET形式插入记录: `insert into tbl_name SET 字段名称=值,...`
 
-- 查询结果插入到表中
-`insert into tbl_name(f1,...) select 字符名称 tbl_name [where 条件]`
+查询结果插入到表中: `insert into tbl_name(f1,...) select 字符名称 tbl_name [where 条件]`
 
 ## 更信数据
 
@@ -884,6 +921,7 @@ alter table tbl_name auto_increment=100
 - concat(str,str)
 
 ##　备份与恢复
+
 ### 备份
 
 `# mysqldump -uroot -p database_name > /PATH/TO/datbase_name.sql`
@@ -892,7 +930,7 @@ alter table tbl_name auto_increment=100
 
 `# mysql -uroot -p database_name < /PATH/TO/database_name.sql`
 
-# DQL (Data Query Language)
+## DQL (Data Query Language)
 
 ## 查询记录
 
@@ -1030,7 +1068,7 @@ constraint emp_fk_dep foreign key(depId) references department(id) on delete cas
 
 ### set null: 从父表删除或更新，并设置子表中的外键列为null, 如果使用该选项，必须保证子表没有指定not null
 
-```
+``` sql
 -- 员工表：employee（子表）
 create table if not exists employee(
 id smallint unsigned auto_increment key,
@@ -1045,11 +1083,13 @@ constraint emp_fk_dep foreign key(depId) references department(id) on delete set
 ### no action: 标准SQL的关键字，在MySQL中与restrict相同
 
 ## 联合查询, 查询字段数目必须相同
+
 - union (去掉相同记录）
 - union all
+
 `select username from employee union all select username from cms_user`
 
-# 子查询
+## 子查询
 
 > 一个查询语句嵌套在另一个查询语句中
 
@@ -1079,7 +1119,8 @@ constraint emp_fk_dep foreign key(depId) references department(id) on delete set
     - `select id,username,score from student where score not in(select level from sholarship)`
     - `select id,username,score from student where score <> all(select level from sholarship)`
 
-# 正则表达式
+## 正则表达式
+
 `SELECT * FROM cms_user where username regexp '^t'`
 
 - ^：匹配字符开始的部分
@@ -1093,14 +1134,16 @@ constraint emp_fk_dep foreign key(depId) references department(id) on delete set
 - String{N}：字符串出现N次
 - 字符串{M,N}：字符串至少出现M次，最多N次
 
-# mysql 运算符
+## mysql 运算符
 
-## 算数运算符
+### 算数运算符
+
 - +,-,* 加减乘
 - /,DIV 除法
 - %,MOD 去余
 
-## 比较运算符
+### 比较运算符
+
 - =
 - <>, !=
 - <=> 判断是否相等，可以判断是否已等于NULL
@@ -1112,13 +1155,15 @@ constraint emp_fk_dep foreign key(depId) references department(id) on delete set
 - like, not like
 - regexp
 
-## 逻辑运算符
+### 逻辑运算符
+
 - && 或者 AND
 - || 或者 OR
 - ! 或者 NOT
 - XOR 异或
 
-# 数学函数库
+## 数学函数库
+
 - CEIL(), CEILING()
 - FLOOR()
 - ROUND()
@@ -1131,7 +1176,8 @@ constraint emp_fk_dep foreign key(depId) references department(id) on delete set
 - SIGN() - 1, 0, -1 符号
 - EXP(3) - E的3次方, 20.085536
 
-# 字符串函数
+## 字符串函数
+
 - char_length('lingyima') 字符数，英文中文占一个字符
 - length('lingyima') 长度，utf8中文一个中文占3个长度
 - concat(s1,s2)
@@ -1160,8 +1206,8 @@ constraint emp_fk_dep foreign key(depId) references department(id) on delete set
 - reverse()
 - elt(2,'A','B','C') 返回指定位置的字符串，索引1开始
 
+## 日期时间函数
 
-# 日期时间函数
 - now() -- YYYY-mm-dd HH:MM:SS
 - curdate(),current_date()
 - curtime(), current_time()
@@ -1178,78 +1224,89 @@ constraint emp_fk_dep foreign key(depId) references department(id) on delete set
 - second()
 - datediff(current_date(), '1990-1-1')
 
+## 条件判断函数
 
-# 条件判断函数
 - if(expr, v1, v2) 
 - ifnull(v1,v2) v1不为空显示v1, 否则v2
-- case when expr1 
-then v1 [when exp2 
-then v2] [else vn] 
+- case when expr1
+
+then v1 [when exp2
+then v2] [else vn]
 end
 
-# 系统函数
+## 系统函数
+
 - version()
 - connection_id() 服务器的连接数
 - database(),schema()
 - user(), system_user() 当前用户
 - current_user(), current_user 当前用户
-- charset(STR) 		STR的字符集
-- collation(STR) 	字符串STR的校验字符集
-- LAST_INSERT_ID()  最近生成auto_increment的值
+- charset(STR) STR的字符集
+- collation(STR) 字符串STR的校验字符集
+- LAST_INSERT_ID() 最近生成auto_increment的值
 
-# 其他常用函数
+## 其他常用函数
 
 - md5() -- 32位字符串
 - password() -- mysql用户加密函数
 - format(3.1415,2)
-- ASCII(s) 				返回ASCII码
+- ASCII(s) 返回ASCII码
 - bin(x)
 - hex(x)
 - oct(x)
-- conv(88,10,16) 		将x从f1进制数变成f2进制数
-- inet_aton(ip) 		将IP地址转换为数字
-- inet_ntoa(n) 			将数字转换成IP地址
-- get_loct(name,time) 	定义锁
+- conv(88,10,16) 将x从f1进制数变成f2进制数
+- inet_aton(ip) 将IP地址转换为数字
+- inet_ntoa(n) 将数字转换成IP地址
+- get_loct(name,time) 定义锁
   - is_free_lock('king') -- 0 表示存在
-- release_lock(name) 	解锁
+- release_lock(name) 解锁
 
-# 索引的使用
+## 索引的使用
+
 > 优点是提高检索数据的速度
 > 缺点是创建和维护索引需要耗费时间
 > 索引可以提高查询速度、会减慢写入速度
 
-
 ## 普通索引
+
 `index|key idx_name(filed[,filed2])`
 
 ## 唯一索引
+
 `unique idx_name(filed[,filed2])`
 
 ## 全文索引
+
 `fulltext index full_name(filed)`
 
 ## 单列索引
+
 ## 多列索引
+
 ## 空间索引
-```
+
+``` sql
 test geometry not null
 spatial index spa_test(test)
 )engine=myisam
 ```
+
 ## 删除索引
+
 - `drop index idx_name on tbl_name`
 - `alter table tbl_name drop index idx_name`
 
 ## 创建索引
-```
+
+``` sql
 create  index idx_name on tbl_name(id)
 alter table tbl_name add index idx_names(username)
 create unique|fulltext index u_idx_name on tbl_name(username)
 ```
 
-# mysql编码设定
+## mysql编码设定
 
-## 服务器编码格式
+### 服务器编码格式
 
 `mysql> show variables like 'char%';`
 
@@ -1267,13 +1324,18 @@ character_set_server latin1
 
 character_set_system utf8
 
-## my.ini
+```
+# vim my.ini
 [mysql]
-`default-character-set=utf8`
+default-character-set=utf8
+```
 
-- 影响效果
-  - `character_set_database utf8`  
-  - `character_set_server utf8`
+影响效果
+```
+character_set_database utf8  
+character_set_server utf8
+```
+
 ```
 [mysqld]
 character-set-server=utf8
@@ -1304,9 +1366,9 @@ character-set-server=utf8
   - file-data文件中加入`set names 'utf8'`
   - `mysql -uroot -p db_name < file-data.sql`
 
-# 会话变量和全局变量
+## 会话变量和全局变量
 
-## 会话变量
+### 会话变量
 
 > clien与server相关联的变量，客户端所拥有的变量
 
@@ -1314,7 +1376,7 @@ character-set-server=utf8
 - 查看某个变量: `show session variables like 'auto%'`
 - 修改会话变量: `set autocommit='off';` `set @@session.autocommit='off'`
 
-## 全局变量
+### 全局变量
 
 > mysql客户端和服务端都有效
 
@@ -1323,7 +1385,8 @@ character-set-server=utf8
 - 查看某个全局变量: `show global variables like 'auto%'`
 
 - 设置全局变量
-```
+
+``` mysql
 set global autocommit='off';
 set @@global.autocommit='off'
 ```
@@ -1346,7 +1409,7 @@ Connection -> Coonection Pool -> SQL Interface -> Parser -> Optimizer -> Caches 
   - Cobol
 
 - 单进程多线程
-  - 用户连接：连接线程
+  - 用户连接：连接一个线程
 
 - Connection Pool （线程池：客户端并发请求处理）
   - Authentication 连接认证
@@ -1390,6 +1453,21 @@ Connection -> Coonection Pool -> SQL Interface -> Parser -> Optimizer -> Caches 
 - 重做日志、撤销日志、二进制日志、错误日志、查询日志、慢查询日志、中继日志
 
 ## MySQL架构流程
+
+MySQL 内部组件的架构类型
+
+Connector 组件的各种各样的连接器(Native C API/JDBD/ODBC开放数据库系统互联/.NET/PHP/Perl/Python/Ruby/Cobol)，比如通过 Native C API 连接 MySQL 服务器
+
+MySQL 是单进程多线程，每一个用户连接都会连接线程，MYSQL 也有长短连接。
+
+MySQL 客户端连接 mysql 服务器之后，一直连接状态，直到注销连接状态。
+
+MySQL 也支持短链接模式，-e 选项，MySQL 运行之后立即返回，并断开连接。
+
+MySQL 必须必须建立连接线程，创立完之后
+
+
+
 
 用户-> 连接管理器-线程管理器-用户模块
 
