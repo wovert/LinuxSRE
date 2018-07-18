@@ -1109,37 +1109,36 @@ ab [OPTIONS] URL
 - Processing: 服务器接收请求并处理时间
 - Waiting: 服务器响应给位客户端所花费时间
 
-
 ## httpd-2.4 的常用配置
 
 ### New features
 
-1. MPM支持运行为DSO机制；以模块形式按需加载；
+1. Run-time Loadable MPMs: MPM 支持运行为 DSO 机制；以模块形式按需加载；
 2. Event MPM 生产环境可用
-3. Asynchronous support,异步读写功能
-4. 支持每模块及每目录的单独日志级别定义
-5. 每请求相关的专用配置
-6. 增强版的表达式分析器
-7. 毫秒级持久连接时长定义
-8. 基于FQDN的虚拟主机也不再需要NameVirtualHost指令
-9. 新指令AllowOverrideList
-10. 支持用户自定义变量
-11. 更低的内存消耗
+3. Asynchronous support: 异步读写功能
+4. Per-module and per-directory LogLevel configuration: 支持每模块及每目录的单独日志级别定义
+5. Per-request configuration sections: 每请求相关的专用配置
+6. General-purpose expression parser: 增强版的表达式分析器
+7. KeepAliveTimeout in milliseconds: 毫秒级持久连接时长定义
+8. NameVirtualHost directive: 基于 FQDN 的虚拟主机也不再需要NameVirtualHost指令
+9. Override Confgiuration： 新指令 AllowOverrideList
+10. Config file variables: 支持用户自定义变量
+11. Reduces memory usage: 更低的内存消耗
 
 ### 新模块
 
-1. mod_proxy_fcgi(驱动fastCGI库) (PHP)
+1. mod_proxy_fcgi(驱动 fastCGI 库)
 2. mod_proxy_scgi (Python)
-3. mod_remoteip
+3. mod_remoteip(取消 allow/deny，替换新的机制))
 
 ### 安装 httpd-2.4
 
-- httpd-2.4依赖于apr-1.4+, apr-util-1.4+, [apr-iconv]
-- apr: apache portable runtime
+- httpd-2.4 依赖于`apr-1.4+, apr-util-1.4+, [apr-iconv]`
+- apr: apache portable runtime : apache可运行环境
 
 #### CentOS 6 下安装 httpd-2.4
 
-- 默认：apr-1.3.9, apr-util-1.3.9
+CentOS 6 默认提供 apr-1.3.9, apr-util-1.3.9
 
 ``` shell
 # rpm -q apr
@@ -1161,6 +1160,8 @@ ab [OPTIONS] URL
 
 2. apr-util-1.4+
 
+apr-util 依赖 apr-1.4
+
 ``` shell
 # ./configure --prefix=/usr/local/apr-util \
 --with-apr=/usr/local/apr
@@ -1170,17 +1171,22 @@ ab [OPTIONS] URL
 3. httpd-2.4
 
 ``` shell
+# ./configure --help | less
 # ./configure --prefix=/usr/local/apache24 \
---enable-so --enable-ssl --enable-cgi \
+--enable-so \
+--enable-ssl \
+--enable-cgi \
 --enable-rewrite \
 --enable-modules=most \
 --enable-mpms-shared=all \
 --sysconfdir=/etc/httpd24 \
 --with-mpm=prefork \
---with-zlib --with-pcre \
+--with-zlib \
+--with-pcre \
 --with-apr=/usr/local/apr \
 --with-apr-util=/usr/local/apr-util \
-# make && make install
+
+# make -j 4 && make install
 ```
 
 - apr-1.5.0.tar.bz2
@@ -1211,21 +1217,29 @@ ab [OPTIONS] URL
 --enable-mpms-shared=all \
 --sysconfdir=/etc/httpd24 \
 --with-mpm=prefork \
---with-zlib --with-pcre \
+--with-zlib \
+--with-pcre \
 --with-apr=/usr/local/apr \
 --with-apr-util=/usr/local/apr-util \
 
 
---enable/disable：启用/禁用特性
+--enable/disable：启用/禁用哪些特性
 --with-?：依赖于哪些程序包
+--without-?: 不依赖哪些程序包
 worker,event是基于线程模型
 
 # make && make install
 ```
 
+---
+
 启动服务 : `~]# /usr/local/apache24/bin/apachectl start`
 
-查看httpd编译安装过程记录文件：`~]# vim /usr/local/apache24/build/config.nice`
+---
+
+查看 httpd 编译安装过程记录文件：`~]# vim /usr/local/apache24/build/config.nice`
+
+---
 
 临时生效 : `~]# export PATH=/usrl/local/apache24/bin:$PATH && echo $PATH`
 
@@ -1238,6 +1252,8 @@ worker,event是基于线程模型
 # hash
 ```
 
+---
+
 导出头文件
 
 ``` shell
@@ -1245,33 +1261,42 @@ worker,event是基于线程模型
 # ls /usr/include/httpd/
 ```
 
-导出库文件：
+---
+
+导出库文件
 
 ``` shell
-# ldconfig -v	当前系统加载的库
-# ldconfig -p	当前系统已经加载的库的所有路径
+# ldconfig -v 当前系统加载的库
+# ldconfig -p 当前系统已经加载的库的所有路径
 # vim /etc/ld.so.conf.d/httpd.conf
   /usr/local/apache24/lib
 # ldconfig -v 加载库文件
 ```
 
-配置http-2.4服务脚本
+配置 http-2.4 服务脚本
 
 ``` shell
+# cd /etc/rc.d/initd./
+# cp httpd httpd24
+# vim httpd24
+  conf
+  pid
+  log
+  lock
 # chkconfig --add httpd24
 # chckconfig --list httpd24
 # service httpd24 status|start|stop|reload
 ```
 
-切换MPM：
+切换 MPM
 
 ``` shell
 # vim /etc/httpd24/httpd.conf
-# 导入mpm配置文件
+  # 导入mpm配置文件
   include /etc/httpd24/extra/httpd-mpm.conf
 ```
 
-后者导入event模块
+后者导入 event 模块
 
 ``` shell
 # vim /etc/httpd.conf
@@ -1291,7 +1316,7 @@ worker,event是基于线程模型
 ``` shell
 # ls /etc/httpd/modules/
 # httpd -l
-# httpd -M
+# httpd -M 模块列表
 ```
 
 #### httpd-2.4 配置应用
@@ -1308,7 +1333,7 @@ worker,event是基于线程模型
 # httpd -M
 ```
 
-2. 基于IP人访问控制
+2. 基于 IP 人访问控制
 
 `DocumentRoot "/apps/www/htdocs"`
 
@@ -1347,7 +1372,7 @@ worker,event是基于线程模型
 
 3. 虚拟主机
 
-基于FQDN的虚拟主机不再需要设置NameVirtualHost指令
+基于 FQDN 的虚拟主机不再需要设置 NameVirtualHost 指令
 
 ``` config
 <VirtualHost *:80>
