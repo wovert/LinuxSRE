@@ -1447,24 +1447,24 @@ Connection -> Coonection Pool -> SQL Interface -> Parser -> Optimizer -> Caches 
 - File System (NTFS, ufs, ext2/3, NfS,sAN,NAS)
 - File & Logs (Redo, Undo, Data, Index, Binary, Error, Query and Slow)
 
-## MySQL数据文件类型
+## MySQL 数据文件类型
 
 - 数据文件、索引文件
 - 重做日志、撤销日志、二进制日志、错误日志、查询日志、慢查询日志、中继日志
 
-## MySQL架构流程
+## MySQL 架构流程
 
 MySQL 内部组件的架构类型
 
-Connector 组件的各种各样的连接器(Native C API/JDBD/ODBC开放数据库系统互联/.NET/PHP/Perl/Python/Ruby/Cobol)，比如通过 Native C API 连接 MySQL 服务器
+`Connector` 组件的各种各样的连接器(`Native C API/JDBD/ODBC开放数据库系统互联/.NET/PHP/Perl/Python/Ruby/Cobol`)，比如通过 Native C API 连接 MySQL 服务器。编程语言连入数据库系统的驱动。站在 MySQL语言的角度，是 MySQL语言的连接器(Connectors)。
 
-MySQL 是单进程多线程，每一个用户连接都会连接线程，MYSQL 也有长短连接。
-
-MySQL 客户端连接 mysql 服务器之后，一直连接状态，直到注销连接状态。
-
-MySQL 也支持短链接模式，-e 选项，MySQL 运行之后立即返回，并断开连接。
+- MySQL 主体组成部分结构
+  - MySQL 是单进程多线程，每一个用户连接都会创建单独的连接线程来实现。起始 MYSQL 也有长短连接两种模式。MySQL 客户端连接 mysql 之后，一直是连接状态，直到注销连接状态。MySQL 也支持短链接模式，-e 选项，MySQL 运行之后立即退出并会断开连接。每一个用户连接都会创建单独的连接线程为每个客户端发来的请求处理构建响应报应并发送给客户端。由于，对于 MySQL 来讲单进程模型，所以必须维持线程池里管理众多线程如何对众多客户端的并发请求完成并发响应的。所以有 `Connection Pool`，而Connection Pool 对于 MySQL 而言，它所实现的功能包括但不仅限于像 `Authentication`(认证，要完成认证功能), `Thread Reuse` 线程重用功能，一般来讲当一个用户连接起来之后，我们需要线程响应它，当用户退出了线程之后，有可能并非销毁，而是把他清理完以后重新收归到线程池当中的空闲线程中去已完成线程重用(Thread Reuse)。`Connection Limit`，线程池的大小决定了连接并发数量的上限，比如：我们定义线程池如果一共只有容纳 100个线程池，那么一旦到达极限，后续的请求只能排队或拒绝连接。接着 `Check Memory` 检查线程内容，还有必要线程 `Cashes`，这整个都是线程池的相关功能。当用户请求之后，通过线程池建立用户连接，那么正在连接会话或连接用户一直存在，而用户通过会话用户发出SQL语句，而服务器收到SQL语句之后解析并完成执行。首先需要SQL解释器解析SQL语句，这就是 `SQL Interface`(DML,DDL,Stored Procedures, Views, Triggers, etc.)来实现解析语句。这个可以理解为整个MySQL的外壳，像 Shell 是Linux 系统的外壳一样道理。用户一般而言无论是哪一种连接发过来的基本的SQL请求，当然我们通过 Native C API请求不是SQL请求，而是API当中的参数调用。不过我们统统理解为 SQL 请求。对于SQL语句而言，它大体语句分为DML和DDL 两种类型，但无论那一种类型，向shell 调用内核，在内核运行之后，但在运行在内核之前，我们必须告诉内核哪一个是选项，哪一个是参数。它是否存在语法错误等等。因此，这个整个SQL Interface 是完完整整的SQL命令的解释器。SQL 接口还需要完备的具备的功能。比如，`过程式编程`；`支持代码块的实现`；`存储过程`；`存储函数`；`触发器`；必要时还需要关系型数据库必备组件 `view` 等等都是在 `SQL Interface` 接口上实现的。SQL 接口接着实现词法(`Prser`)分析语法分析之后
 
 MySQL 必须必须建立连接线程，创立完之后
+
+
+
 
 
 
