@@ -52,11 +52,11 @@
   - 编程接口：选择，循环
   - SQL代码：
     - 存储过程：procedure (call procename 没有返回值)
-    - 存储函数：function	(select funcname有返回值)
+    - 存储函数：function (select funcname有返回值)
     - 触发器：trigger
     - 事件调度器：event scheduler
 
-- 用户和权限：
+- MySQL 用户和权限：
   - 用户：用户名和密码
   - 权限：管理类、数据库、表、字段
 
@@ -145,18 +145,20 @@
 - 存储引擎也称为“表类型”；
 
 1. 更多的存储引擎；
-  - MyISAM：不支持事务
-  - MyISAM --> Aria(改进版)
-  - InnoDB --> XtraDB(改进版)：支持事务
 
-- MySQL-5.1默认存储引擎：MyISAM
-- MySQL-5.5+默认存储引擎：InnoDB
+- MyISAM：不支持事务
+- MyISAM --> Aria(改进版)
+- InnoDB --> XtraDB(改进版)：支持事务
+
+MySQL-5.1 默认存储引擎：MyISAM
+
+MySQL-5.5+ 默认存储引擎：InnoDB
 
 2. 诸多扩展和新特性；
 3. 提供了较多的测试组件；
 4. truly open source；
 
-## 安装和使用MariaDB：	
+## 安装和使用 MariaDB
 
 安装方式
 
@@ -235,7 +237,7 @@ skip_name_resolve = ON
 
 ##　安装 MySQL 5.6
 
-### yum安装 Mariadb
+### yum 安装 Mariadb
 
 [MariabDB](http://www.mariadb.org)
 
@@ -294,7 +296,7 @@ user, host 等
 
 ## 客户端类应用程序的可用选项：
 
-```
+``` options
 -u, --user=
 -h, --host=
 -p, --password=
@@ -1461,6 +1463,11 @@ MySQL 内部组件的架构类型
 - MySQL 主体组成部分结构
   - MySQL 是单进程多线程，每一个用户连接都会创建单独的连接线程来实现。起始 MYSQL 也有长短连接两种模式。MySQL 客户端连接 mysql 之后，一直是连接状态，直到注销连接状态。MySQL 也支持短链接模式，-e 选项，MySQL 运行之后立即退出并会断开连接。每一个用户连接都会创建单独的连接线程为每个客户端发来的请求处理构建响应报应并发送给客户端。由于，对于 MySQL 来讲单进程模型，所以必须维持线程池里管理众多线程如何对众多客户端的并发请求完成并发响应的。所以有 `Connection Pool`，而Connection Pool 对于 MySQL 而言，它所实现的功能包括但不仅限于像 `Authentication`(认证，要完成认证功能), `Thread Reuse` 线程重用功能，一般来讲当一个用户连接起来之后，我们需要线程响应它，当用户退出了线程之后，有可能并非销毁，而是把他清理完以后重新收归到线程池当中的空闲线程中去已完成线程重用(Thread Reuse)。`Connection Limit`，线程池的大小决定了连接并发数量的上限，比如：我们定义线程池如果一共只有容纳 100个线程池，那么一旦到达极限，后续的请求只能排队或拒绝连接。接着 `Check Memory` 检查线程内容，还有必要线程 `Cashes`，这整个都是线程池的相关功能。当用户请求之后，通过线程池建立用户连接，那么正在连接会话或连接用户一直存在，而用户通过会话用户发出SQL语句，而服务器收到SQL语句之后解析并完成执行。首先需要SQL解释器解析SQL语句，这就是 `SQL Interface`(DML,DDL,Stored Procedures, Views, Triggers, etc.)来实现解析语句。这个可以理解为整个MySQL的外壳，像 Shell 是Linux 系统的外壳一样道理。用户一般而言无论是哪一种连接发过来的基本的SQL请求，当然我们通过 Native C API请求不是SQL请求，而是API当中的参数调用。不过我们统统理解为 SQL 请求。对于SQL语句而言，它大体语句分为DML和DDL 两种类型，但无论那一种类型，向shell 调用内核，在内核运行之后，但在运行在内核之前，我们必须告诉内核哪一个是选项，哪一个是参数。它是否存在语法错误等等。因此，这个整个SQL Interface 是完完整整的SQL命令的解释器。SQL 接口还需要完备的具备的功能。比如，`过程式编程`；`支持代码块的实现`；`存储过程`；`存储函数`；`触发器`；必要时还需要关系型数据库必备组件 `view` 等等都是在 `SQL Interface` 接口上实现的。SQL 接口接着实现词法(`Prser`)分析语法分析之后
 
+  - Pluggable Storage Engines(MyISAM,InnoDB, Archive, Memory, Merge, )
+  - File System(NTFS,ufs,ext2/3, NFS,SAN,NAS)
+  - Files & Logs(Fedo, Undo, Data, index, Binary, Error, Query and Slow)
+
+
 MySQL 必须必须建立连接线程，创立完之后
 
 
@@ -2024,9 +2031,9 @@ P1,P2
 
 - 服务器端命令：
   - DDL：主要用于管理数据库组件，例如表、索引、视图、用户、存储过程
-    - CREATE、ALTER、DROP
+    - CREATE、ALTER、DROP、INDEX、VIEW、USER
   - DML：主要用管理表中的数据，实现数据的增、删、改、查；
-    - INSERT， DELETE， UPDATE， SELECT
+    - INSERT/REPLACE， DELETE， UPDATE， SELECT
   - 获取命令帮助：`mysql> help  KEYWORD`
 
 ## 数据库管理：
@@ -2035,19 +2042,19 @@ P1,P2
 - 查看支持的所有字符集：`SHOW CHARACTER SET`
 - 查看支持的所有排序规则：`SHOW COLLATION`
 - 创建数据库：`CREATE  {DATABASE | SCHEMA}  [IF NOT EXISTS]  db_name;`
-`[DEFAULT]  CHARACTER SET [=] charset_name`
-`[DEFAULT]  COLLATE [=] collation_name`
+  - `[DEFAULT]  CHARACTER SET [=] charset_name`
+  - `[DEFAULT]  COLLATE [=] collation_name`
 
 - 修改：`ALTER {DATABASE | SCHEMA}  [db_name]`
-`[DEFAULT]  CHARACTER SET [=] charset_name`
-`[DEFAULT]  COLLATE [=] collation_name`
+  - `[DEFAULT]  CHARACTER SET [=] charset_name`
+  - `[DEFAULT]  COLLATE [=] collation_name`
 - 删除：`DROP {DATABASE | SCHEMA} [IF EXISTS] db_name`
 
-## TABLE MANAGEMENT：
+## TABLE MANAGEMENT
 
 - 查看表结构：`mysql> desc tbl_name`
 - 查看数据库支持的所有存储引擎类型：`mysql> SHOW ENGINES;`
--查看某表的存储引擎类型：`mysql> SHOW TABLES STATUS [LIKE 'tbl_name']`
+- 查看某表的存储引擎类型：`mysql> SHOW TABLES STATUS [LIKE 'tbl_name']`
 - 查看表上的索引的信息：`mysql> SHOW INDEXES FROM tbl_name;`
 - 删除：`DROP TABLE [IF EXISTS] tbl_name [, tbl_name] ...`
 - 表的引用方式：
@@ -2056,7 +2063,7 @@ P1,P2
 
 CREATE：CREATE TABLE [IF NOT EXISTS] tbl_name (create_defination) [table_options]
 
-### create_defination:
+### create_defination
 
 - field：col_name  data_type
 - key：
@@ -2068,7 +2075,7 @@ CREATE：CREATE TABLE [IF NOT EXISTS] tbl_name (create_defination) [table_option
 - table_options
   - ENGINE [=] engine_name
 
-## 用户账号及权限管理
+## MySQL 用户账号及权限管理
 
 ### 权限类别
 
@@ -2083,20 +2090,21 @@ CREATE：CREATE TABLE [IF NOT EXISTS] tbl_name (create_defination) [table_option
 - create temporary tables 创建临时表 （空间：16M ）
 - create user
 - file （导出文件，加载文件）
-- super
+- super(执行高级管理类权限，root)
 - show databases
 - reload (重新装载授权表)
 - shutdown (关闭数据库)
-- replication slave（复制）
-- replication client
+- replication slave(复制主从)
+- replication client(请求复制)
 - lock tables
-- process
+- process(show process list;)
 
-## 程序类 - create,alter,drop,excute
+## 程序类 - create, alter, drop, excute
 
 - procedure
 - function
 - trigger
+- 事件调度器
 
 ## 库和表级别: database or table
 
@@ -2127,8 +2135,8 @@ CREATE：CREATE TABLE [IF NOT EXISTS] tbl_name (create_defination) [table_option
 ## 元数据数据库：mysql
 
 - 授权表
-  - db,host,user
-  - columns,priv, tables_priv, proces_priv, proxies_priv
+  - db, host, user 数据库/哪些客户端主机/用户
+  - columns, priv, tables_priv, proces_priv, proxies_priv
 
 ## 用户账号
 
@@ -2138,87 +2146,95 @@ CREATE：CREATE TABLE [IF NOT EXISTS] tbl_name (create_defination) [table_option
     - IP地址或Network;
     - 通配符：%, _
       - 172.16.%.%
+
 - 创建用户： `create user 'username'@'host' [identified by 'password']`
 - 查看用户的授权：`show grants for 'username'@'host'`
 - 重命名用户：`rename user old_username to new_username`
 - 删除用户：`drop user 'username'@'host'`
 
-- 修改密码：
+修改密码
 ``` mysql
-set password for
+第一种方法
+> set password for root@localhost = password('123');
 
-update  mysql.user set password=password('you_password') where clause  不会重读授权表，因此执行`mysql> flush privileges`
+第二种方法
+> update  mysql.user set password=password('you_password') where clause  不会重读授权表，因此执行 mysql> flush privileges
 
-mysqladmin password
-mysqladmin [options] command command ...
-- options: -h, -u,-p
-  mysqldmin -uroot -p create tdb 创建数据库（不用连接数据库）
-  mysqladmin drop tdb 删除数据库
-  mysqladmin ping
-  mysqladmin --help
+第三种方法
+# mysqladmin password
+# mysqladmin [options] command command ...
+options: -h, -u,-p
+
+# mysqldmin -uroot -p create tdb 创建数据库（不用连接数据库）
+# mysqladmin drop tdb 删除数据库
+# mysqladmin ping
+# mysqladmin --help
 
 mysql> flush status;
 # mysql -e 'flush privileges'
 ```
 
-## 忘记管理员密码
+## 忘记管理员密码(忘记 mysql root 账号密码)
 
 1. 启动mysqld进程时，为其使用： --skip-grant-tables --skip-networking 禁止远程登录  
 2. 使用update命令修改管理员密码: `update mysql.user set password=PASSWORD('password') where user='root';`
 3. 关闭mysql进程，移除上述两个选项，重启mysqld
 
-- 修改my.cnf配置文件
-`# sudo vi /etc/my.cnf`
+``` 修改 my.cnf配置文件
+# sudo vi /etc/my.cnf
+  [mysqld]
+  skip-grant-tables
 ```
-[mysqld]
-skip-grant-tables
+
+重启服务: `# sudo systemctl restart mysqld`
+
+```登陆并修改密码
+# mysql -uroot
+mysql> use mysql
 ```
 
-- 重启服务: `# sudo systemctl restart mysqld`
+MySQL 5.7.6 以及最新版本修改密码：`# mysql> update user set authentication_string=PASSWORD('newpass') where User='root';`
 
-- 登陆并修改密码
-`# mysql -uroot`
-`# mysql> use mysql`
-
-- 修改密码
-- MySQL 5.7.6 以及最新版本：
-`# mysql> update user set authentication_string=PASSWORD('newpass') where User='root';`
-
-- MySQL 5.7.5 或更早之前的版本r:
+MySQL 5.7.5 或更早之前的版本修改密码:
 `# mysql> update user set password=PASSWORD('newpass') where User='root';`
 
-- 授权远程访问
-1. mysql -u root -p
-2. GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'your_root_password' WITH GRANT OPTION;
-3. FLUSH PRIVILEGES;
+授权远程访问
+``` mysql
+#  mysql -u root -p
+> GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'your_root_password' WITH GRANT OPTION;
+> FLUSH PRIVILEGES;
+> create database sina default character set utf8mb4 collate utf8mb4_unicode_ci;
+```
 
-`> create database sina default character set utf8mb4 collate utf8mb4_unicode_ci`
+## grant(授权)
 
-## 授权:grant
+```
+grant priv_type[,...] on [{table|function|procedure}] db.{table|routine} to 'username'@'host' [identified by 'password'] [require ssl] [with with_option]
 
-`grant priv_type[,...] on [{table|function|procedure}] db.{table|routine} to 'username'@'host' [identified by 'password'] [require ssl] [with with_option]`
+with_option
+  grant options 默认
+  max_queries_per_hour count
+  max_updates_per_hour count
+  max_connections_per_hour count
+  max_user_connections count
+```
 
-- with_option
-  - grant options 默认
-  - max_queries_per_hour count
-  - max_updates_per_hour count
-  - max_connections_per_hour count
-  - max_user_connections count
-
-- 用户账号：'username'@'host'
+用户账号：'username'@'host'
   
-  - host：此用户访问当前mysql服务器时，允许其通过哪些主机远程可创建连接
-    - 表示方式：IP，网络地址、主机名、通配符(%和_)
-  - 禁止检查主机名：my.cnf
-    - [mysqld]
-    - `skip_name_resolve = ON`
-  - 创建用户账号：`CREATE USER 'username'@'host' [IDENTIFIED BY 'password'];`
-  - 删除用户账号：`DROP USER  'user'@'host' [, user@host] ...`
+- host：此用户访问当前mysql服务器时，允许其通过哪些主机远程可创建连接
+  - 表示方式：IP，网络地址、主机名、通配符(%和_)
+- 禁止检查主机名：my.cnf
+  - [mysqld]
+  - `skip_name_resolve = ON`
+- 创建用户账号：`CREATE USER 'username'@'host' [IDENTIFIED BY 'password'];`
+- 删除用户账号：`DROP USER  'user'@'host' [, user@host] ...`
 
 - 授权：
   - 权限级别：管理权限、数据库、表、字段、存储例程；
 
-`GRANT priv_type,... ON [object_type] db_name.tbl_name TO 'user'@'host' [IDENTIFIED BY 'password'];`
+```
+GRANT priv_type,... ON [object_type] db_name.tbl_name TO 'user'@'host' [IDENTIFIED BY 'password'];
+```
 
 - priv_type
   - ALL [PRIVILEGES]
@@ -2236,19 +2252,21 @@ skip-grant-tables
 
 - 查看指定用户所获得的授权：
   - `SHOW GRANTS FOR 'user'@'host'`
-  - `SHOW GRANTS FOR CURRENT_USER;`	
+  - `SHOW GRANTS FOR CURRENT_USER;`
 
 - 取消授权：
   - `REVOKE priv_type, ... ON db_name.tbl_name FROM 'user'@'host';`
 
-##　注意：MariaDB服务进程启动时，会读取mysql库的所有授权表至内存中；
+##　注意：MariaDB 服务进程启动时，会读取 mysql 库的所有授权表至内存中
+
 1. GRANT或REVOKE命令等执行的权限操作会保存于表中，MariaDB此时一般会自动重读授权表，权限修改会立即生效；
+
 2. 其它方式实现的权限修改，要想生效，必须手动运行`FLUSH PRIVILEGES命令`方可；
 
 - 加固mysql服务器，在安装完成后，运行`mysql_secure_installation`命令；
 - 实现安全设定，用户账号空秘密删除等操作
 
-## 图形管理组件：
+## 图形管理组件
 
 - Mysql-Front
 - ToadForMySQL
@@ -2280,7 +2298,7 @@ skip-grant-tables
   - Qcache_free_blocks 1 空闲内存块
   - Qcache_free_memory  内存空闲空间
   - Qcache_hits
-  - Qcache_inserts 	可缓存查询语句的结果被放入缓存中次数
+  - Qcache_inserts 可缓存查询语句的结果被放入缓存中次数
   - Qcache_lowmem_prunes 内存空间太少而使用prunes算法清理缓存
   - Qcache_not_cached   可缓存，当没能被缓存的结果
   - Qcache_queries_in_cache  当前的缓存空间中缓存的被查询的个数
@@ -2288,11 +2306,11 @@ skip-grant-tables
 
 - 缓存命中率的评估：**Qcache_hits/(Qcache_hits+Com_select)**
 
-## 索引
+## MySQL 索引
 
 - 基本法则：索引应该构建在被用作查询条件的字段上
 
-### 索引类型：
+### MySQL 索引类型
 
 ### B+ Tree索引（数据结构）：顺序存储，每一个叶子节点到根节点的距离是相同的
 
