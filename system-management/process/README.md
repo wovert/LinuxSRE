@@ -146,16 +146,16 @@
 
 ## Linux系统上的查解及管理工具
 
-> pastree, ps, pidof, pgrep, top, htop, glance,pmap,vmstat,dstat,kill,pkill,job,bg,fg,nohup,nice,renice,kiall
+`pstree`, `ps`, `pidof`, `pgrep`, `top`, `htop`, `glance`,`pmap`,`vmstat`,`dstat`,`kill`,`pkill`,`job`,`bg`,`fg`,`nohup`,`nice`,`renice`,`killall`
 
 ### CentOS 5
 
-- SysV Init
+- SysV Init 程序
   - 缺陷：系统启动和引导时，它创建各个子进程，借助于shell完成的，因此执行脚本来完成，有可能使用上千个进程)
 
 ### CentOS 6
 
-- upstart
+- upstart 程序
   - 启动很多命令来启动系统启动，并行启动多个服务)
 
 ### CentOS 7
@@ -164,18 +164,16 @@
   - systemctl，由 systemd 控制
   - /sbin/init
 
-## pstree
+### pstree
 
 > display a tree of process
 > 包命: psmisc
 
-## ps
+### ps
 
 > report a snapshot of the current processes.（静态状态进程，包括线程信息）
 
-### /proc/
-
-> 内核中的状态信息
+`/proc/`: 内核中的状态信息
 
 - 内核参数：
   - 可设置其值从而调整内核运行特性的参数；/proc/sys/
@@ -183,22 +181,28 @@
 - 参数：模拟成文件系统类型；
 - 进程
 
-### `/proc/#PID`
+``` PID
+/proc/#
+  #: PID
+```
 
 - PID 1：init or systemd process id
 - /proc/1/cmdline：启动进程命令行程序
 - /proc/1/maps 内存映射，物理内存空间分配
-- *.so 库文件
+
+`# cat proc/1/maps`
+
+- *.so 共享库文件
 - [heap] 堆内存
 - [stack] 栈内存
 
-``` SHELL
-ps 只查看当前bash环境进程
+`ps` 只查看当前bash环境进程
+
 选项有三个风格：
+
 1. UNIX options: 必须带着-
 2. BSD: 必须不带-
 3. GNU: 长格式，两个横杠
-```
 
 ### 启动进程的方式
 
@@ -208,62 +212,69 @@ ps 只查看当前bash环境进程
 
 ### 常用选项
 
-- a：所有与终端相关的进程
-- x: 所有与终端无关的进程
-  - PID
-  - TTY
-  - STAT
-  - TIME：累计CPU占用时间)
-  - COMMAND: [内核线程]
+``` OPTIONS
+a：所有与终端相关的进程
+x: 所有与终端无关的进程
+  PID
+  TTY
+  STAT
+  TIME：累计CPU占用时间)
+  COMMAND: [内核线程]
+u: 终端登录的用户的所有进程
+  USER 用户名
+  PID  进程号
+  %CPU 累计CPU时间比率
+  %MEM 累计内存占用比率
+  VSZ Virtual Memory Set，占用虚拟内存集
+  RSS Resident Memory Set，常驻内存集
+  TTY 终端设备
+  STAT 进程状态
+    R: Running进程运行中
+    S: interruptable sleeping进程睡眠状态(idle),但可以被唤醒(signal)
+    D: uninterruptable sleeing,不可唤醒睡眠状态，此进程可能在等待I/O
+    T: Stopped,停止状态，可能在工作控制（后台暂停）或除错(traced)状态
+    Z: Zombie
 
-- u: 终端登录的用户的所有进程
-  - USER 用户名
-  - PID  进程号
-  - %CPU 累计CPU时间比率
-  - %MEM 累计内存占用比率
-  - VSZ Virtual Memory Set，占用虚拟内存集
-  - RSS Resident Memory Set，常驻内存集
-  - TTY 终端设备
-  - STAT 进程状态
-    - R: Running进程运行中
-    - S: interruptable sleeping进程睡眠状态(idle),但可以被唤醒(signal)
-    - D: uninterruptable sleeing,不可唤醒睡眠状态，此进程可能在等待I/O
-    - T: Stopped,停止状态，可能在工作控制（后台暂停）或除错(traced)状态
-    - Z: Zombie
+    +: 前台进程，终端命令
+    l: 多线程集成
 
-    - +: 前台进程，终端命令
-    - l: 多线程集成
+    N: 低优先级进程
+    <: 高优先级进程
 
-    - N: 低优先级进程
-    - <: 高优先级进程
+    s: session leader(bash,可以声明子集成管理的进程)
+    L: 有记忆体分页分配并锁在记忆体内 (即时系统或捱A I/O)
+    W: 没有足够的记忆体分页可分配
 
-    - s: session leader(bash,可以声明子集成管理的进程)
-    - L: 有记忆体分页分配并锁在记忆体内 (即时系统或捱A I/O)
-    - W: 没有足够的记忆体分页可分配
+  START 该进程触发启动时间  
+  TIME 运行时间
+  COMMAND 命令
 
-  - START 该进程触发启动时间  
-  - TIME 运行时间
-  - COMMAND 命令
+f: 完整格式，进程树
+j：工作的格式(jobs format)
+```
 
-- f: 完整格式，进程树
-- j：工作的格式(jobs format)
+`#ps auxs`
 
 ### Unix 选项
 
-- -e：显示所有进程
-- -f：显示完整格式的进程信息
-  - C: pcpu, cpu utilization CPU占用百分比
-  - STIME: 启动时间
-- -l：详细格式显示进程信息，必须使用UNIX格式
-- -F：显示完整格式的进程信息
-  - PSR：运行于哪颗CPU之上 (0开始)
-- -H：层级结构显示进程的相关信息
-- -o：选择字段
-  - o  field1, field2,...：自定义显示的字段列表，以逗号分隔
-  - 常用字段：pid, ni, pri, psr, pcpu, stat, comm, tty, ppid, rtprio
-    - ni: nice值
-    - pri: priority，优先级
-    - rtprio：real time priority，实时优先级
+``` options
+-e：显示所有进程
+-f：显示完整格式的进程信息
+  C: pcpu, cpu utilization CPU占用百分比
+  STIME: 启动时间
+-l：详细格式显示进程信息，必须使用UNIX格式
+-F：显示完整格式的进程信息
+- PSR：运行于哪颗CPU之上 (0开始)
+-H：层级结构显示进程的相关信息
+-o：选择字段
+  o  field1, field2,...：自定义显示的字段列表，以逗号分隔
+  
+常用字段：pid, ni, pri, psr, pcpu, stat, comm, tty, ppid, rtprio
+  ni: nice值
+  pri: priority，优先级
+  rtprio：real time priority，实时优先级
+```
+
 
 ### BSD
 
