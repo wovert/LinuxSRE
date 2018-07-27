@@ -229,11 +229,11 @@ u: 终端登录的用户的所有进程
   RSS Resident Memory Set，常驻内存集
   TTY 终端设备
   STAT 进程状态
-    R: Running进程运行中
-    S: interruptable sleeping进程睡眠状态(idle),但可以被唤醒(signal)
-    D: uninterruptable sleeing,不可唤醒睡眠状态，此进程可能在等待I/O
-    T: Stopped,停止状态，可能在工作控制（后台暂停）或除错(traced)状态
-    Z: Zombie
+    R: Running 进程运行中
+    S: interruptable sleeping 进程睡眠状态(idle),但可以被唤醒(signal)
+    D: uninterruptable sleeping 不可唤醒睡眠状态，此进程可能在等待I/O
+    T: Stopped 停止状态，可能在工作控制（后台暂停）或除错(traced)状态
+    Z: Zombie 僵尸态
 
     +: 前台进程，终端命令
     l: 多线程集成
@@ -264,7 +264,7 @@ j：工作的格式(jobs format)
   STIME: 启动时间
 -l：详细格式显示进程信息，必须使用UNIX格式
 -F：显示完整格式的进程信息
-- PSR：运行于哪颗CPU之上 (0开始)
+  PSR：运行于哪颗CPU之上 (0开始)
 -H：层级结构显示进程的相关信息
 -o：选择字段
   o  field1, field2,...：自定义显示的字段列表，以逗号分隔
@@ -274,7 +274,6 @@ j：工作的格式(jobs format)
   pri: priority，优先级
   rtprio：real time priority，实时优先级
 ```
-
 
 ### BSD
 
@@ -304,8 +303,8 @@ pid, ni, pri, psr, pcpu, stat, comm, tty, ppid, rtprio
 
 ``` OPTIONS
 -eHo
--efl:显示长格式的所有进程，显示PPID
--Al,-Af:另一种显示所有进程，显示PPID
+-efl: 显示长格式的所有进程，显示PPID
+-Al,-Af: 另一种显示所有进程，显示PPID
 ```
 
 ### PID 顺序显示
@@ -348,7 +347,7 @@ pgrep [options] pattern
   -t  TERMINAL：与指定的终端相关的进程
   -l：显示进程名
   -a：显示完整格式的进程名
-  -P pid：显示此进程的子进程
+  -P pid：显示此进程的子进程号
 # pgrep ssh
 # pgrep http* -al
 ```
@@ -359,14 +358,13 @@ pgrep [options] pattern
 
 `# pidof ssh`
 
-## `uptime` 命令
+## uptime 命令
 
-> **系统时间**,**运行时长**，**登录用户数**、**平均负载**：1min,5min,15min（**等待运行队列长度**）
+> 显示**系统时间**,**运行时长**，**登录用户数**、**平均负载**：1min,5min,15min（**等待运行队列长度**）
 
 ### Load average
 
-> 某分钟平均队列长度，CPU等待运行的进程队列长度，等待的进程太多
-超出3个，应付不了队列集成。除了多核CPU，总数量不能大于CPU核数
+> 某分钟平均队列长度，CPU等待运行的进程队列长度，等待的进程太多。超出3个，应付不了队列集成。除了多核CPU，总数量不能大于CPU核数
 
 ## top 命令
 
@@ -378,9 +376,9 @@ pgrep [options] pattern
   - 0.0 ni(nice占用%)
   - 99.9 id(idle,空闲百分比)
   - 0.0 wa(wait，等待IO消耗的时间)
-  - 0.0 hi(hardware interrupt，处理硬件中断%)
-  - 0.0 si(软中断)
-  - 0.0 cs(context switch,上下文切换)
+  - 0.0 hi(hardware interrupt，处理硬件中断所消耗的%)
+  - 0.0 si(软中断所小号的%)
+  - 0.0 cs(context switch,上下文切换%)
   - 0.0 st(stoler，被虚拟化偷走的%)
 
 - KiB Mem(物理内存):total, free, used, buff/cache
@@ -392,18 +390,19 @@ pgrep [options] pattern
 
 ### top 排序
 
-- P: 默认占用CPU排序
-- M: 占据Memory排序
-- T: CPU占用累计时间TIME
+- P: 默认占用 CPU 排序
+- M: 占据 Memory 排序
+- T: CPU 占用累计时间 TIME
 
 ### top 首部信息
 
-- l: uptime信息
-- t: tasks及CPU
+- l: uptime 信息
+- t: tasks 及 CPU
 - m: 内存信息
-- 1: 按CPU每核心数显示
+- 1: 按 CPU 每核心数显示
 - q: 退出命令
 - s: 修改刷新时间间隔
+  - 默认: 3s
 - k: 终止指定的进程
 
 ### top 选项
@@ -412,7 +411,7 @@ pgrep [options] pattern
 - -b: 以批次方式显示
 - -n: 显示多少批次
 
-## `htop` 命令
+## htop 命令
 
 > 包命
 
@@ -437,7 +436,7 @@ l: list oprn files with lsof，进程打开的文件
 s: trace syscalls with strace，跟踪进程系统调用
 ```
 
-## `vmstat` 命令
+## vmstat 命令
 
 > Report virtual memory statistics
 
