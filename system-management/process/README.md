@@ -41,9 +41,10 @@
 
 ## Process: 运行中的程序的一个副本，存在生命周期
 
-## Linux 内核进程信息的固定格式：task struck
+## Linux 内核进程信息的固定格式：
 
-- 多个任务的task struct组件的链表：task list
+- task struck 任务结构
+- 多个任务的task struct组件的链表：task list 任务列表
 
 ## 创建进程
 
@@ -413,7 +414,8 @@ pgrep [options] pattern
 
 ## htop 命令
 
-> 包命
+- 源：epel
+- 包名: yum -y install htop
 
 ``` OPTIONS
 Options
@@ -424,10 +426,10 @@ Options
 
 ### 子命令
 
-1. 显示选定的进程打开的文件：l
-2. 跟踪选定的进程的系统调用：s
-3. 以层级关系显示各进程状态：t
-4. 将选定的进程绑定在某指定的CPU核心：a
+1. l: 显示选定的进程打开的文件
+2. s: 跟踪选定的进程的系统调用
+3. t: 以层级关系显示各进程状态
+4. a: 将选定的进程绑定在某指定的CPU核心
 
 ``` SHELL
 Task: 39用户空间进程，18thr； 1 running
