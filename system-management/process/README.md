@@ -442,51 +442,51 @@ s: trace syscalls with strace，跟踪进程系统调用
 
 > Report virtual memory statistics
 
-`vmstat [options] [delay [count]]`
+``` SHELL
+vmstat [options] [delay [count]]
+```
 
 ``` OPTIONS
-Options:
-  -d:delay 刷新, -d 2 3 2秒刷新，第3次结束
-  -s：内存统计数据
+-d: delay 刷新, -d 2 3 2秒刷新，第3次结束
+-s：内存统计数据
 ```
 
 ### procs
 
-`r`: 等待运行的进程个数；CPU上实时等待运行的任务队列长度
-
-### load overage
-
-`b`: 处于不可中断睡眠态的进程个数；被阻塞的任务队列长度
+- `r`: running, 等待运行的进程个数；CPU上实时等待运行的任务队列长度
+- `b`: 处于不可中断睡眠态的进程个数；被阻塞的任务队列长度; 太长，IO等待时间消耗很多
 
 ### memory
 
-- swpd: 交换内存的使用总量
-- free: 空闲的物理内存总量
-- buff: 用于数据缓冲的内存总量
-- cache: 用户数据缓存的内存总量
+- `swpd`: 交换内存的使用总量
+- `free`: 空闲的物理内存总量
+- `buff`: 用于数据缓冲的内存总量
+- `cache`: 用户数据缓存的内存总量
 
 ### swap
 
-- si: 数据进入swap的数据速率(kb/s)
-- so: 数据离开swap的数据速率(kb/s)
+- `si`: 数据进入swap的数据速率(kb/s)
+- `so`: 数据离开swap的数据速率(kb/s)
 
-### io:
+### io
 
-- bi: 从块设备读入数据到系统的速率(kb/s)
-- bo: 保存数据至块设备的速率(kb/s)
+- `bi`: 从块设备读入数据到系统的速率(kb/s)
+- `bo`: 保存数据至块设备的速率(kb/s)
 
-### system:
+### system
 
-- in: interrupts，中断速率，每秒中断次数
-- cs: context switch,进程上下文切换速率
+- `in`: interrupts，中断速率，每秒中断次数
+  - 软中断：用户模式转为系统内核模式
+  - 硬中端：硬件级别通知使用硬中端
+- `cs`: context switch, 进程上下文切换速率
 
-### cpu:
+### cpu
 
-- us: user space在CPU的占用的%
-- sy: system
-- id: idle
-- wa: wait
-- st: stolen
+- `us`: user space在CPU的占用的%
+- `sy`: system
+- `id`: idle
+- `wa`: wait
+- `st`: stolen
 
 ## `pmap` 命令
 
@@ -501,14 +501,15 @@ Options:
 ### 另一种查看方式
 
 ``` SHELL
+# cat /proc/PID/maps
 # cat /proc/1/maps
 ```
 
 ### 一个文件在不同的内存空间中
 
-- [ anon ]:匿名页
-- [ stack ]:栈
-- [ heap ]：堆
+- [ anon ]: 匿名页
+- [ stack ]: 栈
+- [ heap ]: 堆
 
 ``` MAP
 00007ff771a41000     16K r-x-- libuuid.so.1.3.0
@@ -517,18 +518,21 @@ Options:
 00007ff771c45000      4K rw--- libuuid.so.1.3.0
 ```
 
-## glances命令：python语言开发,支持c/s架构模式
+## `glances` 命令
+
+> 跨平台的监控工具
+> 依赖 epel 源 python 语言开发, 支持 c/s 架构模式
 
 ``` SHELL
-常用选项
-  -b：以byte为单位显示网卡速率
-  -d：关闭磁盘I/O模块
-  -m：关闭mount模块
-  -n：关闭network模块
-  -t #：刷新时间间隔
-  -1：每个CPU核心的相关数据单独显示
-  -o {html | csv}：输出格式
-  -f dir：输出文件的位置
+-b：以byte为单位显示网卡速率
+-d：关闭磁盘I/O模块
+-m：关闭mount模块
+-n：关闭network模块
+-t #：刷新时间间隔
+-1：每个CPU核心的相关数据单独显示
+-o {html | csv}：输出格式
+-f dir：输出文件的位置
+
 # yum -y install python-jinja2`
 # glances -o HTML -f /tmp/
 ```
@@ -536,34 +540,38 @@ Options:
 ### C/S模式下运行glances命令
 
 - 服务模式: `# glances -s -B IPADDR` IPADDR：本机的某地址，用于监听
-
 - 客户端模式: `# glances -c IPADDR` IPADDR: 是远程服务器的地址
 
 ## dstat命令
 
-`# dstat 2 5`
+> 依赖base 源
 
-- c，--cpu：cpu相关信息
-  - C 0,3,total
-- d:disk/total，磁盘相关数据平均值
-  - D sda,sdb,total
-- n: network
-- m：memory
-- g: paging
-- r: io
-- s: swap stats(used, free)
-- p: process(ruanable,uninterruptible,new)
-- y：system
-- --ipc：进程间通信（message queue, semaphores, shared memory）
-- --tcp
-- --udp
-- --raw：raw socket
-- --socket
+``` shell
+# dstat 2 5
+  c，--cpu：cpu相关信息
+    C 0,3,total
 
-- --top-cpu 占用资源量较大的进程
-- --top-io：最占用IO进程
-- --top-mem：最占用内存的进程
-- --top-lantency：延迟最大的进程
+d:disk/total，磁盘相关数据平均值
+  D sda,sdb,total
+n: network
+m：memory
+g: paging
+r: io
+s: swap stats(used, free)
+p: process(ruanable,uninterruptible,new)
+y：system
+
+--ipc：进程间通信（message queue, semaphores, shared memory）
+--tcp
+--udp
+--raw：raw socket
+--socket
+
+--top-cpu 占用资源量较大的进程
+--top-io：最占用IO进程
+--top-mem：最占用内存的进程
+--top-lantency：延迟最大的进程
+```
 
 ## kill命令
 
@@ -581,11 +589,11 @@ kill -l [signal]
 2. 信号的完整名称
 3. 信号的简写名称
 
-### 向进程发送信号：
+### 向进程发送信号
 
 ``` SHELL
 kill [-s signal] [-SIGNAL] PID...
-
+# kill -l
 # ps auxf | grep httpd
 # kill -s 15 3045
 ```
@@ -608,7 +616,7 @@ kill [-s signal] [-SIGNAL] PID...
 15 SIGTERM：terminate，终止运行中的进程并删除进程（后台进程）；默认信号
 优雅杀死
 
-18 SIGCONT：继续(停止进程继续执行)
+18 SIGCONT：继续(停止进程继续执行,比如复制命令)
 
 19 SIGSTOP：停止（送往后台进程）
 
@@ -620,10 +628,10 @@ killall [-SIGNAL] program
 
 ## 作业控制
 
-### Job:
+### Job
 
-- foreground前台作业：通过终端启动且启动后会一直占用终端
-- background后台作业：通过终端启动，启动后转入后台运行（释放终端）
+- foreground 前台作业：通过终端启动且启动后会一直占用终端
+- background 后台作业：通过终端启动，启动后转入后台运行（释放终端）
 
 ### 如何让作业运行后台？
 
@@ -634,7 +642,9 @@ killall [-SIGNAL] program
 
 `# nohup COMMAND &`
 
-### 查看所有作业：`# jobs`
+### 查看所有作业
+
+`# jobs`
 
 ### 可实现作业控制的命令：
 
