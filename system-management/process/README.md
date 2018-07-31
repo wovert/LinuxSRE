@@ -680,7 +680,7 @@ options
 ## renice命令
 
 ``` SELLL
-# renice -n NICE PID
+# renice -n NICE值 PID
 ```
 
 ##　查看nice值和优先级
@@ -693,22 +693,22 @@ options
 
 - 博客作业：htop/dstat/top/ps命令的使用
 
-## 网络客户端工具：
+## 网络客户端工具
 
-ping/lftp/ftp/traceroute/wget等
+`ping/lftp/ftp/traceroute/wget等`
 
 ### ping命令
 
->探测目标网络连通性
+> 探测目标网络连通性
 
 ``` SHELL
 ping [OPTIONS] destination
 OPTIONS
   -c count：发送ping包个数
   -I interface：从哪个接口发送请求
-   -W timeout：一次ping操作中，等待对方响应的超时时长
-   -w second：ping命令超时时长(ping命令最多命令多长时间)
-   -s 128：指定包大小
+  -W timeout：一次ping操作中，等待对方响应的超时时长
+  -w second：ping命令超时时长(ping命令最多命令多长时间)
+  -s 128：指定包大小
 
 ICMP：Internet Control Message Protocol
 echo request, type:8
@@ -728,10 +728,11 @@ echo reply, type:0
 OPTIONS:
   --fast destination
   --faster destination
+  --flood
   -i u10000，一秒钟发送10个包
 ```
 
-## traceroute命令
+## traceroute 命令
 
 > 跟踪从源主机到目标主机之间经过的网关
 
