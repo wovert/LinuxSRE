@@ -36,18 +36,18 @@
 ## 内核设计
 
 - 单内核设计：所有功能集成于同一个程序
-  - Linux
+  - 代表产品：Linux
 - 微内核设计：每种功能使用一个单独的子系统实现
-  - Windows, Solaris
+  - 代表产品：Windows, Solaris
 
-## Linux内核特点：
+## Linux内核特点
 
 - 支持模块化
   - `.ko`(kernel object)除了文件系统、驱动程序等主要模块之外都使用了内核对象（模块） 是动态转载卸载的内核模块(某一种功能实现)
   - `.so`(shared object，共享对象，各种应用程序之间共享的模块)
 - 支持**模块运行时**动态装载或卸载
 
-## Linux内核组成部分：
+### Linux内核组成部分：
 
 - 核心文件：文件系统、驱动程序、网络协议等文件
   - `/boot/vmlinuz-VERSION.release`
