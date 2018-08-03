@@ -49,21 +49,25 @@
 
 ### Linux内核组成部分：
 
+- 核心文件：`/boot/vmlinuz-VERSION.release`
+- rimdisk：虚拟内存盘
+- 模块文件 `/lib/modules/$(uname -r)/kernel/`
+
 - 核心文件：文件系统、驱动程序、网络协议等文件
   - `/boot/vmlinuz-VERSION.release`
     - 核心文件放置文件：编译后的后文件
-    - /boot/vmlinuz-3.10.0-327.el7.x86_64
-    - /boot/vmlinuz-$(uname -r)
+    - `/boot/vmlinuz-3.10.0-327.el7.x86_64`
+    - `/boot/vmlinuz-$(uname -r)`
     - z:内核文件压缩后文件格式
 
 - rimdisk：虚拟内存盘
   - 虚拟内存盘是通过软件将一部分内存（RAM）模拟为硬盘来使用的一种技术。相对于直接的硬盘文件访问来说，这种技术可以极大的提高在其上进行的文件访问的速度。但是RAM的易失性也意味着当关闭电源后这部分数据将会丢失。但是在一般情况下，传递到RAM盘上的数据都是在硬盘或别处永久贮存的文件的一个拷贝。经由适当的配置，可以实现当系统重启后重新建立虚拟盘。
   - CentOS 5: /boot/initrd-VERSION-release.img
     - rd:（ram disk）内存当磁盘使用，磁盘里必须有缓存和缓冲)
-  - CentOS 6,7: /boot/initramfs-VERSION-relase.img
+  - CentOS 6,7: /boot/initramfs-VERSION-release.img
     - ramfs：文件系统，避免双缓存缓冲，提高性能速度
 
-- 模块文件
+- Linux 模块文件
   - `/lib/modules/$(uname -r)/kernel/`
     - arch    平台相关的特有代码（汇编级别）
     - fs      文件系统，ext2,ext3编译进内核中
@@ -73,7 +77,7 @@
     - mm      内存功能
     - net     网络功能
     - sound   声音相关驱动程序，解码器
-    - kernel  内核追中到的文件模块 
+    - kernel  内核追中到的文件模块
 
 ## Linux 内核版本
 
@@ -93,8 +97,7 @@
 
 - ROM: CMOD（主板上的识别设备只读程序）
   - BIOS: Basic Input and Output System，基本输入输出系统
-  
-  - ROM+RAM: 只读内存+随机内存
+  - ROM + RAM: 只读内存+随机内存
 
 ### 2. Boot Sequence: 引导过程
 
@@ -106,7 +109,7 @@
     - LILO: LInux LOader(手机设备)
     - GRUB: Grand Uniform Bootloader,同一引导加载器
       - GRUB 0.x(Grub Legacy): CentOS 5,6
-      - GRUB 1.x: (Grub2,完全重写) CentOS 7 
+      - GRUB 1.x: (Grub2,完全重写) CentOS 7
   - 功能：提供一个菜单，允许用户选择要启动的系统或不同的内核版本；把用户的选定的内核装载到RAM中的特定空间中，解压、展开，而后把系统控制移交给内核；
 
 - MBR：Master Boot Record, 512bytes
@@ -116,7 +119,7 @@
 
 >注意：UEFI, GPT
 
-- GRUB: 两个阶段：
+- GRUB: 两个阶段
   - Bootloader: 1st stage
   - Partition: filesystem diver 1.5 stage
   - Partition: /boot/grub, 2nd stage
