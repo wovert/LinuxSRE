@@ -203,21 +203,21 @@
 
 ## 配置文件：`/etc/inittab`
 
-> 每行定义一种action以及与之对应的process(CentOS 5)
+> 每行定义一种 `action` 以及与之对应的 `process`(CentOS 5)
 
 ### id:runlevels:action:process
 
 - **id**：一个任务的**标识符**
-- **runlevels**：在哪些**级别**启动此任务;#,###，也可以为空，表示所有级别
+- **runlevels**：在哪些**级别**启动此任务;`# or ###`，也可以为空，表示所有级别
 - **action**: 在什么**条件**下启动此任务
 - **process**: **任务**(应用程序或脚本)
 
 ### action
 
-- **wait**: 等待切换至此任务所在的级别时执行一次
+- **wait**: 等待切换至此任务所在的级别时执行一次(刚刚切换时执行一次)
 - **respawn**: 一旦此任务终止时，就自动重新启动之, Login -> login ->login(提示)
 - **initdefault**: 设定默认运行级别；此时，process省略
-- **sysinit**: 设定系统初始化方式，此处一般为指定/etc/rc.d/rc.sysinit脚本(CentOS 5,6)
+- **sysinit**: 设定`系统初始化方式`，此处一般为指定`/etc/rc.d/rc.sysinit`脚本(CentOS 5,6)
 
 ### 例如
 
@@ -225,7 +225,10 @@
 id:3:initdefault
 si::sysinit:/etc/rc.d/rc.sysinit 系统初始化
 
-l0:0:wait:/etc/rc.d/rc 0
+l0:0:wait:/etc/rc.d/rc 0 切换至0级别时执行/etc/rc.d/rc 参数为0
+
+rc脚本：接受一个运行界别数字为参数
+
 l0:1:wait:/etc/rc.d/rc 1
 l0:2:wait:/etc/rc.d/rc 2
 l0:3:wait:/etc/rc.d/rc 3
@@ -234,19 +237,19 @@ l0:5:wait:/etc/rc.d/rc 5
 l0:6:wait:/etc/rc.d/rc 6
 ```
 
-> 启动或关闭/etc/rc.d/rc3.d/目录下的服务脚本所控制服务
+### `lo:0:wait:/etc/rc.d/rc 3` 意味着启动或关闭 `/etc/rc.d/rc3.d/` 目录下的服务脚本所控制服务
 
-- K*：要停止的服务
-  - K##*：优先级，数字越小, 越优先关闭
+- `K*`：要停止的服务
+  - `K##*`：优先级，数字越小, 越优先关闭
   - 依赖的的服务先关闭，而后关闭被依赖的
 
-- S*：要启动的服务
-  - S##*：优先级，数字越小，越是优先启动
+- `S*`：要启动的服务
+  - `S##*`：优先级，数字越小，越是优先启动
   - 被依赖的服务先启动，而依赖的服务后启动
 
-- rc脚本：接受一个运行界别数字为参数
+### `rc 脚本`：接受一个运行界别数字为参数
 
-#### 脚本框架
+脚本框架
 
 ``` SHELL
 for srv in /etc/rc.d/rc#.d/K*;do
@@ -254,13 +257,13 @@ for srv in /etc/rc.d/rc#.d/K*;do
 done
 
 for srv in /etc/rc.d/rc#.d/S*;do
-$srv start
+  $srv start
 done
 
 /etc/init.d/* (/etc/rc.d/init.d/*)
 ```
 
-#### 脚本执行方式：
+脚本执行方式
 
 ``` SHELL
 # /etc/init.d/SRV_SCRIPT {start|stop|restart|status}
@@ -273,11 +276,11 @@ done
 # service SRV_SCRIPT {start|stop|restart|status}
 ```
 
-## chkconfig命令：
+## chkconfig 命令
 
->创建K*,S*文件
+> 创建`K*,S*`文件
 
-管控/etc/init.d/每个服务脚本在各个级别下的启动或关闭状态
+管控`/etc/init.d/`每个服务脚本在各个级别下的启动或关闭状态
 
 ### 查看
 
@@ -305,10 +308,10 @@ done
 # chkconfig --del SERVICE_NAME
 ```
 
-### 修改指定的链接类型：
+### 修改指定的链接类型
 
 ``` SHELL
-#chkconfig [--level LEVELS] name <on|off|reseat> 
+#chkconfig [--level LEVELS] name <on|off|reseat>
 ```
 
 > --level LEVELS：指定要控制的级别；默认为2345
@@ -323,8 +326,8 @@ done
   #!bin/bash
   # testsrv This starts and stops testsrv
   #
-  # chkconfig: 2345 11 88  **-** 11 99 任何级别都没有
-  # description: This sdfkjlasjdfljaf
+  # chkconfig: 2345 11 88 - 11 99 任何级别都没有
+  # description: This test service
   # `
   prog=$(basename $0)
   if [ $# -lt 1 ]; then
@@ -382,13 +385,13 @@ tty7:5:respawn:/etc/X11/
 
 1. 设置主机名 `/bin/hostname, /etc/sysconfig/network`
 2. 设置欢迎信息
-3. 激活udev和selinux
+3. 激活`udev`和`selinux`
 4. 挂载`/etc/fstab`文件中定义的所有文件系统
 5. 检测根文件系统，并以读写方式挂载根文件系统
 6. 设置系统时钟
 7. 根据`/etc/sysctl.conf`文件的设置**内核参数**
-8. 激活vim及软raid设备
-9. 激活swap设备
+8. 激活`vim`及`软raid设备`
+9. 激活`swap设备`
 10. 加载额外设备的驱动程序
 11. 清理操作
 
@@ -403,7 +406,7 @@ tty7:5:respawn:/etc/X11/
 ###　CentOS 6
 
 - init程序：`upstart`，但依然为`/sbin/init`，其配置文件：
-  - `/etc/init/*.conf, /etc/inittab`(仅用于定义默认运行级别)	
+  - `/etc/init/*.conf, /etc/inittab`(仅用于定义默认运行级别)
   - 注意：`*.conf`为upstart风格的配置文件
     - `rcS.conf` 初始化脚本
     - `rc.conf`  服务开发关闭脚本
@@ -415,9 +418,10 @@ tty7:5:respawn:/etc/X11/
   - 配置文件:`/usr/lib/systemd/system/*, /etc/systemd/system/*`
   - 完全兼容Sysv脚本机制；service命令依然可以使用；建议使用systemctl命令来控制服务
 
-`# systemctl {start|stop|restart|status} name[.service]`
-
-`# systemctl get-default`
+``` SHELL
+# systemctl {start|stop|restart|status} name[.service]
+# systemctl get-default
+```
 
 > multi-user.target
 
@@ -453,177 +457,225 @@ tty7:5:respawn:/etc/X11/
 - Stage1_5: mbr之间的扇区，让stage1中的boot loader能识别stage2所在的分区上的文件系统
 - Stage2: 磁盘分区（/boot/grub/）
 
-- 配置文件：/boot/grub/grub.conf <-- /etc/grub.conf
+- 配置文件：`/boot/grub/grub.conf <-- /etc/grub.conf`
 
-- Stage2及内核等通常放置于一个基本磁盘分区：
-  + 功用：
-    1. 提供菜单，并提供交互式接口
-      + e: 编辑模式，用于编辑菜单
-      + c: 命令模式，交互式接口
-    2. 加载用户选择的内核或操作系统
-      + 允许传递参数给内核
-      + 可隐藏此菜单
-    3. 为菜单提供了保护机制
-      + 为编辑菜单进行认证
-      + 为启动内核或操作系统进行认证
+### Stage2 及内核等通常放置于一个基本磁盘分区
 
-## grub如何识别设备？
-- hd#，#（hd：hardware，#:第几块磁盘，第几个分区）
-  + hd#：磁盘编号，用数字表示；从0开始编号
-  + #：分区编号，用数字表示；从0开始编号
-  + (hd0,0)
+- 功用：
 
-## grub的命令行接口：
-`help`：获取帮助列表
-`help root`：设置grub的根设备
-`help KEYWORD`：详细帮助信息
-`find (hd#,#)/PATH/TO/SOMEFILE`
-`find (hd0,0)/wmlinuz-`tab键
-`root (hd#,#)` 设定哪个设备的哪个分区作为根文件系统
-`root (hd0,0)`
-`find /vmlinuz-2.6.32-504.e.....`
-`kernel /PATH/TOKERNEL_FILE`：本次启动时用到内核文件(z代表压缩文件)；额外还可以添加许多内核支持使用的cmdline参数：`init=/path/to/init, selinux=0`
-`initrd /PATH/TO/INITRAMFS_FILE`：设定为选定的内核提供额外文件的ramdisk
-`boot`：引导启动选定的内核
+1. 提供菜单，并提供交互式接口
 
-## 手动在grub命令行接口启动系统：
-grub> `root(hd0,0)`
-grub> `kernel /vmlinuz-VERSION-RELEASE ro root=/dev/mapper/vg0-root quite`
-grub> `initrd /initramfs-VERSION-RELEASE.gim`
-grub> `boot` 
+``` CONFIG
+e: 编辑模式，用于编辑菜单
+c: 命令模式，交互式接口
+```
 
-## grub2命令行接口
-`help`        显示所有可用命令
-`ls`          列出当前的所有设备
-`ls -l`       列出当前的所有设备，对于分区显示其label及uuid
-`ls (hd1,1)`  列出(hd1,1)分区下文件
-`search -f /ntldr`  列出根目录里包含ntldr文件的分区，返回为分区号
-`search -l Linux`   搜索label是linux的分区
-`search --set -f /ntldr`  搜索根目录包含ntldr文件的分区并设为root，注意如果多外分区含有ntldr文件,set失去作用
-`set root=`   设置变量的值
-`set timeout=`设置变量的值
+2. 加载用户选择的内核或操作系统
+
+``` CONFIG
+允许传递参数给内核
+可隐藏此菜单
+```
+
+3. 为菜单提供了保护机制
+
+``` CONFIG
+- 为编辑菜单进行认证
+- 为启动内核或操作系统进行认证
+```
+
+## grub 如何识别设备
+
+- `hd#, #`（hd：hardware，#:第几块磁盘，第几个分区）
+  - hd#：磁盘编号，用数字表示；从0开始编号
+  - #：分区编号，用数字表示；从0开始编号
+  - (hd0,0)
+
+## grub 的命令行接口：
+
+``` SHELL
+help：获取帮助列表
+help root：设置grub的根设备
+help KEYWORD：详细帮助信息
+find (hd#,#)/PATH/TO/SOMEFILE
+find (hd0,0)/wmlinuz- tab键
+root (hd#,#) 设定哪个设备的哪个分区作为根文件系统
+root (hd0,0)
+find /vmlinuz-2.6.32-504.e.....
+kernel /PATH/TOKERNEL_FILE：本次启动时用到内核文件(z代表压缩文件)；额外还可以添加许多内核支持使用的cmdline参数：`init=/path/to/init, selinux=0`
+initrd /PATH/TO/INITRAMFS_FILE：设定为选定的内核提供额外文件的ramdisk
+boot：引导启动选定的内核
+```
+
+## 手动在 grub 命令行接口启动系统
+
+``` SHELL
+grub> root(hd0,0)
+grub> kernel /vmlinuz-VERSION-RELEASE ro root=/dev/mapper/vg0-root quite
+grub> initrd /initramfs-VERSION-RELEASE.gim
+grub> boot
+```
+
+## grub2 命令行接口
+
+``` SHELL
+help        显示所有可用命令
+ls          列出当前的所有设备
+ls -l       列出当前的所有设备，对于分区显示其label及uuid
+ls (hd1,1)  列出(hd1,1)分区下文件
+search -f /ntldr  列出根目录里包含ntldr文件的分区，返回为分区号
+search -l Linux   搜索label是linux的分区
+search --set -f /ntldr  搜索根目录包含ntldr文件的分区并设为root，注意如果多外分区含有ntldr文件,set失去作用
+set root=   设置变量的值
+set timeout=  设置变量的值
 调用变量的值时，使用${AA}，如set root=(hd1,1)，则${root}=(hd1,1)
 linux取代grub中的kernel
-boot 
+boot
+```
 
-## 配置文件：/boot/grub/grub.conf
-- default=0	设定默认启动的菜单项;菜单项(title)编号从0开始
-- timeout=5	指定菜单项等待选项选择的时长
-- splashimage=(hd0,0)/grub/xpm.gz	菜单背景图片文件路径(14位图像600x800)
-- hiddenmenu	隐藏菜单
+## 配置文件：`/boot/grub/grub.conf`
+
+- default=0 设定默认启动的菜单项;菜单项(title)编号从0开始
+- timeout=5 指定菜单项等待选项选择的时长
+- splashimage=(hd0,0)/grub/xpm.gz 菜单背景图片文件路径(14位图像600x800)
+- hiddenmenu 隐藏菜单
 - password [--md5] STRING：菜单编辑认证
-  + Password --md5 $1$TOrM8/$zY5p2Lr4CbXBqXyfguLaG.
+  - Password --md5 $1$TOrM8/$zY5p2Lr4CbXBqXyfguLaG.
 
-- title TITLE	定义菜单项的标题，可出现多次
-  + root (hd#,#)：grub查找stage2及kernel文件所在设备分区；为grub的根
-  + kernel /PATH/TO/vmlinuz_FILE [PARAMETERS] 启动的内核
-  + initrd /PATH/TO/INITRAMFS_FILE	内核匹配的ramfs文件
-  + password [--md5] STRING：启动选定的内核或操作系统时进行认证
-    + `grub-md5-crypt命令`：生成grub密码
-    + openssl生成密码串
-
+- title TITLE : 定义菜单项的标题，可出现多次
+  - root (hd#,#)：grub查找stage2及kernel文件所在设备分区；为grub的根
+  - kernel /PATH/TO/vmlinuz_FILE [PARAMETERS] 启动的内核
+  - initrd /PATH/TO/INITRAMFS_FILE : 内核匹配的ramfs文件
+  - password [--md5] STRING：启动选定的内核或操作系统时进行认证
+    - `grub-md5-crypt命令`：生成grub密码
+    - openssl生成密码串
 
 ## 如何进入单用户模式？
+
 1. 编辑grub菜单(选定要编辑的title,而后使用**e命令**）
-2. 在选定的kernel后附加
-  + 1,s,S或single都可以
+2. 在选定的kernel后附加; 1,s,S或single都可以
 3. 在kernel所在上，键入**"b"命令**
 
+## 安装grub方法（2种）
 
-## 安装grub方法（2种）：
-1. `# grub-install --root-directory=ROOT /dev/DISK`
-
-2. `grub` 修复
-  + grub> `root (hd#,#)`   stage1,stage1.5必须存在
-  + grub> `setup (hd#)`
+``` SHELL
+1. 第一部
+# grub-install --root-directory=ROOT /dev/DISK
+2. grub 修复
+# grub> root (hd#,#)   stage1,stage1.5必须存在
+# grub> setup (hd#)
+```
 
 ## 创建系统
+
 > 添加一个硬盘sdb
-创建分区：boot(100Mb), root(5G)，swap(1G)
-创建文件系统:ext4,ext4
-挂载文件：
-`# mkdir /mnt/boot`
-`# mount /dev/sdb1 /mnt/boot/`
-`# ls /mnt/boot`
-`# grub-install --root-directory=/mnt /dev/sdb`
-`# ls -l /mnt/boot/grub/`
+
+- 创建分区：boot(100Mb), root(5G)，swap(1G)
+- 创建文件系统:ext4,ext4
+- 挂载文件：
+
+``` SHELL
+# mkdir /mnt/boot
+# mount /dev/sdb1 /mnt/boot/
+# ls /mnt/boot
+# grub-install --root-directory=/mnt /dev/sdb
+# ls -l /mnt/boot/grub/
+```
 
 ### 没有grub配置文件，需要自己配置
-`# vim /mnt/boot/grub/grub.conf`
+
+``` SHELL
+# vim /mnt/boot/grub/grub.conf
 default=0
 timeout=5
 titie Centos(Expres)
   root (hd0,0)
   kernel /vmlinuz ro root=/dev/sda3 selinux=0 init=/bin/bash
   initrd /initramfs.img
+```
 
 ### 没有kernel文件，需要复制
+
 `# cp /boot/vmlinuz-ss /mnt/boot/vmlinuz`
 
 ### 没有initramfs文件，需要复制
+
 `# cp /boot/initramfs-.. /mnt/boot/initramfs.img`
 
-
 ### 创建系统目录
-`# mkdir /mnt/sysroot`
-`# mount /dev/sdb3 /mnt/sysroot/`
-`# cd /mnt/sysroot/`
-`# mkdir -pv etc bin sbin lib lib64 dev proc sys tmp var usr home root mnt media `
-`# cp /bin/bash /mnt/sysroot/bin/` 
-`# ldd /bin/bash` 查看bash依赖哪些库文件
-`# cp /li64/libtiinfo.so.5 /mnt/sysroot/lib64/`
+
+``` SHELL
+# mkdir /mnt/sysroot
+# mount /dev/sdb3 /mnt/sysroot/
+# cd /mnt/sysroot/
+# mkdir -pv etc bin sbin lib lib64 dev proc sys tmp var usr home root mnt media
+# cp /bin/bash /mnt/sysroot/bin/
+# ldd /bin/bash` 查看bash依赖哪些库文件
+# cp /li64/libtiinfo.so.5 /mnt/sysroot/lib64/
 ......
-`# chroot /mnt/sysroot/` 切换根文件系统
-`# sync` 同步
+# chroot /mnt/sysroot/ 切换根文件系统
+# sync 同步
+```
 
 ### 创建虚拟机刚才创建生成的新的系统磁盘
+
 ...
 
 ## grub菜单文件丢失怎么办？
+
 > grub文件丢失，说明bootloader丢失
+
 修复MBR,硬盘接到其他机器上，修复MBR的bootloader程序
 
-`# dd if=/dev/sda of=/root/mbr.bak count=1 bs=512`
-`# dd if=/dev/zero of=/dev/sda bs=200 count=1`
-`# sync` 同步到磁盘上
+``` SHELL
+# dd if=/dev/sda of=/root/mbr.bak count=1 bs=512
+# dd if=/dev/zero of=/dev/sda bs=200 count=1
+# sync 同步到磁盘上
 
-`# grub-install --root-directory=/ /dev/sda`	boot所在的根目录
-`# sync`
+# grub-install --root-directory=/ /dev/sda boot所在的根目录
+# sync
 
-`# dd if=/dev/zero of=/dev/sda bs=200 cont=1`
-`# grub`
-`grub> root (hd0,0)`
-`grub> setup (hd0)`  hd0硬盘
-`grub> exit`
-`# sync`
-`# reboot`
+# dd if=/dev/zero of=/dev/sda bs=200 cont=1
+# grub
+grub> root (hd0,0)
+grub> setup (hd0)  hd0硬盘
+grub> exit
+# sync
+# reboot
+```
 
+## 紧急求援模式
 
-## 紧急求援模式：
-`# dd if=/dev/zero of=/dev/sda bs=200 cont=1`
-`# sync`
-`# reboot`
+``` SEHLL
+# dd if=/dev/zero of=/dev/sda bs=200 cont=1
+# sync
+# reboot
+```
 
 1. 载入光盘设备：
-  + 选择 Rescure installed system
-  + 输入 boot: linux rescure
+  - 选择 Rescure installed system
+  - 输入 boot: linux rescure
 
-`# chroot /mnt/sysimage/`
-`# grub-install --root-directory=/ /dev/sda`
-`# reboot`
+``` SHELL
+# chroot /mnt/sysimage/
+# grub-install --root-directory=/ /dev/sda
+# reboot
+```
 
 ## 练习
+
 1. 新加硬盘，提供直接单独运行bash系统
 2. 破坏本机grub stage1, 而后在救援模式下修复之
 3. 为grub设备保护功能
 
 ## ldd命令
+
 > 程序命令所依赖的库文件
 
 `# ldd /PATH/TO/COMMAND`
 
 - 库文件名 => 库文件路径
-- linux-vdso.so.1 => (0x00008fffea5a3000) 系统调用库入口
-- /lib64/ld-linux-x86-64.so.2 各应用程序调用其他库文件入口
+- `linux-vdso.so.1 => (0x00008fffea5a3000)` 系统调用库入口
+- `/lib64/ld-linux-x86-64.so.2` 各应用程序调用其他库文件入口
 
-# ldd /bin/ls | grep -o "/lib[^[:space:]*"
+`# ldd /bin/ls | grep -o "/lib[^[:space:]*"`
