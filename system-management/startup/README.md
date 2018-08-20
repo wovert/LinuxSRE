@@ -87,7 +87,9 @@
 - linux-next
 
 - CentOS 6: 2.6.X
-- CentOS 7: 3.10.X
+- CentOS `7`  ,MNBVCXZAhj
+
+`: 3.10.X
 
 > 内核启动之后，加载根文件系统,然后运行init进程，init进程用户所有进程，内核退回只在特权指令时运行
 
@@ -429,13 +431,13 @@ tty7:5:respawn:/etc/X11/
 
 > 所有服务都没有启动。当第一次启动的时候启动服务
 
-### 博客作业：UEFI,GPT;CentOS启动流程
+## 博客作业：UEFI,GPT;CentOS启动流程
 
 ## CentOS 6启动流程
 
 1. POST
 2. Boot Sequence(BIOS)
-3. Boot Loder(MBR)
+3. Boot Loader(MBR)
 4. Kernel(ramdisk)
 5. rootfs
 6. switchroot
@@ -443,10 +445,12 @@ tty7:5:respawn:/etc/X11/
 8. (/etc/inittab, /etc/init/*.conf)
 9. 设定默认运行界别
 10. 系统初始化脚本
-11. 关闭或启动对应界别下的服务
-12. 启动终端
+11. 关闭或启动对应级别下的服务
+12. 启动终端并显示登录提示符
 
-##　GRUB(Boot Loader):
+##　GRUB(Boot Loader)
+
+> grub: Grand Unified Bootloader
 
 - Grub 0.x: grub legacy
 - Grub 1.x: grub2
@@ -491,7 +495,7 @@ c: 命令模式，交互式接口
   - #：分区编号，用数字表示；从0开始编号
   - (hd0,0)
 
-## grub 的命令行接口：
+## grub 的命令行接口
 
 ``` SHELL
 help：获取帮助列表
@@ -502,7 +506,8 @@ find (hd0,0)/wmlinuz- tab键
 root (hd#,#) 设定哪个设备的哪个分区作为根文件系统
 root (hd0,0)
 find /vmlinuz-2.6.32-504.e.....
-kernel /PATH/TOKERNEL_FILE：本次启动时用到内核文件(z代表压缩文件)；额外还可以添加许多内核支持使用的cmdline参数：`init=/path/to/init, selinux=0`
+kernel /PATH/TOKERNEL_FILE：本次启动时用到内核文件(z代表压缩文件)；额外还可以添加许多内核支持使用的cmdline参数：
+  例如：`init=/path/to/init, selinux=0`
 initrd /PATH/TO/INITRAMFS_FILE：设定为选定的内核提供额外文件的ramdisk
 boot：引导启动选定的内核
 ```
@@ -510,9 +515,9 @@ boot：引导启动选定的内核
 ## 手动在 grub 命令行接口启动系统
 
 ``` SHELL
-grub> root(hd0,0)
-grub> kernel /vmlinuz-VERSION-RELEASE ro root=/dev/mapper/vg0-root quite
-grub> initrd /initramfs-VERSION-RELEASE.gim
+grub> root(hd0,0) 选择根文件系统
+grub> kernel /vmlinuz-VERSION-RELEASE ro root=/dev/mapper/vg0-root quite 启动内核文件，只读，选择根文件系统设备，静默模式(初始化显示信息不现实)
+grub> initrd /initramfs-VERSION-RELEASE.gim 默认启动程序
 grub> boot
 ```
 
@@ -533,7 +538,7 @@ linux取代grub中的kernel
 boot
 ```
 
-## 配置文件：`/boot/grub/grub.conf`
+## GRUB 配置文件：`/boot/grub/grub.conf`
 
 - default=0 设定默认启动的菜单项;菜单项(title)编号从0开始
 - timeout=5 指定菜单项等待选项选择的时长
@@ -545,25 +550,28 @@ boot
 - title TITLE : 定义菜单项的标题，可出现多次
   - root (hd#,#)：grub查找stage2及kernel文件所在设备分区；为grub的根
   - kernel /PATH/TO/vmlinuz_FILE [PARAMETERS] 启动的内核
-  - initrd /PATH/TO/INITRAMFS_FILE : 内核匹配的ramfs文件
+  - initrd /PATH/TO/INITRAMFS_FILE : 内核匹配的 `ramfs`文件
   - password [--md5] STRING：启动选定的内核或操作系统时进行认证
-    - `grub-md5-crypt命令`：生成grub密码
-    - openssl生成密码串
+    - `# grub-md5-crypt`：生成grub密码复制到 "STRING" 位置
+    - `# openssl` 生成密码串
 
 ## 如何进入单用户模式？
 
-1. 编辑grub菜单(选定要编辑的title,而后使用**e命令**）
+1. 编辑 grub 菜单(选定要编辑的title,而后使用**e命令**）
 2. 在选定的kernel后附加; 1,s,S或single都可以
-3. 在kernel所在上，键入**"b"命令**
+3. 在 kernel 所在上，键入**"b"命令**
 
-## 安装grub方法（2种）
+## 安装 grub 方法（2种）
 
 ``` SHELL
-1. 第一部
+
+1. 第一步
 # grub-install --root-directory=ROOT /dev/DISK
+
 2. grub 修复
 # grub> root (hd#,#)   stage1,stage1.5必须存在
 # grub> setup (hd#)
+
 ```
 
 ## 创建系统
@@ -637,9 +645,11 @@ titie Centos(Expres)
 
 # dd if=/dev/zero of=/dev/sda bs=200 cont=1
 # grub
+
 grub> root (hd0,0)
 grub> setup (hd0)  hd0硬盘
 grub> exit
+
 # sync
 # reboot
 ```
@@ -653,8 +663,9 @@ grub> exit
 ```
 
 1. 载入光盘设备：
-  - 选择 Rescure installed system
-  - 输入 boot: linux rescure
+
+- 选择 Rescure installed system
+- 输入 boot: linux rescure
 
 ``` SHELL
 # chroot /mnt/sysimage/
