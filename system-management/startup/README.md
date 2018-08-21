@@ -681,7 +681,7 @@ grub> exit
 
 ## ldd命令
 
-> 程序命令所依赖的库文件
+> 应用程序命令所依赖的库文件
 
 `# ldd /PATH/TO/COMMAND`
 
