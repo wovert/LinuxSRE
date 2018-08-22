@@ -139,16 +139,20 @@ module.alias.bin 二进制编码(原文件编译成二进制文件)
 ```
 
 创建initrd文件
+
 ``` shell
+5/6/7 CentOS
 # mv /boot/initramfs-$(uname -r).img /tmp/
 # mkinitrd /boot/initramfs-$(uname -r).img $(uname -r)
 ```
 
 ### dracut命令(CentOS 6,7)
 
-> dracut [OPTION]... <image>  <kernel-version>`
+`dracut [OPTION]... <image>  <kernel-version>`
 
-`# dracut /boot/inintramfs-$(uname -r).img $(uname -r)`
+``` shell
+# dracut /boot/inintramfs-$(uname -r).img $(uname -r)
+```
 
 ## 内核信息输出的伪文件系统
 
@@ -165,13 +169,15 @@ module.alias.bin 二进制编码(原文件编译成二进制文件)
 1. sysctl命令：专用于查看或设定/proc/sys目录下的参数的值
 
 查看
+
 ``` SHELL
 # sysctl -a
 # sysctl variable
 # cat /proc/sys/PATH/TO/SOME_KERNEL_FILE
 ```
 
-设置
+设置/修改其值
+
 ``` SHELL
 # sysctl -w variable=value
 # sysctl -a 可配置的所有选项
@@ -214,7 +220,7 @@ module.alias.bin 二进制编码(原文件编译成二进制文件)
 
 ``` SHELL
 默认读取/etc/sysctl.conf
-# sysctl -p [/PATH/TO/CONFIG_FILE] 
+# sysctl -p [/PATH/TO/CONFIG_FILE]
 
 ```
 
@@ -223,6 +229,7 @@ module.alias.bin 二进制编码(原文件编译成二进制文件)
 ### net.ipv4.ip_forward：核心转发功能
 
 > 从一个网络主机的报文经过主机转发到另一个网络的主机
+
 主机转发功能
 
 ### vm.drop_caches: 0 1 2
@@ -230,6 +237,7 @@ module.alias.bin 二进制编码(原文件编译成二进制文件)
 ``` SHELL
 # free -m
 # echo 1 > /proc/sys/vm/drop_caches   buffer
+0：表示不丢，1：丢掉
 # echo 2 > /proc/sys/vm/drop_caches    cahe
 ```
 
@@ -263,7 +271,7 @@ module.alias.bin 二进制编码(原文件编译成二进制文件)
 ### 网卡文件对换
 
 - 网卡名词对换：`# vim /etc/udev/rules.d/70-persistent-net.rules`
-- 网卡文件对换: `/etc/sysconfig/network-scripts/ifcfg-eth0 ifcfg-eth1`
+- 网卡文件对换: `# /etc/sysconfig/network-scripts/ifcfg-eth0 ifcfg-eth1`
 - 卸载网卡模块: `# modprobe -r e1000`
 - 重装网卡模块：`# modprobe e1000`
 
@@ -276,7 +284,7 @@ module.alias.bin 二进制编码(原文件编译成二进制文件)
 3. Boot Loader(MBR)
 4. Kernel(ramdisk)
 5. rootfs(switch_root)
-6. /sbin/init(/etc/inittab,/etc/init/*.conf,/usr/lib/systemd/system) 
+6. /sbin/init(/etc/inittab,/etc/init/*.conf,/usr/lib/systemd/system)
 7. 默认运行级别、系统初始化、关闭和启动服务、启动终端（图形终端）
 
 ## grub
