@@ -51,7 +51,7 @@
 # yum list all  *ncurses*
 ```
 
-CentOS 6, 7 包组
+### CentOS 6, 7 包组
 
 ``` shell
 # yum -y groupinstall "Development Tools"
@@ -129,10 +129,13 @@ CentOS 6
 # cd /usr/src
 # ln -sv linux-3.10.107 linux
 # cd linux
+
 配置内核选项
 # make menuconfig
+
 编译内核，-j指定内核线程数量
 # make [-j #]
+
 安装内核模块
 # make modules_install
 # make install` 安装内核核心
@@ -141,17 +144,18 @@ CentOS 6
 ### screen命令：打开新的屏幕，不会终端断开而关闭
 
 - 打开screen: `# screen`
-- 列出screen: `# screen -ls` 
+- 列出screen: `# screen -ls`
 - 拆除screen: `Ctrl+a,d`
 - 连接screen: `# screen -r SCREEN_ID`
 - 关闭screen: `# exit`
 
-### 配置内核选项：
+### 配置内核选项
 
 参考当前内核编译文件
 
 ``` shell
 # cd /usr/src/linux
+
 编译内核文件
 # ls /boot/config-$(uname -r)
 ```
@@ -168,7 +172,7 @@ CentOS 6
 - 64-bit kernel 64内核编译(不选择编译成32位)
 - General setup 通用设定
   - Local version - append to kernel release
-    - -1.el7 （第一次编译el7）
+    - `-1.el7` （第一次编译el7）
   - Default hostname
 
 - Enable loadable module support 是否支持模块动态装载（必须）
@@ -200,6 +204,7 @@ CentOS 6
 # make modules_install
 # make install
 # reboot
+
 设置默认grub
 # vim /etc/default/grub
 ```
