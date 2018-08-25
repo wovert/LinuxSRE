@@ -269,7 +269,7 @@ useradd -g www www
 
 ###  验证PHP
 
-`~]# /usr/local/php/bin/php -v` 
+`~]# /usr/local/php/bin/php -v`
 
 ###  启动php-fpm
 
@@ -617,3 +617,51 @@ server {
     }
 }
 ```
+
+## ubuntu 挂在smb服务器的方法
+
+sudo mount -t cifs -o rw,user=chengguo,password=zj123456 //192.168.1.2/chengguo /home/chengguo/dev
+
+share 是  smb.conf 文件的共享名称[share]
+
+网站根目录权限遵循：
+
+文件644
+
+文件夹755
+
+权限用户和用户组www-data
+
+chown -R www-data.www-data /usr/local/nginx/html/
+
+find /usr/local/nginx/html/ -type d -exec chmod 755 {} \;
+
+find /usr/local/nginx/html/ -type f -exec chmod 644 {} \;
+
+
+PHPstorm激活码: http://www.activejetbrains.gq 
+
+
+ubuntu忘记密码怎么办
+
+刚安装了，ubuntu14.04，就想着，如果忘记登录密码，这可不好办，所以测试下
+开机，刚过bios显示画面，不停的点击，，键盘左边的shift键。（因为刚开始是采用按着不放的办法，结果不灵。所以我不停的点击，失败了，重启机子，直到用这个方法，不停的点击，出来成功为止）
+grub2画面出来了
+选择第二项：ubuntu kylin gnu/linux 高级选项
+进入另一画面后，再选择第二项
+ubuntu kylin gnu/linux,with linux 3.13.0-24-generic (recover mode)
+进入画面后，选择第八选项。
+root drop to root shell prompt
+
+
+最后操作的部分
+chmod 666 /dev/null            (chmod 666,所有用户都有读写权限，）
+mount -o remount,rw /   (备注：-o,这个是字母，不是零,是磁盘配额的挂载点为/分区。rw是读写模式。通俗点，大概意思就是将根分区设置为读写模式。）
+chmod 777 /etc/passwd         （chmod 777,所以用户都有读写执行权限）
+pwconv                                         (开启用户的shadow口令.)
+passwd root （备注，root是用户名）
+接下来，你连续输入两次相同的密码。
+最后大功成了。
+
+
+ useradd -r -m -s /bin/bash chengguo
