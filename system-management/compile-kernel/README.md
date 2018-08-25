@@ -48,6 +48,8 @@
 
 ``` shell
 # yum grouplist
+
+提供字符终端处理库
 # yum list all  *ncurses*
 ```
 
