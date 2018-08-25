@@ -63,13 +63,14 @@
 
 - 获取目标主机上硬件设备的相关信息
 
-### CPU
+### 获取 CPU 型号
 
 ``` shell
 # cat /proc/cpuinfo
   vendor_id
-  model_name:
+  model_name: 型号名称
 # lscpu
+
 # yum -y install x86info
 # x86info --help
 # x86info -a
