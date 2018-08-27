@@ -69,6 +69,7 @@
 # cat /proc/cpuinfo
   vendor_id
   model_name: 型号名称
+
 # lscpu
 
 # yum -y install x86info
@@ -133,15 +134,17 @@ CentOS 6
 # ln -sv linux-3.10.107 linux
 # cd linux
 
-配置内核选项
+1.配置内核选项
 # make menuconfig
 
-编译内核，-j指定内核线程数量
+2.编译内核，-j指定内核线程数量
 # make [-j #]
 
-安装内核模块
+3.安装内核模块
 # make modules_install
-# make install` 安装内核核心
+
+4.安装内核核心
+# make install
 ```
 
 ### screen命令：打开新的屏幕，不会终端断开而关闭
@@ -189,8 +192,8 @@ CentOS 6
 - Executable file forms /Emulations 可执行文件格式
 - Write ELF core dumps with partial segments
 - Kernel support for scripts starting with #!
-- Network options
-- Device Drivers 驱动程序，网卡、
+- Network options 网络选项
+- Device Drivers 驱动程序，网卡
 - Firmware Drivers 固件驱动
 - File systems 文件系统
 - Kernel hacking 内核调试
@@ -219,13 +222,13 @@ CentOS 6
 #### 1. 配置内核选项
 
 - 支持更新模式进行配置：在已有的.config文件的基础之上进行修改配置
-  - `make config`：基于**命令行**以遍历的方式去配置内核中可配置的每个选项；
-  - `make menuconfig`：基于**ncureses**的文本配置窗口
-  - `make gconfig`：基于**GTK开发环境**的窗口界面；包组"桌面平台开发"
-  - `make xonfig`：基于**QT开发环境**的窗口界面
+  - `# make config`：基于**命令行**以遍历的方式去配置内核中可配置的每个选项；
+  - `# make menuconfig`：基于**ncureses**的文本配置窗口
+  - `# make gconfig`：基于**GTK开发环境**的窗口界面；包组"桌面平台开发"
+  - `# make xonfig`：基于**QT开发环境**的窗口界面
 - 支持全新配置模式进行配置
-  - `make deconfig`：基于内核为**目标平台**提供的默认配置为模版进行配置
-  - `make allnoconfig`：所有选项均为no
+  - `# make deconfig`：基于内核为**目标平台**提供的默认配置为模版进行配置
+  - `# make allnoconfig`：所有选项均为no
 
 #### 2. 编译
 
@@ -252,7 +255,7 @@ CentOS 6
 清理编译生成的所有文件，包括配置生成的config文件及某些备份文件
 # make mrproper
 
-相当于mrproper，额外清理各种patches以及编辑器备份文件
+相当于`mrproper`，额外清理各种patches以及编辑器备份文件
 # make disclean
 ```
 
@@ -265,4 +268,8 @@ CentOS 6
 make[1]: *** [kernel/timeconst.h] Error 127
 make: *** [kernel] Error 2
 
-解决方案：`# yum install -y bc`
+解决方案：
+
+``` SHELL
+# yum install -y bc
+```
