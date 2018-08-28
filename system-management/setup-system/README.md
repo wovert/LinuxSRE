@@ -1,12 +1,12 @@
 # 安装系统
 
-## 安装程序: anaconda
+## 安装程序 - anaconda
 
 1. bootloader（光盘) -> isolinux/vmlinuz(isolinux/initrd) -> anaconda
-2. kernel(initrd(rootfs)，不做根切换)
+2. 启动 kernel(initrd(rootfs)，不做根切换)
 3. 启动anaconda程序（用户空间第一个程序）
 
-## anaconda
+## anaconda 安装方式
 
 - tui: 基于curses(多视窗处理方式)的文本配置窗口
 - gui: 图形界面
@@ -17,11 +17,12 @@
 2. Stage2: `isolinux/isolinux.bin` (操作系统**安装菜单**)
 
 ``` config
-配置文件：`isolinux/isolinux.cfg`
+
+配置文件：isolinux/isolinux.cfg
 
 每个对应的菜单选型
-  加载内核：`isolinux/vmlinuz`
-  向内核传递参数：`append initrd=initrd.img`
+  加载内核：isolinux/vmlinuz
+  向内核传递参数：append initrd=initrd.img
 
   label linux
     menu label ^Install CentOS 7
@@ -93,7 +94,7 @@ core dump(核心转储,内核崩溃时存储在磁盘上)
 
 - 文本安装方式 `boot: linux text`
 - 手动指定使用的安装方法 `boot: linux method`
-- 与网络相关的引导选项：
+- 与网络相关的引导选项
 
 ``` shell
 boot: linux method ip=172.16.7.1 netmask=255.255.0.0 gateway=172.16.1.1 dns=114.114.114.114 ifname=NAME:MAC_ADDR
