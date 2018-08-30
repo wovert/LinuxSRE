@@ -11,42 +11,37 @@
 - tui: 基于curses(多视窗处理方式)的文本配置窗口
 - gui: 图形界面
 
-## CentOS安装过程启动流程：
+## CentOS安装过程启动流程
 
 1. MBR：`isolinux/boot.cat`（光盘的**引导加载器**）
 2. Stage2: `isolinux/isolinux.bin` (操作系统**安装菜单**)
 
-``` config
+- 配置文件：`isolinux/isolinux.cfg`
+- 每个对应的菜单选型
+  - 加载内核：`isolinux/vmlinuz`
+  - 向内核传递参数：`append initrd=initrd.img`
+  - label linux
+    - menu label ^Install CentOS 7
+    - menu default
+    - kernel vmlinuz
+    - append initrd=initrd.img - inst.stage2=hd:LABEL=CentOS\x207\x20x86_64 quiet
 
-配置文件：isolinux/isolinux.cfg
+- 装载根文件系统，并启动anaconda
+  - 默认界面是图形界面（至少512MB+ 内存空间）
+  - 若显示启动tui接口: 向启动内核传递一个参数**text**即可
+    - `ESC` 键之后输入 `boot: linux text`
 
-每个对应的菜单选型
-  加载内核：isolinux/vmlinuz
-  向内核传递参数：append initrd=initrd.img
+- 注意：上述内容一般位于引导设备，例如可通过光盘、U盘或网络等；后续的anacona及其安装用到的程序包等可以来自于**程序包仓库**，此仓库的位置为：
+  - 本地光盘
+  - 本地硬盘
+  - ftp server
+  - http server
+  - nfs server
 
-  label linux
-    menu label ^Install CentOS 7
-    menu default
-    kernel vmlinuz
-    append initrd=initrd.img inst.stage2=hd:LABEL=CentOS\x207\x20x86_64 quiet
+  - 手动指定安装仓库：
+    - ESC 键之后输入 boot: linux method
 
-装载根文件系统，并启动anaconda
-  默认界面是图形界面（至少512MB+ 内存空间）
-  若显示启动tui接口: 向启动内核传递一个参数**text**即可
-    ESC键之后输入 `boot: linux text`
-
-注意：上述内容一般位于引导设备，例如可通过光盘、U盘或网络等；后续的anacona机器安装用到的程序包等可以来自于**程序包仓库**，此仓库的位置为：
-  本地光盘
-  本地硬盘
-  ftp server
-  http server
-  nfs server
-
-  手动指定安装仓库：
-    ESC键之后输入 boot: linux method
-```
-
-## anaconda的工作过程
+## anaconda 的工作过程
 
 - 安装前配置阶段
 - 安装阶段
@@ -92,22 +87,19 @@ core dump(核心转储,内核崩溃时存储在磁盘上)
 
 ## 安装引导选项
 
-- 文本安装方式 `boot: linux text`
-- 手动指定使用的安装方法 `boot: linux method`
-- 与网络相关的引导选项
+- BOOT:
+  - 文本安装方式 `boot: linux text`
+  - 手动指定使用的安装方法 `boot: linux method`
+  - 与网络相关的引导选项
+    - `boot: linux method ip=172.16.7.1 netmask=255.255.0.0 gateway=172.16.1.1 dns=114.114.114.114 ifname=NAME:MAC_ADDR`
+  - 远程访问功能相关的引导选项
+    - `vnc vncpassword='PASSWORD'`
+  - 启动紧急救援模式
+    - `boot: linux rescue`
+  - 装载额外驱动：driver disk
+    - `boot: linux dd`
 
-``` shell
-boot: linux method ip=172.16.7.1 netmask=255.255.0.0 gateway=172.16.1.1 dns=114.114.114.114 ifname=NAME:MAC_ADDR
-```
-
-- 远程访问功能相关的引导选项
-  - `vnc vncpassword='PASSWORD'`
-
-- 启动紧急救援模式
-  - `boot: linux rescue`
-
-- 装载额外驱动：driver disk
-  - `boot: linux dd`
+系统工程师：www.redhat.com/docs ->《Installation guide》
 
 ## 指明kickstart文件的位置
 
@@ -121,7 +113,7 @@ boot: linux method ip=172.16.7.1 netmask=255.255.0.0 gateway=172.16.1.1 dns=114.
 boot: linux method ip=172.16.7.1 netmask=255.255.0.0 gateway=172.16.1.1 dns=114.114.114.114 ks=ftp://172.16.0.1/pub/sources/other/anaconda-ks.cfg
 ```
 
-## kickstart文件的格式：
+## kickstart文件的格式
 
 1. 命令段：指明各种安装前配置选项，如键盘类型等
 2. 程序包段：指明要安装的程序包租或程序包，不安装的程序包等
@@ -187,19 +179,19 @@ package 包
   - firewall 防火墙
     - `firewall --disabled`
     - `firewall --service=ssh` 启动firewall，开放ssh服务
-  -　selinux： SELinux
+  -　`selinux： SELinux`
     -　`selinux --disabled`
 
-  - halt,poweroff, reboot： 安装完成之后的行为
+  - `halt,poweroff, reboot`： 安装完成之后的行为
 
-  - user：安装完成之后为系统创建新用户
+  - `user`：安装完成之后为系统创建新用户
 
-  - repo：指明安装时使用的repository
+  - `repo`：指明安装时使用的repository
     - `repo --name="CentOS" --baseurl=cdrom:sr0 --cost=100`
   - url：指明安装时使用的repository，URL格式, 比repo优先级更高
     - `url --url=http://IP/cobbler/ks_mirror/CentOS-6.7-x86_64/`
 
-## 系统安装完成之后禁用防火墙：
+## 系统安装完成之后禁用防火墙
 
 - CentOS 6
 
@@ -215,10 +207,10 @@ package 包
 # systemctl disabled firewalld.service
 ```
 
-## 警用SELinux
+## 禁用 SELinux
 
 - 重启之后有效
-  - 编辑`# /etc/sysconfig/selinux或/tc/selinux/config`文件，修改参数SELINUX=permissive或disabled
+  - 编辑 `# /etc/sysconfig/selinux或/tc/selinux/config`文件，修改参数`SELINUX=permissive或disabled`
 - 立即生效
 
 ``` shell
@@ -243,7 +235,7 @@ package 包
 
 `# ksvalidator ks.cfg`
 
-## 创建引导光盘：
+## 创建引导光盘
 
 ``` shell
 # cp -r /media/cdrom/isolinux /tmp/myiso/
