@@ -1,11 +1,11 @@
 # Linux Services and Security
 
-- OpenSSL(ssl/tls)
-- OpenSSH(ssh)
-- bind(dns)
-- web(httpd): httpd(apache), php, mariadb(mysql),LAMP, nginx(tengine,openresty),LNMP
+- OpenSSL(ssl/tls协议)
+- OpenSSH(ssh协议)
+- bind(dns协议)
+- web(httpd协议): httpd(apache), php, mariadb(mysql),LAMP, nginx(tengine,OpenResty),LNMP
 - file server: samba,ftp,nfs
-- dhcp,pxe
+- dhcp, pxe
 - iptables
 - pam,nsswitch
 
@@ -201,7 +201,7 @@
 3. 再向上一层：组合算法实现的半成品
 4. 用各种组件拼装而成的各种成品密码学协议软件
 
-##  协议的开源实现
+## 协议的开源实现
 
 - OpenSSL
 
@@ -462,8 +462,7 @@ CA验证
 ~]# openssl ca -in /tmp/httpd.csr -out /etc/pki/CA/certs/httpd.crt -days 365
 ```
 
-- 查看证书中的信息：
-`# openssl x509 -in /etc/pki/CA/certs/httpd.crt -noout -serial -subject`
+- 查看证书中的信息：`# openssl x509 -in /etc/pki/CA/certs/httpd.crt -noout -serial -subject`
 
 ## 吊销证书：步骤(CA主机上执行)
 
