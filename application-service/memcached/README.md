@@ -1,4 +1,5 @@
 # memcached介绍
+
 - 数据结构模型：
 	+ 结构化数据：关系型数据库
 	+ 半结构化数据：xml,json，NoSQL(Redis,Hbase,MongoDB)

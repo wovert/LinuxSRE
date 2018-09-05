@@ -88,5 +88,3 @@ processor : 几核数，核心, 0单核
 module name: 
 flags: vmx(支持虚拟化)
 `# lscpu`
-
-23:00
