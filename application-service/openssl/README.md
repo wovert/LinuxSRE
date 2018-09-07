@@ -9,10 +9,10 @@
 - iptables
 - pam,nsswitch
 
-## OpenSSL
+## 网通通信协议
 
 - 传输层协议：TCP, UDP, SCTP
-- port: 进程地址，进程向内核注册使用某端口（独占）
+  - port: 进程地址，进程向内核注册使用某端口（独占）
 - 同一主机上的进程间通信：IPC, message queue, shm, semerphor
 - 不同主机上的进程间通信：socket(ip:port成对出现)
 - Client (ip:port) <-----> (ip:port) Server
@@ -26,16 +26,16 @@
 
 ## 网络通信安全的目标
 
-- confidentiality
+- confidentiality(保密性)
 - integrity(系统完整性、数据完整性)
-- availability
+- availability(可用性或有效性)
 
 ## 攻击类型
 
-- 威胁保密性的攻击：窃听、通信量分析
+- 威胁保密性的攻击：窃听(被动攻击)、通信量分析(主动攻击)
 - 威胁完整性的攻击：更改、伪装、重放、否认
 - 威胁可用性攻击：拒绝服务(DoS， Denial Of Service)
-  - DDoS: Destributed Denial of Service，分布式拒绝服务 
+  - DDoS: Destributed Denial of Service，分布式拒绝服务
 
 ## 解决方案
 
@@ -59,24 +59,26 @@
 - 单向加密
 - 认证协议
 
-## Linux实现服务
+## Linux 实现服务
 
 - OpenSSL(ssl)
 - GPG(gpg)
 
 ###　OpenSSL组成
 
-1. libencrypt, 加密/解密库
-2. libssl, ssl 安全通信机制 数据交换
-3. openssl 多用途命令行工具
+1. libencrypt: 加密/解密库
+2. libssl ssl: 安全通信机制 数据交换
+3. openssl: 多用途命令行工具
 
 ## 加密算法和协议
 
-### 1. **对称加密**：加密和解密使用同一个密钥
+### 1. 对称加密
 
-- DES: Data Encryption Standard(IBM开发，现代加密方法)
-- 3DES: Triple DES 
-- AES: Advanced Encryption Standard(128bits, 192bits,256bits,384bits)
+> 加密和解密使用同一个密钥
+
+- DES: Data Encryption Standard(IBM开发，现代加密方法，56bit)
+- 3DES: Triple DES(3倍DES)
+- AES: Advanced Encryption Standard(128bits, 192bits, 256bits, 384bits)
 
 - Blowfish
 - Twofish
@@ -85,28 +87,30 @@
 - RC6（商业）
 - CAST5（商业）
 
-#### 特性：
+#### 对称加密特性
 
 1. 加密、解密使用同一个密钥
 2. 将原始数据分割称为固定大小的块，逐个进行加密
 
-#### 缺陷：
+#### 对称加密缺陷
 
 1. 密钥过多
 2. 密钥分发困难
 
-### 2. **公钥加密**：密钥分为公钥与之配对的私钥
+### 2. 公钥加密
+
+> 密钥分为公钥与之配对的私钥
 
 - 公钥：从私钥中提取产生；可公开给所有人;pubkey
 - 私钥：通过工具创建，使用者自己留存，必须保存其私密性；secret key;
 - 特点：用公钥加密的数据，只能使用与之配对儿的私钥解密；反之亦然；
 
-#### 用途：
+#### 公钥加密用途
 
 - 数字签名：主要在于让接受方确认发送方的身份
 - 密钥交换：发送方用对方公钥加密一个对称密钥，并发送给对方
 
-#### 算法：
+#### 公钥加密算法
 
 - RSA (能数字签名、加密/解密)
 - DSA (仅能数字签名，不能加密/解密)
@@ -114,7 +118,9 @@
   - DSS: Digital Signature Standard
 - ELGamal
 
-### 3. **单向加密**：提取数据**指纹**；只能加密，不能解密
+### 3. 单向加密
+
+> 提取数据**指纹**；只能加密，不能解密
 
 - 特性：定长输出、雪崩效应
 - 功能：完全性验证
@@ -123,7 +129,9 @@
   - sha1: Secure Hash Algorithm 1, 160bits
   - sha224, sha256, sha384, sha512
 
-### 4. **密钥交换**：**IKE**(Internet Key Exchange)
+### 4. **密钥交换**
+
+> IKE(Internet Key Exchange)
 
 - 公钥加密（发送密码，有可能暴力破解)
 - DH(Deffie-Hellman)算法
@@ -316,7 +324,7 @@
 - `# openssl genrsa 1024 -out /tmp/mykey.private2`
 - `# (umask 077; openssl genrsa -out /tmp/mykey.private 2048)`
 
-**(umask 077 只对子shell有效**
+`# (umask 077` 只对子shell有效
 
 ### 提出公钥
 
@@ -347,7 +355,7 @@
 
 - 配置文件：`# cat /etc/pki/tls/openssl.conf`
 
-### 构建私有CA：172.16.7.1
+### 构建私有CA(172.16.7.1)
 
 >在确定配置为CA的服务器上生成一个自签证书，并为CA提供所需要的目录及文件即可
 
@@ -421,7 +429,7 @@ CA验证
 ~]# openssl ca -in /tmp/httpd.csr -out /etc/pki/CA/certs/httpd.crt -days 365
 ```
 
-- CA主机：172.16.7.1
+- CA主机(172.16.7.1)
 
 ``` SHELL
 ~]# touch /etc/pki/CA/{serial,index.txt}
