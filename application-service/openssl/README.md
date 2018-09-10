@@ -199,7 +199,7 @@ Eve 冒充 Alice 请求CA获取Alice的防伪证书。CA 查看调查 Eve 是否
 - 签证机构：CA(Certificate Authority)
 - 注册机构：RA(Registration Authority)
 - 证书吊销列表：CRL(Certificate Revoke List)
-- 证书存取库：CB
+- 证书存取库：CB（公共存取库）
 
 - verisign 机构
 
@@ -235,7 +235,7 @@ Linux 系统本地都没有内置的CA证书。我们自行可靠手段获取证
 
 > 国际标准化组织定义证书的结构以及认证协议标准
 
-- 版本号(证书版本号，身份证1代/2代)
+- 版本号(证书版本号，身份证1代/2代，v1/v2/v3(最常用版本))
 - 序列号(第几个证书)
 - 签名算法ID(签名算法，需要对方解密)
 
@@ -250,20 +250,31 @@ Linux 系统本地都没有内置的CA证书。我们自行可靠手段获取证
 - 扩展信息
 - 发行者的签名(CA获取数据特征码，并进行CA的私钥进行加密特征码得到签名)
 
-## SSL: Secure Sockets Layer
+## SSL 协议
 
-- Netscape: 1994
-- v1.0(没有公开), v2.0, v3.0(有漏洞，所以废弃)
+> Secure Sockets Layer 安全套接层
 
-## TLS: Transport Layer Security
+SSL 负责调用TCP/IP协议进行通信
 
-- 与SSL兼容
-- IETF: 1999年发布
-- v1.0 v1.1(2006) v1.2(常用,2008) v1.3(2014,草案, 支持椭圆曲线算法)
+- 1994 Netscape 开发的 ssl协议，Netscape 拥有版权
+- v1.0(没有公开过)
+- v2.0(因为有数个漏洞升级为v3.0)
+- v3.0(google发现有漏洞，所以废弃)
 
-## TLS 分层设计
+## TLS
 
-1. 最底层：基础算法原语的实现：aes, rsa, md5
+> Transport Layer Security 传输层安全
+
+- 1999年发布 IETF 与 SSL 兼容
+- v1.0
+- v1.1(2006)
+- v1.2(常用, 2008)
+- v1.3(2014年草案，支持椭圆曲线算法)
+- 事实上的标准
+
+### TLS 分层设计
+
+1. 最底层：基础算法原语的实现：`aes, rsa, md5`
 2. 向上一层：各种算法的实现
 3. 再向上一层：组合算法实现的半成品
 4. 用各种组件拼装而成的各种成品密码学协议软件
@@ -272,20 +283,22 @@ Linux 系统本地都没有内置的CA证书。我们自行可靠手段获取证
 
 - OpenSSL
 
-###　加密算法和协议：
+###　加密算法和协议
 
 - 对称加密：数据加密（保密性）（3DES，AES）
 - 公钥加密：身份认证、密钥交换、数据加密（不常用，比对称加密要慢3个数量级）RSA, DSA, ECDH
 - 单项加密：数据完整性（MD5，SHA1, ...）
 - 密钥交换：DH（迪菲-赫尔曼），ECDH（椭圆曲线DH），ECDHE（临时椭圆曲线DH）
 
-## SSL会话主要三部：
+### SSL会话主要三部
 
 - 客户端向服务器端索要并验证证书
 - 双方协商生成“会话密钥”（对称密钥）
 - 双方采用“会话密钥”进行加密通信
 
-## SSL Handshake Protocol
+### SSL Handshake Protocol
+
+![ssl handshake](./images/SSL_handshake_with_two_way_authentication_with_certificates.svg.gif)
 
 - 第一阶段：ClientHello
   - 支持的协议版本，比如tls1.2
@@ -328,7 +341,7 @@ Linux 系统本地都没有内置的CA证书。我们自行可靠手段获取证
 - `# man enc`
 - `# openssl ?`
 
-- 选项：
+- 选项
   - -e/d：加密/解密
   - -a|-base64: base64编码，默认二进制格式
   - -des3：加密/解密算法
