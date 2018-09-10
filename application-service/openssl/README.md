@@ -192,14 +192,18 @@ Alice 看着 Eve 像 Bob
 
 Eve 冒充 Alice 请求CA获取Alice的防伪证书。CA 查看调查 Eve 是否是 Alice
 
-##　PKI: Public Key Infrastructure　公钥基础设施
+##　PKI
 
-- 签证机构：CA， certificate authority
-- 注册机构：RA， registration authority
-- 证书吊销列表：CRL， Certificate Revoke List
-- 证书存储库：CB
+> Public Key Infrastructure　公钥基础设施
+
+- 签证机构：CA(Certificate Authority)
+- 注册机构：RA(Registration Authority)
+- 证书吊销列表：CRL(Certificate Revoke List)
+- 证书存取库：CB
 
 - verisign 机构
+
+办理身份证？当地派出所接受申请办理身份证（注册机构），区公安局可以签发身份证(签证机构)，在签发的身份证全国都认可。丢了身份证，到派出所吊销身份证（证书吊销列表）
 
 ### CA签发整数流程
 
@@ -227,15 +231,17 @@ Linux 系统本地都没有内置的CA证书。我们自行可靠手段获取证
 
 但是 Bob 私钥丢了怎么办？任何人都冒充 Bob 与别人通信，为了防止降低损失。断臂求生，立即向CA申请吊销证书，把证书声明作废，但声明作废别人怎么知道？
 
-### X.509：定义证书的结构以及认证协议标准
+### X.509
 
-- 版本号
-- 序列号
-- 签名算法ID
+> 国际标准化组织定义证书的结构以及认证协议标准
 
-- 发行者名称（CA自己的名字）
-- 发行者的唯一标识
-- 有效期限
+- 版本号(证书版本号，身份证1代/2代)
+- 序列号(第几个证书)
+- 签名算法ID(签名算法，需要对方解密)
+
+- 发行者名称（CA自己的名字，签发证书的机构名称）
+- 发行者的唯一标识(CA机构标识)
+- 有效期限（证书有效期）
 
 - 主体名称
 - 主体公钥
