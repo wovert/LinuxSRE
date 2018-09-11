@@ -385,18 +385,34 @@ openssl enc -ciphername [-in filename] [-out filename] [-pass arg] [-e] [-d] [-a
 
 #### dgst命令：
 
-- `# openssl dgst -md5 fstab`
-- `# md5sum fstab`
-- `# openssl dgst -shal384 fstab`
-- `# sha384sum fstab`
+- `# openssl dgst -md5 fstab` 等于 `# md5sum fstab`
+- `# openssl dgst -sha384 fstab` 等于 `# sha384sum fstab`
 
 ### 3.生成用户密码
 
-- 工具：passwd 或 openssl passwd
+- 工具：`passwd` 或 `openssl passwd`
+- `# man sslpasswd`
+- `# opensl passswd -1 -salt 1234567` -1：MD5-based password algorithm
+- `# openssl -1 -salt $(openssl rand -hex 4)` -hex: 16进制
 
-`# opensl passswd -1 -salt 1234567` -1：MD5-based password algorithm
+关于openssl passwd文件，它生成的密码可以直接复制到/etc/shadow文件中，但openssl passwd因为不支持sha512，所以密码强度不够。如果要生成sha512的密码，可以使用`grub-crypt`生成，它是一个python脚本，只不过很不幸CentOS 7只有grub2，grub-crypt命令已经没有了。
 
-`# openssl -1 -salt $(openssl rand -hex 4)` -hex: 16进制
+``` shell
+# grub-crypt --sha-512
+Password:
+Retype password:
+$6$2RCBJT7rELpfX4.Q$iKM5vNShNqUcCiez.JDBgbRkj007eXVVs790UwiOw1PMvB/s/vE7DhyDe8YJ6T8aEtP0Vev5kMReL/nILwLZX/
+```
+
+可以使用语句简单地代替grub-crypt。
+
+``` shell
+python -c 'import crypt,getpass;pw=getpass.getpass();print(crypt.crypt(pw) if (pw==getpass.getpass("Confirm: ")) else exit())
+```
+
+grub-crypt和上述python语句都是交互式的。如果要非交互式，稍稍修改下python语句：
+
+`python -c 'import crypt,getpass;pw="123456";print(crypt.crypt(pw))'`
 
 ### 4.随机数
 
