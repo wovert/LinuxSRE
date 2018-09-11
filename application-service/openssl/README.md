@@ -281,7 +281,10 @@ SSL 负责调用TCP/IP协议进行通信
 
 ### 协议的开源实现
 
-- OpenSSL
+- OpenSSL 组件
+  - libcrypto (加密/解密)
+  - libssl(库，面向开发者)
+  - openssl(命令行工具)
 
 ###　加密算法和协议
 
@@ -291,7 +294,7 @@ SSL 负责调用TCP/IP协议进行通信
 - 密钥交换：DH（迪菲-赫尔曼），ECDH（椭圆曲线DH），ECDHE（临时椭圆曲线DH）
 
 ### SSL会话主要三部
- 
+
 - 客户端向服务器端索要并验证证书
 - 双方协商生成“会话密钥”（对称密钥）
 - 双方采用“会话密钥”进行加密通信
@@ -325,41 +328,69 @@ SSL 负责调用TCP/IP协议进行通信
     - 编码变更通知，表示随后的信息都将用双方商定的的加密方法和密钥发送；
     - 服务端握手结束通知；
 
-## Openssl (众多子命令，分为三类)
+### Openssl (众多子命令，分为三类)
 
-- Standard command 标准命令(enc, ca, req, genrsa等)
+> 多用途命令行工具
+
+- Standard command 标准命令
+  - enc 加密
+  - ca(CA相关命令)
+  - req(生成证书签署请求)
+  - gendsa(生成dsa密钥对)
+  - genrsa(生成rsa密钥对)
+  - x509
+  - rand
 - Message Digest commands 消息摘要命令（dgst子命令）
+  - md5
+  - sha
+  - sha1
 - Cipher commands 加密命令（enc子命令）
+  - des3
+  - des
+  - aes-128-cbc
+  - aes-128-ecb
+  - cast
 
-## 1.对称加密
+### openssl 对称加密命令
 
-- 工具：openssl [enc|gpg]
-- 支持的算法：3des, aes, blowfish, towfish
+- 工具：`openssl [enc|gpg]`
+- 支持的算法：`3des, aes, blowfish, towfish`
 
-### enc命令
+- 子命令帮助：
+  - `# whatis enc`
+  - `# man enc`
+  - `# openssl ?`
 
-- `# man enc`
-- `# openssl ?`
+#### enc 命令
 
-- 选项
-  - -e/d：加密/解密
-  - -a|-base64: base64编码，默认二进制格式
-  - -des3：加密/解密算法
-- 加密: `# openssl enc -e -des3 -a -salt -in fstab -out fstab.ciphertext`
+``` SHELL
+openssl enc -ciphername [-in filename] [-out filename] [-pass arg] [-e] [-d] [-a/-base64] [-A] [-k password] [-kfile filename] [-K key] [-iv IV] [-S salt] [-salt] [-nosalt] [-z] [-md] [-p] [-P] [-bufsize number] [-nopad] [-debug]
+
+-ciphername: 加密的名称
+-in filename: 对哪个文件进行加密
+-out filename: 加密的文件放在哪里
+-pass arg: 密码是什么
+-e：加密
+-d: 解密
+-a | -base64: base64编码，默认二进制格式
+-des3：加密/解密算法
+```
+
+- 加密(bas64文本编码的结果): `# openssl enc -e -des3 -a -salt -in fstab -out fstab.ciphertext`
 - 解密: `# openssl enc -d -des3 -a -salt -out fstab.plaintext -in fstab.ciphertext`
 
-## 2.单项加密
+### 2.单项加密
 
-- 工具：openssl dgst, md5sum, sha1sum, sha224shum,sha256shum,sha384shum,sha512sum
+- 工具：`openssl dgst, md5sum, sha1sum, sha224shum,sha256shum,sha384shum,sha512sum`
 
-### dgst命令：
+#### dgst命令：
 
-- `# openssl dgst -md5 fstab` 
+- `# openssl dgst -md5 fstab`
 - `# md5sum fstab`
-- `# openssl dgst -shal384 fstab` 
+- `# openssl dgst -shal384 fstab`
 - `# sha384sum fstab`
 
-## 3.生成用户密码
+### 3.生成用户密码
 
 - 工具：passwd 或 openssl passwd
 
@@ -367,25 +398,25 @@ SSL 负责调用TCP/IP协议进行通信
 
 `# openssl -1 -salt $(openssl rand -hex 4)` -hex: 16进制
 
-## 4.随机数
+### 4.随机数
 
 - 工具：openssl rand
   - `# openssl rand -base64 10` 10个字节
   - `# openssl rand -hex 10`
 
-## 5.公钥加密
+### 5.公钥加密
 
-### 5.1 加密解密：
+#### 5.1 加密解密：
 
 - 算法：RSA, ELGamal
 - 工具：openssl [rsautl | gpg]
 
-### 5.2 数字签名
+#### 5.2 数字签名
 
 - 算法：RSA，DSA(数字签名算法)，ELGamal
 - 工具：openssl [rsautl | gpg]
 
-### 5.3 密钥交换
+#### 5.3 密钥交换
 
 - 算法：DH
 
@@ -402,13 +433,13 @@ SSL 负责调用TCP/IP协议进行通信
 
 `# openssl ras -in /tmp/mykey.private -pubout`
 
-## Linux系统上的随机数生成器：
+### Linux系统上的随机数生成器
 
 - /dev/random：仅从熵(shang1)池返回随机数；随机数用尽，阻塞(se4)；
 - /dev/urandom：从熵池返回随机数；随机数用尽，会利用软件生成伪随机数，非阻塞
   - 伪随机数不安全
 
-## 熵池中随机数的来源
+### 熵池中随机数的来源
 
 - 硬盘IO中断时间间隔
 - 键盘IO中断时间间隔
