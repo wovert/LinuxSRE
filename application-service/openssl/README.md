@@ -422,7 +422,7 @@ grub-crypt和上述python语句都是交互式的。如果要非交互式，稍�
 
 ### 5.公钥加密
 
-#### 5.1 加密解密：
+#### 5.1 加密解密
 
 - 算法：RSA, ELGamal
 - 工具：openssl [rsautl | gpg]
@@ -436,29 +436,38 @@ grub-crypt和上述python语句都是交互式的。如果要非交互式，稍�
 
 - 算法：DH
 
-### 生成私钥
+### 生成密钥
 
-- `# openssl genrsa 1024(位数，必须是2N次方倍数)`
+#### 私钥私钥
+
+``` shell
+# (umask 077; openssl genrsa -out /PATH/TO/PRIVATE_KEY_FILE NUM_BITS)
+```
+
+- `# openssl genrsa 1024(位数，必须是2的N次方位数)`
 - `# openssl genrsa 1024 > /tmp/mykey.private`
 - `# openssl genrsa 1024 -out /tmp/mykey.private2`
-- `# (umask 077; openssl genrsa -out /tmp/mykey.private 2048)`
 
-`# (umask 077` 只对子shell有效
+- `# ls /tmp -l` mykey.private2是-rx-r--r--.权限，私钥文件能没有安全性可言
 
-### 提出公钥
+- `# (umask 077; openssl genrsa -out /tmp/mykey.private 2048)` 仅当前用户能读写文件(rw-------) `# (umask 077` 只对子 shell 进程有效，执行完毕之后回到主shell进程
 
-`# openssl ras -in /tmp/mykey.private -pubout`
+#### 提出公钥-根据私钥提取公钥
+
+`# openssl ras -in /tmp/mykey.private -pubout` -pubout输出到屏幕
 
 ### Linux系统上的随机数生成器
 
-- /dev/random：仅从熵(shang1)池返回随机数；随机数用尽，阻塞(se4)；
-- /dev/urandom：从熵池返回随机数；随机数用尽，会利用软件生成伪随机数，非阻塞
+- `/dev/random`：仅从熵(shang1)池返回随机数；随机数用尽，阻塞(se4)；
+- `/dev/urandom`：从熵池返回随机数；随机数用尽，会利用软件生成伪随机数，非阻塞
   - 伪随机数不安全
 
-### 熵池中随机数的来源
+#### 熵池中随机数的来源
 
-- 硬盘IO中断时间间隔
-- 键盘IO中断时间间隔
+> 剪切随机数
+
+- 硬盘 IO 中断时间间隔
+- 键盘 IO 中断时间间隔
 
 ## CA
 
@@ -481,9 +490,9 @@ grub-crypt和上述python语句都是交互式的。如果要非交互式，稍�
 ### 1.生成私钥
 
 ``` shell
-# ls /etc/pki/CA/private/
-# (umask 077; openssl genrsa -out /etc/pki/CA/private/cakey.pem 4096
-# ls -l /etc/pki/CA/private/
+~]# ls /etc/pki/CA/private/
+~]# (umask 077; openssl genrsa -out /etc/pki/CA/private/cakey.pem 4096
+~]# ls -l /etc/pki/CA/private/
 ```
 
 ### 2.生成自签证书
