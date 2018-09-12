@@ -615,56 +615,71 @@ webmaster@wovert.com
 #### 1.用到证书的主机生成证书签署请求
 
 ``` SHELL
-~]# mkdir /etc/httpd/ssl
-~]# cd /etc/httpd/ssl
-~]# (umask 077; openssl genrsa -out /etc/httpd/ssl/httpd.key 2048
+[HOST]# mkdir /etc/httpd/ssl
+[HOST]# cd /etc/httpd/ssl
+[HOST]# (umask 077; openssl genrsa -out /etc/httpd/ssl/httpd.key 2048
 ```
 
 #### 2.生成证书签署请求
 
 ``` SHELL
-~]# openssl req -new -key /etc/httpd/ssl/httpd.key -out /etc/httpd/ssl/httpd.csr -days 365
+[HOST]# openssl req -new -key /etc/httpd/ssl/httpd.key -out /etc/httpd/ssl/httpd.csr -days 365
 ```
 
 #### 3.将请求通过可靠方式发送给CA主机；
 
 ``` SHELL
-~]# scp /etc/httpd/ssl/httpd.csr root@172.16.100.67:/tmp/
+[HOST]# scp /etc/httpd/ssl/httpd.csr root@172.16.100.67:/tmp/
 ```
 
-#### 4.在CA主机上签署证书
+#### 4.在CA主机上签署证书(CA主机上操作)
 
 ``` SHELL
-~]# openssl ca -in /tmp/httpd.csr -out /etc/pki/CA/certs/httpd.crt -days 365
+[CA]# openssl ca -in /tmp/httpd.csr -out /etc/pki/CA/certs/httpd.crt -days 365
 ```
 
-- 查看证书中的信息：`# openssl x509 -in /etc/pki/CA/certs/httpd.crt -noout -serial -subject`
+- 查看证书中的信息：
 
-## 吊销证书：步骤(CA主机上执行)
+``` SHELL
+[CA]# openssl x509 -in /etc/pki/CA/certs/httpd.crt -noout -serial -subject`
+```
 
-### 1.客户端获取要吊销的证书的serial(使用证书的主机执行)：
+### 吊销证书：步骤
 
-`# openssl x509 -in /etc/pki/CA/certs/httpd.crt -noout -serial -subject`
+#### 1.客户端获取要吊销的证书的serial(使用证书的主机执行)：
 
-### 2.CA主机吊销证书
+```SHELL
+[ca]# openssl x509 -in /etc/pki/CA/certs/httpd.crt -noout -serial -subject`
+```
 
->先根据客户提交的serial和subject信息，对比其本机数据库index.txt中存储的是否一致；
+#### 2.CA主机吊销证书
+
+先根据客户提交的serial和subject信息，对比其本机数据库index.txt中存储的是否一致；
 
 - 吊销：
 
-`# openssl ca -revoke /etc/pki/CA/newcerts/SERIAL.pem`
-其中的SERIAL要换成证书真正的序列号
+``` SHELL
+[ca]# openssl ca -revoke /etc/pki/CA/newcerts/SERIAL.pem
+SERIAL.pem => newcerts/01.pem 其中的SERIAL要换成证书真正的序列号
+```
 
-### 3.生成吊销证书的吊销编号（第一次吊销证书时执行）
+#### 3.生成吊销证书的吊销编号（第一次吊销证书时执行）
 
-`# echo 01 > /etc/pki/CA/crinumber`
+``` SHELL
+#证书吊销列表序列号
+[ca]# echo 01 > /etc/pki/CA/crinumber
+```
 
-### 4.更新证书吊销列表
+#### 4.更新证书吊销列表
 
-`# openssl ca -gencrl -out thisca.crl`
+``` SHELL
+[ca]# openssl ca -gencrl -out [thisca.crl]
+```
 
-- 查看crl文件：
+#### 查看crl文件
 
-`# openssl crl -in /PATH/FROM/CRL_FILE.crl -noout -text`
+``` SHELL
+[ca]# openssl crl -in /PATH/FROM/CRL_FILE.crl -noout -text
+```
 
-博客作业：加密解密技术基础、PKI及创建私有CA
+## 博客作业：加密解密技术基础、PKI及创建私有CA
