@@ -477,25 +477,59 @@ grub-crypt和上述python语句都是交互式的。如果要非交互式，稍�
 ### 建立私有CA
 
 - openssl（测试CA）
-- OpenCA(开源，企业级,银行等私有CA)
+- OpenCA(开源，企业级,银行等私有CA, 对openssl进行二次封装)
 
 ### openssl命令
 
-- 配置文件：`# cat /etc/pki/tls/openssl.conf`
+#### 配置文件
+
+``` SHELL
+# vim /etc/pki/tls/openssl.conf
+[ ca ]
+default_ca = CA_default # The default ca section
+
+[CA_default]
+dir = /etc/pki/CA # CA 工作目录
+certs = $dir/certs # 已经签发的整数目录
+crl_dir = $dir/crl # 吊销的列表目录
+database = $dir/index.txt # 数据库文件，已经版发过的索引
+
+new_cers_dir = $ir/newcerts
+certificate = $ir/cacert.pem # CA 的自签证书（CA自己给自己签发证书）
+serial = $dir/serial # 下一个证书的序列号：第一次办法序列号为1，下一次办法变为2，为每一个证书提供序列号
+crlnumber = $dir/crlnumber
+
+crl = $dir/crl.pem
+private_key = $dir/private/cakey.pem # CA 自己的私钥
+RANDFILE = $dir/private/.rand
+
+x509_extenions = usr_cert
+
+name_opt = ca_default
+cert_opt = ca_default
+
+default_days = 365 # 证书的默认有效期
+default_crl_days = 30 # 吊销默认有效期
+default_md = sha256 # morn消息摘要算法
+
+# 向证书签发机构请求签发证书请求
+[ req ]
+
+```
 
 ### 构建私有CA(172.16.7.1)
 
->在确定配置为CA的服务器上生成一个自签证书，并为CA提供所需要的目录及文件即可
+#### 在确定配置为CA的服务器上生成一个自签证书，并为CA提供所需要的目录及文件即可
 
-### 1.生成私钥
+1. 生成CA私钥
 
 ``` shell
 ~]# ls /etc/pki/CA/private/
 ~]# (umask 077; openssl genrsa -out /etc/pki/CA/private/cakey.pem 4096
-~]# ls -l /etc/pki/CA/private/
+~]# cat /etc/pki/CA/private/cakey.pem
 ```
 
-### 2.生成自签证书
+2. 生成自签证书
 
 ``` shell
 ~]# openssl req -new -x509 -key /etc/pki/CA/private/cakey.pem -out /etc/pki/CA/cacert.pem -days 3655
@@ -503,18 +537,18 @@ grub-crypt和上述python语句都是交互式的。如果要非交互式，稍�
 
 req：证书请求
 -new：生成新证书签署请求
--x509：生成自签格式证书，专用于创建私有CA时；
+-x509：生成自签格式证书，专用于创建私有CA时，自签自请求
 -key：生成请求时用到的私有文件路径
--out：生成请求文件路径；如果自签操作将直接生成签署过的证书；
--days：证书的有效时长，单位是day
+-out：生成请求文件路径；如果自签操作将直接生成签署过的证书
+-days：证书的有效时长，单位是day, 默认365
 
-Country Name(2 letter code) [XX]: CN
-State of Province Name(full name): Beijing
-Locality Name.................: Beijing
-Organization Name().....: lingyima
-Organizational Unit Name...: Ops
-Common Name: ca.lingyima.com
-Email: lingyima@qq.com
+Country Name(2 letter code) [XX] 国家: CN
+State of Province Name(full name)省: Beijing
+Locality Name.................城市: Beijing
+Organization Name()(eg,company)公司名: wovrt
+Organizational Unit Name...部门名: Ops
+Common Name 主机名: ca.wovert.com
+Email 管理员邮箱: wovert@126.com
 
 ~]# ls -l /etc/pki/CA
 
@@ -522,7 +556,7 @@ cacert.pem
 目录：certs crl mewcerts private
 ```
 
-###　３.为CA提供所需的目录及文件
+3. 为 CA 提供所需的目录及文件
 
 ``` shell
 # mkdir -pv /etc/pki/CA/{certs,crl,newcerts}
@@ -530,49 +564,55 @@ cacert.pem
 # echo 01 > /etc/pki/CA/serial` 序列号
 ```
 
-### 要用到证书进行安全通信的服务器，需要向CA请求签署证书(172.16.7.1)
+#### 某服务器要用到证书进行安全通信的服务器，需要向CA(172.16.7.1)请求签署证书
 
-> server: 172.16.7.0
+- 某Web服务器主机: 172.16.7.0
 
 ``` shell
-~]# cd /etc/httpd
-~]# mkdir ssl
-~]# cd ssl
-~]# (umask 077; openssl genrsa -out httpd.key 2048)
-~]# openssl req -new -key httpd.key -out httpd.csr -days 365
+[172.16.7.0 ~]# cd /etc/httpd
+[172.16.7.0 ~]# mkdir ssl
+[172.16.7.0 ~]# cd ssl
+[172.16.7.0 ~]# (umask 077; openssl genrsa -out httpd.key 2048)
+[172.16.7.0 ~]# openssl req -new -key httpd.key -out httpd.csr -days 365
 csr: certificate signature request
 
 CN
 Beijing
 Beijing
-lingyima
+wovert
 Ops
-www.yinglima.com
-webmaster@lingyima.com
+www.wovert.com
+webmaster@wovert.com
 
-httpd.csr：证书签署请求
-~]# scp httpd.csc root@172.16.100.67:/tmp/`
-
-CA验证
-~]# openssl ca -in /tmp/httpd.csr -out /etc/pki/CA/certs/httpd.crt -days 365
+# 向 CA 主机发送 httpd.scr 文件
+[172.16.7.0 ~]# scp httpd.csr root@172.16.7.1:/tmp/`
 ```
 
 - CA主机(172.16.7.1)
 
 ``` SHELL
-~]# touch /etc/pki/CA/{serial,index.txt}
-~]# echo 01 > /etc/pki/CA/serial
-~]# openssl ca -in /tmp/httpd.csr -out /etc/pki/CA/certs/httpd.crt -days 365
-~]# cd /etc/pki/CA
-~]# cat index.txt
-~]# scp certs/httpd.crt root@171.16.7.0:/etc/httpd/ssl/
+[172.16.7.1 ~]# touch /etc/pki/CA/{serial,index.txt}
+[172.16.7.1 ~]# echo 01 > /etc/pki/CA/serial
+# 证书签署请求 CA验证
+[172.16.7.1 ~]# openssl ca -in /tmp/httpd.csr -out /etc/pki/CA/certs/httpd.crt -days 365
+[172.16.7.1 ~]# cd /etc/pki/CA
+[172.16.7.1 ~]# cat index.txt
+
+# 证书发给请求者
+[172.16.7.1 ~]# scp certs/httpd.crt root@171.16.7.0:/etc/httpd/ssl/
+
 ```
 
-- 删除服务器上：http.csr文件
+#### 删除http.csr文件
 
-## httpd的为例
+``` shell
+[172.16.7.1 ~]# rm -rf /tmp/httpd.csr
+[172.16.7.0 ~]# rm -rf /etc/httpd/ssl/httpd.csr
+```
 
-### 1.用到证书的主机生成证书签署请求：
+### httpd的为例
+
+#### 1.用到证书的主机生成证书签署请求
 
 ``` SHELL
 ~]# mkdir /etc/httpd/ssl
@@ -580,19 +620,19 @@ CA验证
 ~]# (umask 077; openssl genrsa -out /etc/httpd/ssl/httpd.key 2048
 ```
 
-### 2.生成证书签署请求
+#### 2.生成证书签署请求
 
 ``` SHELL
 ~]# openssl req -new -key /etc/httpd/ssl/httpd.key -out /etc/httpd/ssl/httpd.csr -days 365
 ```
 
-### 3.将请求通过可靠方式发送给CA主机；
+#### 3.将请求通过可靠方式发送给CA主机；
 
 ``` SHELL
 ~]# scp /etc/httpd/ssl/httpd.csr root@172.16.100.67:/tmp/
 ```
 
-### 4.在CA主机上签署证书
+#### 4.在CA主机上签署证书
 
 ``` SHELL
 ~]# openssl ca -in /tmp/httpd.csr -out /etc/pki/CA/certs/httpd.crt -days 365
