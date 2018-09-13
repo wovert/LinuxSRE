@@ -42,26 +42,25 @@
 - [http](./application-service/http/)
 - [Nginx](./application-service/nginx/)
 - [DNS](./application-service/dns/)
-- OpenSSH
-- IPTABLES
-- tcp wrapper
-- nss and pam
-- File Server
-- FTP
-- NFS
-- SMB
-- Web Service
-  - Apache
-  - PHP
-  - Mariadb(Storage)
-  - Cache
-    - Memecache, varnish
+- OpenSSH(./application-service/openssh/)
+- IPTABLES(./application-service/iptables/)
+- tcp wrapper(./application-service/tcp-wrapper/)
+- nss and pam(./application-service/nss-pam/)
+- FTP(./application-service/ftp/)
+- NFS(./application-service/nfs/)
+- SAMBA(./application-service/samba/)
+- Web Service(./application-service/dns/)
+  - Apache(./application-service/dns/)
+  - PHP(./application-service/dns/)
+  - Mariadb(Storage)(./application-service/dns/)
+  - Cache(./application-service/dns/)
+    - Memecache, varnish(./application-service/dns/)
   - NoSQL(Cache)
-    - Redis
-    - MongoDB
-    - HBase
-  - tomcap
-  - session replication cluster
+    - Redis(./application-service/dns/)
+    - MongoDB(./application-service/dns/)
+    - HBase(./application-service/dns/)
+  - tomcap(./application-service/dns/)
+  - session replication cluster(./application-service/dns/)
 
 
 ## Cluster(集群)
