@@ -14,6 +14,14 @@ smtp 服务实现邮件传输
 
 POP3 或 IMAP4 服务实现邮件收取
 
+![udp encapsulation](./images/udp_encapsulation.png)
+
+![udp client server](./images/udp-client-server.png)
+
+![tcp client server](./images/tcp-client-server.jpg)
+
+![tcp udp](./images/tcp_udp_headers.jpg)
+
 - Client: 发起应用请求的程序
 - Server: 响应请求（提供服务）的程序
   - LISTEN: Socket
@@ -33,17 +41,23 @@ POP3 或 IMAP4 服务实现邮件收取
 - port: `53/UDP`, `53/TCP`
 - www.localtest.com FQDN(Full Qualified Domain Name) 完全合格域名/全称域名，是指主机名加上全路径
 
+![DNS](./images/dns.png)
+
+![What is DNS](./images/what-is-dns.png)
+
+[IETF](http://ietf.org/)
+
 ## 名称解析：名称转换
 
 - 公共库
-  - `getipbyhostname()`
-  - `gethostnamebyip()`
+  - `getipbyhostname()` 根据IP获取主机名
+  - `gethostnamebyip()` 根据主机名获取IP
 
 - 本地hosts文件格式： `ip hosts alias`
 
 - 根域
-  - TLD: top level domain, 顶级域
-    - 组织域：`.com .net .org .gov .edu .mil`
+  - TLD: top level domain(顶级域)
+    - 组织域：`.com .net .org .gov .edu .mil(军工部门)`
     - 国家域：`.iq .tw .hk .jp .cn`
 
 - `www.localtest.com.`
@@ -62,13 +76,17 @@ www.localtest.com(主机名，FQDN: Full Qualified Domain Name)
 
 ## DNS查询类型
 
-- 递归查询：client->DNS Server
-- 迭代查询：DNS Server -> DNS Server .....
+- 递归查询：client->DNS Server(客户端指定的DNS服务器)
+- 迭代查询(客户端指定的DNS服务器找不到，此DNS服务器迭代请求查询客户端要查询的FQDN)：DNS Server(顶级域) -> DNS Server(二级域) -> .....
 
-## DNS名称解析方式：
+## DNS名称解析方式
 
-- 名称->IP：正向解析
-- IP->名称：反向解析
+解决高并发DNS服务器请求问题？读取，更新(多个服务器同步数据),多加一个服务器解决不了问题。分层设计解决此问题。先查找根域->顶级域->二级域->三级域，最终返回
+
+DNS是分布式数据库系统
+
+- 根据名称->查找IP：正向解析
+- 根据IP->查找名称：反向解析
   - 4.3.2.1.in-addr.arpa.
     - 4
     - 3
@@ -80,10 +98,10 @@ www.localtest.com(主机名，FQDN: Full Qualified Domain Name)
 - 注意：二者的名称空间，非为同一个空间，即非为同一棵树；因此，也不是同一个解析库
 
 - 域：localtest.com. 1.1.1.1
-- www.localtest.com 2.2.2.2
-- ftp.localtest.com. 3.3.3.3
-- bbs.localtest.com. 4.4.4.4
-- news.localtest.com. 5.5.5.5
+  - www.localtest.com 2.2.2.2
+  - ftp.localtest.com. 3.3.3.3
+  - bbs.localtest.com. 4.4.4.4
+  - news.localtest.com. 5.5.5.5
 
 ##　DNS服务器类型
 
@@ -97,7 +115,7 @@ www.localtest.com(主机名，FQDN: Full Qualified Domain Name)
 
 1. Client 查找本地文件hosts文件
 2. 查找本地 DNS Local Cache
-3. 查找 DNS Server(recursive) 
+3. 查找 DNS Server(recursive)
 4. 自己负责解析的域：直接查询数据库并返回答案
 5. 不是自己负责解析域：Server Cache -> iteration(迭代)
 
