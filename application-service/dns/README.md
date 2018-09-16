@@ -39,7 +39,7 @@ POP3 或 IMAP4 服务实现邮件收取
 ## DNS: Domain Name Service, 应用层协议
 
 - port: `53/UDP`, `53/TCP`
-- www.localtest.com FQDN(Full Qualified Domain Name) 完全合格域名/全称域名，是指主机名加上全路径
+- www.wovert.com FQDN(Full Qualified Domain Name) 完全合格域名/全称域名，是指主机名加上全路径
 
 ![DNS](./images/dns.png)
 
@@ -60,19 +60,19 @@ POP3 或 IMAP4 服务实现邮件收取
     - 组织域：`.com .net .org .gov .edu .mil(军工部门)`
     - 国家域：`.iq .tw .hk .jp .cn`
 
-- `www.localtest.com.`
+- `www.wovert.com.`
   - www(三级域，主机域)
-  - localtest(二级域)
+  - wovert(二级域)
   - com(一级域或顶级域)
   - .(根域)
 
-- 查看www.localtest.com相对应的IP地址
+- 查看www.wovert.com相对应的IP地址
 
-本地hosts->DNS缓存(TTL，在内存里)->DNS服务器->根域名服务器->.com服务器，返回给DNS服务器-> 查找localtest服务器，返回给DNS服务器->查找www对应的地址，返回给DNS服务器 -> 在DNS服务器缓存
+本地hosts->DNS缓存(TTL，在内存里)->DNS服务器->根域名服务器->.com服务器，返回给DNS服务器-> 查找wovert服务器，返回给DNS服务器->查找www对应的地址，返回给DNS服务器 -> 在DNS服务器缓存
 
-域名: localtest.com
+域名: wovert.com
 
-www.localtest.com(主机名，FQDN: Full Qualified Domain Name)
+www.wovert.com(主机名，FQDN: Full Qualified Domain Name)
 
 ## DNS查询类型
 
@@ -97,11 +97,11 @@ DNS是分布式数据库系统
 - . -> in-addr.arpa -> 1 -> 2 -> 3 -> [1-9]
 - 注意：二者的名称空间，非为同一个空间，即非为同一棵树；因此，也不是同一个解析库
 
-- 域：localtest.com. 1.1.1.1
-  - www.localtest.com 2.2.2.2
-  - ftp.localtest.com. 3.3.3.3
-  - bbs.localtest.com. 4.4.4.4
-  - news.localtest.com. 5.5.5.5
+- 域：wovert.com. 1.1.1.1
+  - www.wovert.com 2.2.2.2
+  - ftp.wovert.com. 3.3.3.3
+  - bbs.wovert.com. 4.4.4.4
+  - news.wovert.com. 5.5.5.5
 
 ##　DNS服务器类型
 
@@ -148,11 +148,12 @@ DNS是分布式数据库系统
 - 增量传送：ixfr, 仅传送变量的数据
 
 - DNSsec(安全DNS)
+  - DNS 截取 -> 完整性校验认证（校验码签名）
   - 本地局域网需要使用DNS服务器，自动化运维
 
 ## 区域(zone， 物理概念，解析库文件)和域(domain，逻辑概念)
 
-- localtest.com域
+- wovert.com域
   - FQDN -> IP
     - 正向解析库；正向解析区域
   - IP -> FQDN
@@ -164,34 +165,26 @@ DNS是分布式数据库系统
 
 DNS服务器必须指定根域域名服务器地址
 
-- 资源记录：Resource Record，简称RR
-- 记录有类型：A, AAAA, PTR, SOA, NS, CNAME, MX
+- 资源记录(每一行都是资源记录)：Resource Record，简称RR
 
-### SOA: Start Of Authority 起始授权(权威)记录
+### 记录有类型
 
-一个区域解析库有且只能有一个SOA记录，而且必须放在第一条；（岛屿）
+> A, AAAA, PTR, SOA, NS, CNAME, MX
 
-### NS: Name Resolving 域名解析记录
+- SOA: Start Of Authority 起始授权(权威)记录
+  - 一个区域解析库有且只能有一个SOA记录，而且必须放在第一条；（岛屿）
+- NS: Name Resolving 域名解析记录
+  - 一个区域解析库可以有多个NS记录(多个岛主)；其中一个为主的；（岛主）
+- A: Address 地址记录
+  - FQDN -> IPv4
+- AAAA: 地址记录
+  - FQDN -> IPv6
+- CNAME: Canonical Name 别名记录
+- PTR：Pointer
+  - IP -> FQDN (反向解析)
+- MX: Mail eXchanger 邮件交换器
 
-一个区域解析库可以有多个NS记录；其中一个为主的；（岛主）
-
-### A: Address 地址记录
-
-FQDN -> IPv4
-
-### AAAA: 地址记录
-
-FQDN -> IPv6
-
-### CNAME: Canonical Name 别名记录
-
-### PTR：Pointer
-
-- IP -> FQDN (反向解析)
-
-### MX: Mail eXchanger 邮件交换器
-
-- 优先级：0-99, 数字越小优先级越高
+优先级：0-99, 数字越小优先级越高
 
 ### 资源记录的定义格式
 
@@ -199,35 +192,39 @@ FQDN -> IPv6
 
 ### SOA：
 
-- name: 当前区域的名字；例如："localtest.com."后者"2.3.4.in-addr.arpa."
+- name: 当前区域的名字；例如："wovert.com."后者"2.3.4.in-addr.arpa."
+- IN 关键字
+- RR_TYPE 资源类型
 - value: 有三部分组成
-  - 当前区域的区域名称（也可以使用主DNS服务器名称）
-  - 当前区域管理员的邮箱地址； 但地址中不能使用@符号，一般使用点号来替代；
-  - (主从服务协调属性的定义以及否定答案的TTL)
+  - 1.当前区域的区域名称（也可以使用主DNS服务器名称）
+  - 2.当前区域管理员的邮箱地址； 但地址中不能使用@符号，一般使用点号来替代；
+  - 3.(主从服务协调属性的定义以及否定答案的TTL)
 
 - 例如：
 
 ``` dns-config
-localtest.com. 86400 IN SOA localtest.com. admin.localtest.com (
-2017010801;serial
-2H ;refresh time hour
-10M ;retry, minute
-1W ;expire, week
-1D ;negative answer ttl, day
+wovert.com. 86400 IN SOA wovert.com. admin.wovert.com. (
+2017010801  ;serial
+2H          ;refresh time hour
+10M         ;retry, minute
+1W          ;expire, week
+1D          ;negative answer ttl, day
 )
+
+- 86400: 1 days
 ```
 
 ### NS
 
 - name: 当前区域的区域名称
-- value: 当前区域的某DNS服务器的名字，例如ns.localtest.com.
+- value: 当前区域的某DNS服务器的名字，例如`ns.wovert.com.`
   - 注意：一个区域可以有多个ns记录
 
-- 例如
+- 例如: 指定域名解析服务器
 
 ``` dns-config
-localtest.com. 86400 IN NS ns1.localtest.com.
-localtest.com. 86400 IN NS ns2.localtest.com.
+wovert.com. 86400 IN NS ns1.wovert.com.
+wovert.com. 86400 IN NS ns2.wovert.com.
 ```
 
 ### MX
@@ -239,21 +236,21 @@ localtest.com. 86400 IN NS ns2.localtest.com.
 - 例如：
 
 ``` dns-config
-localtest.com. IN MX 10 mx1.localtest.com
-localtest.com. IN MX 10 mx2.localtest.com
+wovert.com. IN MX 10 mx1.wovert.com
+wovert.com. IN MX 20 mx2.wovert.com
 ```
 
 ### A
 
-- name: FQDN, 例如www.localtest.com. 
+- name: FQDN, 例如`www.wovert.com.`
 - value: IPv4地址
 
 - 例如：
 
 ``` dns-config
-www.localtest.com. IN A 1.1.1.1
-www.localtest.com. IN A 1.1.1.2
-bbs.localtest.com. IN A 1.1.1.1
+www.wovert.com. IN A 1.1.1.1
+www.wovert.com. IN A 1.1.1.2
+bbs.wovert.com. IN A 1.1.1.1
 ns1 IN A 1.1.1.1
 mx1 IN A 1.1.1.1
 ```
@@ -272,15 +269,15 @@ mx1 IN A 1.1.1.1
 - 例如
 
 ``` dns-config
-4.3.2.1.in-addr.arpa. IN PTR www.localtest.com.
+4.3.2.1.in-addr.arpa. IN PTR www.wovert.com.
 ```
 
 ### CNAME
 
-- name: FQDN格式的别名
-- value: FQDN格式的正式名字
+- name: FQDN 格式的别名
+- value: FQDN 格式的正式名字
 
-- 例如：`web.localtest.com.	IN	CNAME	www.localtest.com.`
+- 例如：`web.wovert.com. IN CNAME www.wovert.com.`
 
 ## 注意
 
@@ -297,7 +294,7 @@ mx1 IN A 1.1.1.1
 
 ### bind介绍
 
-- BIND: Berkeley Internet Name Domain, ISC.org
+- BIND: Berkeley Internet Name Domain, `ISC.org`
   - dns：协议
   - bind：DNS协议的一种实现
   - named：bind程序的运行的进程名
@@ -333,8 +330,8 @@ mx1 IN A 1.1.1.1
   - 1.一台DNS服务器可同时为多个区域提供解析
   - 2.必须要有根区域解析库文件：`named.ca`
   - 3.还应该有两个区域解析库文件：localhost和127.0.0.1的正反向解析库
-    - 正向：`named.localhost`
-    - 反向：`named.loopback`
+    - 正向解析库文件：`named.localhost`
+    - 反向解析库文件：`named.loopback`
 
 #### rndc: remote name domain controller，name server control utility 远程名称域管理工具
 
@@ -445,7 +442,7 @@ www.sohu.com 要查询的名称
 
 ### 配置解析一个正向区域
 
-> 以localtest.com域为例
+> 以wovert.com域为例
 
 #### 1.定义区域
 
@@ -460,7 +457,7 @@ file "ZONE_NAME.zone";  #相对路径/var/named路径下
 
 - hint：根服务器
 - forward：转发服务器
-- 注意：区域名字即为域名；ZONE_NAME => localtest.com
+- 注意：区域名字即为域名；ZONE_NAME => wovert.com
 
 #### 2.建立区域数据文件(主要记录为A或AAAA记录)
 
@@ -468,16 +465,16 @@ file "ZONE_NAME.zone";  #相对路径/var/named路径下
 
 ``` shell
 # cd /var/named/`
-# vim localtest.com.zone
+# vim wovert.com.zone
 $TTL 3600
-$ORIGIN localtest.com.
-@ IN SOA localtest.com. dnsadmin.localtest.com. (
+$ORIGIN wovert.com.
+@ IN SOA wovert.com. dnsadmin.wovert.com. (
   2017010801
   1H
   10M
   3D
   1D )
-  IN  NS  ns1 或则 ns1.localtest.com.
+  IN  NS  ns1 或则 ns1.wovert.com.
   IN  NS  ns2
   IN  MX  10  mx1
   IN  MX  20  mx2
@@ -493,8 +490,8 @@ bbs IN A 1721.16.7.1
 - 权限及属组修改
 
 ``` shell
-# chgrp named /var/named/localtest.com.zone
-# chmod o= /var/named/localtest.com.zone
+# chgrp named /var/named/wovert.com.zone
+# chmod o= /var/named/wovert.com.zone
 ```
 
 - 检查语法错误
@@ -533,20 +530,20 @@ file "172.16.0.zone"; # 相对路径/var/named路径下
 ``` dns-config
 $TTL 3600
 $ORIGIN 0.16.172.in-addr.arpa.
-@     IN    SOA         ns1.localtest.com. nsadmin.localtest.com. (
+@     IN    SOA         ns1.wovert.com. nsadmin.wovert.com. (
             2017110102
             1H  
             10M
             3D  
             12H )
-      IN    NS          ns1.localtest.com.
-71    IN    PTR         ns1.localtest.com.
-61    IN    PTR         ns1.localtest.com.
-71    IN    PTR         mx1.localtest.com.
-61    IN    PTR         mx2.localtest.com.
-71    IN    PTR         bbs.localtest.com.
-61    IN    PTR         bbs.localtest.com.
-71    IN    PTR         www.localtest.com.
+      IN    NS          ns1.wovert.com.
+71    IN    PTR         ns1.wovert.com.
+61    IN    PTR         ns1.wovert.com.
+71    IN    PTR         mx1.wovert.com.
+61    IN    PTR         mx2.wovert.com.
+71    IN    PTR         bbs.wovert.com.
+61    IN    PTR         bbs.wovert.com.
+71    IN    PTR         www.wovert.com.
 ```
 
 - 权限及属组修改
@@ -606,19 +603,19 @@ zone "ZONE_NAME" IN {
 # rndc reload
 # systemctl reload named.service
 # cd /var/named
-# vim localtest.zone
+# vim wovert.zone
 
 新增NS记录
 IN NS ns2
 ns2 IN A 192.168.1.3
 
 SOA的序列表一定要加1，才能更新到从服务器
-# named-checkzone localtest.com /var/named/localtest.com.zone
+# named-checkzone wovert.com /var/named/wovert.com.zone
 # rndc reload
 # rndc status
 
 新增域名
-# vim /var/named/localtest.zone
+# vim /var/named/wovert.zone
 pop3 IN	A	192.168.1.71
 修改序列号+1
 # rndc reload
@@ -626,7 +623,7 @@ pop3 IN	A	192.168.1.71
 
 
 手动传输区域文件：
-# dig -t axfr localtest.com
+# dig -t axfr wovert.com
 ```
 
 - On Master
@@ -644,9 +641,9 @@ pop3 IN	A	192.168.1.71
 
 配置正向区域的从服务器
 # vim /etc/named.rfc1912.zones
-  zone "localtest.com" IN {
+  zone "wovert.com" IN {
     type slave;
-    file "slaves/localtest.com.zone";
+    file "slaves/wovert.com.zone";
     masters { 192.168.1.2;  };
   };
 
@@ -655,12 +652,12 @@ pop3 IN	A	192.168.1.71
 # systemctl status named.service
 # cd /var/named/slaves
 # ls -l
-# dig -t A www.localtest.com @192.168.1.3
+# dig -t A www.wovert.com @192.168.1.3
 
 检查主服务器发送的通知
 # systemctl status named.service
-# dig -t A pop3.localtest.com @192.168.1.3
-# dig -t axfr localtest.com @192.168.1.2
+# dig -t A pop3.wovert.com @192.168.1.3
+# dig -t axfr wovert.com @192.168.1.2
 
 注意：时间要同步；`ntpdate`命令；同步到时间服务器
 ```
@@ -672,24 +669,24 @@ pop3 IN	A	192.168.1.71
 - 定义子域
 
 ``` dns-config
-ops.localtest.com. IN NS ns1.ops.localtest.com
-ops.localtest.com. IN NS ns2.ops.localtest.com
+ops.wovert.com. IN NS ns1.ops.wovert.com
+ops.wovert.com. IN NS ns2.ops.wovert.com
 ```
 
 - 子域有主从服务器
 
 ``` dns-config
-ns1.ops.localtest.com. IN A IP.AD.DR.ESS
-ns2.ops.localtest.com. IN A IP.AD.DR.ESS
+ns1.ops.wovert.com. IN A IP.AD.DR.ESS
+ns2.ops.wovert.com. IN A IP.AD.DR.ESS
 
-localtest.com IN NS ns1.localtest.com
-ns1.localtest.com IN A 1.1.1.1
+wovert.com IN NS ns1.wovert.com
+ns1.wovert.com IN A 1.1.1.1
 
-fin.localtest.com
-www.fin.localtest.com
-ops.localtest.com
-www.ops.localtest.com
-ns.ops.localtest.com
+fin.wovert.com
+www.fin.wovert.com
+ops.wovert.com
+www.ops.wovert.com
+ns.ops.wovert.com
 ```
 
 ### 1.子域服务器(172.16.100.69)
@@ -697,7 +694,7 @@ ns.ops.localtest.com
 - 在主服务器上授权子域服务器: `172.16.100.67`
 
 ``` shell
-# vim /etc/named/localtest.com.zone
+# vim /etc/named/wovert.com.zone
   ops IN NS ns1.ops
   ns1.ops IN A 172.16.100.69
 
@@ -722,16 +719,16 @@ ns.ops.localtest.com
 
 ``` SHELL
 # vim /etc/named.rfc1912.zones
-  zone "ops.localtest.com" IN {
+  zone "ops.wovert.com" IN {
     type master;
-    file "ops.localtest.com.zone";
+    file "ops.wovert.com.zone";
   };
 
 # cd /var/named
-# vim ops.localtest.com.zone
+# vim ops.wovert.com.zone
   $TTL 3600
-  $ORIGIN ops.localtest.com.
-  @	IN	SOA	ns1.ops.localtest.com. nsadmin.ops.localtest.com. (
+  $ORIGIN ops.wovert.com.
+  @	IN	SOA	ns1.ops.wovert.com. nsadmin.ops.wovert.com. (
     2018010801
     1H
     10M
@@ -740,14 +737,14 @@ ns.ops.localtest.com
   IN NS ns1
 ns1 IN A 172.16.100.69
 www IN A 172.16.100.69
-# chmod o= ops.localtest.com.zone
-# chgrp named ops.localtest.com.zone
+# chmod o= ops.wovert.com.zone
+# chgrp named ops.wovert.com.zone
 # named-checkconf
-# named-checkzone ops.localtest.com.zone /var/named/ops.localtest.com.zone
+# named-checkzone ops.wovert.com.zone /var/named/ops.wovert.com.zone
 # rndc reload
-# dig -t A www.ops.localtest.com @172.16.100.69
-# dig -t A www.ops.localtest.com @172.16.100.67
-# dig -t A www.localtest.com @172.16.100.67
+# dig -t A www.ops.wovert.com @172.16.100.69
+# dig -t A www.ops.wovert.com @172.16.100.67
+# dig -t A www.wovert.com @172.16.100.67
 ```
 
 ## 定义转发
@@ -771,7 +768,7 @@ zone "ZONE_NAME" IN {
 
 ``` shell
 # vim /etc/named.rfc1912.zones
-  zone "localtest.com" IN {
+  zone "wovert.com" IN {
     type forward;
     forward only;
     forwarders { 172.16.100.67; 172.16.100.68; };
@@ -779,7 +776,7 @@ zone "ZONE_NAME" IN {
 
 # named-checkconf
 # rndc reload
-# dig -t A www.localtest.com @172.16.100.69
+# dig -t A www.wovert.com @172.16.100.69
 父域解析子域，子域解析父域
 allow-query {}
 ```
@@ -838,9 +835,9 @@ acl mynet {
 - 主服务器：vim /etc/named.rfc1912.zones
 
 ``` config
-zone "localtest.com" IN {
+zone "wovert.com" IN {
   type master;
-  file "localtest.com";
+  file "wovert.com";
   allow-transfer { slave; };
 };
 
@@ -870,22 +867,22 @@ zone "localtest.com" IN {
 172.16.100.68上测试
 
 ``` shell
-# dig -t axfr localtest.com @172.16.100.67
+# dig -t axfr wovert.com @172.16.100.67
 ```
 
 172.16.100.67
 
 ``` shell
-# dig -t axfr localtest.com @127.0.0.1;
+# dig -t axfr wovert.com @127.0.0.1;
 # systemctl restart named.service
 ```
 
 ### Slave
 
 ``` shell
-zone "localtest.com" IN {
+zone "wovert.com" IN {
   type slave;
-  file "slaves/localtest.com.zone";
+  file "slaves/wovert.com.zone";
   masters { 172.16.100.67; };
   allow-transfer { none; };
   allow-update { none; };
@@ -909,7 +906,7 @@ view VIEW_NAME {
 
 view internal {
   Match-clients { 172.16.0.0/8; };
-  zone "localtest.com" {
+  zone "wovert.com" {
     type master;
     file "lingyigma.com/internal"；
   };
@@ -917,7 +914,7 @@ view internal {
 
 view external {
   match-clients { any; };
-  zone "localtest.com" {
+  zone "wovert.com" {
     type master;
     file "lingyigma.com/external"；
   };
@@ -941,9 +938,9 @@ view external {
 # systemctl status named.service
 # vim /etc/named.rfc1912.zones
   // 配置正向从区域
-  zone "localtest.com"　IN {
+  zone "wovert.com"　IN {
     type slave;
-    file "slaves/localtest.com.zone";
+    file "slaves/wovert.com.zone";
     masters { 172.16.100.67; };
   };
 
@@ -954,13 +951,13 @@ view external {
 
 ``` shell
 # cd /var/named/`
-# vim localtest.com.zone
+# vim wovert.com.zone
   201700916 加上+1
   // 新增NS记录
   IN  NS  ns2
   ns2 IN  A 172.16.100.68
 
-# named-checkzone localtest.com /var/named.localtest.com.zone
+# named-checkzone wovert.com /var/named.wovert.com.zone
 # rndc reload
 # rndc status
 ```
@@ -976,16 +973,16 @@ view external {
 
 ``` shell
 二进制文件
-# cd /var/named/slaves/localtest.com.zone
+# cd /var/named/slaves/wovert.com.zone
 ```
 
 ## 5. 测试
 
-`# dig -t A www.localtest.com @172.16.100.68`
+`# dig -t A www.wovert.com @172.16.100.68`
 
 ## 6. 在主服务器上增加新的
 
-`# vim /var/named/localtest.com.zone`
+`# vim /var/named/wovert.com.zone`
 
 pop3 IN A 172.16.100.72
 并且修改序列号,+1
@@ -999,7 +996,7 @@ pop3 IN A 172.16.100.72
 
 ``` shell
 # systemctl status named.servie
-# dig -t A pop2.localtest.com @172.16.100.68
+# dig -t A pop2.wovert.com @172.16.100.68
 ```
 
 ## 反向解析 1. 从服务器
@@ -1018,10 +1015,10 @@ pop3 IN A 172.16.100.72
 ## 反向解析 2. 主服务器
 
 ``` shell
-# vim /var/named/localtest.com.zone`
+# vim /var/named/wovert.com.zone`
   增加序列号
-  IN  NS  ns2.localtest.com.
-  68  IN  PTR ns2.localtest.com.
+  IN  NS  ns2.wovert.com.
+  68  IN  PTR ns2.wovert.com.
 
 # named-checkzone 100.16.172.in-addr.arpa /var/named/172.16.100.zone
 # rndc reload
@@ -1047,7 +1044,7 @@ pop3 IN A 172.16.100.72
 ``` shell
 # vim /var/named/172.16.100.zone
   增加序列号,+1
-  72 IN PTR pop3.localtest.com.
+  72 IN PTR pop3.wovert.com.
 
 # rndc reload
 # systemctl status named.service
