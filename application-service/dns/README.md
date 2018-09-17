@@ -299,11 +299,22 @@ mx1 IN A 1.1.1.1
   - bind：DNS协议的一种实现
   - named：bind程序的运行的进程名
 
+``` SHELL
+# yum info bind
+ 9.9.4
+# yum list all bind*
+# yum info bind-libs
+# rpm -ql bind-libs  
+
+```
+
 - 程序包：
-  - bind-libs：被bind和bind-utils包中的程序共同用到的库文件
-  - bind-utils：bind客户端程序集，例如：**dig, host, nslookup**等
-  - bind: 提供的DNS Server程序、以及几个常用的测试程序
-  - bind-chroot：选装,让named运行于jail模式下
+  - `bind-libs`：被bind和bind-utils包中的程序共同用到的库文件
+  - `bind-utils`：bind 客户端程序集，例如：**dig, host, nslookup**等
+
+  - `bind`: 提供的 `DNS Server` 程序、以及几个常用的测试程序
+  - `bind-chroot`：选装,让 `named` 运行于 `jail` 模式下
+    - 假根下操作，容器里操作，防止在根进程操作下被劫持
 
 ### bind安装
 
@@ -313,6 +324,14 @@ mx1 IN A 1.1.1.1
 ```
 
 ### bind配置
+
+``` SHELL
+# rpm -ql bind
+
+/usr/sbin/named
+/usr/sbin/named-checkconf 检查配置文件是否有错误
+19：59
+```
 
 - 主配置文件: `/etc/named.conf`
 - 区域解析库文件: `/var/named/*.zone`
