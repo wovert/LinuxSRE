@@ -99,9 +99,9 @@ HTTP服务=WWW服务=Web服务
   - http 响应报文
 
 - 请求报文首部的格式：
-  - <method><URL><VERSION>
-  - HEADERS:(name:value)
-  - <request body>
+  - `<method><URL><VERSION>`
+  - `HEADERS:(name:value)`
+  - `<request body>`
 
 ## 访问资源：获取请求报文中的资源
 
@@ -144,7 +144,7 @@ Web 服务器的资源路径映射方式
 
 ## 用户访问网站基本流程
 
-1. 用户使用客户端浏览器里输入网站地址(https://lingyima.com)回车后，用户系统首先查找系统本地的DNS缓存及hosts文件信息，确实是否存在该域名对应的IP解析记录(Linux:/etc/hosts)，如果有直接获取IP地址，然后去访问这个IP地址对应的域名的服务器。一般第一次请求时，DNS缓存是没有解析记录的，而 hosts 文件在本地测试时使用
+1. 用户使用客户端浏览器里输入网站地址(https://lingyima.com)回车后，用户系统首先查找系统本地的DNS缓存及hosts文件信息，确实是否存在该域名对应的IP解析记录(`Linux:/etc/hosts`)，如果有直接获取IP地址，然后去访问这个IP地址对应的域名的服务器。一般第一次请求时，DNS缓存是没有解析记录的，而 `hosts` 文件在本地测试时使用
 
 2. 本地没有域名对应的解析记录，系统会版浏览器解析请求发送给客户端本地设置的DNS服务器地址（LDNS, Local DNS）解析，如果LDNS服务器有对应的解析记录一会直接返回IP地址给客户端。若没有，则LDNS会负责继续请求其他的DNS服务器
 
@@ -219,32 +219,32 @@ com
 
 ## 基本语法
 
-- <scheme>://<user>:<pw>@<host>:<port>/<path>;<params>?<query>#<frag>
-- params: 参数
-- http://www.lingyima.com/bbs/hello;gender=f
-- query: 查询
-- http://www.lingyima.com/bbs/item.php?username=tom&title=article
-- frag: 手雷
+- `<scheme>://<user>:<pw>@<host>:<port>/<path>;<params>?<query>#<frag>`
+- `params`: 参数
+- `http://www.lingyima.com/bbs/hello;gender=f`
+- `query`: 查询
+- `http://www.lingyima.com/bbs/item.php?username=tom&title=article`
+- `frag`: 手雷
 
 - 相对URL：同站访问站点
 - 绝对URL：跨站访问站点
 
-- <schem>://<user>:<passwords>@<host>:<port>/<path>;<params>?<query>#<frag>
-- params
+- `<schem>://<user>:<passwords>@<host>:<port>/<path>;<params>?<query>#<frag>`
+- `params`
   - http://www.lingyima.com/bbs/hello;gender=f
-- query
+- `query`
   - http://www.lingyima.com/bbs/item.php?user=tom&title=abc
-- frag
+- `frag`
   - http://www.lingyima.com/index.html#heaer-2
 
-## http协议 version：
+## http协议 version
 
 - http/0.9, http/1.0, http/1.1,http/2.0
 - stateless：无状态
   - 服务器无法持续追踪访问者来源
   - 解决方案 session(服务器管理客户端cookie)：cookie（追踪同一个用户）
 
-- http事务
+- http 事务
   - 请求：request
   - 响应：response
 
@@ -274,15 +274,15 @@ com
 
 ## method(方法)：告诉服务器对资源做什么操作
 
-- GET：从服务器获取一个资源
-- POST: 向服务器发送要处理的数据
-- HEAD: 只从服务器获取文档响应首部
-- PUT: 将请求的主体部分存储在服务器上（危险）
-- DELETE：请求删除服务器上指定的文档
-- TRACE：跟踪请求到大服务器中间经过的代理服务器
-- OPTIONS：请求服务器返回对指定资源支持使用的请求方法
+- `GET`：从服务器获取一个资源
+- `POST`: 向服务器发送要处理的数据
+- `HEAD`: 只从服务器获取文档响应首部
+- `PUT`: 将请求的主体部分存储在服务器上（危险）
+- `DELETE`：请求删除服务器上指定的文档
+- `TRACE`：跟踪请求到大服务器中间经过的代理服务器
+- `OPTIONS`：请求服务器返回对指定资源支持使用的请求方法
 
-- 协议查看或分析的工具：`tcpdump,tshark,wireshark`
+- 协议查看或分析的工具：`tcpdump, tshark, wireshark`
 
 ## status(状态码)
 
@@ -294,30 +294,30 @@ com
 
 ### 常用状态码：
 
-- 200: 请求的所有数据通过响应报文的entity-body部分发送；OK
-- 301: 请求的URL指向的资源已经被删除；但在响应报文中通过首部Location指明了资源现在所处的新位置；永久重定向；Moved Permanently
-- 302: 与301相似，但在响应报文中通过Location指明资源现在所处临时新位置；Found
-- 304: 客户端发出了条件式请求，但服务器上的资源未曾发生改变，则通过响应此响应状态码通知客户端；Not Modified
-- 401: 需要输入账号和密码认证方能访问资源；Unauthorized
-- 403: 请求被禁止；Forbidden（用户没有权限）
-- 404: 服务去无法找到客户端请求的资源；Not Found
-- 500: 服务器内部错误；Internal Server Error
-- 502: 代理服务器从后端服务器收到一条伪响应：Bad Gateway
+- `200`: 请求的所有数据通过响应报文的entity-body部分发送；OK
+- `301`: 请求的URL指向的资源已经被删除；但在响应报文中通过首部Location指明了资源现在所处的新位置；永久重定向；Moved Permanently
+- `302`: 与301相似，但在响应报文中通过Location指明资源现在所处临时新位置；Found
+- `304`: 客户端发出了条件式请求，但服务器上的资源未曾发生改变，则通过响应此响应状态码通知客户端；Not Modified
+- `401`: 需要输入账号和密码认证方能访问资源；Unauthorized
+- `403`: 请求被禁止；Forbidden（用户没有权限）
+- `404`: 服务去无法找到客户端请求的资源；Not Found
+- `500`: 服务器内部错误；Internal Server Error
+- `502`: 代理服务器从后端服务器收到一条伪响应：Bad Gateway
 
 ## headers
 
-- 格式：` Name: Value`
+- 格式: `Name: Value`
 
 ``` request
 Request Headers:
 GET / HTTP/1.1
 Host: www.qq.com
 Connection: keep-alive 是否保持连接
-Upgrade-Insecure-Requests: 1 
-User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36 
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36
 Accept: text/html,application/xhtml+xml,application/
-xml;q=0.9,image/webp,*/*;q=0.8 
-Accept-Encoding: gzip, deflate, sdch 
+xml;q=0.9,image/webp,*/*;q=0.8
+Accept-Encoding: gzip, deflate, sdch
 Accept-Language: zh-CN,zh;q=0.8
 Cookie: tvfe_boss_uuid=aead7ae45ac1d686; pac_uid=1_67668283; eas_sid=X1L418a0g0W4z5l2t168w6T2V9; mobileUV=1_158dd38a6b7_391c4; ts_uid=9246952727; ptui_loginuin=67668283; pgv_pvid=6872186886; o_cookie=67668283; ptcz=04ed5113ef85398a5b53ab269f1faa6d8d6d765f31bce6cad37e4383362eaaae; pt2gguin=o0067668283
 ```

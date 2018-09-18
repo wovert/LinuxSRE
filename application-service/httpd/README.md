@@ -151,9 +151,9 @@ a patchy(补丁) server = apache
 
 `~]# cd /etc/httpd/conf/ && cp -v httpd.conf{,.backup}` 备份主配置文件
 
-#### 1. 修改监听的 IP 和 PORT: 
+#### 1. 修改监听的 IP 和 PORT
 
-> `Listen [IP:]PORT`
+> `Listen [IP:]PORT` IP 可以省略可以监听本机所有网卡端口
 
 - 省略 IP 表示为 0.0.0.0 (本机正常使用的所有 IP)
 - `Listen` 指令可重复出现多次，监听多个端口
@@ -174,9 +174,10 @@ a patchy(补丁) server = apache
 - 折衷：使用较短的持久连接时长，以及较少的请求数量
   - `KeepAlive On|Off` 默认是 Off
   - `KeepAliveTimeout 15` 长连接持续时间
-  - `MaxKeepAliveRequests	100` 最多请求资源数量，超出这个数量限制自动断开连接
+  - `MaxKeepAliveRequests 100` 最多请求资源数量，超出这个数量限制自动断开连接
 
-- 模拟请求资源测试长连接：
+- 模拟请求资源测试长连接
+
 ``` shell
 telnet 连接请求资源
 ~]# telnet 172.16.100.6 80
@@ -225,7 +226,8 @@ Enter
 - 在限定时长内最多可以请求多少个连接，不包括第一个连接，总共可以连接100+1
 
 - 客户端模拟请求：时间过期和最大请求数
-```
+
+``` shell
 ~]# yum -y install telent
 ~]# telnet 192.168.1.61 80
 GET /test.html HTTP/1.1
@@ -255,6 +257,7 @@ Host: 192.168.1.61
   - 查看静态编译及动态编译的模块：`# /usr/sbin/httpd -M`
 
 - 更换使用httpd程序，以支持其他 MPM 机制
+
 ``` shell
 ~]# service httpd stop
 ~]# vim /etc/sysconfig/httpd 默认使用prefork
@@ -262,7 +265,8 @@ Host: 192.168.1.61
 ~]# service restart stop
 ```
 
-- 脚本配置文件：
+- 脚本配置文件
+
 ``` shell
 ~]# vim /tmp/useradd.conf`
   username=myuser`
@@ -277,6 +281,7 @@ Host: 192.168.1.61
 ##### MPM配置
 
 - prefork配置
+
 ``` prefork.conf
 <IfModule prefork.c>
   StartServers 8 服务进程启动时子进程数量
@@ -298,6 +303,7 @@ prefork 是 select IO 模型(1024并发)
 - UV: User View 用户浏览量
 
 - worker配置
+
 ``` worker.conf
 <IfModule worker.c>
   StartServers 4 服务启动时子进程数量
@@ -337,6 +343,9 @@ B shell 运行
   logs -> ../../var/log/httpd
   modules -> ../../usr/lib64/httpd/modules
   run -> ../../var/run/htpd
+
+~]# httpd -M 编译进去的静态模块和动态装载模块
+~]# httpd -l 编译进去的静态模块
 ```
 
 #### 5. 定义 Main Server（中心主机）的文档页面路径
@@ -373,6 +382,7 @@ B shell 运行
 1. 文件系统路径
 
 所有目录及其子目录
+
 ``` config
 <Directory "">
   ...
@@ -411,7 +421,7 @@ B shell 运行
 
 ---
 
-##### <Directory> 中"基于源地址"实现访问控制
+##### `<Directory>` 中"基于源地址"实现访问控制
 
 1. `Options`: 后跟 1 个或多个以空白字符分隔的选项列表
 - `Indexes`：指明的 URL 路径下不存在与定义的主页面资源相符的资源文件时，返回索引列表给用户；推荐不使用
@@ -498,8 +508,8 @@ Allow from 172.16
 
 > 日志类型：访问日志和错误日志
 
-
 **错误日志**：`ErrorLog` 指令（进程运行错误、用户访问错误页面）
+
 ``` log
 ErrorLog logs/error_log (logs 相对于ServerRoot => /etc/httpd)
 LogLevel warn 日志级别
@@ -507,6 +517,7 @@ LogLevel warn 日志级别
 ```
 
 **访问日志**：`CustomLog` 指令（用户访问页面）
+
 ``` log
 组合日志格式
 LogFormat %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
@@ -532,20 +543,23 @@ CustomLog logs/access_log combined
 - **%{User-Agent}i** ：请求报文中首部 User-Agent的值；发出**请求的应用程序**
 
 #### 10. 基于用户的访问控制
+
 - 认证方式：
   - 表单认证(form+db)
   - http 协议认证(http)
 
-1.认证质询：
-  - WWW-Authenticate：响应码为 401，拒绝客户端请求，并说明要求客户端提供账号和密码
+1. 认证质询：
 
-2.认证：
-  - Authorization：客户端用户填入账号和密码后再次发送请求报文；认证通过时，则服务器发送响应的资源；
+- WWW-Authenticate：响应码为 401，拒绝客户端请求，并说明要求客户端提供账号和密码
+
+2. 认证：
+
+- Authorization：客户端用户填入账号和密码后再次发送请求报文；认证通过时，则服务器发送响应的资源；
   - 认证方式有两种：
     - basic：明文
     - digest: 信息摘要(摘要认证)（很多浏览器可能不支持）
 
-3.安全域：需要用户认证后方能访问的路径；应该通过名称对其进行标识，以便于告知用户认证的原因；
+3. 安全域：需要用户认证后方能访问的路径；应该通过名称对其进行标识，以便于告知用户认证的原因；
 
 - 用户的账号和密码存放于何处？
   - 虚拟账号：仅用于访问某服务时用到的认证标识
