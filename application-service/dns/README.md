@@ -329,20 +329,19 @@ mx1 IN A 1.1.1.1
 # rpm -ql bind
 
 /usr/sbin/named
-/usr/sbin/named-checkconf 检查配置文件是否有错误
-19：59
+/usr/sbin/named-checkconf 检查配置文件是否有语法错误
+/usr/sbin/named-checkzone 检查区域数据库文件是否有语法错误
+/usr/sbin/named-compilezone 检查手动编译二进制区域否有语法错误
 ```
 
-- 主配置文件: `/etc/named.conf`
-- 区域解析库文件: `/var/named/*.zone`
+#### 主配置文件: `/etc/named.conf`
 
-#### 主配置文件, 可包含其它配置文件
+- 主配置文件, 可包含其它配置文件
+  - `/etc/named.iscdlv.key`
+  - `/etc/named.rfc1912.zones`
+  - `/ecc/named.root.key`
 
-- `/etc/named.iscdlv.key`
-- `/etc/named.rfc1912.zones`
-- `/ecc/named.root.key`
-
-#### 解析库文件
+#### 区域解析库文件: `/var/named/*.zone`
 
 - `/var/named/`目录下；一般名字为：ZONE_NAME.zone
 - 注意：
@@ -352,27 +351,29 @@ mx1 IN A 1.1.1.1
     - 正向解析库文件：`named.localhost`
     - 反向解析库文件：`named.loopback`
 
-#### rndc: remote name domain controller，name server control utility 远程名称域管理工具
+#### rndc
 
-- `953/tcp`，但默认监听于127.0.0.1地址，因此仅允许本地使用
+> remote name domain controller，name server control utility 远程名称域管理工具
+
+`953/tcp`，但默认监听于127.0.0.1地址，因此仅允许本地使用
 
 #### bind程序安装完成之后，默认即可做缓存名称服务器使用；如果没有专门负责解析的区域，直接即可启动服务
 
 - CentOS 6: `# service named start`
 - CentOS 7: `# systemctl start named.service`
 
-#### 主配置文件格式：
+#### 主配置文件格式
 
 - 全局配置段: `options {...}`
 - 日志配置段: `logging {...}`
 - 区域配置段: `zone {...}`
   - 那些由本机负责解析的区域，或转发的区域
-
-- 缓存名称服务器的配置：
-  - 监听能与外部主机通信的地址（不是127.0.0.1）
-  - `listen-on port 53 { 172.16.0.2; };`
   - 注意：每个配置语句必须以分号结尾，花括号前后都有空格
 
+- 缓存名称服务器的配置
+  - 监听能与外部主机通信的地址（不是`127.0.0.1`）
+    - `listen-on port 53 { 172.16.0.2; };`
+  
   - 学习时，建议关闭dnssec功能
     - `dnssec-enable no;`
     - `dnssec-validation no;`
@@ -386,10 +387,18 @@ mx1 IN A 1.1.1.1
 ``` SHELL
 # named-checkconf -h (help)
 # named-checkconf /etc/named.conf
+# systemctl start named.service
+# netstat -tunlp
+# vim /etc/resolve.conf
+  search wovert.com
+  nameserver 172.16.100.67 自己的地址，自己当自己DNS服务器
+# ping www.taobao.com 不能解析
+# iptables -L -n
 ```
 
 - 53/TCP：区域传送
 - 53/UDP：解析
+- 953/tcp
 
 ### 测试工具
 
@@ -397,11 +406,13 @@ mx1 IN A 1.1.1.1
 
 #### dig命令
 
-`dig [-t RR_TYPE] name [@SERVER] [query options]` 用于测试dns系统，因此其不会查询hosts文件
+`dig [-t RR_TYPE] name [@SERVER] [query options]`
 
-``` OPTIONS 查询选项
-  +[no]trace：跟踪解析过程
-  +[no]recurse：进行递归解析
+用于测试dns系统，因此其不会查询hosts文件
+
+``` shell 查询选项
+  +[no]trace：[不]跟踪解析过程
+  +[no]recurse：[不]进行递归解析
 ```
 
 Flags: qr(query request) ra(request answer)
@@ -416,12 +427,48 @@ Flags: qr(query request) ra(request answer)
 - MSG SIZE
 
 ``` SHELL
-# dig -t A www.taobao.com` 没有@IP，通过本机测试
-# dig -t A www.sina.com @114.114.114.114
-# dig -t A www.taobao.com +trace
+# dig -t A www.baidu.com.com 没有@IP，通过本机测试
+;; global optiosn: +cmd 全局属性
+;; Got answer: 已经获得答案了
+
+;; OPT PSEUDOSECTION: 假选项段
+
+;; QUESTION SECTION: 问题段
+;www.baidu.com 要解析www.baidu.com这个名称的A记录
+
+;; ANSWER SECTION 答案段
+www.baidu.com.    1200  IN CNAME  www.a.shifen.com.
+www.a.shifen.com. 300   IN A      61.135.169.121
+www.a.shifen.com. 300   IN A      61.135.169.126
+
+;; AUTHORITY SECTION: 权威段(谁来负责解析)
+a.shifen.com.     1063  IN    NS    ns1.a.shifen.com.
+a.shifen.com.     1063  IN    NS    ns5.a.shifen.com.
+a.shifen.com.     1063  IN    NS    ns3.a.shifen.com.
+a.shifen.com.     1063  IN    NS    ns2.a.shifen.com.
+a.shifen.com.     1063  IN    NS    ns4.a.shifen.com.
+
+;; ADDITIONAL SECTION:附加段
+ns4.a.shifen.com. 1063  IN    A     115.239.210.176
+ns5.a.shifen.com. 1063  IN    A     119.75.222.17
+ns1.a.shifen.com. 1063  IN    A     61.135.165.224
+ns3.a.shifen.com. 1063  IN    A     61.135.162.215
+
+;; Query time: 0 msec 查询时长
+;; SERVER: 172.16.100.67#53(172.16.100.67) 哪个服务器进行解析的
+
+以上通过迭代的方式通过互联网去查询并返回的答案
+
+# dig -t A www.sina.com @114.114.114.114 在114DNS服务器查询
+# dig -t A www.baidu.com +trace 迭代查询追踪过程
+
 ```
 
 - 注意：反向解析测试 `# dig -x IP`
+
+``` SHELL
+# dig -x 119.75.222.17 有正向未必有反向
+```
 
 - 模拟完全区域传送：`# dig -t axfr DOMAIN [@SERVER]`
 
@@ -430,9 +477,9 @@ Flags: qr(query request) ra(request answer)
 `host [-t RR_TYPE] name SERVER_IP`
 
 ``` SHELL
-# host -t A www.baidu.com IP地址
-# host -t NS baidu.com 域名服务器
-# host -t MX baidu.com 邮件服务器
+# host -t A www.baidu.com 查询IP地址
+# host -t NS baidu.com 查询baidu域名服务器
+# host -t MX baidu.com 查询baidu邮件服务器
 ```
 
 #### nslookup命令
@@ -445,11 +492,17 @@ Flags: qr(query request) ra(request answer)
 nslookup>
 server IP : 以指定的IP为DNS服务器进行查询
 set q=RR_TYPE: 要查询的资源记录类型
-www.sohu.com 要查询的名称
+name 要查询的名称
+
+
+> server 172.16.0.1
+> set q=A
+> www.sohu.com
+
 ```
 
 #### rndc命令：named服务控制命令
-
+62:48
 ``` shell
 # rndc status
 # rndc stats
