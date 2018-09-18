@@ -860,8 +860,10 @@ Group apache
 - rpm安装：apache
 - 编译安装：daemon
 
-`suid`
-`SUexec`
+``` config
+suid
+SUexec
+```
 
 #### 15. mod_deflate
 
@@ -874,11 +876,9 @@ Group apache
 
 ``` config
 输出过滤器
-
 SetOutputFilter DEFLATE
 
 # mod_deflat configuration
-
 # Restrict compression to these MIME types
 AddOutputFilterByType DEFLATE text/plain
 AddOutputFilterByType DEFLATE text/html
@@ -903,7 +903,7 @@ BrowserMatch \bMSI[E] !no-gzip !gzip-only-text/html
 Content-Encoding: gzip
 ```
 
-``` http
+``` shell
 # vim httpd.conf
   # Defalt
   SetOutputFilter DEFLATE
