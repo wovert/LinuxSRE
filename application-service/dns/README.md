@@ -625,21 +625,22 @@ bbs IN    A           172.1.16.7.1
 
 ``` shell
 # vim /etc/named.rfc1912.zones
-  zone "0.16.172.in-addr.arpa." IN {
-    type {master|slave|hint|forward};
-    file "172.16.0.zone"; # 相对路径/var/named路径下
+  zone "100.16.172.in-addr.arpa." IN {
+    type master;
+    file "172.16.100.zone";
   };
 ```
 
 - 注意：反向区域的名字
-- 反写的网段地址`.in-addr.arpa`
-  - `0.16.172.in-addr.arpa`
+- `反写的网段地址.in-addr.arpa.`
+  - `0.16.172.in-addr.arpa.`
 
 #### 2.定义区域解析库文件
 
-``` dns-config
+``` shell
+# vim /etc/named/172.16.100.zone
 $TTL 3600
-$ORIGIN 0.16.172.in-addr.arpa.
+$ORIGIN 100.16.172.in-addr.arpa.
 @     IN    SOA         ns1.wovert.com. nsadmin.wovert.com. (
             2017110102
             1H  
@@ -659,27 +660,29 @@ $ORIGIN 0.16.172.in-addr.arpa.
 - 权限及属组修改
 
 ``` shell
-# chgrp named /var/named/172.16.zone
-# chmod o= /var/named/172.16.zone
+# chgrp named /var/named/172.16.100.zone
+# chmod o= /var/named/172.16.100.zone
 ```
 
 - 检查语法错误
 
 ``` shell
-# named-checkzone 16.172.in-addr.arpa /var/named/172.16.zone
+# named-checkzone 16.172.100.in-addr.arpa /var/named/172.16.100.zone
 # named-checkconf
 ```
 
-#### 3.让服务器重载配置文件和区域数据文件
+#### 3.让服务器重载配置文件和区域数据文件-反向解析
 
 ``` shell
+# rnds status
 # rndc reload
+# rnds status
 # systemctl reload named.service
 ```
 
 #### 4.测试
 
-`# dig -x 172.16.0.1`
+`# dig -x 172.16.100.67`
 
 ## 主从服务器
 
@@ -838,7 +841,7 @@ ns.ops.wovert.com
 # vim ops.wovert.com.zone
   $TTL 3600
   $ORIGIN ops.wovert.com.
-  @	IN	SOA	ns1.ops.wovert.com. nsadmin.ops.wovert.com. (
+  @ IN  SOA ns1.ops.wovert.com. nsadmin.ops.wovert.com. (
     2018010801
     1H
     10M
