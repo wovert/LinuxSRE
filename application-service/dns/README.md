@@ -501,15 +501,27 @@ name 要查询的名称
 
 ```
 
-#### rndc命令：named服务控制命令
-62:48
+#### rndc命令
+
+> named服务控制命令
+
 ``` shell
 # rndc status
+
+数据统计
 # rndc stats
-# rndc flush 清空缓存DNS服务器
+
+清空缓存DNS服务器
+# rndc flush
+
+重新加载配置文件或区域数据库文件
 # rndc reload [zone] reload configuration file and zones
-# rndc refresh zone 冻结zones
-# rndc stop 关闭DNS服务器
+
+冻结zones
+# rndc refresh zone
+
+关闭DNS服务器
+# rndc stop
 ```
 
 ### 配置解析一个正向区域
@@ -522,46 +534,58 @@ name 要查询的名称
 
 ``` zone
 zone "ZONE_NAME" IN {
-type {master|slave|hint|forward};
-file "ZONE_NAME.zone";  #相对路径/var/named路径下
+  type {master|slave|hint|forward};
+  file "ZONE_NAME.zone";  #相对路径/var/named路径下
 };
 ```
 
 - hint：根服务器
 - forward：转发服务器
-- 注意：区域名字即为域名；ZONE_NAME => wovert.com
+- 注意：区域名字即为域名；`ZONE_NAME => wovert.com`
+
+``` shell
+# vim /etc/named.conf
+# vim /etc/named.rfc1912.zones
+  zone "wovert.com" IN {
+    type master;
+    file "wovert.com.zone";
+  };
+```
 
 #### 2.建立区域数据文件(主要记录为A或AAAA记录)
 
 - 在`/var/named`目录下建立区域数据文件
 
 ``` shell
-# cd /var/named/`
+# cd /var/named/
 # vim wovert.com.zone
 $TTL 3600
 $ORIGIN wovert.com.
-@ IN SOA wovert.com. dnsadmin.wovert.com. (
-  2017010801
-  1H
-  10M
-  3D
-  1D )
-  IN  NS  ns1 或则 ns1.wovert.com.
-  IN  NS  ns2
-  IN  MX  10  mx1
-  IN  MX  20  mx2
-ns1 IN A 172.16.0.2
-mx1 IN A 172.16.0.10
-mx2 IN A 172.16.0.11
-www IN A 172.16.7.0
-web IN CNAME www
-bbs IN A 1721.16.7.0
-bbs IN A 1721.16.7.1
+@   IN    SOA   wovert.com. dnsadmin.wovert.com. (
+          2017010801
+          1H
+          10M
+          3D
+          1D )
+    IN    NS          ns1 或则 ns1.wovert.com.
+    IN    NS          ns2
+    IN    MX    10    mx1
+    IN    MX    20    mx2
+ns1 IN    A           172.16.0.2
+mx1 IN    A           172.16.0.10
+mx2 IN    A           172.16.0.11
+www IN    A           172.16.7.0
+web IN    CNAME       www
+bbs IN    A           172.1.16.7.0
+bbs IN    A           172.1.16.7.1
 ```
+
+`@`代表区域名字`wovert.com.` 别忘了最优还有个点
 
 - 权限及属组修改
 
 ``` shell
+# chown :named /var/named/wovert.com.zone
 # chgrp named /var/named/wovert.com.zone
 # chmod o= /var/named/wovert.com.zone
 ```
@@ -569,28 +593,42 @@ bbs IN A 1721.16.7.1
 - 检查语法错误
 
 ``` shell
-# named-checkzone ZONE_NAME /var/named/ZONE_FILE
+# named-checkzone wovert.com /var/named/wovert.com.zone
 # named-checkconf
 ```
 
 #### 3.让服务器重载配置文件和区域数据文件
 
 ``` shell
+# rndc status
+  number of zones: 101
 # rndc reload
+# rndc status
+  number of zones: 102
 # systemctl reload named.service
+
+# dig -t A www.wovert.com
+# dig -t A web.wovert.com
+# dig -t A bbs.wovert.com
+# dig -t A bbs.wovert.com
+# dig -t A bbs.wovert.com
+# dig -t NS wovert.com
+# dig -t MX wovert.com
+# host -t MX wovert.com
 ```
 
-### 配置解析一个反向区域：
+### 配置解析一个反向区域
 
 #### 1. 定义区域
 
 - 在主配置文件中或主配置文件辅助配置文件中实现
 
-``` dns-config
-zone "0.16.172.in-addr.arpa." IN {
-type {master|slave|hint|forward};
-file "172.16.0.zone"; # 相对路径/var/named路径下
-};
+``` shell
+# vim /etc/named.rfc1912.zones
+  zone "0.16.172.in-addr.arpa." IN {
+    type {master|slave|hint|forward};
+    file "172.16.0.zone"; # 相对路径/var/named路径下
+  };
 ```
 
 - 注意：反向区域的名字
