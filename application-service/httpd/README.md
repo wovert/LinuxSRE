@@ -874,7 +874,7 @@ SUexec
 1. 节约带宽，额外消耗 CPU；同时，可能有些叫老浏览器不支持
 2. 压缩适于压缩的资源，**文本文件**
 
-``` config
+``` shell
 输出过滤器
 SetOutputFilter DEFLATE
 
@@ -975,7 +975,7 @@ Content-Encoding: gzip
 
 3. 测试基于https访问相应的主机
 
-``` command
+``` shell
 openssl s_client [-connect host:port] [-cert filename] [-CApath directory] [-CAfile filename]
 ```
 
@@ -1090,7 +1090,7 @@ https://172.16.100.6
 
 ## httpd 自带的工具程序
 
-``` tools
+``` shell
 htpasswd: basic 认证基于文件实现时，用到的账号密码文件生成工具；
 apachectl: httpd 自带的服务控制脚本，支持 start 和 stop, gracefulll；
 apxs: 有 httpd-devel 包提供，扩展 httpd 使用第三方模块的工具；
@@ -1119,9 +1119,9 @@ ab [OPTIONS] URL
 
 - Time per request : 并发100个请求所花费时间
 - Time per request : 请求1个所花费的时间
-- Connect: 客户端连接服务器时间
-- Processing: 服务器接收请求并处理时间
-- Waiting: 服务器响应给位客户端所花费时间
+- Connect: 客户端连接服务器时间(服务器进程数量))
+- Processing: 服务器接收请求并处理时间(服务器处理应用时间)
+- Waiting: 服务器响应给位客户端所花费时间(服务器带宽)
 
 ## httpd-2.4 的常用配置
 
