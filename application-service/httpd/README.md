@@ -1125,10 +1125,10 @@ ab [OPTIONS] URL
 
 ## httpd-2.4 的常用配置
 
-### New features
+### [httpd-2.4 New features](https://httpd.apache.org/docs/2.4/new_features_2_4.html)
 
-1. Run-time Loadable MPMs: MPM 支持运行为 DSO 机制；以模块形式按需加载；
-2. Event MPM 生产环境可用
+1. Run-time Loadable MPMs: MPM 支持运行为 DSO 机制；以模块形式按需加载
+2. Event MPM(网络IO) 生产环境可用
 3. Asynchronous support: 异步读写功能
 4. Per-module and per-directory LogLevel configuration: 支持每模块及每目录的单独日志级别定义
 5. Per-request configuration sections: 每请求相关的专用配置
@@ -1143,12 +1143,12 @@ ab [OPTIONS] URL
 
 1. mod_proxy_fcgi(驱动 fastCGI 库)
 2. mod_proxy_scgi (Python)
-3. mod_remoteip(取消 allow/deny，替换新的机制))
+3. mod_remoteip(给予远程访问IP控制，取消了 allow/deny机制，替换新的机制))
 
 ### 安装 httpd-2.4
 
-- httpd-2.4 依赖于`apr-1.4+, apr-util-1.4+, [apr-iconv]`
-- apr: apache portable runtime : apache可运行环境
+- httpd-2.4 依赖于 `apr-1.4+, apr-util-1.4+, [apr-iconv]`
+- `apr`: apache portable runtime : apache可运行环境
 
 #### CentOS 6 下安装 httpd-2.4
 
@@ -1201,6 +1201,20 @@ apr-util 依赖 apr-1.4
 --with-apr-util=/usr/local/apr-util \
 
 # make -j 4 && make install
+
+
+--enable-so               启用DSO机制
+--enable-ssl              启用SSL功能
+--enable-cgi              启用CGI
+--enable-rewrite          启用重写机制
+--enable-modules=most     启用哪些模块，most是常用模块
+--enable-mpms-shared=all  哪些MPM模块编译
+--sysconfdir=/etc/httpd24 配置文件目录
+--with-mpm=prefork        默认运行mpm模块
+--with-zlib         依赖zlib程序库
+--with-pcre         依赖perl正则表达式
+--with-apr=/usr/local/apr
+--with-apr-util=/usr/local/apr-util
 ```
 
 - apr-1.5.0.tar.bz2
@@ -1345,6 +1359,35 @@ worker,event是基于线程模型
   LoadModule mpm_event_module modules/mod_mpm_event.so
 # systemctl restart httpd.service
 # httpd -M
+# mkdir /apps/www/htdocs -pv
+# vim /apps/www/htdocs/index.html
+# pwd
+# vim /etc/httpd/conf/httpd.conf
+# cd conf
+# cp httpd.conf{,.bak}
+# vim httpd.conf
+# systemctl reload httpd.service
+# cd ../conf.d/
+# ls
+# mv welcome.conf welcome.conf.bak
+# systemctl reload httpd.service
+# cd ../conf
+# vim httpd.conf
+  DocumentRoot "/apps/www/htdocs"
+
+  #示例：所有主机访问, 禁用Indexes
+  <Directory "/apps/www/htdocs">
+    Options -Indexes FollowSymLinks
+    Require all granted
+
+    #所有主机访问，除了172.16.100.2
+    <RequireAll>
+      Require all granted
+      Require not ip 172.16.100.2
+    </RequireAll>
+  </Directory>
+
+# httpd -t
 ```
 
 2. 基于 IP 人访问控制
@@ -1366,29 +1409,12 @@ worker,event是基于线程模型
   - FQDN：特定主机
   - Domain.tid：指定域名下的所有主机
 
-示例：所有主机访问, 禁用Indexes
-
-``` shell
-<Directory "/apps/www/htdocs">
-  Options -Indexes FollowSymLinks
-  Require all granted
-</Directory>
-```
-
-所有主机访问，除了172.16.100.2
-
-``` shell
-<RequireAll>
-  Require all granted
-  Require not ip 172.16.100.2
-</RequireAll>
-```
-
 3. 虚拟主机
 
 基于 FQDN 的虚拟主机不再需要设置 NameVirtualHost 指令
 
-``` config
+``` shell
+# vim httpd.conf
 <VirtualHost *:80>
   ServerName www.a.com
   DocumentRoot "/apps/www/htdocs"
@@ -1407,6 +1433,7 @@ worker,event是基于线程模型
 默认虚拟主机设置：
 
 ``` shell
+# vim httpd.conf
 <VirtualHost _default_:80>
   ServerName _default_
   DocumentRoot "/apps/default/htdocs"
@@ -1427,10 +1454,11 @@ worker,event是基于线程模型
 
 5. 毫秒级持久连接时长
 
-``` config
-KeepAlive on
-KeepAliveTimeout 30ms
-MaxKeepAliveRequests 20
+``` shell
+# vim httpd.conf
+  KeepAlive on
+  KeepAliveTimeout 30ms
+  MaxKeepAliveRequests 20
 ```
 
 ### 练习：分别使用 httpd-2.2 和 httpd-2.4 实现
@@ -1439,16 +1467,16 @@ MaxKeepAliveRequests 20
 
 1.1 提供两个基于名称的虚拟主机
 
-www1.stuX.com，页面文件目录为/web/vhosts/www1；错误日志为/var/log/httpd/www1/error_log，访问日志为/var/log/httpd/www1/access_log;
+`www1.stuX.com`，页面文件目录为`/web/vhosts/www1`；错误日志为`/var/log/httpd/www1/error_log`，访问日志为`/var/log/httpd/www1/access_log`;
 
-www2.stuX.com，页面文件目录为/web/vhosts/www2；错误日志为/var/log/httpd/www2/error_log，访问日志为/var/log/httpd/www2/access_log;
+`www2.stuX.com`，页面文件目录为`/web/vhosts/www2`；错误日志为`/var/log/httpd/www2/error_log`，访问日志为`/var/log/httpd/www2/access_log`;
 
-1.2 通过www1.stuX.com/server-status输出其状态信息，且要求只允许提供账号用户访问
+1.2 通过`www1.stuX.com/server-status`输出其状态信息，且要求只允许提供账号用户访问
 
-1.3 www1不允许192.168.1.0/24网络中的主机访问
+1.3 www1不允许`192.168.1.0/24`网络中的主机访问
 
-2. 上面的第2个虚拟主机提供https服务，使得用户可以通过https安全的访问此web站点
+2. 上面的第2个虚拟主机提供`https`服务，使得用户可以通过https安全的访问此web站点
 
 2.1 要求使用证书，证书中要求使用国家(CN), 州(Beijing), 城市(Beijing)，组织为(lingyima)
 
-2.2设置部分为 Ops，主机名为 www2.stux.com
+2.2 设置部分为 `Ops`，主机名为 `www2.stux.com`
