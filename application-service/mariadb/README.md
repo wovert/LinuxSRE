@@ -307,17 +307,21 @@ skip_name_resolve = ON
 
 1. root用户设定密码
 
-``` mysql
+``` sql
 mysql> set password （自动重读授权表）
 mysql> update mysql.user SET password = password('password') where cluase;
 mysql> flush privilige
 ```
 
-`# mysqladmin`
+``` shell
+# mysqladmin
+```
 
 2. 删除所有匿名用户
 
-`mysql> drop user ''@'localhost';`
+``` shell
+mysql> drop user ''@'localhost';
+```
 
 上述两步骤运行命令：`# mysql_secure_installation`
 
@@ -327,7 +331,7 @@ my.ini文件中修改 `skip_name_resolve=off`
 
 ### 元数据数据库:mysql
 
-user, host 等
+`user, host` 等
 
 ### Windows 下安装 MySQL 5.6
 
@@ -1577,7 +1581,7 @@ MySQL 必须必须建立连接线程，创立完之后
 - 稠密索引、稀疏索引：是否索引了每一个数据项
 - B+ Tree、Hash（一对一，不能排序），R Tree(空间索引)
 - 简单索引，组合索引
-- 左前缀索引：
+- 左前缀索引
   - LIKE "abc%"
 - 覆盖索引
 
@@ -2490,7 +2494,7 @@ GRANT priv_type,... ON [object_type] db_name.tbl_name TO 'user'@'host' [IDENTIFI
 
 ### 创建存储过程
 
-```
+``` SQL
 1. 选择数据库：`use db1;`
 2. 改变语句分隔符：`delimiter $$`
 3. 创建语句：

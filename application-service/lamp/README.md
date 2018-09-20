@@ -120,7 +120,7 @@ Zend Engine的出现将PHP代码的处理过程分成了两个阶段：首先是
 
 - http 与 php 结合的方式
   - CGI(传统方式：http创建CGI子进程，销毁子进程)
-  - FastCGI(常用结合方式)
+  - FastCGI(常用结合方式): php-fpm
   - modules(把php编译成为httpd的模块，性能一般，但服务稳定)
     - MPM:
       - prefork: `libphp5.so`
@@ -255,19 +255,44 @@ data.timezone=Asia/Shanghai
 
 ## php-fpm
 
-- CentOS 6：
-  - PHP-5.3.2-：默认不支持fpm机制；需要自行打补丁并编译安装
-  - httpd-2.2：默认不支持fcgi协议，需要自行编译此模块
-  - 解决方案：编译安装httpd-2.4, php-5.3.3+
+php-fpm 与 module 无法共存
 
-- CentOS 7：
-  - httpd-2.4：rpm包默认编译支持了fcgi模块；
-  - php-fpm包：专用于将php运行于fpm模式；
+``` shell
+# rpm -q php
+# yum install php-fpm
+  依赖 libzip和php-common
+# rpm -q php-fpm | less
+  /etc/php-fpm.conf 主配置文件
+  /etc/php-fpm.c 其他配置文件目录
+  /etc/php-fpm.d/www.conf
+  /etc/sysconfig/php-fpm 环境配置文件程序
+  /usr/lib/systemd/system/php-fpm.service
+
+```
+
+### CentOS 6
+
+- PHP-5.3.2-：默认不支持fpm机制；需要自行打补丁并编译安装
+- httpd-2.2：默认不支持fcgi协议，需要自行编译此模块
+- 解决方案：编译安装httpd-2.4, php-5.3.3+
+
+### CentOS 7
+
+- httpd-2.4：rpm包默认编译支持了fcgi模块
+- php-fpm包：专用于将php运行于fpm模式
 
 ### 配置文件
 
-- 服务配置文件(配置PHP服务进程)：`/etc/php-fpm.conf,  /etc/php-fpm.d/*.conf`
-- php环境配置文件：`/etc/php.ini, /etc/php.d/*.ini`
+- 服务配置文件(PHP服务进程配置文件)：`/etc/php-fpm.conf,  /etc/php-fpm.d/*.conf`
+- PHP环境配置文件：`/etc/php.ini, /etc/php.d/*.ini`
+
+``` shell
+# rpm -ql php-common
+  /etc/php.ini
+  /etc/php.d/*.ini
+```
+
+27:00
 
 ``` shell
 # vim /etc/php-fpm.conf`
@@ -279,7 +304,7 @@ data.timezone=Asia/Shanghai
   ;emergency_restart_threshold = 0
   ;emergency_restart_interval = 0
   ;process_control_timeout = 0
-  daemonize = no 	运行前台用于测试
+  daemonize = no 运行前台用于测试
 
 # vim /etc/php-fpm.d/www.conf
   [www]
@@ -327,13 +352,14 @@ data.timezone=Asia/Shanghai
 
 1. 中心主机配置
 
-``` config
-DirectoryIndex index.php 默认访问页面
-ProxyRequests Off 是否开启反向代理,在这里反向代理
-ProxyPassMatch ^/(.*\.php)$  fcgi://127.0.0.1:9000/var/www/html/$1
-  代理解析匹配以url后缀.php结束，转义至fcgi协议127.0.0.1:9000端口/var/www/html/$1的资源文件
-  ^/(.*\.php)$
-  http://www.demo.com/(admin/index.php)
+``` shell
+# vim /etc/httpd.conf
+  DirectoryIndex index.php 默认访问页面
+  ProxyRequests Off 是否开启反向代理,在这里反向代理
+  ProxyPassMatch ^/(.*\.php)$  fcgi://127.0.0.1:9000/var/www/html/$1
+    代理解析匹配以url后缀.php结束，转义至fcgi协议127.0.0.1:9000端口/var/www/html/$1的资源文件
+    ^/(.*\.php)$
+    http://www.demo.com/(admin/index.php)
 # systemctl restart php-fpm.service
 测试访问phpinfo()函数内容
 ```
