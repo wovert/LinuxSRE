@@ -52,13 +52,13 @@ Zend Engine 1.0于1999年随PHP 4发布，由C语言开发且经过高度优化�
 
 Zend Engine的出现将PHP代码的处理过程分成了两个阶段：首先是分析PHP代码并将其转换为称作Zend opcode的二进制格式(类似Java的字节码)，并将其存储于内存中；第二阶段是使用Zend Engine去执行这些转换后的Opcode。
 
-### PHP的 Opcode
+### PHP Opcode
 
-> Opcode是一种PHP脚本编译后的中间语言，就像Java的ByteCode,或者.NET的MSL。PHP执行PHP脚本代码一般会经过如下4个步骤(确切的来说，应该是PHP的语言引擎Zend)：
+> Opcode 是一种 PHP 脚本编译后的中间语言，就像Java的ByteCode,或者.NET的MSL。PHP执行PHP脚本代码一般会经过如下4个步骤(确切的来说，应该是PHP的语言引擎Zend)：
 
 1. Scanning(Lexing) —— 将PHP代码转换为语言片段(Tokens)
 2. Parsing —— 将Tokens转换成简单而有意义的表达式
-3. Compilation —— 将表达式编译成Opocdes
+3. Compilation —— 将表达式编译成Opcodes
 4. Execution —— 顺次执行Opcodes，每次一条，从而实现PHP脚本的功能
 
 扫描-->分析-->编译-->执行
@@ -71,23 +71,23 @@ Zend Engine的出现将PHP代码的处理过程分成了两个阶段：首先是
 
 ##### APC (Alternative PHP Cache)
 
-> 遵循PHP License的开源框架，PHP opcode缓存加速器，目前的版本不适用于PHP 5.4。项目地址，http://pecl.php.net/package/APC。
+> 遵循PHP License的开源框架，PHP opcode缓存加速器，目前的版本不适用于PHP 5.4。项目地址，[APC](http://pecl.php.net/package/APC)
 
 ##### eAccelerator
 
-> 源于Turck MMCache，早期的版本包含了一个PHP encoder和PHP loader，目前encoder已经不在支持。项目地址， http://eaccelerator.net/。
+> 源于Turck MMCache，早期的版本包含了一个PHP encoder和PHP loader，目前encoder已经不在支持。项目地址， [eAccelerator](http://eaccelerator.net/)
 
 ##### XCache
 
-> 快速而且稳定的PHP opcode缓存，经过严格测试且被大量用于生产环境。项目地址，http://xcache.lighttpd.net/
+> 快速而且稳定的PHP opcode缓存，经过严格测试且被大量用于生产环境。项目地址，[XCache](http://xcache.lighttpd.net/)
 
 ##### Zend Optimizer and Zend Guard Loader
 
-> Zend Optimizer并非一个opcode加速器，它是由Zend Technologies为PHP5.2及以前的版本提供的一个免费、闭源的PHP扩展，其能够运行由Zend Guard生成的加密的PHP代码或模糊代码。 而Zend Guard Loader则是专为PHP5.3提供的类似于Zend Optimizer功能的扩展。项目地址，http://www.zend.com/en/products/guard/runtime-decoders
+> Zend Optimizer并非一个opcode加速器，它是由Zend Technologies为PHP5.2及以前的版本提供的一个免费、闭源的PHP扩展，其能够运行由Zend Guard生成的加密的PHP代码或模糊代码。 而Zend Guard Loader则是专为PHP5.3提供的类似于Zend Optimizer功能的扩展。项目地址，[Zend Optimizer](http://www.zend.com/en/products/guard/runtime-decoders)
 
 ##### NuSphere PhpExpress
 
-> NuSphere的一款开源PHP加速器，它支持装载通过NuSphere PHP Encoder编码的PHP程序文件，并能够实现对常规PHP文件的执行加速。项目地址，http://www.nusphere.com/products/phpexpress.htm
+> NuSphere的一款开源PHP加速器，它支持装载通过NuSphere PHP Encoder编码的PHP程序文件，并能够实现对常规PHP文件的执行加速。项目地址，[NuSphere PhpExpress](http://www.nusphere.com/products/phpexpress.htm)
 
 ### PHP 源码目录结构
 
@@ -118,16 +118,17 @@ Zend Engine的出现将PHP代码的处理过程分成了两个阶段：首先是
   - `# yum -y install php && rpm -ql php`
 - MariaDB：数据管理系统
 
-- http 与 php结合的方式
-  - CGI
+- http 与 php 结合的方式
+  - CGI(传统方式：http创建CGI子进程，销毁子进程)
   - FastCGI(常用结合方式)
-  - modules (把php编译成为httpd的模块，性能一般，但服务稳定) MPM:
-    - prefork: libphp5.so
-    - event, worker: libphp5-zts.so
+  - modules(把php编译成为httpd的模块，性能一般，但服务稳定)
+    - MPM:
+      - prefork: `libphp5.so`
+      - event, worker: `libphp5-zts.so`
 
 ## 安装 LAMP
 
-CentOS 6 下安装 LAMP
+### CentOS 6 下安装 LAMP
 
 ```shell
 # yum -y install httpd php php-mysql mysql-server
@@ -135,7 +136,7 @@ CentOS 6 下安装 LAMP
 # service mysqld start
 ```
 
-CentOS 7 下载安装 LAMP
+### CentOS 7 下载安装 LAMP
 
 ``` shell
 # yum -y install httpd php php-mysql mariadb-server
@@ -143,7 +144,7 @@ CentOS 7 下载安装 LAMP
 # systemctl start mariadb.service
 ```
 
-MySQL 的命令行客户端程序
+### MySQL 的命令行客户端程序
 
 ``` shell
 # mysql -uUSERNAME -hHOST -pPASSWORD
@@ -170,9 +171,11 @@ Error ... (...): Access denied for user 'testuser'@'localhost' (Using password:Y
 
 授权能远程的连接用户
 
-``` mysql
+``` sql
+# mysql -uroot -h127.0.0.1 -p
 mysql> GRANT ALL PRIVILEGES ON db_name.tbl_name TO username@host IDENTIFIED BY 'password';
-mysql> GRANT ALL PRIVILEGES ON testdb.* TO testuser@’%’ IDENTIFIED 'testpass'	> FLUSH PRIVILEGS 刷新权限(mysql进程重读授权表)
+mysql> GRANT ALL PRIVILEGES ON testdb.* TO testuser@'%' IDENTIFIED 'testpass' 
+mysql> FLUSH PRIVILEGS 刷新权限(mysql进程重读授权表)
 
 '%'：任何追加
 '172.16.%.%'：172.16网段
@@ -183,14 +186,14 @@ mysql> GRANT ALL PRIVILEGES ON testdb.* TO testuser@’%’ IDENTIFIED 'testpass
 ## AMP
 
 - 静态资源：Client -- http --> httpd
-- 动态资源：Client -- http --> httpd --> libphp5.so () -- mysql --> MySQL server
+- 动态资源：Client -- http --> httpd --> libphp5.so() -- mysql --> MySQL server
 
 ### 快速部署 AMP
 
-- CentOS 6：httpd, php, php-mysql, mysql-server
+- CentOS 6：`httpd, php, php-mysql, mysql-server`
 - CentOS 7:
-  - Modules：httpd, php, php-mysql, mariadb-server
-  - FastCGI：httpd, php-fpm, php-mysql, mariadb-server
+  - Modules：`httpd, php, php-mysql, mariadb-server`
+  - FastCGI：`httpd, php-fpm, php-mysql, mariadb-server`
 
 - php：Zend Engine
 - 编译：opcode是一种PHP脚本编程后的中间语言
@@ -240,79 +243,15 @@ Linux：epoll()
   - [foo]：Section Header
   - directive = value
 
-```
+``` php-config
 注释符：较新的版本中，已经完全使用;进行注释；
 #：纯粹的注释信息
 ;：用于注释可启用的directive
+data.timezone=Asia/Shanghai
 ```
 
-data.timezone=Asia/Shanghai
-php.ini的核心配置选项文档：  http://php.net/manual/zh/ini.core.php
-php.ini配置选项列表：http://php.net/manual/zh/ini.list.php
-
-mariadb(mysql)：
-
-SQL接口：
-分析器：分析SQL语句
-操作求解器：求解如何执行
-计划执行器：执行的路径
-优化器：选择最优路径
-存储引擎：
-文件和存取接口
-缓冲管理器
-磁盘空间管理器
-事务管理器、锁管理器
-恢复管理器
-
-补充材料：RDMBS设计范式基础概念
-
-设计关系数据库时，遵从不同的规范要求，设计出合理的关系型数据库，这些不同的规范要求被称为不同的范式，各种范式呈递次规范，越高的范式数据库冗余越小。
-
-目前关系数据库有六种范式：第一范式（1NF）、第二范式（2NF）、第三范式（3NF）、巴德斯科范式（BCNF）、第四范式(4NF）和第五范式（5NF，又称完美范式）。满足最低要求的范式是第一范式（1NF）。在第一范式的基础上进一步满足更多规范要求的称为第二范式（2NF），其余范式以次类推。一般说来，数据库只需满足第三范式(3NF）就行了。
-
-(1) 第一范式（1NF）
-所谓第一范式（1NF）是指在关系模型中，对域（字段）添加的一个规范要求，所有的域都应该是原子性的，即数据库表的每一列都是不可分割的原子数据项，而不能是集合，数组，记录等非原子数据项。即实体中的某个属性有多个值时，必须拆分为不同的属性。在符合第一范式（1NF）表中的每个域值只能是实体的一个属性或一个属性的一部分。简而言之，第一范式就是无重复的域。
-
-说明：在任何一个关系数据库中，第一范式（1NF）是对关系模式的设计基本要求，一般设计中都必须满足第一范式（1NF）。不过有些关系模型中突破了1NF的限制，这种称为非1NF的关系模型。换句话说，是否必须满足1NF的最低要求，主要依赖于所使用的关系模型。
-
-(2) 第二范式(2NF)
-第二范式（2NF）是在第一范式（1NF）的基础上建立起来的，即满足第二范式（2NF）必须先满足第一范式（1NF）。第二范式（2NF）要求数据库表中的每个实例或记录必须可以被唯一地区分。选取一个能区分每个实体的属性或属性组，作为实体的唯一标识。
-
-第二范式（2NF）要求实体的属性完全依赖于主关键字。所谓完全依赖是指不能存在仅依赖主关键字一部分的属性，如果存在，那么这个属性和主关键字的这一部分应该分离出来形成一个新的实体，新实体与原实体之间是一对多的关系。为实现区分通常需要为表加上一个列，以存储各个实例的唯一标识。简而言之，第二范式就是在第一范式的基础上属性完全依赖于主键。
-
-(3) 第三范式（3NF）
-第三范式（3NF）是第二范式（2NF）的一个子集，即满足第三范式（3NF）必须满足第二范式（2NF）。简而言之，第三范式（3NF）要求一个关系中不能包含已在其它关系已包含的非主关键字信息。简而言之，第三范式就是属性不依赖于其它非主属性，也就是在满足2NF的基础上，任何非主属性不得传递依赖于主属性。
-
-数据库：数据集合
-表：为了满足范式设计要求，将一个数据集分拆为多个
-约束：constraint，向数据表插入的数据要遵守的限制规则
-主键：一个或多个字段的组合，填入主键中的数据，必须不同于已存在的数据；不能为空
-外键：一个表中某字段中能插入的数据，取决于另外一张表的主键中的数据；
-惟一键：一个或多个字段的组合，填入惟一键中的数据，必须不同于已存在的数据；可以为空
-检查性约束：取决于表达式的要求
-
-索引：将表中的某一个或某些字段抽取出来，单独将其组织一个独特的数据结构中
-
-常用的索引类型：
-  b-tree
-  Hash
-  有助于读请求，但不利于写请求
-
-关系运算：
-  选择：挑选出符合条件的行；
-  投影：挑选出符合需要的列；
-  连接：将多张表关联起来；
-
-数据抽象：
-  物理层：决定数据的存储格式，即如何将数据组织成为物理文件；
-  逻辑层：描述DB存储什么数据，以及数据间存在什么样的关系；
-  视图层：描述DB中的部分数据；
-
-关系模型的分类：
-  关系模型
-  实体-关系模型
-  基于对象的关系模型
-  半结构化关系模型(xml)
+[php.ini的核心配置选项文档](http://php.net/manual/zh/ini.core.php)
+[php.ini配置选项列表](http://php.net/manual/zh/ini.list.php)
 
 ## php-fpm
 
