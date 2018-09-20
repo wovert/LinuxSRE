@@ -308,35 +308,54 @@ php-fpm 与 module 无法共存
 
 # vim /etc/php-fpm.d/www.conf
   [www]
-  listen = 127.0.0.1:9000 若单独主机，监听与外部httpd主机通信的地址(listen = 192.168.1.20等设置)
+  listen = 127.0.0.1:9000 若单独主机，监听与外部httpd主机通信的地址(listen = 192.168.1.20等设置, 允许所有主机访问监听 0.0.0.0)
   ;listen.backlog = -1 后援队列，-1无限制，连接池满了的时候，等待队列的长度
-  listen.allowed_clients = 127.0.0.1 允许哪个httpd服务主机的客户端地址发起请求
+  listen.allowed_clients = 127.0.0.1 允许来自哪个httpd服务主机的客户端地址发起请求对本地的fpm进程(127.0.0.1只有本机的可以请求)
+  ;listen.owner = nobody 进程运行用户
+  ;listen.group = nobody 进程运行组名
+  ;listen.mode = 0666
+
 
   连接池：
   pm = static|dynamic  
     static：ftpm固定数量的子进程；pm.max_children；最大并发连接数
-    dynamic: httpd prefok模式；子进程数据以动态模式管理
+    dynamic: **httpd prefok**模式；子进程数据以动态模式管理
   
   pm.start_servers：开始启动进程数
   pm.min_spare_servers：最少空间进程数
   pm.max_spare_servers：最多空间进程数
   ;pm.max_requests = 500：每个进程最大请求连接数
-  ;pm.status_path = /status
-  ;ping.path = /ping
-  php_admin_value[error_log] = /var/log/php-fpm/www-error.log
+  ;pm.status_path = /status 监控机制
+  ;ping.path = /ping 监控机制
+  php_admin_value[error_log] = /var/log/php-fpm/www-error.log PHP错误日志
   php_admin_flag[log_errors_log] = on
-  php_value[session.save_handler] = files
-  php_value[session.save_path] = /var/lib/php/session
+  php_value[session.save_handler] = files **PHP session存储方式**
+  php_value[session.save_path] = /var/lib/php/session **PHP session保存位置**
 
 # systemctl start php-fpm.service
-# systemctl status php-fpm.service 五个空闲请求任务
+# systemctl status php-fpm.service 启动五个空闲请求进程
+
+# yum -y install httpd
 # httpd -M | grep fcgi http是否开启fcgi模块
+  proxy_fcgi_module (shared) 已经装载
 # cd /etc/httpd/conf.modules.d/
 # vim 00-proxy.conf
   LoadModule proxy_fcgi_module modules/mod_proxy_fcgi.so
 # cd ..
 # vim conf/httpd.conf
 # vim conf.d/fcgi.conf
+  DirectoryIndex index.php 默认访问页面
+  ProxyRequests Off 是否开启反向代理,在这里反向代理
+  ProxyPassMatch ^/(.*\.php)$ fcgi://127.0.0.1:9000/var/www/html/$1 哪些内容转发至后端,$1 => (.*\.php)
+# httpd -t
+# systemctl start httpd.service
+# systemctl status httpd.service
+# vim /var/www/html/index.php
+  <?php phpinfo();?>
+
+浏览器访问：http://172.16.100.67
+
+
 ```
 
 创建session目录，并确保运行php-fpm进程的用户对此目录有读写权限
@@ -366,35 +385,43 @@ php-fpm 与 module 无法共存
 
 2. 虚拟主机配置
 
-- 注释中心主机配置: DocumentRoot "/var/www/html"
-- 定义虚拟主机文件名: vhosts.conf
+- 注释中心主机配置: `DocumentRoot` "/var/www/html"
+- 定义虚拟主机文件名: `vhosts.conf`
+
+``` shell
+# vim /etc/httpd/conf.d/vhosts.conf
+  DirectoryIndex index.php
+  <VirtualHost *:80>
+    ServerName www.b.net
+    AliasName b.net
+    DocumentRoot /apps/vhosts/b.net
+    ProxyRequests Off
+    ProxyPassMatch ^/(.*\.php)$  fcgi://127.0.0.1:9000/apps/vhosts/b.net/$1
+    <Directory "/apps/vhosts/b.net">
+      Options None
+      AllowOverride None
+      Require all granted
+    </Directory>
+  </VirtualHost>
+# mkdir -pv /apps/vhosts/b.net
+# vim /apps/vhosts/b.net/index.php
+  <h1>www.b.net</h1>
+  <?php phpinfo();?>
+# httpd -t
+# systemctl reload httpd.service
+浏览器访问：http://172.16.100.67或 www.b.net
 
 ```
-DirectoryIndex index.php
-<VirtualHost *:80>
-  ServerName www.b.net
-  AliasName b.net
-  DocumentRoot /apps/vhosts/b.net
-  ProxyRequests Off
-  ProxyPassMatch ^/(.*\.php)$  fcgi://127.0.0.1:9000/apps/vhosts/b.net/$1
 
-<Directory "/apps/vhosts/b.net">
-  Options None
-  AllowOverride None
-  Require all granted
-  </Directory>
-</VirtualHost>
-```
+### 编译安装 LAMP
 
-### 编译安装lamp
+- httpd：编译安装，`httpd-2.4`
+- mairadb：通用二进制格式，`mariadb-5.5`
+- php5：编译安装，`php-5.4`
 
-- httpd：编译安装，httpd-2.4
-- mairadb：通用二进制格式，mariadb-5.5
-- php5：编译安装，php-5.4
+- 注意：任何一个程序包被编译操作依赖到时，需要安装此程序包的“开发”组件，其包名一般类似于`name-devel-VERSION`
 
-- 注意：任何一个程序包被编译操作依赖到时，需要安装此程序包的“开发”组件，其包名一般类似于name-devel-VERSION；
-
-**CentOS 7**
+#### CentOS 7 编译安装 LAMP
 
 1. 安装环境开发包
 
