@@ -292,7 +292,7 @@ php-fpm 与 module 无法共存
   /etc/php.d/*.ini
 ```
 
-27:00
+首先到达httpd进程，根据URL的后缀是.php，httpd模块fcgi反代模块，用户请求反向代理请求至fpm进程(PHP引擎)，fpm进程收到请求之后在后台生成空闲进程来响应用户请求（fastcgi可以理解为http协议的简装版），fpm负责分析URL加载所对应的资源文件，加载完成之后由子进程运行，运行完之后返回给httpd的fcgi模块，fcgi重新解封装取得内容http重新封装成http协议封装格式。如果请求的是静态资源，httpd获取文件并响应给客户端。http与fpm不在同一个主机；则动态资源部署在fpm主机上，静态资源部署在httpd主机上，只有动态资源httpd的反向代理模块请求给fpm服务。
 
 ``` shell
 # vim /etc/php-fpm.conf`
@@ -308,9 +308,9 @@ php-fpm 与 module 无法共存
 
 # vim /etc/php-fpm.d/www.conf
   [www]
-  listen = 127.0.0.1:9000 若单独主机，监听与外部httpd主机通信的地址
+  listen = 127.0.0.1:9000 若单独主机，监听与外部httpd主机通信的地址(listen = 192.168.1.20等设置)
   ;listen.backlog = -1 后援队列，-1无限制，连接池满了的时候，等待队列的长度
-  listen.allowed_clients = 127.0.0.1 允许哪个httpd的地址发起请求
+  listen.allowed_clients = 127.0.0.1 允许哪个httpd服务主机的客户端地址发起请求
 
   连接池：
   pm = static|dynamic  
