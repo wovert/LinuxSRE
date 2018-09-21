@@ -511,69 +511,68 @@ MySQL: CPU/IO密集型
 1. httpd+php,mysql
 2. httpd,php,mysql
 
-10000个并发
-8000个静态并发
-2000个动态并发
-  极限500个并发，解决？横向扩展，集群
-  20%访问数据(mysql, 400个请求)
-    数据数据逻辑复杂，大量事务（极限50个并发）
-    解决：
-      纵向扩展：主从复制
-      横向扩展：mysql集群
+- 10000个并发
+- 8000个静态并发
+- 2000个动态并发
+  - 极限500个并发，解决？横向扩展，集群
+  - 20%访问数据(mysql, 400个请求)
+    - 数据数据逻辑复杂，大量事务（极限50个并发）
+    - 解决：
+      - 纵向扩展：主从复制
+      - 横向扩展：mysql集群
 
 ### ab命令：远程测试
 
 `# ab -n 20000 -c 200 http://url/phpmyadmin/index.php`
 
-执行三遍，平均数据
+- 执行三遍，平均数据
 
-测试较大资源文件：执行857k大小(/var/log/message)， log.html
+- 测试较大资源文件：执行857k大小(/var/log/message)， log.html
 
-**Concurrency Level: 200** 并发量
-**Requests per second:555.55** [#/sec](mean，平均值) 每秒完成多少个请求
-**Time per request:	360.005** [ ms ] 一次并发200个请求完成时间
-Time per request:	1.800 [ ms ] 每个请求完成时间 （360/200=1.8）
-**Transfer rate：带宽x8** = 实际带宽
+- **Concurrency Level: 200** 并发量
+- **Requests per second:555.55** [#/sec](mean，平均值) 每秒完成多少个请求
+- **Time per request:	360.005** [ ms ] 一次并发200个请求完成时间
+- Time per request:	1.800 [ ms ] 每个请求完成时间 （360/200=1.8）
+- **Transfer rate：带宽x8** = 实际带宽
 
-min mean[+/-sd] median max (单位：ms)
-**Connect**: C<---连接---->S 连接时间
-  消耗很长：
-    1. 网络带宽有限
-    2. 服务器过于繁忙已经跑满负载，并发200,你是201个
+- min mean[+/-sd] median max (单位：ms)
+- **Connect**: C<---连接---->S 连接时间
+  - 消耗很长
+    - 1.网络带宽有限
+    - 2.服务器过于繁忙已经跑满负载，并发200,你是201个
 
-**Processing**: 服务器上处理I 服务器处理时间
-  消耗很长：
-    1. 服务器IO慢
-    2. 脚本运行慢
+- **Processing**: 服务器上处理I 服务器处理时间
+  - 消耗很长：
+    - 1.服务器IO慢
+    - 2.脚本运行慢
 
-**Waiting**: 响应给客户端响应时间
-  消耗很长：
-    1. 服务器带宽有限
-    2. 客户端带宽慢
+- **Waiting**: 响应给客户端响应时间
+  - 消耗很长：
+    - 1.服务器带宽有限
+    - 2.客户端带宽慢
 
-Total: 总计时间总时间
+- Total: 总计时间总时间
 
-50% 244 ms
-...
-**98% 1315** (20000个请求，200并发的98%完成请求量，使用1.3s左右)
+- 50% 244 ms
 
-虚拟机：一部分空间
-虚拟主机：独立空间
+- **98% 1315** (20000个请求，200并发的98%完成请求量，使用1.3s左右)
 
-phpmysqmin
+- 虚拟机：一部分空间
+- 虚拟主机：独立空间
 
-``` shel
+- phpmysqmin
+
+``` shell
 # openssl rand -base64 20 生成随机数
 # vim config.inc.php
   $cfg['blowfish_secret'] = '粘贴'
-
 ```
 
 - xcache
 - epel源中
   - 程序包：yum -y install php-xcache
 
-编译安装 xache 的方法
+#### 编译安装 xache 的方法
 
 ``` shell
 # yum install php-devel
@@ -594,29 +593,29 @@ phpmysqmin
 测试 phpfino()
 ```
 
-php 以扩展模块方式组合
+- php 以扩展模块方式组合
 
-多次访问 php 页面，预热，产生缓存
+- 多次访问 php 页面，预热，产生缓存
 
-再次 ap 命令测试，并发量
+- 再次 ap 命令测试，并发量
 
-没有效果时，调整内核参数
+- 没有效果时，调整内核参数
 
-使用 CentOS 6 测试
+- 使用 CentOS 6 测试
 
-关闭xcache功能, 没mv /etc/php.d/xcache.ini 移走
+- 关闭xcache功能, 没mv /etc/php.d/xcache.ini 移走
 
-**安装xcache之后，测试ab命令**
+- **安装xcache之后，测试ab命令**
 
-Connection(tcp三次握手，建立连接)：时间太长，网络带宽有限，服务器繁忙(并发高)
-服务器构建报文(服务器慢,脚本慢)
-服务器响应报文(带宽有限，客户端接受能力有限)
+- Connection(tcp三次握手，建立连接)：时间太长，网络带宽有限，服务器繁忙(并发高)
+- 服务器构建报文(服务器慢,脚本慢)
+- 服务器响应报文(带宽有限，客户端接受能力有限)
 
-**远程测试ab命令** - 本地测试没有考虑带宽
+- **远程测试ab命令** - 本地测试没有考虑带宽
 
-**一定要有效带宽测试**
+- **一定要有效带宽测试**
 
-博客作业一：CentOS 7, lamp (module)；
+### 博客作业一：CentOS 7, lamp (module)；
 
 (1) 三者分离于两台主机；
 
@@ -626,7 +625,7 @@ Connection(tcp三次握手，建立连接)：时间太长，网络带宽有限�
 
 (4) 为phpMyAdmin提供https虚拟主机；
 
-博客作业二：CentOS 7, lamp (php-fpm)；
+### 博客作业二：CentOS 7, lamp (php-fpm)；
 
 (1) 三者分离于三台主机；
 
@@ -634,7 +633,7 @@ Connection(tcp三次握手，建立连接)：时间太长，网络带宽有限�
 
 (3) xcache
 
-博客作业三：CentOS 6, lamp (编译安装，模块或php-fpm)；
+### 博客作业三：CentOS 6, lamp (编译安装，模块或php-fpm)；
 
 (1) 三者分离于两台或三台主机；
 
