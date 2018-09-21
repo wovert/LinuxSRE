@@ -44,67 +44,121 @@
 ## MySQL数据库
 
 - 数据库：表、索引，视图(虚表)
+
 - SQL接口：Structured Query Language
   - 类似于OS的shell接口
   - 提供编程功能
   - ANSI： SQL标准，SQL-86, SQL-89, SQL-92, SQL-99, SQL-03, ...
-    - xml
+    - 支持xml 格式输出
   - 编程接口：选择，循环
   - SQL代码：
     - 存储过程：procedure (call procename 没有返回值)
-    - 存储函数：function (select funcname有返回值)
+    - 存储函数：function (select funcname 有返回值)
     - 触发器：trigger
     - 事件调度器：event scheduler
 
-- MySQL 用户和权限：
+- MySQL 用户和权限
   - 用户：用户名和密码
   - 权限：管理类、数据库、表、字段
 
 - DBMS：DataBase Management System
-- RDBMS：Relational
+  - RDBMS：Relational
 
-- MySQL：单进程，多线程
-  - 用户连接：通过线程来实现；连接线程
-  - 线程池：
+  - MySQL：单进程，多线程
+    - 用户连接：通过线程来实现；连接线程
+      - 线程池
 
 - 数据字典：元数据数据库（mysql表）
 - 视图层（逻辑层）-映射层-物理层
 
 - 事务(Transaction)：组织多个操作为一个整体，要么全部都执行，要么全部都不执行；
-
-"回滚"， rollback
+  - "回滚"， rollback
 
 - Bob:8000, 8000-2000
 - Alice:5000, 5000+2000
 
 - 一个存储系统是否支持事务，测试标准：
   - ACID：
-    - A：atomicity,原子性(不可分割)
-    - C：consistent, 一致性（两个事务有一致性,加减）
-    - I：isolation, 隔离性(事务彼此之间分割, 线上和线下)
-    - D：durability, 持久性(内存中处理中，突然停电，必须得完成)
+    - A：atomicity, **原子性**(不可分割)
+    - C：consistent, **一致性**（两个事务有一致性,加减）
+    - I：isolation, **隔离性**(事务彼此之间分割, 线上和线下)
+    - D：durability, **持久性**(内存中处理中，突然停电，必须得完成)
 
 ## MySQL层次结构
 
-1. SQL接口
-  - 分析器： 分析SQL语句
-  - 操作求解器：求解如何执行
-  - 计划执行器：执行的路径
-  - 优化器：选择最优路径
+### 1. SQL接口
 
-2. 存储引擎
-  - 事务管理器
-  - 锁管理器
+- 分析器： 分析SQL语句
+- 操作求解器：求解如何执行
+- 计划执行器：执行的路径
+- 优化器：选择最优路径
 
-  - 文件存取方法 (速度慢)
-  - 缓冲区管理器（热点数据装载至内存中，内存中管理）
-  - 磁盘空间管理器 (限定表里最大数据)
+### 2. 存储引擎
 
-  -　恢复管理器 （断电数据恢复）
+- 事务管理器
+- 锁管理器
 
-3. 物理数据文件
+- 文件存取方法 (速度慢)
+- 缓冲区管理器（热点数据装载至内存中，内存中管理）
+- 磁盘空间管理器 (限定表里最大数据)
 
-### 事务
+- 恢复管理器 （断电数据恢复）
+
+### 3. 物理数据文件
+
+
+
+### RDMBS设计范式基础概念
+
+设计关系数据库时，遵从不同的规范要求，设计出合理的关系型数据库，这些不同的规范要求被称为不同的范式，各种范式呈递次规范，越高的范式数据库冗余越小。
+
+目前关系数据库有六种范式：第一范式（1NF）、第二范式（2NF）、第三范式（3NF）、巴德斯科范式（BCNF）、第四范式(4NF）和第五范式（5NF，又称完美范式）。满足最低要求的范式是第一范式（1NF）。在第一范式的基础上进一步满足更多规范要求的称为第二范式（2NF），其余范式以次类推。一般说来，数据库只需满足第三范式(3NF）就行了。
+
+(1) 第一范式（1NF）
+所谓第一范式（1NF）是指在关系模型中，对域（字段）添加的一个规范要求，所有的域都应该是原子性的，即数据库表的每一列都是不可分割的原子数据项，而不能是集合，数组，记录等非原子数据项。即实体中的某个属性有多个值时，必须拆分为不同的属性。在符合第一范式（1NF）表中的每个域值只能是实体的一个属性或一个属性的一部分。简而言之，第一范式就是无重复的域。
+
+说明：在任何一个关系数据库中，第一范式（1NF）是对关系模式的设计基本要求，一般设计中都必须满足第一范式（1NF）。不过有些关系模型中突破了1NF的限制，这种称为非1NF的关系模型。换句话说，是否必须满足1NF的最低要求，主要依赖于所使用的关系模型。
+
+(2) 第二范式(2NF)
+第二范式（2NF）是在第一范式（1NF）的基础上建立起来的，即满足第二范式（2NF）必须先满足第一范式（1NF）。第二范式（2NF）要求数据库表中的每个实例或记录必须可以被唯一地区分。选取一个能区分每个实体的属性或属性组，作为实体的唯一标识。
+
+第二范式（2NF）要求实体的属性完全依赖于主关键字。所谓完全依赖是指不能存在仅依赖主关键字一部分的属性，如果存在，那么这个属性和主关键字的这一部分应该分离出来形成一个新的实体，新实体与原实体之间是一对多的关系。为实现区分通常需要为表加上一个列，以存储各个实例的唯一标识。简而言之，第二范式就是在第一范式的基础上属性完全依赖于主键。
+
+(3) 第三范式（3NF）
+第三范式（3NF）是第二范式（2NF）的一个子集，即满足第三范式（3NF）必须满足第二范式（2NF）。简而言之，第三范式（3NF）要求一个关系中不能包含已在其它关系已包含的非主关键字信息。简而言之，第三范式就是属性不依赖于其它非主属性，也就是在满足2NF的基础上，任何非主属性不得传递依赖于主属性。
+
+### 数据库：数据集合
+
+- 表：为了满足范式设计要求，将一个数据集分拆为多个
+- 约束：constraint，向数据表插入的数据要遵守的限制规则
+  - 主键：一个或多个字段的组合，填入主键中的数据，必须不同于已存在的数据；不能为空
+  - 外键：一个表中某字段中能插入的数据，取决于另外一张表的主键中的数据；
+  - 惟一键：一个或多个字段的组合，填入惟一键中的数据，必须不同于已存在的数据；可以为空
+  - 检查性约束：取决于表达式的要求
+
+- 索引：将表中的某一个或某些字段抽取出来，单独将其组织一个独特的数据结构中
+  - 常用的索引类型：
+    - b-tree
+    - Hash
+  - 有助于读请求，但不利于写请求
+
+- 关系运算：
+  - 选择：挑选出符合条件的行；
+  - 投影：挑选出符合需要的列；
+  - 连接：将多张表关联起来；
+
+- 数据抽象：
+  - 物理层：决定数据的存储格式，即如何将数据组织成为物理文件；
+  - 逻辑层：描述DB存储什么数据，以及数据间存在什么样的关系；
+  - 视图层：描述DB中的部分数据；
+
+- 关系模型的分类：
+  - 关系模型
+  - 实体-关系模型
+  - 基于对象的关系模型
+  - 半结构化关系模型(xml)
+
+## 事务
 
 - 组织多个事务为一个整体，要么全部都执行，要么全部都不执行
 - 回滚：rollback
@@ -135,53 +189,54 @@
 
 - MySQL的发行机制：
   - Enterprise(企业版)：线程池，可视化编程组件，提供了更丰富的功能；
-  - Community(社区版)：
+  - Community(社区版)
 
-### MariaDB features：
+### MariaDB features
 
 - 插件式存储引擎：
 - 存储管理器有多种实现版本，彼此间的功能和特性可能略有区别；
-- 用户可根据需要灵活选择； 
+- 用户可根据需要灵活选择；
 - 存储引擎也称为“表类型”；
 
-1. 更多的存储引擎；
+#### 1. 更多的存储引擎
 
 - MyISAM：不支持事务
 - MyISAM --> Aria(改进版)
 - InnoDB --> XtraDB(改进版)：支持事务
 
-MySQL-5.1 默认存储引擎：MyISAM
+- MySQL-5.1 默认存储引擎：`MyISAM`
+- MySQL-5.5+ 默认存储引擎：`InnoDB`
 
-MySQL-5.5+ 默认存储引擎：InnoDB
+#### 2. 诸多扩展和新特性
 
-2. 诸多扩展和新特性；
-3. 提供了较多的测试组件；
-4. truly open source；
+#### 3. 提供了较多的测试组件
+
+#### 4. truly open source
 
 ## 安装和使用 MariaDB
 
-安装方式
+### 安装方式
 
-1. 包管理器的程序包（rpm,deb包等）
+#### 1. 包管理器的程序包（rpm,deb包等）
 
 (a) 由OS的发行商提供
 
 (b) 程序官方提供
 
-2. 源码包
+#### 2. 源码包
 
-3. 通用二进制格式的程序包
+#### 3. 通用二进制格式的程序包
 
 ### 通用二进制格式安装MariaDB：
 
-1. 准备数据目录,以/mydata/data目录为例
+#### 1. 准备数据目录,以/mydata/data目录为例
 
-```
+``` SHELL
 # mkdir -pv /mydata/data
 # chown -R mysql.mysql /mydata/data/
 ```
 
-2. 安装配置 mariadb
+#### 2. 安装配置 mariadb
 
 ``` SHELL
 # useradd -r mysql
@@ -195,11 +250,11 @@ MySQL-5.5+ 默认存储引擎：InnoDB
 # chkconfig --add mysqld
 ```
 
-3. 提供配置文件
+#### 3. 提供配置文件
 
 ini格式的配置文件；各程序均可通过此配置文件获取配置信息；
 
-```
+``` SHELL
  [program_name]
 
 1. OS Vendor提供mariadb rpm包安装的服务的配置文件查找次序：
@@ -208,7 +263,8 @@ ini格式的配置文件；各程序均可通过此配置文件获取配置信�
 2. 通用二进制格式安装的服务程序其配置文件查找次序：
  /etc/my.cnf 越靠后最终生效的 --> /etc/mysql/my.cnf  --> --default-extra-file=/PATH/TO/CONF_FILE --> ~/.my.cnf
 
-获取其读取次序的方法：`mysqld --verbose --help`
+获取其读取次序的方法：
+# mysqld --verbose --help
 
 # cp  support-files/my-large.cnf  /etc/my.cnf
 
@@ -219,7 +275,11 @@ innodb_file_per_table = ON
 skip_name_resolve = ON
 ```
 
-4. 启动服务: `# service mysqld  start`
+#### 4. 启动服务
+
+``` SHELL
+# service mysqld  start
+```
 
 ## 设计范式
 
@@ -247,17 +307,21 @@ skip_name_resolve = ON
 
 1. root用户设定密码
 
-``` mysql
+``` sql
 mysql> set password （自动重读授权表）
 mysql> update mysql.user SET password = password('password') where cluase;
 mysql> flush privilige
 ```
 
-`# mysqladmin`
+``` shell
+# mysqladmin
+```
 
 2. 删除所有匿名用户
 
-`mysql> drop user ''@'localhost';`
+``` shell
+mysql> drop user ''@'localhost';
+```
 
 上述两步骤运行命令：`# mysql_secure_installation`
 
@@ -267,7 +331,7 @@ my.ini文件中修改 `skip_name_resolve=off`
 
 ### 元数据数据库:mysql
 
-user, host 等
+`user, host` 等
 
 ### Windows 下安装 MySQL 5.6
 
@@ -294,9 +358,9 @@ user, host 等
 
 --no-auto-rehash 不能命令自动补全（性能差，创建hash计算）
 
-## 客户端类应用程序的可用选项：
+## 客户端类应用程序的可用选项
 
-``` options
+``` SQL
 -u, --user=
 -h, --host=
 -p, --password=
@@ -305,7 +369,7 @@ user, host 等
 -S, --socket=统一主机上及，-h localhost，socket文件路径
 -D, --database=
 -C, --compress 数据传输时是否压缩
-mysql -e "SQL"
+# mysql -e "SQL" 在shell命令直接执行SQL语句并返回
 ```
 
 ## mysql 使用模式
@@ -414,7 +478,8 @@ skip_name_reslve=off
 - `mysql> help create`
 
 create相关命令
-``` mysql
+
+``` SQL
 create database
 create event
 create function
@@ -491,10 +556,10 @@ charcter-set-server=utf8 服务器端字符集
 - -p, --port=#
 - -D, --database=name
 - --prompt=name, 设置命令提示符
-  - \D	full date
-  - \d	current database
-  - h		hostname
-  - u 	username
+  - \D full date
+  - \d current database
+  - h hostname
+  - u username
 - --delimiter=name，指定分隔符
 - -V,--version，输出版本信息并且退出
 
@@ -516,18 +581,18 @@ charcter-set-server=utf8 服务器端字符集
 ### 保存命令历史文件
 
 - `mysql> \T /path/to/file`
-- `mysql> SELECT NOW();		命令和结果都保存于/path/to/file` 
+- `mysql> SELECT NOW(); 命令和结果都保存于/path/to/file` 
 - `mysql> \T 结束`
 
 ## 数据库操作
 
 ### 创建数据
 
-```
+``` sql
 create database | schema [it not exits] db_name [[default] character set [=] 'charset_name']
 ```
 
-```
+``` sql
 CREATE DATABASE IF NOT EXISTS db DEFAULT CHARACTER SET 'UTF8';
 mysql> help create database
 mysql> ? create database
@@ -687,7 +752,7 @@ mysql> \h create database
 
 默认继承数据库或表
 
-``` mysql
+``` sql
 mysql> show character set
 mysql> show collation
 ```
@@ -700,7 +765,7 @@ mysql> show collation
 
 ### SQL MODE: 定义mysql对约束等的响应行为
 
-``` mysql
+``` sql
 mysql> set global sql_mode='string'
 mysql> set @@global.sql_mode='string'
 ```
@@ -708,7 +773,8 @@ mysql> set @@global.sql_mode='string'
 - 需要修改权限，不会立即生效，只会对新建的会话生效，对已经建立的会话无效
 - 立即生效，使用会话方式
 
-```mysql> set session sql_mode='string'
+``` sql
+mysql> set session sql_mode='string'
 mysql> set @@session.sql_mode='string'
 
 mysql> show global variables like 'sql_mode'
@@ -767,7 +833,7 @@ mysql> show global variables like 'sql_%'
 
 ### 创建表
 
-``` mysql
+``` sql
 -- 注释内容
 SET NAMES UTF8
 -- 输入中文的时候，需要临时转换客户端的编码方式
@@ -779,7 +845,7 @@ engine=INNODB AUTO_INCREMENT=100 [DEFAULT] charset=UTF8
 1. 直接创建
 2. 通过查询现存的表创建
 
-``` mysql
+``` sql
 create [temporary] table [if not exists] tbl_name
 [(create_definition,...)]
 [table_options]
@@ -789,7 +855,7 @@ select_statement
 
 3. 通过复制现存的表的表结果创建；不复制数据
 
-``` mysql
+``` sql
 create [temporary] table [it not exists] tbl_name
 { like old_tbl_name | (like old_tbl_name) }
 ```
@@ -810,7 +876,7 @@ create [temporary] table [it not exists] tbl_name
 
 ### 查看表结构
 
-``` mysql
+``` sql
 DESC tbl_name
 DESCRIBE tbl_name
 SHOW COLUMNS FROM tbl_name
@@ -841,7 +907,7 @@ SHOW COLUMNS FROM tbl_name
 
 ## 重命名表
 
-``` mysql
+``` sql
 alter table tbl_name rename to tbl_new_name
 alter table tbl_name rename as tbl_new_name
 alter table tbl_name rename tbl_new_name
@@ -850,7 +916,7 @@ alter table tbl_name to tbl_new_name
 
 ## 修改表格结构
 
-``` mysql
+``` sql
 添加字段
 alter table tbl_name
 add 字段名1  after|before target_filed
@@ -936,7 +1002,7 @@ alter table tbl_name auto_increment=100
 
 ## 查询记录
 
-```
+``` sql
 select {*|field} from tbl_name
 where [条件]
 group by {col_name | position} [ASC | DESC]
@@ -989,7 +1055,7 @@ order by {col_name | position} [ASC | DESC]
 - [inner|cross] join on 连接条件
 - 示例：
 
-```
+``` sql
 select A.f, B.f from A,B where A.proId=B.id
 select a.f, b.f from A as a inner join B as b on a.proId=b.id
 select a.f, b.f,b.proName,count(*) as total_users,group_concat(username) from A as a join B as b on a.proId=b.id where a.gender=1 group by b.proName having count(*) > 1 order by a.id asc
@@ -1005,7 +1071,7 @@ select a.f, b.f,b.proName,count(*) as total_users,group_concat(username) from A 
 
 > 数据表存储引擎只能为InnoDB
 
-``` mysql
+``` sql
 -- 部门表：department
 create table if not exists department(
 id tinyint unsigned auto_increment key,
@@ -1045,7 +1111,7 @@ delete from department where depName='督导部';
 
 ### 删除外键
 
-``` mysql
+``` sql
 alter table employee drop foreign key emp_fk_dep
 show create table employee
 ```
@@ -1058,7 +1124,7 @@ show create table employee
 
 ### cascade: 从父表删除或更新且自动删除或更新子表中匹配的行
 
-``` mysql
+``` sql
 -- 员工表：employee（子表）
 create table if not exists employee(
 id smallint unsigned auto_increment key,
@@ -1326,19 +1392,20 @@ character_set_server latin1
 
 character_set_system utf8
 
-```
+``` shell
 # vim my.ini
 [mysql]
 default-character-set=utf8
 ```
 
 影响效果
-```
+
+``` shell
 character_set_database utf8  
 character_set_server utf8
 ```
 
-```
+``` sell
 [mysqld]
 character-set-server=utf8
 ```
@@ -1469,14 +1536,7 @@ MySQL 内部组件的架构类型
   - File System(NTFS,ufs,ext2/3, NFS,SAN,NAS)
   - Files & Logs(Fedo, Undo, Data, index, Binary, Error, Query and Slow)
 
-
 MySQL 必须必须建立连接线程，创立完之后
-
-
-
-
-
-
 
 用户-> 连接管理器-线程管理器-用户模块
 
@@ -1521,7 +1581,7 @@ MySQL 必须必须建立连接线程，创立完之后
 - 稠密索引、稀疏索引：是否索引了每一个数据项
 - B+ Tree、Hash（一对一，不能排序），R Tree(空间索引)
 - 简单索引，组合索引
-- 左前缀索引：
+- 左前缀索引
   - LIKE "abc%"
 - 覆盖索引
 
@@ -1656,7 +1716,8 @@ MySQL 必须必须建立连接线程，创立完之后
 ## Storage Engine
 
 表类型
-``` mysql
+
+``` sql
 create table ... engine[=]storage_engine_name...
 show table status [like|where]
 ```
@@ -1809,7 +1870,7 @@ show table status [like|where]
 - `set session autocommit = off` 临时有效
 - `show variables like '%commit%'`
 
-```
+``` sql
 mysql> start transaction;
 mysql> select * from tb1;
 mysql> insert into tb1 values(4,'Ouyang Feng');
@@ -1856,7 +1917,7 @@ mysql> commit;
 - `set autocommit=0;`
 - `start transaction;`
 - `insert into tb1 values(6, 'hello'); --1`
-- `rollback; ; --3 `
+- `rollback; ; --3`
 
 ### IP1-session1(read-uommitted)
 
@@ -1875,7 +1936,7 @@ mysql> commit;
 - `set autocommit=0;`
 - `start transaction;`
 - `insert into tb1 values(6, 'hello'); --1`
-- `commit; ; --3 `
+- `commit; ; --3`
 
 ### IP1-session1(repeatable-read)
 
@@ -1883,10 +1944,10 @@ mysql> commit;
 - `set tx_isolation='repeatable-read';`
 - `set autocommit=0;`
 - `start transaction;`
-- `select * from tb1; -- 2 看到6,hello` 
-- `select * from tb1; -- 4 看到6,hello 幻读` 
+- `select * from tb1; -- 2 看到6,hello`
+- `select * from tb1; -- 4 看到6,hello 幻读`
 - `commit`
-- `select * from tb1; -- 5 看不到6,hello` 
+- `select * from tb1; -- 5 看不到6,hello`
 
 ### IP1-session2(repeatable-read)
 
@@ -1895,7 +1956,7 @@ mysql> commit;
 - `set autocommit=0;`
 - `start transaction;`
 - `delete form tb1 where id=6; --1`
-- `commit; ; --3 `
+- `commit; ; --3`
 
 ### IP1-session1（seriablizable)
 
@@ -1916,7 +1977,7 @@ mysql> commit;
 - `start transaction;`
 - `insert into tb1 values(6, 'hello'); --1`
 - `update form tb1 where id=6; --3`
-- `commit; ; --5 `
+- `commit; ; --5`
 
 ### 设置隔离级别：tx_isolation，默认为第三级别
 
@@ -1925,7 +1986,7 @@ mysql> commit;
 - REPEATABLE-READ
 - SERIALIZABLE
 
-```
+``` shell
 A,B
 P1,P2
   P1: A
@@ -1976,25 +2037,35 @@ P1,P2
   - %：匹配任意长度的任意字符
     - 172.16.%.%,  172.16.0.0/16
 
-## 命令：
+## MySQL 命令
 
 - 客户端命令：本地执行
 
-- mysql> help 或 \h
-  - \u db_name or use db_name：设定哪个库为默认数据库
-  - \q or exit：退出；
-  - \d CHAR or delimiter CHAR：设定新的语句结束符；
-  - \g：语句结束标记；
-  - \G：语句结束标记，结果竖排方式显式；
-  - \s：状态信息
-  - \c：取消语句
+- mysql> `help` 或 `\h`
+  - `\u db_name` or `use db_name`：设定哪个库为默认数据库
+  - `\q` or `exit`：退出
+  - `\d CHAR` or `delimiter CHAR`：设定新的语句结束符
+  - `\g`：语句结束标记
+  - `\G`：语句结束标记，结果竖排方式显式
+  - `\s`：状态信息
+    - Connection id: 3 线程ID
+    - Currrent database: mysql
+    - SSL: Not in use
+    - Using delimiter: ; 语句分隔符
+    - Current pager: stdout
+    - Server Characterset: latin1 服务器端字符集
+    - Db Characterset: latin1 数据库字符集
+    - Client Characterset: latin1 客户端字符集
+    - Conn. Characterset: latin1 连接数据库字符集(连接传输字符集)
+    - UNIX socket: /var/lib/mysql/mysql.sock
+  - `\c`：取消语句
 
 - 服务端命令：通过mysql连接发往服务器执行并取回结果；
   - DDL， DML， DCL
 
 - 注意：每个语句必须有语句结束符，默认为分号(;)
 
-## 数据类型：
+## MySQL 数据类型
 
 - 表：行和列
 
@@ -2004,41 +2075,45 @@ P1,P2
 - 字符型：字符集
   - 码表：在字符和二进制数字之间建立映射关系；
 
+``` SQL
+> show character set;
+```
+
 - 种类：
   - 字符型：
-    - 定长字符型：max 255
-    - CHAR(#)：不区分字符大小写
-    - BINARY(#)：区分字符大小写
-    - 变长字符型：max 65535,有一个结束符，表示结束字符
-    - VARCHAR(#)：不区分字符大小写
-    - VARBINARY(#)：区分字符大小写
+    - `定长字符型`：max 255
+    - `CHAR(#)`：不区分字符大小写
+    - `BINARY(#)`：区分字符大小写
+    - `变长字符型`：max 65535,有一个结束符，表示结束字符
+    - `VARCHAR(#)`：不区分字符大小写
+    - `VARBINARY(#)`：区分字符大小写
   - 对象存储：存储的是指针
-    - TEXT：max 2^32(40G)，不区分大小写
-    - BLOB：tinyblog,smallblob,mediumblob,blob,bigblob区分大小写
-  - 内置类型：SET(集合), ENUM(枚举)
+    - `TEXT`：max 2^32(40G)，不区分大小写
+    - `BLOB`：`tinyblog,smallblob,mediumblob,blob,bigblob`区分大小写
+  - 内置类型：`SET(集合)`, `ENUM(枚举)`
   - 数值型：
-    - 精确数值型：INT（TINYINT，SMALLINT，MEDIUMINT，INT，BIGINT） 
-    - 近似数值型：FLOAT，DOBULE
+    - 精确数值型：`INT(TINYINT，SMALLINT，MEDIUMINT，INT，BIGINT)`
+    - 近似数值型：`FLOAT，DOBULE`
     - 日期时间型：
-      - 日期型：DATE
-      - 时间型：TIME
-      - 日期时间型：DATETIME
-      - 时间戳：TIMESTAMP
-      - 年份：YEAR(2), YEAR(4)
+      - 日期型：`DATE`
+      - 时间型：`TIME`
+      - 日期时间型：`DATETIME`
+      - 时间戳：`TIMESTAMP`
+      - 年份：`YEAR(2), YEAR(4)`
 
 - 数据类型有修饰符：
-  - UNSIGNED：无符号
-  - NOT NULL：非空
-  - DEFAULT value：默认值
+  - `UNSIGNED`：无符号
+  - `NOT NULL`：非空
+  - `DEFAULT value`：默认值
 
 - 服务器端命令：
   - DDL：主要用于管理数据库组件，例如表、索引、视图、用户、存储过程
-    - CREATE、ALTER、DROP、INDEX、VIEW、USER
+    - `CREATE、ALTER、DROP、INDEX、VIEW、USER`
   - DML：主要用管理表中的数据，实现数据的增、删、改、查；
-    - INSERT/REPLACE， DELETE， UPDATE， SELECT
+    - `INSERT/REPLACE, DELETE, UPDATE, SELECT`
   - 获取命令帮助：`mysql> help  KEYWORD`
 
-## 数据库管理：
+## 数据库管理
 
 - 查看：`SHOW DATABASES LIKE ''`;
 - 查看支持的所有字符集：`SHOW CHARACTER SET`
@@ -2063,19 +2138,19 @@ P1,P2
   - `tbl_name`
   - `db_name.tbl_name`
 
-CREATE：CREATE TABLE [IF NOT EXISTS] tbl_name (create_defination) [table_options]
+`CREATE：CREATE TABLE [IF NOT EXISTS] tbl_name (create_defination) [table_options]`
 
 ### create_defination
 
 - field：col_name  data_type
 - key：
-  - PRIMARY KEY (col1, col2, ...)
-  - UNIQUE KEY  (col1, col2,...)
-  - FOREIGN KEY (column)
+  - `PRIMARY KEY (col1, col2, ...)`
+  - `UNIQUE KEY  (col1, col2,...)`
+  - `FOREIGN KEY (column)`
 - index：
-  - KEY|INDEX  [index_name]  (col1, col2,...)
+  - `KEY|INDEX  [index_name]  (col1, col2,...)`
 - table_options
-  - ENGINE [=] engine_name
+  - `ENGINE [=] engine_name`
 
 ## MySQL 用户账号及权限管理
 
@@ -2089,56 +2164,56 @@ CREATE：CREATE TABLE [IF NOT EXISTS] tbl_name (create_defination) [table_option
 
 ### 管理类
 
-- create temporary tables 创建临时表 （空间：16M ）
-- create user
-- file （导出文件，加载文件）
-- super(执行高级管理类权限，root)
-- show databases
-- reload (重新装载授权表)
-- shutdown (关闭数据库)
-- replication slave(复制主从)
-- replication client(请求复制)
-- lock tables
-- process(show process list;)
+- `create temporary tables 创建临时表` （空间：16M ）
+- `create user`
+- `file`(导出文件，加载文件)
+- `super`(执行高级管理类权限，root)
+- `show databases`
+- `reload` (重新装载授权表)
+- `shutdown` (关闭数据库)
+- `replication slave`(复制主从)
+- `replication client`(请求复制)
+- `lock tables`
+- `process`(show process list;)
 
 ## 程序类 - create, alter, drop, excute
 
-- procedure
-- function
-- trigger
-- 事件调度器
+- `procedure`
+- `function`
+- `trigger`
+- `事件调度器`
 
 ## 库和表级别: database or table
 
-- alter database | table
-- create database | table
-- drop database | table
-- create | drop  index
-- create | show view
-- grant option 能够把自己获得的权限赠给其他用户一个副本
+- `alter database | table`
+- `create database | table`
+- `drop database | table`
+- `create | drop  index`
+- `create | show view`
+- `grant option` 能够把自己获得的权限赠给其他用户一个副本
 
 ## 数据操作
 
-- select
-- insert
-- update
-- delete
+- `select`
+- `insert`
+- `update`
+- `delete`
 
 ## 字段级别
 
-- select(col1,col2,...)
-- update(col1,col2,...)
-- insert(col1,col2,...)
+- `select(col1,col2,...)`
+- `update(col1,col2,...)`
+- `insert(col1,col2,...)`
 
 ## 所有权限
 
-- all [privileges]
+- `all [privileges]`
 
 ## 元数据数据库：mysql
 
 - 授权表
-  - db, host, user 数据库/哪些客户端主机/用户
-  - columns, priv, tables_priv, proces_priv, proxies_priv
+  - `db, host, user` 数据库/哪些客户端主机/用户
+  - `columns, priv, tables_priv, proces_priv, proxies_priv`
 
 ## 用户账号
 
@@ -2155,7 +2230,8 @@ CREATE：CREATE TABLE [IF NOT EXISTS] tbl_name (create_defination) [table_option
 - 删除用户：`drop user 'username'@'host'`
 
 修改密码
-``` mysql
+
+``` SQL
 第一种方法
 > set password for root@localhost = password('123');
 
@@ -2179,10 +2255,12 @@ mysql> flush status;
 ## 忘记管理员密码(忘记 mysql root 账号密码)
 
 1. 启动mysqld进程时，为其使用： --skip-grant-tables --skip-networking 禁止远程登录  
+
 2. 使用update命令修改管理员密码: `update mysql.user set password=PASSWORD('password') where user='root';`
+
 3. 关闭mysql进程，移除上述两个选项，重启mysqld
 
-``` 修改 my.cnf配置文件
+``` shell 修改 my.cnf配置文件
 # sudo vi /etc/my.cnf
   [mysqld]
   skip-grant-tables
@@ -2190,7 +2268,7 @@ mysql> flush status;
 
 重启服务: `# sudo systemctl restart mysqld`
 
-```登陆并修改密码
+```shell 登陆并修改密码
 # mysql -uroot
 mysql> use mysql
 ```
@@ -2201,7 +2279,8 @@ MySQL 5.7.5 或更早之前的版本修改密码:
 `# mysql> update user set password=PASSWORD('newpass') where User='root';`
 
 授权远程访问
-``` mysql
+
+``` shell
 #  mysql -u root -p
 > GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'your_root_password' WITH GRANT OPTION;
 > FLUSH PRIVILEGES;
@@ -2415,7 +2494,7 @@ GRANT priv_type,... ON [object_type] db_name.tbl_name TO 'user'@'host' [IDENTIFI
 
 ### 创建存储过程
 
-```
+``` SQL
 1. 选择数据库：`use db1;`
 2. 改变语句分隔符：`delimiter $$`
 3. 创建语句：

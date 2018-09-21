@@ -66,7 +66,7 @@
 
 ###　OpenSSL组成
 
-1. libencrypt: 加密/解密库
+1. libencrypto: 加密/解密库
 2. libssl ssl: 安全通信机制 数据交换
 3. openssl: 多用途命令行工具
 
@@ -108,11 +108,14 @@
 #### 公钥加密用途
 
 - 数字签名：主要在于让接受方确认发送方的身份
+  - 使用私钥加密单项加密的特征码 = 生成数字签名
+  - 身份认证和数据完整性得到验证
 - 密钥交换：发送方用对方公钥加密一个对称密钥，并发送给对方
+  - 数据保密性
 
 #### 公钥加密算法
 
-- RSA (能数字签名、加密/解密)
+- RSA (能数字签名、加密/解密) 公司名/加密算法名/创始人合并名子缩写
 - DSA (仅能数字签名，不能加密/解密)
   - DSA: Digital Signature Algorithm
   - DSS: Digital Signature Standard
@@ -123,31 +126,35 @@
 > 提取数据**指纹**；只能加密，不能解密
 
 - 特性：定长输出、雪崩效应
-- 功能：完全性验证
-- 算法：
-  - md5: message Digest version5, 128bits
-  - sha1: Secure Hash Algorithm 1, 160bits
-  - sha224, sha256, sha384, sha512
+- 功能：数据完整性校验
+- 常见算法：
+  - md5: Message Digest version5 消息摘要(128bits定常输入)
+  - sha1: Secure Hash Algorithm version1 安全的哈希算法, (160bits定常输入)
+  - sha224, sha256, sha384, sha512(CentOS 7用户加密算法)
 
-### 4. **密钥交换**
+### 4. 密钥交换
 
-> IKE(Internet Key Exchange)
+> IKE(Internet Key Exchange) 互联网密钥交换
 
-- 公钥加密（发送密码，有可能暴力破解)
-- DH(Deffie-Hellman)算法
-  - A: p,g
-  - B: p,g
+1. 公钥加密（使用对方的公钥加密并发送，有可能暴力破解)
+2. DH(Deffie-Hellman，发明者两人姓名) 算法
 
-  - A: x（私有）
-    - p^x%g ==传递=> B
-    - A得到 (p^y%g)^x = p^yx%g
+- A: p大素数,g
+- B: p大素数,g
 
-  - B: y（私有）
-    - p^y%g ==传递==> A
-    - B得到 (p^x%g)^y = p^xy%g
+- A: x(私有数据)
+  - p^x%g ==传递=> B
+  - B得到 (p^x%g)
+  - (p^x%g)^y = p^xy%g
 
-  - 11111111^3891%g=abc
-    - 求3891？
+- B: y(私有数据)
+  - p^y%g ==传递==> A
+  - A得到 p^y%g
+  - (p^y%g)^x = p^yx%g
+
+- 11111111素数^3891%g=abc
+  - 有p,g,abc求3891？
+  - abc 是密钥
 
 ### Alice 把数据安全保密的发送给 Bob
 
@@ -165,72 +172,136 @@
 3. 身份认证：用 Alice 公钥解密特征码，能解密得到 Alice 身份得到验证
 4. Bob 在同样再用对称加密方法计算对称加密的特征码，并与解密出来的数据进行比较，相同则数据完整得到验证，否则数据不完整。
 
-##　PKI: Public Key Infrastructure　公钥基础设施
+### 问题
 
-- 签证机构：CA， certificate authority
-- 注册机构：RA， registration authority
-- 证书吊销列表：CRL， Certificate Revoke List
-- 证书存储库：CB
+Bob 与 Alice 从来没有交流过，怎么确定他俩的通信
+
+Bob 和 Alice 都各自把自己的公钥公开到互联网
+
+Bob 和 Alice 通信，Eve 截取到他们的公钥之后在他们之间建立联系
+
+Bob 看着 Eve 像 Alice
+
+Alice 看着 Eve 像 Bob
+
+所有数据都通过 Eve 都周转一次，而 Alice和Bob 都蒙在鼓里
+
+缺失：可靠身份的公钥
+
+解决：Bob 把自己的公钥提请给CA。在 CA 机构做一些特殊防伪技术返回给Bob,以后任何人与 Bob 通信，Bob 把特殊防伪标签的公钥(证书)发给 Alice。Alice 刚开始不认可此证书，Alice 到 CA 机构验证此证书获得证书认可。
+
+Eve 冒充 Alice 请求CA获取Alice的防伪证书。CA 查看调查 Eve 是否是 Alice
+
+##　PKI
+
+> Public Key Infrastructure　公钥基础设施
+
+- 签证机构：CA(Certificate Authority)
+- 注册机构：RA(Registration Authority)
+- 证书吊销列表：CRL(Certificate Revoke List)
+- 证书存取库：CB（公共存取库）
 
 - verisign 机构
 
-Bob 把自己的公钥提请给 在 CA 机构做一些特殊防伪技术返回给Bob,以后任何人与 Bob 通信，Bob 把特殊防伪标签的公钥(证书)发给 Alice。Alice 刚开不认可此证书，Alice 到 CA 机构验证此证书获得证书认可。
+办理身份证？当地派出所接受申请办理身份证（注册机构），区公安局可以签发身份证(签证机构)，在签发的身份证全国都认可。丢了身份证，到派出所吊销身份证（证书吊销列表）
 
-CA 查看调差 Eve 是否是 Alice
+### CA签发整数流程
 
-### X.509：定义证书的结构以及认证协议标准
+Bob 请求CA机构签发证书：
 
-- 版本号
-- 序列号
-- 签名算法ID
+1. 拥有者的名称
+2. 拥有者的公钥
+3. 证书有效期限
+4. CA 自己的私钥加密以上这个数据的特征码，并附加在数据后面（数字签名）
 
-- 发行者名称（CA自己的名字）
-- 发行者的唯一标识
-- 有效期限
+Bob 把此证书发给 Alice
+
+Alice 如何验证此证书？Alice 使用 CA 公钥解密数字签名，能解密就说明CA签发的证书，还要使用同样的单向加密算法进行对数据提取特征码并与验证解密出来的特征码是否相等。如果一样，就说明证书内容没有问题。
+
+问题：Alice 如何获取 CA 的公钥？如何可靠获取 CA 证书
+
+解决：CA 给自己发证（央行发行获取？你信不信？有枪有权利），半路有人给你发其他机构证书，但是你与其他的通信时，对方不认可此证书。CA 为了能验证它发的证书是它发的，CA把整数会提请给每一个信任它的人，为了整个链是完整的，CA 首先自己给发一个证书，这个证书里包含了自己的信息和 CA的公钥。因此 Alice 拿到 CA 的证书才能获的 CA 的公钥，只有拿到CA的公钥，才能解密CA的签名。包括其他人给他发的证书是否OK。如何可靠的获得CA证书？能不能通过网络发送呢？可以当面交易。一年的证书使用费5万元以上。
+每一个请求CA获得证书的时候，会检查你的各种信息核实你的身份。全球几千万都当面交易？CA 在全球有护心链，CA -> CA1 -> CA2 -> 信任关系互相传递。为了CA管理方便全球有一个**根CA**，根下有很多派出机构，所有我们CA关系是互相传递的。这是第一层。第二层，全球CA数量是有限的，而且基本都是固定的。因此，很多操作系统的发行者，尤其像微软这样的系统，直接装完操作系统之后，全球著名的有公信力的CA证书机构证书已经在系统上了。可以拿去使用。不用通过互联网进行获取。如果安装的是到盗版系统，另当别论。
+
+伪装CA机构非常困难，只能在本地进行伪装。影响不了上线。
+
+Linux 系统本地都没有内置的CA证书。我们自行可靠手段获取证书。
+
+### CA 能够通信双方可靠的获取到对方公钥的一种基础保证机制
+
+但是 Bob 私钥丢了怎么办？任何人都冒充 Bob 与别人通信，为了防止降低损失。断臂求生，立即向CA申请吊销证书，把证书声明作废，但声明作废别人怎么知道？
+
+### X.509
+
+> 国际标准化组织定义证书的结构以及认证协议标准
+
+- 版本号(证书版本号，身份证1代/2代，v1/v2/v3(最常用版本))
+- 序列号(第几个证书)
+- 签名算法ID(签名算法，需要对方解密)
+
+- 发行者名称（CA自己的名字，签发证书的机构名称）
+- 发行者的唯一标识(CA机构标识)
+- 有效期限（证书有效期）
 
 - 主体名称
 - 主体公钥
 - 主体的惟一标识
 
 - 扩展信息
-- 发行者的签名
+- 发行者的签名(CA获取数据特征码，并进行CA的私钥进行加密特征码得到签名)
 
-## SSL: Secure Sockets Layer
+## SSL 协议
 
-- Netscape: 1994
-- v1.0(没有公开), v2.0, v3.0(有漏洞，所以废弃)
+> Secure Sockets Layer 安全套接层
 
-## TLS: Transport Layer Security
+SSL 负责调用TCP/IP协议进行通信
 
-- 与SSL兼容
-- IETF: 1999年发布
-- v1.0 v1.1(2006) v1.2(常用,2008) v1.3(2014,草案, 支持椭圆曲线算法)
+- 1994 Netscape 开发的 ssl协议，Netscape 拥有版权
+- v1.0(没有公开过)
+- v2.0(因为有数个漏洞升级为v3.0)
+- v3.0(google发现有漏洞，所以废弃)
 
-## TLS 分层设计
+## TLS
 
-1. 最底层：基础算法原语的实现：aes, rsa, md5
+> Transport Layer Security 传输层安全
+
+- 1999年发布 IETF 与 SSL 兼容
+- v1.0
+- v1.1(2006)
+- v1.2(常用, 2008)
+- v1.3(2014年草案，支持椭圆曲线算法)
+- 事实上的标准
+
+### TLS 分层设计
+
+1. 最底层：基础算法原语的实现：`aes, rsa, md5`
 2. 向上一层：各种算法的实现
 3. 再向上一层：组合算法实现的半成品
 4. 用各种组件拼装而成的各种成品密码学协议软件
 
-## 协议的开源实现
+### 协议的开源实现
 
-- OpenSSL
+- OpenSSL 组件
+  - libcrypto (加密/解密)
+  - libssl(库，面向开发者)
+  - openssl(命令行工具)
 
-###　加密算法和协议：
+###　加密算法和协议
 
 - 对称加密：数据加密（保密性）（3DES，AES）
 - 公钥加密：身份认证、密钥交换、数据加密（不常用，比对称加密要慢3个数量级）RSA, DSA, ECDH
 - 单项加密：数据完整性（MD5，SHA1, ...）
 - 密钥交换：DH（迪菲-赫尔曼），ECDH（椭圆曲线DH），ECDHE（临时椭圆曲线DH）
 
-## SSL会话主要三部：
+### SSL会话主要三部
 
 - 客户端向服务器端索要并验证证书
 - 双方协商生成“会话密钥”（对称密钥）
 - 双方采用“会话密钥”进行加密通信
 
-## SSL Handshake Protocol
+### SSL Handshake Protocol
+
+![ssl handshake](./images/SSL_handshake_with_two_way_authentication_with_certificates.svg.gif)
 
 - 第一阶段：ClientHello
   - 支持的协议版本，比如tls1.2
@@ -257,93 +328,146 @@ CA 查看调差 Eve 是否是 Alice
     - 编码变更通知，表示随后的信息都将用双方商定的的加密方法和密钥发送；
     - 服务端握手结束通知；
 
-## Openssl (众多子命令，分为三类)
+### Openssl (众多子命令，分为三类)
 
-- Standard command 标准命令(enc, ca, req, genrsa等)
+> 多用途命令行工具
+
+- Standard command 标准命令
+  - enc 加密
+  - ca(CA相关命令)
+  - req(生成证书签署请求)
+  - gendsa(生成dsa密钥对)
+  - genrsa(生成rsa密钥对)
+  - x509
+  - rand
 - Message Digest commands 消息摘要命令（dgst子命令）
+  - md5
+  - sha
+  - sha1
 - Cipher commands 加密命令（enc子命令）
+  - des3
+  - des
+  - aes-128-cbc
+  - aes-128-ecb
+  - cast
 
-## 1.对称加密
+### openssl 对称加密命令
 
-- 工具：openssl [enc|gpg]
-- 支持的算法：3des, aes, blowfish, towfish
+- 工具：`openssl [enc|gpg]`
+- 支持的算法：`3des, aes, blowfish, towfish`
 
-### enc命令
+- 子命令帮助：
+  - `# whatis enc`
+  - `# man enc`
+  - `# openssl ?`
 
-- `# man enc`
-- `# openssl ?`
+#### enc 命令
 
-- 选项：
-  - -e/d：加密/解密
-  - -a|-base64: base64编码，默认二进制格式
-  - -des3：加密/解密算法
-- 加密: `# openssl enc -e -des3 -a -salt -in fstab -out fstab.ciphertext`
+``` SHELL
+openssl enc -ciphername [-in filename] [-out filename] [-pass arg] [-e] [-d] [-a/-base64] [-A] [-k password] [-kfile filename] [-K key] [-iv IV] [-S salt] [-salt] [-nosalt] [-z] [-md] [-p] [-P] [-bufsize number] [-nopad] [-debug]
+
+-ciphername: 加密的名称
+-in filename: 对哪个文件进行加密
+-out filename: 加密的文件放在哪里
+-pass arg: 密码是什么
+-e：加密
+-d: 解密
+-a | -base64: base64编码，默认二进制格式
+-des3：加密/解密算法
+```
+
+- 加密(bas64文本编码的结果): `# openssl enc -e -des3 -a -salt -in fstab -out fstab.ciphertext`
 - 解密: `# openssl enc -d -des3 -a -salt -out fstab.plaintext -in fstab.ciphertext`
 
-## 2.单项加密
+### 2.单项加密
 
-- 工具：openssl dgst, md5sum, sha1sum, sha224shum,sha256shum,sha384shum,sha512sum
+- 工具：`openssl dgst, md5sum, sha1sum, sha224shum,sha256shum,sha384shum,sha512sum`
 
-### dgst命令：
+#### dgst命令：
 
-- `# openssl dgst -md5 fstab` 
-- `# md5sum fstab`
-- `# openssl dgst -shal384 fstab` 
-- `# sha384sum fstab`
+- `# openssl dgst -md5 fstab` 等于 `# md5sum fstab`
+- `# openssl dgst -sha384 fstab` 等于 `# sha384sum fstab`
 
-## 3.生成用户密码
+### 3.生成用户密码
 
-- 工具：passwd 或 openssl passwd
+- 工具：`passwd` 或 `openssl passwd`
+- `# man sslpasswd`
+- `# opensl passswd -1 -salt 1234567` -1：MD5-based password algorithm
+- `# openssl -1 -salt $(openssl rand -hex 4)` -hex: 16进制
 
-`# opensl passswd -1 -salt 1234567` -1：MD5-based password algorithm
+关于openssl passwd文件，它生成的密码可以直接复制到/etc/shadow文件中，但openssl passwd因为不支持sha512，所以密码强度不够。如果要生成sha512的密码，可以使用`grub-crypt`生成，它是一个python脚本，只不过很不幸CentOS 7只有grub2，grub-crypt命令已经没有了。
 
-`# openssl -1 -salt $(openssl rand -hex 4)` -hex: 16进制
+``` shell
+# grub-crypt --sha-512
+Password:
+Retype password:
+$6$2RCBJT7rELpfX4.Q$iKM5vNShNqUcCiez.JDBgbRkj007eXVVs790UwiOw1PMvB/s/vE7DhyDe8YJ6T8aEtP0Vev5kMReL/nILwLZX/
+```
 
-## 4.随机数
+可以使用语句简单地代替grub-crypt。
+
+``` shell
+python -c 'import crypt,getpass;pw=getpass.getpass();print(crypt.crypt(pw) if (pw==getpass.getpass("Confirm: ")) else exit())
+```
+
+grub-crypt和上述python语句都是交互式的。如果要非交互式，稍稍修改下python语句：
+
+`python -c 'import crypt,getpass;pw="123456";print(crypt.crypt(pw))'`
+
+### 4.随机数
 
 - 工具：openssl rand
   - `# openssl rand -base64 10` 10个字节
   - `# openssl rand -hex 10`
 
-## 5.公钥加密
+### 5.公钥加密
 
-### 5.1 加密解密：
+#### 5.1 加密解密
 
 - 算法：RSA, ELGamal
 - 工具：openssl [rsautl | gpg]
 
-### 5.2 数字签名
+#### 5.2 数字签名
 
-- 算法：RSA，DSA，ELGamal
+- 算法：RSA，DSA(数字签名算法)，ELGamal
 - 工具：openssl [rsautl | gpg]
 
-### 5.3 密钥交换
+#### 5.3 密钥交换
 
 - 算法：DH
 
-### 生成私钥
+### 生成密钥
 
-- `# openssl genrsa 1024(位数，必须是2N次方倍数)`
+#### 私钥私钥
+
+``` shell
+# (umask 077; openssl genrsa -out /PATH/TO/PRIVATE_KEY_FILE NUM_BITS)
+```
+
+- `# openssl genrsa 1024(位数，必须是2的N次方位数)`
 - `# openssl genrsa 1024 > /tmp/mykey.private`
 - `# openssl genrsa 1024 -out /tmp/mykey.private2`
-- `# (umask 077; openssl genrsa -out /tmp/mykey.private 2048)`
 
-`# (umask 077` 只对子shell有效
+- `# ls /tmp -l` mykey.private2是-rx-r--r--.权限，私钥文件能没有安全性可言
 
-### 提出公钥
+- `# (umask 077; openssl genrsa -out /tmp/mykey.private 2048)` 仅当前用户能读写文件(rw-------) `# (umask 077` 只对子 shell 进程有效，执行完毕之后回到主shell进程
 
-`# openssl ras -in /tmp/mykey.private -pubout`
+#### 提出公钥-根据私钥提取公钥
 
-## Linux系统上的随机数生成器：
+`# openssl ras -in /tmp/mykey.private -pubout` -pubout输出到屏幕
 
-- /dev/random：仅从熵(shang1)池返回随机数；随机数用尽，阻塞(se4)；
-- /dev/urandom：从熵池返回随机数；随机数用尽，会利用软件生成伪随机数，非阻塞
+### Linux系统上的随机数生成器
+
+- `/dev/random`：仅从熵(shang1)池返回随机数；随机数用尽，阻塞(se4)；
+- `/dev/urandom`：从熵池返回随机数；随机数用尽，会利用软件生成伪随机数，非阻塞
   - 伪随机数不安全
 
-## 熵池中随机数的来源
+#### 熵池中随机数的来源
 
-- 硬盘IO中断时间间隔
-- 键盘IO中断时间间隔
+> 剪切随机数
+
+- 硬盘 IO 中断时间间隔
+- 键盘 IO 中断时间间隔
 
 ## CA
 
@@ -353,25 +477,59 @@ CA 查看调差 Eve 是否是 Alice
 ### 建立私有CA
 
 - openssl（测试CA）
-- OpenCA(开源，企业级,银行等私有CA)
+- OpenCA(开源，企业级,银行等私有CA, 对openssl进行二次封装)
 
 ### openssl命令
 
-- 配置文件：`# cat /etc/pki/tls/openssl.conf`
+#### 配置文件
+
+``` SHELL
+# vim /etc/pki/tls/openssl.conf
+[ ca ]
+default_ca = CA_default # The default ca section
+
+[CA_default]
+dir = /etc/pki/CA # CA 工作目录
+certs = $dir/certs # 已经签发的整数目录
+crl_dir = $dir/crl # 吊销的列表目录
+database = $dir/index.txt # 数据库文件，已经版发过的索引
+
+new_cers_dir = $ir/newcerts
+certificate = $ir/cacert.pem # CA 的自签证书（CA自己给自己签发证书）
+serial = $dir/serial # 下一个证书的序列号：第一次办法序列号为1，下一次办法变为2，为每一个证书提供序列号
+crlnumber = $dir/crlnumber
+
+crl = $dir/crl.pem
+private_key = $dir/private/cakey.pem # CA 自己的私钥
+RANDFILE = $dir/private/.rand
+
+x509_extenions = usr_cert
+
+name_opt = ca_default
+cert_opt = ca_default
+
+default_days = 365 # 证书的默认有效期
+default_crl_days = 30 # 吊销默认有效期
+default_md = sha256 # morn消息摘要算法
+
+# 向证书签发机构请求签发证书请求
+[ req ]
+
+```
 
 ### 构建私有CA(172.16.7.1)
 
->在确定配置为CA的服务器上生成一个自签证书，并为CA提供所需要的目录及文件即可
+#### 在确定配置为CA的服务器上生成一个自签证书，并为CA提供所需要的目录及文件即可
 
-### 1.生成私钥
+1. 生成CA私钥
 
 ``` shell
-# ls /etc/pki/CA/private/
-# (umask 077; openssl genrsa -out /etc/pki/CA/private/cakey.pem 4096
-# ls -l /etc/pki/CA/private/
+~]# ls /etc/pki/CA/private/
+~]# (umask 077; openssl genrsa -out /etc/pki/CA/private/cakey.pem 4096
+~]# cat /etc/pki/CA/private/cakey.pem
 ```
 
-### 2.生成自签证书
+2. 生成自签证书
 
 ``` shell
 ~]# openssl req -new -x509 -key /etc/pki/CA/private/cakey.pem -out /etc/pki/CA/cacert.pem -days 3655
@@ -379,18 +537,18 @@ CA 查看调差 Eve 是否是 Alice
 
 req：证书请求
 -new：生成新证书签署请求
--x509：生成自签格式证书，专用于创建私有CA时；
+-x509：生成自签格式证书，专用于创建私有CA时，自签自请求
 -key：生成请求时用到的私有文件路径
--out：生成请求文件路径；如果自签操作将直接生成签署过的证书；
--days：证书的有效时长，单位是day
+-out：生成请求文件路径；如果自签操作将直接生成签署过的证书
+-days：证书的有效时长，单位是day, 默认365
 
-Country Name(2 letter code) [XX]: CN
-State of Province Name(full name): Beijing
-Locality Name.................: Beijing
-Organization Name().....: lingyima
-Organizational Unit Name...: Ops
-Common Name: ca.lingyima.com
-Email: lingyima@qq.com
+Country Name(2 letter code) [XX] 国家: CN
+State of Province Name(full name)省: Beijing
+Locality Name.................城市: Beijing
+Organization Name()(eg,company)公司名: wovrt
+Organizational Unit Name...部门名: Ops
+Common Name 主机名: ca.wovert.com
+Email 管理员邮箱: wovert@126.com
 
 ~]# ls -l /etc/pki/CA
 
@@ -398,7 +556,7 @@ cacert.pem
 目录：certs crl mewcerts private
 ```
 
-###　３.为CA提供所需的目录及文件
+3. 为 CA 提供所需的目录及文件
 
 ``` shell
 # mkdir -pv /etc/pki/CA/{certs,crl,newcerts}
@@ -406,101 +564,122 @@ cacert.pem
 # echo 01 > /etc/pki/CA/serial` 序列号
 ```
 
-### 要用到证书进行安全通信的服务器，需要向CA请求签署证书(172.16.7.1)
+#### 某服务器要用到证书进行安全通信的服务器，需要向CA(172.16.7.1)请求签署证书
 
-> server: 172.16.7.0
+- 某Web服务器主机: 172.16.7.0
 
 ``` shell
-~]# cd /etc/httpd
-~]# mkdir ssl
-~]# cd ssl
-~]# (umask 077; openssl genrsa -out httpd.key 2048)
-~]# openssl req -new -key httpd.key -out httpd.csr -days 365
+[172.16.7.0 ~]# cd /etc/httpd
+[172.16.7.0 ~]# mkdir ssl
+[172.16.7.0 ~]# cd ssl
+[172.16.7.0 ~]# (umask 077; openssl genrsa -out httpd.key 2048)
+[172.16.7.0 ~]# openssl req -new -key httpd.key -out httpd.csr -days 365
 csr: certificate signature request
 
 CN
 Beijing
 Beijing
-lingyima
+wovert
 Ops
-www.yinglima.com
-webmaster@lingyima.com
+www.wovert.com
+webmaster@wovert.com
 
-httpd.csr：证书签署请求
-~]# scp httpd.csc root@172.16.100.67:/tmp/`
-
-CA验证
-~]# openssl ca -in /tmp/httpd.csr -out /etc/pki/CA/certs/httpd.crt -days 365
+# 向 CA 主机发送 httpd.scr 文件
+[172.16.7.0 ~]# scp httpd.csr root@172.16.7.1:/tmp/`
 ```
 
 - CA主机(172.16.7.1)
 
 ``` SHELL
-~]# touch /etc/pki/CA/{serial,index.txt}
-~]# echo 01 > /etc/pki/CA/serial
-~]# openssl ca -in /tmp/httpd.csr -out /etc/pki/CA/certs/httpd.crt -days 365
-~]# cd /etc/pki/CA
-~]# cat index.txt
-~]# scp certs/httpd.crt root@171.16.7.0:/etc/httpd/ssl/
+[172.16.7.1 ~]# touch /etc/pki/CA/{serial,index.txt}
+[172.16.7.1 ~]# echo 01 > /etc/pki/CA/serial
+# 证书签署请求 CA验证
+[172.16.7.1 ~]# openssl ca -in /tmp/httpd.csr -out /etc/pki/CA/certs/httpd.crt -days 365
+[172.16.7.1 ~]# cd /etc/pki/CA
+[172.16.7.1 ~]# cat index.txt
+
+# 证书发给请求者
+[172.16.7.1 ~]# scp certs/httpd.crt root@171.16.7.0:/etc/httpd/ssl/
+
 ```
 
-- 删除服务器上：http.csr文件
+#### 删除http.csr文件
 
-## httpd的为例
+``` shell
+[172.16.7.1 ~]# rm -rf /tmp/httpd.csr
+[172.16.7.0 ~]# rm -rf /etc/httpd/ssl/httpd.csr
+```
 
-### 1.用到证书的主机生成证书签署请求：
+### httpd的为例
+
+#### 1.用到证书的主机生成证书签署请求
 
 ``` SHELL
-~]# mkdir /etc/httpd/ssl
-~]# cd /etc/httpd/ssl
-~]# (umask 077; openssl genrsa -out /etc/httpd/ssl/httpd.key 2048
+[HOST]# mkdir /etc/httpd/ssl
+[HOST]# cd /etc/httpd/ssl
+[HOST]# (umask 077; openssl genrsa -out /etc/httpd/ssl/httpd.key 2048
 ```
 
-### 2.生成证书签署请求
+#### 2.生成证书签署请求
 
 ``` SHELL
-~]# openssl req -new -key /etc/httpd/ssl/httpd.key -out /etc/httpd/ssl/httpd.csr -days 365
+[HOST]# openssl req -new -key /etc/httpd/ssl/httpd.key -out /etc/httpd/ssl/httpd.csr -days 365
 ```
 
-### 3.将请求通过可靠方式发送给CA主机；
+#### 3.将请求通过可靠方式发送给CA主机；
 
 ``` SHELL
-~]# scp /etc/httpd/ssl/httpd.csr root@172.16.100.67:/tmp/
+[HOST]# scp /etc/httpd/ssl/httpd.csr root@172.16.100.67:/tmp/
 ```
 
-### 4.在CA主机上签署证书
+#### 4.在CA主机上签署证书(CA主机上操作)
 
 ``` SHELL
-~]# openssl ca -in /tmp/httpd.csr -out /etc/pki/CA/certs/httpd.crt -days 365
+[CA]# openssl ca -in /tmp/httpd.csr -out /etc/pki/CA/certs/httpd.crt -days 365
 ```
 
-- 查看证书中的信息：`# openssl x509 -in /etc/pki/CA/certs/httpd.crt -noout -serial -subject`
+- 查看证书中的信息：
 
-## 吊销证书：步骤(CA主机上执行)
+``` SHELL
+[CA]# openssl x509 -in /etc/pki/CA/certs/httpd.crt -noout -serial -subject`
+```
 
-### 1.客户端获取要吊销的证书的serial(使用证书的主机执行)：
+### 吊销证书：步骤
 
-`# openssl x509 -in /etc/pki/CA/certs/httpd.crt -noout -serial -subject`
+#### 1.客户端获取要吊销的证书的serial(使用证书的主机执行)：
 
-### 2.CA主机吊销证书
+```SHELL
+[ca]# openssl x509 -in /etc/pki/CA/certs/httpd.crt -noout -serial -subject`
+```
 
->先根据客户提交的serial和subject信息，对比其本机数据库index.txt中存储的是否一致；
+#### 2.CA主机吊销证书
+
+先根据客户提交的serial和subject信息，对比其本机数据库index.txt中存储的是否一致；
 
 - 吊销：
 
-`# openssl ca -revoke /etc/pki/CA/newcerts/SERIAL.pem`
-其中的SERIAL要换成证书真正的序列号
+``` SHELL
+[ca]# openssl ca -revoke /etc/pki/CA/newcerts/SERIAL.pem
+SERIAL.pem => newcerts/01.pem 其中的SERIAL要换成证书真正的序列号
+```
 
-### 3.生成吊销证书的吊销编号（第一次吊销证书时执行）
+#### 3.生成吊销证书的吊销编号（第一次吊销证书时执行）
 
-`# echo 01 > /etc/pki/CA/crinumber`
+``` SHELL
+#证书吊销列表序列号
+[ca]# echo 01 > /etc/pki/CA/crinumber
+```
 
-### 4.更新证书吊销列表
+#### 4.更新证书吊销列表
 
-`# openssl ca -gencrl -out thisca.crl`
+``` SHELL
+[ca]# openssl ca -gencrl -out [thisca.crl]
+```
 
-- 查看crl文件：
+#### 查看crl文件
 
-`# openssl crl -in /PATH/FROM/CRL_FILE.crl -noout -text`
+``` SHELL
+[ca]# openssl crl -in /PATH/FROM/CRL_FILE.crl -noout -text
+```
 
-博客作业：加密解密技术基础、PKI及创建私有CA
+## 博客作业：加密解密技术基础、PKI及创建私有CA

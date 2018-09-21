@@ -13,6 +13,7 @@
 - GWS-Google
 
 ## HTTP请求
+
 - Request
   - 请求行
   - 请求头
@@ -24,7 +25,6 @@
 
 - curl -v https://lingyima.com
   - -v: 显示 request/response
-
 
 ## I/O模型
 
@@ -56,7 +56,6 @@
 
 - 阻塞：block（挂起）：调用结果返回之前，调用者会被挂起（暂停），一直等待消息通知，不能执行其他任务的状态。只有被调用者成功返回消息时，调用者才会被唤醒，并继续完成任务。
 - 非阻塞：nonblock（活动）：调用结果返回之前，调用者不会被挂起
-
 
 - 阻塞：调用者挂起（在面馆点菜，被冷冻不能做其他行为）
 - 非阻塞：调用者继续执行其他任务（在面馆点菜，继续玩儿游戏）
@@ -324,14 +323,14 @@ pm.max_spare_servers=最大空闲进程数
 综合以上，确定是同时到达80端口的tcp 建立链接的请求过多， 服务器没有及时响应。
 
 问题处理：
+
 1. 对于服务器不能及时处理建立链接的请求，可能是系统中队列设置过小。
 `/proc/sys/net/ipv4/tcp_max_syn_backlog`  中的值已经修改， 这个不是系统的瓶颈。
+
 2. nginx监听80端口限制。
 经查阅，发现nginx的listen 命令有参数backlog 用来指定队列大小。 而nginx 默认的值为511， 这就验证了SYN_RECV状态到500左右就会出现问题了。
 
 修改 nginx 配置， 将backlog 参数改大， 重启nginx 。 一切正常
-
-
 
 ## Nginx 信号控制
 
@@ -345,6 +344,7 @@ pm.max_spare_servers=最大空闲进程数
 - WINCH: 优雅关闭旧的进程（配合USR2来进行升级）
 
 ## nginx 服务
+
 - /usr/local/nginx/
   - conf 配置文件
   - html 网页文件
@@ -390,6 +390,7 @@ pm.max_spare_servers=最大空闲进程数
 - mail { ... }：mail 相关的配置
 
 - http相关的配置
+
 ``` nginx.conf
 http {
   ...
@@ -417,25 +418,27 @@ http {
 
 ---
 
-```
+``` config
 user USERNAME [GROUPNAME];
 ```
+
 > 指定用于运行 worker 进程的用户和组
 
 `user nginx nginx;`
 
 ---
 
-```
+``` config
 pid /PATH/TO/PID_FILE;
 ```
+
 > 指定nginx进程pid文件路径
 
 pid /var/run/nginx.pid;
 
 ---
 
-```
+``` config
 worker_rlimit_nofile number;
 ```
 
@@ -452,6 +455,7 @@ worker_rlimit_nofile number;
 ```
 
 配置文件中修改可打开的文件数
+
 ``` shell
 ~]# vim /etc/security/limits.conf
   soft nofile 65535 默认：默认可打开文件数
@@ -466,7 +470,7 @@ worker_rlimit_nofile number;
 
 ---
 
-```
+``` config
 worker_process number | auto;
 ```
 
@@ -495,9 +499,10 @@ Nginx进程平均耗费10M-12M内存
 
 ---
 
-```
+``` config
 worker_cpu_affinity cpumask ...;
 ```
+
 > Nginx 绑定具体 CPU
 
 - worker_cpu_affinity auto [cpumask];
@@ -507,7 +512,7 @@ worker_cpu_affinity cpumask ...;
 - 0000 0100：第2颗
 - 0000 1000：第3颗
 
-```
+``` config
 worker_processes 2;
 worker_cpu_affinity 0010 0100; 第1个和第2个颗
 ~]# ps axo command,pid,psr
@@ -515,12 +520,13 @@ worker_cpu_affinity 0010 0100; 第1个和第2个颗
 
 ---
 
-```
+``` config
 worker_priority number;
 ```
+
 > 进程优先级: [-20,19] 100-139
 
-```
+``` config
 worker_priority -5;
 ~]# ps axo command,pid,psr,ni
 ```
@@ -529,21 +535,23 @@ worker_priority -5;
 
 #### 调式、定位问题
 
-```
+``` config
 daemon on | off;
 ```
+
 > 是否守护进程方式启动nginx进程；默认on; 调试时 off，前台查看信息
 
 ---
 
-```
+``` config
 master_process on | off;
 ```
+
 > 正常：是否以`master/worker`模型启动nginx进程; 调试：off
 
 ---
 
-```
+``` config
 error_log file | stderr | syslog:server=address[,parameters=value] | memory:size [debug | info | notice |warn | error | crit | alert | emerg];
 ```
 
@@ -564,7 +572,7 @@ error_log file | stderr | syslog:server=address[,parameters=value] | memory:size
 
 ---
 
-```
+``` config
 worker_connections number;
 ```
 
@@ -575,23 +583,26 @@ worker_connections number;
 
 ---
 
-```
+``` config
 use method;
 ```
+
 > 并发请求处理时使用的方法: `use epoll;`
 
 ---
 
-```
+``` config
 accept_mutex on(default) 或 off;
 ```
+
 > 启用时，表示用于让多个`worker`进程轮流的、序列化的响应新请求
 
 ---
 
-```
+``` config
 lock_file logs/nginx.lock;
 ```
+
 ---
 
 ### http 配置
@@ -599,7 +610,8 @@ lock_file logs/nginx.lock;
 #### 定义套接字相关功能
 
 - 配置一个虚拟主机
-```
+
+``` config
 server {
   listen PORT;
   server_name HOSTNAME;
@@ -636,17 +648,22 @@ server {
 4. 正则表达式模式(`~`)匹配
 
 1. `server_name www.lingyima.com;`s
+
 2. `server_name *.lingyima.com`
+
 3. `server_name www.lingyi.*;`
+
 4. `server_name ~^.*\.lingyima\..*$;`
+
 5. `mail.lingyima.com, www.lingyima.com`
 
 ---
 
-```
+``` config
 tcp_nodelay on | off;
 默认 on(告诉服务器直接发送请求数据，不要延迟)
 ```
+
 - 对 **keepalived** 模式下的连接是否启用 TCP_NODELAY 选项；
 - off: 服务器将小数据多个报文合并起来发送一个，web客户端影响速率(请求小图片，服务器等待第二个数据报文一起发送，客户端得不到图片)
 - on: 服务器不等待合并报文，直接发送小报文
@@ -654,30 +671,31 @@ tcp_nodelay on | off;
 
 ---
 
-```
+``` config
 tcp_nopush on | off; 默认 off
 sendfile 启用下才会生效
 ```
 
-
 ---
 
-```
+``` config
 sendfile on | off;
 ```
 
 - 是否启用sendfile功能，默认off
 - on: 在内核中直接包装响应报文给内存，不用往用户空间返回
 - 推荐：on
+
 ---
 
 #### 定义路径相关配置
 
 ---
 
-```
+``` config
 root path;
 ```
+
 > 设置web资源路径映射；
 
 用于指明用户请求的URL所对应的本地文件系统上的文档所在目录路径
@@ -695,9 +713,10 @@ Context: `http,server,location,if in location`
 
 ---
 
-```
+``` config
 location [ = | ~ | ~* | ^~] uri {...}
 ```
+
 > 根据用户请求的 URI 来匹配定义的 location，匹配到时，此请求将被相应的 location 块中的指令所处理
 
 `location @name {...}`
@@ -725,13 +744,13 @@ location [ = | ~ | ~* | ^~] uri {...}
 
 ---
 
-```
+``` config
 alias path;
 ```
 
 > 定义路径别名，文档映射的一种机制；仅能用于location上下文
 
-```
+``` config
 location /i/ {
   alias /web/v2/images/;
 }
@@ -744,7 +763,7 @@ http://fqdn.com/i/a.jpg => /web/v2/images/a.jpg
 
 ---
 
-```
+``` config
 index file ...
 ```
 
@@ -754,7 +773,7 @@ index file ...
 
 ---
 
-```
+``` config
 error_page code ... [=response] uri;
 ```
 
@@ -772,9 +791,10 @@ error_page code ... [=response] uri;
 
 ---
 
-```
+``` config
 try_files file ... uri;
 ```
+
 > try_files file 尝试访问没有文件，则显示最后一个文件内容
 
 - Context: server, location
@@ -797,7 +817,7 @@ location /test/ {
 
 ### 定义客户端请求的相关配置
 
-```
+``` config
 keepalive_timeout timeout [header_timeout];
 ```
 
@@ -807,7 +827,7 @@ keepalive_timeout timeout [header_timeout];
 
 ---
 
-```
+``` config
 keepalive_requests number;
 ```
 
@@ -815,7 +835,7 @@ keepalive_requests number;
 
 ---
 
-```
+``` config
 keepalive_disable none | browser ...;
 ```
 
@@ -823,7 +843,7 @@ keepalive_disable none | browser ...;
 
 ---
 
-```
+``` config
 send_timeout time;
 ```
 
@@ -831,7 +851,7 @@ send_timeout time;
 
 ---
 
-```
+``` config
 client_body_buffer_size size;
 ```
 
@@ -839,7 +859,7 @@ client_body_buffer_size size;
 
 ---
 
-```
+``` config
 client_body_temp_path path [level1 [ level2 [level3]]]
 ```
 
@@ -853,7 +873,7 @@ client_body_temp_path path [level1 [ level2 [level3]]]
 
 ### 对客户端请求进行限制的相关配置
 
-```
+``` config
 Syntax: limit_rate rate;
 Context: http, server, location, if in location
 ```
@@ -875,14 +895,14 @@ Context: http, server, location, if in location
 
 ---
 
-```
+``` config
 Syntax: limit_except method ... {...}
 Context: http,server,location if in location
 ```
 
 > 限制对指定的请求方法之外的其他方法的使用客户端
 
-```
+``` config
 # 表示除了GET和POST之外的其他方法仅允许192.168.1.0/32中主机使用
 limit_except GET POST {
   allow 192.168.1.0/32;
@@ -899,7 +919,7 @@ limit_except GET POST {
 
 ### 文件操作优化的配置
 
-```
+``` config
 Syntax: aio on | off | threads[=pool]多少个线程;
 Default: aio off;
 Context: http, server, location
@@ -909,7 +929,7 @@ Context: http, server, location
 
 ---
 
-```
+``` config
 Syntax: directio size | off;
 Default: directio off;
 ```
@@ -918,7 +938,7 @@ Default: directio off;
 
 ---
 
-```
+``` config
 Syntax: open_file_cache max=N [inactive=time];
 Default: open_file_cache off;
 Context: http, server, location
@@ -937,7 +957,7 @@ Context: http, server, location
 
 ---
 
-```
+``` config
 Syntax: open_file_cache_errors on | off;
 Default: open_file_cache_errors off;
 Context: http, server, location
@@ -947,7 +967,7 @@ Context: http, server, location
 
 ---
 
-```
+``` config
 Syntax: open_file_cache_min_uses number;
 Default: open_file_cache_min_uses 1;
 Context: http, server, location
@@ -957,7 +977,7 @@ Context: http, server, location
 
 ---
 
-```
+``` config
 Syntax: open_file_cache_valid time;
 Default: open_file_cache_valid 60s;
 Context: http, server, location
@@ -980,7 +1000,7 @@ Context: http, server, location
   - 结合 geo 模块
   - http 自定义变量传递
 
-```
+``` config
 Syntax: allow address | CIDR | unix: | all;
 Context: http, server, location, limit_except
 
@@ -991,7 +1011,7 @@ Context: http, server, location, limit_except
 
 ---
 
-```
+``` config
 Syntax: deny address | CIDR | unix: | all;
 Context: http, server, location, limit_except
 ```
@@ -1002,7 +1022,7 @@ Context: http, server, location, limit_except
 
 > 实现基于用户的信任登录访问控制功能
 
-```
+``` config
 Syntax: auth_basic string | off;
 Default: auth_basic off;
 Context: http,server,location,limit_except;
@@ -1010,7 +1030,7 @@ Context: http,server,location,limit_except;
 
 > 使用basic机制进行用户认证
 
-```
+``` config
 location / {
   auth_basic "closed site";
   auth_basic_user_file conf/htpasswd;
@@ -1018,17 +1038,16 @@ location / {
 
 ```
 
-```
+``` config
 # comment
 name1:password1
 name2:password2:comment
 name3:password3
 ```
 
-
 ---
 
-```
+``` config
 auth_basic_user_file file
 ```
 
@@ -1049,6 +1068,7 @@ auth_basic_user_file file
 ```
 
 认证
+
 ``` config
 location /admin/ {
   auth_basic "Admin Area";
@@ -1066,17 +1086,17 @@ location /admin/ {
 
 > 用于输出 nginx 的基本状态信息（脚本获取状态信息）
 
-```
+``` config
 Syntax: stub_status;
 Default: --
 Context: server, location
 ```
 
-```
+``` config
 stub_status
 ```
 
-```
+``` config
 location /status {
   stub_status;
 }
@@ -1107,7 +1127,7 @@ location /status {
 
 > 目录中选择一个随机主页
 
-```
+``` config
 Syntax: random_index on | off;
 Default: random_index off;
 Context: location

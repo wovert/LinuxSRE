@@ -151,9 +151,9 @@ a patchy(补丁) server = apache
 
 `~]# cd /etc/httpd/conf/ && cp -v httpd.conf{,.backup}` 备份主配置文件
 
-#### 1. 修改监听的 IP 和 PORT: 
+#### 1. 修改监听的 IP 和 PORT
 
-> `Listen [IP:]PORT`
+> `Listen [IP:]PORT` IP 可以省略可以监听本机所有网卡端口
 
 - 省略 IP 表示为 0.0.0.0 (本机正常使用的所有 IP)
 - `Listen` 指令可重复出现多次，监听多个端口
@@ -174,9 +174,10 @@ a patchy(补丁) server = apache
 - 折衷：使用较短的持久连接时长，以及较少的请求数量
   - `KeepAlive On|Off` 默认是 Off
   - `KeepAliveTimeout 15` 长连接持续时间
-  - `MaxKeepAliveRequests	100` 最多请求资源数量，超出这个数量限制自动断开连接
+  - `MaxKeepAliveRequests 100` 最多请求资源数量，超出这个数量限制自动断开连接
 
-- 模拟请求资源测试长连接：
+- 模拟请求资源测试长连接
+
 ``` shell
 telnet 连接请求资源
 ~]# telnet 172.16.100.6 80
@@ -225,7 +226,8 @@ Enter
 - 在限定时长内最多可以请求多少个连接，不包括第一个连接，总共可以连接100+1
 
 - 客户端模拟请求：时间过期和最大请求数
-```
+
+``` shell
 ~]# yum -y install telent
 ~]# telnet 192.168.1.61 80
 GET /test.html HTTP/1.1
@@ -255,6 +257,7 @@ Host: 192.168.1.61
   - 查看静态编译及动态编译的模块：`# /usr/sbin/httpd -M`
 
 - 更换使用httpd程序，以支持其他 MPM 机制
+
 ``` shell
 ~]# service httpd stop
 ~]# vim /etc/sysconfig/httpd 默认使用prefork
@@ -262,7 +265,8 @@ Host: 192.168.1.61
 ~]# service restart stop
 ```
 
-- 脚本配置文件：
+- 脚本配置文件
+
 ``` shell
 ~]# vim /tmp/useradd.conf`
   username=myuser`
@@ -277,6 +281,7 @@ Host: 192.168.1.61
 ##### MPM配置
 
 - prefork配置
+
 ``` prefork.conf
 <IfModule prefork.c>
   StartServers 8 服务进程启动时子进程数量
@@ -298,6 +303,7 @@ prefork 是 select IO 模型(1024并发)
 - UV: User View 用户浏览量
 
 - worker配置
+
 ``` worker.conf
 <IfModule worker.c>
   StartServers 4 服务启动时子进程数量
@@ -337,6 +343,9 @@ B shell 运行
   logs -> ../../var/log/httpd
   modules -> ../../usr/lib64/httpd/modules
   run -> ../../var/run/htpd
+
+~]# httpd -M 编译进去的静态模块和动态装载模块
+~]# httpd -l 编译进去的静态模块
 ```
 
 #### 5. 定义 Main Server（中心主机）的文档页面路径
@@ -373,6 +382,7 @@ B shell 运行
 1. 文件系统路径
 
 所有目录及其子目录
+
 ``` config
 <Directory "">
   ...
@@ -411,7 +421,7 @@ B shell 运行
 
 ---
 
-##### <Directory> 中"基于源地址"实现访问控制
+##### `<Directory>` 中"基于源地址"实现访问控制
 
 1. `Options`: 后跟 1 个或多个以空白字符分隔的选项列表
 - `Indexes`：指明的 URL 路径下不存在与定义的主页面资源相符的资源文件时，返回索引列表给用户；推荐不使用
@@ -498,8 +508,8 @@ Allow from 172.16
 
 > 日志类型：访问日志和错误日志
 
-
 **错误日志**：`ErrorLog` 指令（进程运行错误、用户访问错误页面）
+
 ``` log
 ErrorLog logs/error_log (logs 相对于ServerRoot => /etc/httpd)
 LogLevel warn 日志级别
@@ -507,6 +517,7 @@ LogLevel warn 日志级别
 ```
 
 **访问日志**：`CustomLog` 指令（用户访问页面）
+
 ``` log
 组合日志格式
 LogFormat %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
@@ -532,20 +543,23 @@ CustomLog logs/access_log combined
 - **%{User-Agent}i** ：请求报文中首部 User-Agent的值；发出**请求的应用程序**
 
 #### 10. 基于用户的访问控制
+
 - 认证方式：
   - 表单认证(form+db)
   - http 协议认证(http)
 
-1.认证质询：
-  - WWW-Authenticate：响应码为 401，拒绝客户端请求，并说明要求客户端提供账号和密码
+1. 认证质询：
 
-2.认证：
-  - Authorization：客户端用户填入账号和密码后再次发送请求报文；认证通过时，则服务器发送响应的资源；
+- WWW-Authenticate：响应码为 401，拒绝客户端请求，并说明要求客户端提供账号和密码
+
+2. 认证：
+
+- Authorization：客户端用户填入账号和密码后再次发送请求报文；认证通过时，则服务器发送响应的资源；
   - 认证方式有两种：
     - basic：明文
     - digest: 信息摘要(摘要认证)（很多浏览器可能不支持）
 
-3.安全域：需要用户认证后方能访问的路径；应该通过名称对其进行标识，以便于告知用户认证的原因；
+3. 安全域：需要用户认证后方能访问的路径；应该通过名称对其进行标识，以便于告知用户认证的原因；
 
 - 用户的账号和密码存放于何处？
   - 虚拟账号：仅用于访问某服务时用到的认证标识
@@ -846,8 +860,10 @@ Group apache
 - rpm安装：apache
 - 编译安装：daemon
 
-`suid`
-`SUexec`
+``` config
+suid
+SUexec
+```
 
 #### 15. mod_deflate
 
@@ -858,13 +874,11 @@ Group apache
 1. 节约带宽，额外消耗 CPU；同时，可能有些叫老浏览器不支持
 2. 压缩适于压缩的资源，**文本文件**
 
-``` config
+``` shell
 输出过滤器
-
 SetOutputFilter DEFLATE
 
 # mod_deflat configuration
-
 # Restrict compression to these MIME types
 AddOutputFilterByType DEFLATE text/plain
 AddOutputFilterByType DEFLATE text/html
@@ -889,7 +903,7 @@ BrowserMatch \bMSI[E] !no-gzip !gzip-only-text/html
 Content-Encoding: gzip
 ```
 
-``` http
+``` shell
 # vim httpd.conf
   # Defalt
   SetOutputFilter DEFLATE
@@ -961,7 +975,7 @@ Content-Encoding: gzip
 
 3. 测试基于https访问相应的主机
 
-``` command
+``` shell
 openssl s_client [-connect host:port] [-cert filename] [-CApath directory] [-CAfile filename]
 ```
 
@@ -1076,7 +1090,7 @@ https://172.16.100.6
 
 ## httpd 自带的工具程序
 
-``` tools
+``` shell
 htpasswd: basic 认证基于文件实现时，用到的账号密码文件生成工具；
 apachectl: httpd 自带的服务控制脚本，支持 start 和 stop, gracefulll；
 apxs: 有 httpd-devel 包提供，扩展 httpd 使用第三方模块的工具；
@@ -1105,16 +1119,16 @@ ab [OPTIONS] URL
 
 - Time per request : 并发100个请求所花费时间
 - Time per request : 请求1个所花费的时间
-- Connect: 客户端连接服务器时间
-- Processing: 服务器接收请求并处理时间
-- Waiting: 服务器响应给位客户端所花费时间
+- Connect: 客户端连接服务器时间(服务器进程数量))
+- Processing: 服务器接收请求并处理时间(服务器处理应用时间)
+- Waiting: 服务器响应给位客户端所花费时间(服务器带宽)
 
 ## httpd-2.4 的常用配置
 
-### New features
+### [httpd-2.4 New features](https://httpd.apache.org/docs/2.4/new_features_2_4.html)
 
-1. Run-time Loadable MPMs: MPM 支持运行为 DSO 机制；以模块形式按需加载；
-2. Event MPM 生产环境可用
+1. Run-time Loadable MPMs: MPM 支持运行为 DSO 机制；以模块形式按需加载
+2. Event MPM(网络IO) 生产环境可用
 3. Asynchronous support: 异步读写功能
 4. Per-module and per-directory LogLevel configuration: 支持每模块及每目录的单独日志级别定义
 5. Per-request configuration sections: 每请求相关的专用配置
@@ -1129,12 +1143,12 @@ ab [OPTIONS] URL
 
 1. mod_proxy_fcgi(驱动 fastCGI 库)
 2. mod_proxy_scgi (Python)
-3. mod_remoteip(取消 allow/deny，替换新的机制))
+3. mod_remoteip(给予远程访问IP控制，取消了 allow/deny机制，替换新的机制))
 
 ### 安装 httpd-2.4
 
-- httpd-2.4 依赖于`apr-1.4+, apr-util-1.4+, [apr-iconv]`
-- apr: apache portable runtime : apache可运行环境
+- httpd-2.4 依赖于 `apr-1.4+, apr-util-1.4+, [apr-iconv]`
+- `apr`: apache portable runtime : apache可运行环境
 
 #### CentOS 6 下安装 httpd-2.4
 
@@ -1187,6 +1201,20 @@ apr-util 依赖 apr-1.4
 --with-apr-util=/usr/local/apr-util \
 
 # make -j 4 && make install
+
+
+--enable-so               启用DSO机制
+--enable-ssl              启用SSL功能
+--enable-cgi              启用CGI
+--enable-rewrite          启用重写机制
+--enable-modules=most     启用哪些模块，most是常用模块
+--enable-mpms-shared=all  哪些MPM模块编译
+--sysconfdir=/etc/httpd24 配置文件目录
+--with-mpm=prefork        默认运行mpm模块
+--with-zlib         依赖zlib程序库
+--with-pcre         依赖perl正则表达式
+--with-apr=/usr/local/apr
+--with-apr-util=/usr/local/apr-util
 ```
 
 - apr-1.5.0.tar.bz2
@@ -1331,6 +1359,35 @@ worker,event是基于线程模型
   LoadModule mpm_event_module modules/mod_mpm_event.so
 # systemctl restart httpd.service
 # httpd -M
+# mkdir /apps/www/htdocs -pv
+# vim /apps/www/htdocs/index.html
+# pwd
+# vim /etc/httpd/conf/httpd.conf
+# cd conf
+# cp httpd.conf{,.bak}
+# vim httpd.conf
+# systemctl reload httpd.service
+# cd ../conf.d/
+# ls
+# mv welcome.conf welcome.conf.bak
+# systemctl reload httpd.service
+# cd ../conf
+# vim httpd.conf
+  DocumentRoot "/apps/www/htdocs"
+
+  #示例：所有主机访问, 禁用Indexes
+  <Directory "/apps/www/htdocs">
+    Options -Indexes FollowSymLinks
+    Require all granted
+
+    #所有主机访问，除了172.16.100.2
+    <RequireAll>
+      Require all granted
+      Require not ip 172.16.100.2
+    </RequireAll>
+  </Directory>
+
+# httpd -t
 ```
 
 2. 基于 IP 人访问控制
@@ -1352,29 +1409,12 @@ worker,event是基于线程模型
   - FQDN：特定主机
   - Domain.tid：指定域名下的所有主机
 
-示例：所有主机访问, 禁用Indexes
-
-``` shell
-<Directory "/apps/www/htdocs">
-  Options -Indexes FollowSymLinks
-  Require all granted
-</Directory>
-```
-
-所有主机访问，除了172.16.100.2
-
-``` shell
-<RequireAll>
-  Require all granted
-  Require not ip 172.16.100.2
-</RequireAll>
-```
-
 3. 虚拟主机
 
 基于 FQDN 的虚拟主机不再需要设置 NameVirtualHost 指令
 
-``` config
+``` shell
+# vim httpd.conf
 <VirtualHost *:80>
   ServerName www.a.com
   DocumentRoot "/apps/www/htdocs"
@@ -1393,6 +1433,7 @@ worker,event是基于线程模型
 默认虚拟主机设置：
 
 ``` shell
+# vim httpd.conf
 <VirtualHost _default_:80>
   ServerName _default_
   DocumentRoot "/apps/default/htdocs"
@@ -1413,10 +1454,11 @@ worker,event是基于线程模型
 
 5. 毫秒级持久连接时长
 
-``` config
-KeepAlive on
-KeepAliveTimeout 30ms
-MaxKeepAliveRequests 20
+``` shell
+# vim httpd.conf
+  KeepAlive on
+  KeepAliveTimeout 30ms
+  MaxKeepAliveRequests 20
 ```
 
 ### 练习：分别使用 httpd-2.2 和 httpd-2.4 实现
@@ -1425,16 +1467,16 @@ MaxKeepAliveRequests 20
 
 1.1 提供两个基于名称的虚拟主机
 
-www1.stuX.com，页面文件目录为/web/vhosts/www1；错误日志为/var/log/httpd/www1/error_log，访问日志为/var/log/httpd/www1/access_log;
+`www1.stuX.com`，页面文件目录为`/web/vhosts/www1`；错误日志为`/var/log/httpd/www1/error_log`，访问日志为`/var/log/httpd/www1/access_log`;
 
-www2.stuX.com，页面文件目录为/web/vhosts/www2；错误日志为/var/log/httpd/www2/error_log，访问日志为/var/log/httpd/www2/access_log;
+`www2.stuX.com`，页面文件目录为`/web/vhosts/www2`；错误日志为`/var/log/httpd/www2/error_log`，访问日志为`/var/log/httpd/www2/access_log`;
 
-1.2 通过www1.stuX.com/server-status输出其状态信息，且要求只允许提供账号用户访问
+1.2 通过`www1.stuX.com/server-status`输出其状态信息，且要求只允许提供账号用户访问
 
-1.3 www1不允许192.168.1.0/24网络中的主机访问
+1.3 www1不允许`192.168.1.0/24`网络中的主机访问
 
-2. 上面的第2个虚拟主机提供https服务，使得用户可以通过https安全的访问此web站点
+2. 上面的第2个虚拟主机提供`https`服务，使得用户可以通过https安全的访问此web站点
 
 2.1 要求使用证书，证书中要求使用国家(CN), 州(Beijing), 城市(Beijing)，组织为(lingyima)
 
-2.2设置部分为 Ops，主机名为 www2.stux.com
+2.2 设置部分为 `Ops`，主机名为 `www2.stux.com`

@@ -21,51 +21,47 @@
 
 ## [Linux 系统管理](./system-management/)
 
-- [磁盘分区](./system-management/)
-- 文件系统管理工具
-- 程序包管理
-- RAID
-- LVM
-- 网络管理
-- 进程管理
-- 系统启动流程
-- 内核管理
-- 安装系统
+- [磁盘分区及文件系统管理工具](./system-management/disk-partition/)
+- [selinux安全](./system-management/selinux/)
+- [程序包管理](./system-management/package/)
+- [RAID](./system-management/raid/)
+- [LVM](./system-management/lvm/)
+- [网络管理](./system-management/network/)
+- [进程管理](./system-management/process/)
+- [系统启动流程](./system-management/startup/)
+- [内核管理](./system-management/kernel-module/)
+- [安装系统](./system-management/setup-system/)
+- [系统服务](./system-management/system-service/)
+  - [crontab](./system-management/system-service/crontab/)
+  - [selinux](./system-management/system-service/selinux/)  
+- [systemd](./system-management/systemd/)
 
-## SHELL 脚本编程
+## 应用服务管理
 
-## 系统服务管理
-
-- systemd
-- 任务计划
-- SELinux
-- OpenSSL
-- OpenSSH
-- DNS
-- IPTABLES
-- tcp wrapper
-- nss and pam
-
-## 服务安全及服务管理
-
-- File Server
-- FTP
-- NFS
-- SMB
-- Web Service
-  - Apache
-  - PHP
-  - Mariadb(Storage)
-  - Cache
-    - Memecache, varnish
-  - NoSQL(Cache)
-    - Redis
-    - MongoDB
-    - HBase
-  - tomcap
-  - session replication cluster
+- [OpenSSL](./application-service/openssl/)
 - [http](./application-service/http/)
 - [Nginx](./application-service/nginx/)
+- [DNS](./application-service/dns/)
+- OpenSSH(./application-service/openssh/)
+- IPTABLES(./application-service/iptables/)
+- tcp wrapper(./application-service/tcp-wrapper/)
+- nss and pam(./application-service/nss-pam/)
+- FTP(./application-service/ftp/)
+- NFS(./application-service/nfs/)
+- SAMBA(./application-service/samba/)
+- Web Service(./application-service/dns/)
+  - Apache(./application-service/dns/)
+  - PHP(./application-service/dns/)
+  - Mariadb(Storage)(./application-service/dns/)
+  - Cache(./application-service/dns/)
+    - Memecache, varnish(./application-service/dns/)
+  - NoSQL(Cache)
+    - Redis(./application-service/dns/)
+    - MongoDB(./application-service/dns/)
+    - HBase(./application-service/dns/)
+  - tomcap(./application-service/dns/)
+  - session replication cluster(./application-service/dns/)
+
 
 ## Cluster(集群)
 

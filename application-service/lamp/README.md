@@ -52,13 +52,13 @@ Zend Engine 1.0于1999年随PHP 4发布，由C语言开发且经过高度优化�
 
 Zend Engine的出现将PHP代码的处理过程分成了两个阶段：首先是分析PHP代码并将其转换为称作Zend opcode的二进制格式(类似Java的字节码)，并将其存储于内存中；第二阶段是使用Zend Engine去执行这些转换后的Opcode。
 
-### PHP的 Opcode
+### PHP Opcode
 
-> Opcode是一种PHP脚本编译后的中间语言，就像Java的ByteCode,或者.NET的MSL。PHP执行PHP脚本代码一般会经过如下4个步骤(确切的来说，应该是PHP的语言引擎Zend)：
+> Opcode 是一种 PHP 脚本编译后的中间语言，就像Java的ByteCode,或者.NET的MSL。PHP执行PHP脚本代码一般会经过如下4个步骤(确切的来说，应该是PHP的语言引擎Zend)：
 
 1. Scanning(Lexing) —— 将PHP代码转换为语言片段(Tokens)
 2. Parsing —— 将Tokens转换成简单而有意义的表达式
-3. Compilation —— 将表达式编译成Opocdes
+3. Compilation —— 将表达式编译成Opcodes
 4. Execution —— 顺次执行Opcodes，每次一条，从而实现PHP脚本的功能
 
 扫描-->分析-->编译-->执行
@@ -71,23 +71,23 @@ Zend Engine的出现将PHP代码的处理过程分成了两个阶段：首先是
 
 ##### APC (Alternative PHP Cache)
 
-> 遵循PHP License的开源框架，PHP opcode缓存加速器，目前的版本不适用于PHP 5.4。项目地址，http://pecl.php.net/package/APC。
+> 遵循PHP License的开源框架，PHP opcode缓存加速器，目前的版本不适用于PHP 5.4。项目地址，[APC](http://pecl.php.net/package/APC)
 
 ##### eAccelerator
 
-> 源于Turck MMCache，早期的版本包含了一个PHP encoder和PHP loader，目前encoder已经不在支持。项目地址， http://eaccelerator.net/。
+> 源于Turck MMCache，早期的版本包含了一个PHP encoder和PHP loader，目前encoder已经不在支持。项目地址， [eAccelerator](http://eaccelerator.net/)
 
 ##### XCache
 
-> 快速而且稳定的PHP opcode缓存，经过严格测试且被大量用于生产环境。项目地址，http://xcache.lighttpd.net/
+> 快速而且稳定的PHP opcode缓存，经过严格测试且被大量用于生产环境。项目地址，[XCache](http://xcache.lighttpd.net/)
 
 ##### Zend Optimizer and Zend Guard Loader
 
-> Zend Optimizer并非一个opcode加速器，它是由Zend Technologies为PHP5.2及以前的版本提供的一个免费、闭源的PHP扩展，其能够运行由Zend Guard生成的加密的PHP代码或模糊代码。 而Zend Guard Loader则是专为PHP5.3提供的类似于Zend Optimizer功能的扩展。项目地址，http://www.zend.com/en/products/guard/runtime-decoders
+> Zend Optimizer并非一个opcode加速器，它是由Zend Technologies为PHP5.2及以前的版本提供的一个免费、闭源的PHP扩展，其能够运行由Zend Guard生成的加密的PHP代码或模糊代码。 而Zend Guard Loader则是专为PHP5.3提供的类似于Zend Optimizer功能的扩展。项目地址，[Zend Optimizer](http://www.zend.com/en/products/guard/runtime-decoders)
 
 ##### NuSphere PhpExpress
 
-> NuSphere的一款开源PHP加速器，它支持装载通过NuSphere PHP Encoder编码的PHP程序文件，并能够实现对常规PHP文件的执行加速。项目地址，http://www.nusphere.com/products/phpexpress.htm
+> NuSphere的一款开源PHP加速器，它支持装载通过NuSphere PHP Encoder编码的PHP程序文件，并能够实现对常规PHP文件的执行加速。项目地址，[NuSphere PhpExpress](http://www.nusphere.com/products/phpexpress.htm)
 
 ### PHP 源码目录结构
 
@@ -118,16 +118,17 @@ Zend Engine的出现将PHP代码的处理过程分成了两个阶段：首先是
   - `# yum -y install php && rpm -ql php`
 - MariaDB：数据管理系统
 
-- http 与 php结合的方式
-  - CGI
-  - FastCGI(常用结合方式)
-  - modules (把php编译成为httpd的模块，性能一般，但服务稳定) MPM:
-    - prefork: libphp5.so
-    - event, worker: libphp5-zts.so
+- http 与 php 结合的方式
+  - CGI(传统方式：http创建CGI子进程，销毁子进程)
+  - FastCGI(常用结合方式): php-fpm
+  - modules(把php编译成为httpd的模块，性能一般，但服务稳定)
+    - MPM:
+      - prefork: `libphp5.so`
+      - event, worker: `libphp5-zts.so`
 
 ## 安装 LAMP
 
-CentOS 6 下安装 LAMP
+### CentOS 6 下安装 LAMP
 
 ```shell
 # yum -y install httpd php php-mysql mysql-server
@@ -135,7 +136,7 @@ CentOS 6 下安装 LAMP
 # service mysqld start
 ```
 
-CentOS 7 下载安装 LAMP
+### CentOS 7 下载安装 LAMP
 
 ``` shell
 # yum -y install httpd php php-mysql mariadb-server
@@ -143,7 +144,7 @@ CentOS 7 下载安装 LAMP
 # systemctl start mariadb.service
 ```
 
-MySQL 的命令行客户端程序
+### MySQL 的命令行客户端程序
 
 ``` shell
 # mysql -uUSERNAME -hHOST -pPASSWORD
@@ -170,9 +171,11 @@ Error ... (...): Access denied for user 'testuser'@'localhost' (Using password:Y
 
 授权能远程的连接用户
 
-``` mysql
+``` sql
+# mysql -uroot -h127.0.0.1 -p
 mysql> GRANT ALL PRIVILEGES ON db_name.tbl_name TO username@host IDENTIFIED BY 'password';
-mysql> GRANT ALL PRIVILEGES ON testdb.* TO testuser@’%’ IDENTIFIED 'testpass'	> FLUSH PRIVILEGS 刷新权限(mysql进程重读授权表)
+mysql> GRANT ALL PRIVILEGES ON testdb.* TO testuser@'%' IDENTIFIED 'testpass' 
+mysql> FLUSH PRIVILEGS 刷新权限(mysql进程重读授权表)
 
 '%'：任何追加
 '172.16.%.%'：172.16网段
@@ -183,14 +186,14 @@ mysql> GRANT ALL PRIVILEGES ON testdb.* TO testuser@’%’ IDENTIFIED 'testpass
 ## AMP
 
 - 静态资源：Client -- http --> httpd
-- 动态资源：Client -- http --> httpd --> libphp5.so () -- mysql --> MySQL server
+- 动态资源：Client -- http --> httpd --> libphp5.so() -- mysql --> MySQL server
 
 ### 快速部署 AMP
 
-- CentOS 6：httpd, php, php-mysql, mysql-server
+- CentOS 6：`httpd, php, php-mysql, mysql-server`
 - CentOS 7:
-  - Modules：httpd, php, php-mysql, mariadb-server
-  - FastCGI：httpd, php-fpm, php-mysql, mariadb-server
+  - Modules：`httpd, php, php-mysql, mariadb-server`
+  - FastCGI：`httpd, php-fpm, php-mysql, mariadb-server`
 
 - php：Zend Engine
 - 编译：opcode是一种PHP脚本编程后的中间语言
@@ -240,95 +243,56 @@ Linux：epoll()
   - [foo]：Section Header
   - directive = value
 
-```
+``` php-config
 注释符：较新的版本中，已经完全使用;进行注释；
 #：纯粹的注释信息
 ;：用于注释可启用的directive
+data.timezone=Asia/Shanghai
 ```
 
-data.timezone=Asia/Shanghai
-php.ini的核心配置选项文档：  http://php.net/manual/zh/ini.core.php
-php.ini配置选项列表：http://php.net/manual/zh/ini.list.php
-
-mariadb(mysql)：
-
-SQL接口：
-分析器：分析SQL语句
-操作求解器：求解如何执行
-计划执行器：执行的路径
-优化器：选择最优路径
-存储引擎：
-文件和存取接口
-缓冲管理器
-磁盘空间管理器
-事务管理器、锁管理器
-恢复管理器
-
-补充材料：RDMBS设计范式基础概念
-
-设计关系数据库时，遵从不同的规范要求，设计出合理的关系型数据库，这些不同的规范要求被称为不同的范式，各种范式呈递次规范，越高的范式数据库冗余越小。
-
-目前关系数据库有六种范式：第一范式（1NF）、第二范式（2NF）、第三范式（3NF）、巴德斯科范式（BCNF）、第四范式(4NF）和第五范式（5NF，又称完美范式）。满足最低要求的范式是第一范式（1NF）。在第一范式的基础上进一步满足更多规范要求的称为第二范式（2NF），其余范式以次类推。一般说来，数据库只需满足第三范式(3NF）就行了。
-
-(1) 第一范式（1NF）
-所谓第一范式（1NF）是指在关系模型中，对域（字段）添加的一个规范要求，所有的域都应该是原子性的，即数据库表的每一列都是不可分割的原子数据项，而不能是集合，数组，记录等非原子数据项。即实体中的某个属性有多个值时，必须拆分为不同的属性。在符合第一范式（1NF）表中的每个域值只能是实体的一个属性或一个属性的一部分。简而言之，第一范式就是无重复的域。
-
-说明：在任何一个关系数据库中，第一范式（1NF）是对关系模式的设计基本要求，一般设计中都必须满足第一范式（1NF）。不过有些关系模型中突破了1NF的限制，这种称为非1NF的关系模型。换句话说，是否必须满足1NF的最低要求，主要依赖于所使用的关系模型。
-
-(2) 第二范式(2NF)
-第二范式（2NF）是在第一范式（1NF）的基础上建立起来的，即满足第二范式（2NF）必须先满足第一范式（1NF）。第二范式（2NF）要求数据库表中的每个实例或记录必须可以被唯一地区分。选取一个能区分每个实体的属性或属性组，作为实体的唯一标识。
-
-第二范式（2NF）要求实体的属性完全依赖于主关键字。所谓完全依赖是指不能存在仅依赖主关键字一部分的属性，如果存在，那么这个属性和主关键字的这一部分应该分离出来形成一个新的实体，新实体与原实体之间是一对多的关系。为实现区分通常需要为表加上一个列，以存储各个实例的唯一标识。简而言之，第二范式就是在第一范式的基础上属性完全依赖于主键。
-
-(3) 第三范式（3NF）
-第三范式（3NF）是第二范式（2NF）的一个子集，即满足第三范式（3NF）必须满足第二范式（2NF）。简而言之，第三范式（3NF）要求一个关系中不能包含已在其它关系已包含的非主关键字信息。简而言之，第三范式就是属性不依赖于其它非主属性，也就是在满足2NF的基础上，任何非主属性不得传递依赖于主属性。
-
-数据库：数据集合
-表：为了满足范式设计要求，将一个数据集分拆为多个
-约束：constraint，向数据表插入的数据要遵守的限制规则
-主键：一个或多个字段的组合，填入主键中的数据，必须不同于已存在的数据；不能为空
-外键：一个表中某字段中能插入的数据，取决于另外一张表的主键中的数据；
-惟一键：一个或多个字段的组合，填入惟一键中的数据，必须不同于已存在的数据；可以为空
-检查性约束：取决于表达式的要求
-
-索引：将表中的某一个或某些字段抽取出来，单独将其组织一个独特的数据结构中
-
-常用的索引类型：
-  b-tree
-  Hash
-  有助于读请求，但不利于写请求
-
-关系运算：
-  选择：挑选出符合条件的行；
-  投影：挑选出符合需要的列；
-  连接：将多张表关联起来；
-
-数据抽象：
-  物理层：决定数据的存储格式，即如何将数据组织成为物理文件；
-  逻辑层：描述DB存储什么数据，以及数据间存在什么样的关系；
-  视图层：描述DB中的部分数据；
-
-关系模型的分类：
-  关系模型
-  实体-关系模型
-  基于对象的关系模型
-  半结构化关系模型(xml)
+[php.ini的核心配置选项文档](http://php.net/manual/zh/ini.core.php)
+[php.ini配置选项列表](http://php.net/manual/zh/ini.list.php)
 
 ## php-fpm
 
-- CentOS 6：
-  - PHP-5.3.2-：默认不支持fpm机制；需要自行打补丁并编译安装
-  - httpd-2.2：默认不支持fcgi协议，需要自行编译此模块
-  - 解决方案：编译安装httpd-2.4, php-5.3.3+
+php-fpm 与 module 无法共存
 
-- CentOS 7：
-  - httpd-2.4：rpm包默认编译支持了fcgi模块；
-  - php-fpm包：专用于将php运行于fpm模式；
+``` shell
+# rpm -q php
+# yum install php-fpm
+  依赖 libzip和php-common
+# rpm -q php-fpm | less
+  /etc/php-fpm.conf 主配置文件
+  /etc/php-fpm.c 其他配置文件目录
+  /etc/php-fpm.d/www.conf
+  /etc/sysconfig/php-fpm 环境配置文件程序
+  /usr/lib/systemd/system/php-fpm.service
+
+```
+
+### CentOS 6
+
+- PHP-5.3.2-：默认不支持fpm机制；需要自行打补丁并编译安装
+- httpd-2.2：默认不支持fcgi协议，需要自行编译此模块
+- 解决方案：编译安装httpd-2.4, php-5.3.3+
+
+### CentOS 7
+
+- httpd-2.4：rpm包默认编译支持了fcgi模块
+- php-fpm包：专用于将php运行于fpm模式
 
 ### 配置文件
 
-- 服务配置文件(配置PHP服务进程)：`/etc/php-fpm.conf,  /etc/php-fpm.d/*.conf`
-- php环境配置文件：`/etc/php.ini, /etc/php.d/*.ini`
+- 服务配置文件(PHP服务进程配置文件)：`/etc/php-fpm.conf,  /etc/php-fpm.d/*.conf`
+- PHP环境配置文件：`/etc/php.ini, /etc/php.d/*.ini`
+
+``` shell
+# rpm -ql php-common
+  /etc/php.ini
+  /etc/php.d/*.ini
+```
+
+首先到达httpd进程，根据URL的后缀是.php，httpd模块fcgi反代模块，用户请求反向代理请求至fpm进程(PHP引擎)，fpm进程收到请求之后在后台生成空闲进程来响应用户请求（fastcgi可以理解为http协议的简装版），fpm负责分析URL加载所对应的资源文件，加载完成之后由子进程运行，运行完之后返回给httpd的fcgi模块，fcgi重新解封装取得内容http重新封装成http协议封装格式。如果请求的是静态资源，httpd获取文件并响应给客户端。http与fpm不在同一个主机；则动态资源部署在fpm主机上，静态资源部署在httpd主机上，只有动态资源httpd的反向代理模块请求给fpm服务。
 
 ``` shell
 # vim /etc/php-fpm.conf`
@@ -340,39 +304,58 @@ SQL接口：
   ;emergency_restart_threshold = 0
   ;emergency_restart_interval = 0
   ;process_control_timeout = 0
-  daemonize = no 	运行前台用于测试
+  daemonize = no 运行前台用于测试
 
 # vim /etc/php-fpm.d/www.conf
   [www]
-  listen = 127.0.0.1:9000 若单独主机，监听与外部httpd主机通信的地址
+  listen = 127.0.0.1:9000 若单独主机，监听与外部httpd主机通信的地址(listen = 192.168.1.20等设置, 允许所有主机访问监听 0.0.0.0)
   ;listen.backlog = -1 后援队列，-1无限制，连接池满了的时候，等待队列的长度
-  listen.allowed_clients = 127.0.0.1 允许哪个httpd的地址发起请求
+  listen.allowed_clients = 127.0.0.1 允许来自哪个httpd服务主机的客户端地址发起请求对本地的fpm进程(127.0.0.1只有本机的可以请求)
+  ;listen.owner = nobody 进程运行用户
+  ;listen.group = nobody 进程运行组名
+  ;listen.mode = 0666
+
 
   连接池：
   pm = static|dynamic  
     static：ftpm固定数量的子进程；pm.max_children；最大并发连接数
-    dynamic: httpd prefok模式；子进程数据以动态模式管理
+    dynamic: **httpd prefok**模式；子进程数据以动态模式管理
   
   pm.start_servers：开始启动进程数
   pm.min_spare_servers：最少空间进程数
   pm.max_spare_servers：最多空间进程数
   ;pm.max_requests = 500：每个进程最大请求连接数
-  ;pm.status_path = /status
-  ;ping.path = /ping
-  php_admin_value[error_log] = /var/log/php-fpm/www-error.log
+  ;pm.status_path = /status 监控机制
+  ;ping.path = /ping 监控机制
+  php_admin_value[error_log] = /var/log/php-fpm/www-error.log PHP错误日志
   php_admin_flag[log_errors_log] = on
-  php_value[session.save_handler] = files
-  php_value[session.save_path] = /var/lib/php/session
+  php_value[session.save_handler] = files **PHP session存储方式**
+  php_value[session.save_path] = /var/lib/php/session **PHP session保存位置**
 
 # systemctl start php-fpm.service
-# systemctl status php-fpm.service 五个空闲请求任务
+# systemctl status php-fpm.service 启动五个空闲请求进程
+
+# yum -y install httpd
 # httpd -M | grep fcgi http是否开启fcgi模块
+  proxy_fcgi_module (shared) 已经装载
 # cd /etc/httpd/conf.modules.d/
 # vim 00-proxy.conf
   LoadModule proxy_fcgi_module modules/mod_proxy_fcgi.so
 # cd ..
 # vim conf/httpd.conf
 # vim conf.d/fcgi.conf
+  DirectoryIndex index.php 默认访问页面
+  ProxyRequests Off 是否开启反向代理,在这里反向代理
+  ProxyPassMatch ^/(.*\.php)$ fcgi://127.0.0.1:9000/var/www/html/$1 哪些内容转发至后端,$1 => (.*\.php)
+# httpd -t
+# systemctl start httpd.service
+# systemctl status httpd.service
+# vim /var/www/html/index.php
+  <?php phpinfo();?>
+
+浏览器访问：http://172.16.100.67
+
+
 ```
 
 创建session目录，并确保运行php-fpm进程的用户对此目录有读写权限
@@ -388,48 +371,57 @@ SQL接口：
 
 1. 中心主机配置
 
-``` config
-DirectoryIndex index.php 默认访问页面
-ProxyRequests Off 是否开启反向代理,在这里反向代理
-ProxyPassMatch ^/(.*\.php)$  fcgi://127.0.0.1:9000/var/www/html/$1
-  代理解析匹配以url后缀.php结束，转义至fcgi协议127.0.0.1:9000端口/var/www/html/$1的资源文件
-  ^/(.*\.php)$
-  http://www.demo.com/(admin/index.php)
+``` shell
+# vim /etc/httpd.conf
+  DirectoryIndex index.php 默认访问页面
+  ProxyRequests Off 是否开启反向代理,在这里反向代理
+  ProxyPassMatch ^/(.*\.php)$  fcgi://127.0.0.1:9000/var/www/html/$1
+    代理解析匹配以url后缀.php结束，转义至fcgi协议127.0.0.1:9000端口/var/www/html/$1的资源文件
+    ^/(.*\.php)$
+    http://www.demo.com/(admin/index.php)
 # systemctl restart php-fpm.service
 测试访问phpinfo()函数内容
 ```
 
 2. 虚拟主机配置
 
-- 注释中心主机配置: DocumentRoot "/var/www/html"
-- 定义虚拟主机文件名: vhosts.conf
+- 注释中心主机配置: `DocumentRoot` "/var/www/html"
+- 定义虚拟主机文件名: `vhosts.conf`
+
+``` shell
+# vim /etc/httpd/conf.d/vhosts.conf
+  DirectoryIndex index.php
+  <VirtualHost *:80>
+    ServerName www.b.net
+    AliasName b.net
+    DocumentRoot /apps/vhosts/b.net
+    ProxyRequests Off
+    ProxyPassMatch ^/(.*\.php)$  fcgi://127.0.0.1:9000/apps/vhosts/b.net/$1
+    <Directory "/apps/vhosts/b.net">
+      Options None
+      AllowOverride None
+      Require all granted
+    </Directory>
+  </VirtualHost>
+# mkdir -pv /apps/vhosts/b.net
+# vim /apps/vhosts/b.net/index.php
+  <h1>www.b.net</h1>
+  <?php phpinfo();?>
+# httpd -t
+# systemctl reload httpd.service
+浏览器访问：http://172.16.100.67或 www.b.net
 
 ```
-DirectoryIndex index.php
-<VirtualHost *:80>
-  ServerName www.b.net
-  AliasName b.net
-  DocumentRoot /apps/vhosts/b.net
-  ProxyRequests Off
-  ProxyPassMatch ^/(.*\.php)$  fcgi://127.0.0.1:9000/apps/vhosts/b.net/$1
 
-<Directory "/apps/vhosts/b.net">
-  Options None
-  AllowOverride None
-  Require all granted
-  </Directory>
-</VirtualHost>
-```
+### 编译安装 LAMP
 
-### 编译安装lamp
+- httpd：编译安装，`httpd-2.4`
+- mairadb：通用二进制格式，`mariadb-5.5`
+- php5：编译安装，`php-5.4`
 
-- httpd：编译安装，httpd-2.4
-- mairadb：通用二进制格式，mariadb-5.5
-- php5：编译安装，php-5.4
+- 注意：任何一个程序包被编译操作依赖到时，需要安装此程序包的“开发”组件，其包名一般类似于`name-devel-VERSION`
 
-- 注意：任何一个程序包被编译操作依赖到时，需要安装此程序包的“开发”组件，其包名一般类似于name-devel-VERSION；
-
-**CentOS 7**
+#### CentOS 7 编译安装 LAMP
 
 1. 安装环境开发包
 
@@ -519,69 +511,68 @@ MySQL: CPU/IO密集型
 1. httpd+php,mysql
 2. httpd,php,mysql
 
-10000个并发
-8000个静态并发
-2000个动态并发
-  极限500个并发，解决？横向扩展，集群
-  20%访问数据(mysql, 400个请求)
-    数据数据逻辑复杂，大量事务（极限50个并发）
-    解决：
-      纵向扩展：主从复制
-      横向扩展：mysql集群
+- 10000个并发
+- 8000个静态并发
+- 2000个动态并发
+  - 极限500个并发，解决？横向扩展，集群
+  - 20%访问数据(mysql, 400个请求)
+    - 数据数据逻辑复杂，大量事务（极限50个并发）
+    - 解决：
+      - 纵向扩展：主从复制
+      - 横向扩展：mysql集群
 
 ### ab命令：远程测试
 
 `# ab -n 20000 -c 200 http://url/phpmyadmin/index.php`
 
-执行三遍，平均数据
+- 执行三遍，平均数据
 
-测试较大资源文件：执行857k大小(/var/log/message)， log.html
+- 测试较大资源文件：执行857k大小(/var/log/message)， log.html
 
-**Concurrency Level: 200** 并发量
-**Requests per second:555.55** [#/sec](mean，平均值) 每秒完成多少个请求
-**Time per request:	360.005** [ ms ] 一次并发200个请求完成时间
-Time per request:	1.800 [ ms ] 每个请求完成时间 （360/200=1.8）
-**Transfer rate：带宽x8** = 实际带宽
+- **Concurrency Level: 200** 并发量
+- **Requests per second:555.55** [#/sec](mean，平均值) 每秒完成多少个请求
+- **Time per request:	360.005** [ ms ] 一次并发200个请求完成时间
+- Time per request:	1.800 [ ms ] 每个请求完成时间 （360/200=1.8）
+- **Transfer rate：带宽x8** = 实际带宽
 
-min mean[+/-sd] median max (单位：ms)
-**Connect**: C<---连接---->S 连接时间
-  消耗很长：
-    1. 网络带宽有限
-    2. 服务器过于繁忙已经跑满负载，并发200,你是201个
+- min mean[+/-sd] median max (单位：ms)
+- **Connect**: C<---连接---->S 连接时间
+  - 消耗很长
+    - 1.网络带宽有限
+    - 2.服务器过于繁忙已经跑满负载，并发200,你是201个
 
-**Processing**: 服务器上处理I 服务器处理时间
-  消耗很长：
-    1. 服务器IO慢
-    2. 脚本运行慢
+- **Processing**: 服务器上处理I 服务器处理时间
+  - 消耗很长：
+    - 1.服务器IO慢
+    - 2.脚本运行慢
 
-**Waiting**: 响应给客户端响应时间
-  消耗很长：
-    1. 服务器带宽有限
-    2. 客户端带宽慢
+- **Waiting**: 响应给客户端响应时间
+  - 消耗很长：
+    - 1.服务器带宽有限
+    - 2.客户端带宽慢
 
-Total: 总计时间总时间
+- Total: 总计时间总时间
 
-50% 244 ms
-...
-**98% 1315** (20000个请求，200并发的98%完成请求量，使用1.3s左右)
+- 50% 244 ms
 
-虚拟机：一部分空间
-虚拟主机：独立空间
+- **98% 1315** (20000个请求，200并发的98%完成请求量，使用1.3s左右)
 
-phpmysqmin
+- 虚拟机：一部分空间
+- 虚拟主机：独立空间
 
-``` shel
+- phpmysqmin
+
+``` shell
 # openssl rand -base64 20 生成随机数
 # vim config.inc.php
   $cfg['blowfish_secret'] = '粘贴'
-
 ```
 
 - xcache
 - epel源中
   - 程序包：yum -y install php-xcache
 
-编译安装 xache 的方法
+#### 编译安装 xache 的方法
 
 ``` shell
 # yum install php-devel
@@ -602,29 +593,29 @@ phpmysqmin
 测试 phpfino()
 ```
 
-php 以扩展模块方式组合
+- php 以扩展模块方式组合
 
-多次访问 php 页面，预热，产生缓存
+- 多次访问 php 页面，预热，产生缓存
 
-再次 ap 命令测试，并发量
+- 再次 ap 命令测试，并发量
 
-没有效果时，调整内核参数
+- 没有效果时，调整内核参数
 
-使用 CentOS 6 测试
+- 使用 CentOS 6 测试
 
-关闭xcache功能, 没mv /etc/php.d/xcache.ini 移走
+- 关闭xcache功能, 没mv /etc/php.d/xcache.ini 移走
 
-**安装xcache之后，测试ab命令**
+- **安装xcache之后，测试ab命令**
 
-Connection(tcp三次握手，建立连接)：时间太长，网络带宽有限，服务器繁忙(并发高)
-服务器构建报文(服务器慢,脚本慢)
-服务器响应报文(带宽有限，客户端接受能力有限)
+- Connection(tcp三次握手，建立连接)：时间太长，网络带宽有限，服务器繁忙(并发高)
+- 服务器构建报文(服务器慢,脚本慢)
+- 服务器响应报文(带宽有限，客户端接受能力有限)
 
-**远程测试ab命令** - 本地测试没有考虑带宽
+- **远程测试ab命令** - 本地测试没有考虑带宽
 
-**一定要有效带宽测试**
+- **一定要有效带宽测试**
 
-博客作业一：CentOS 7, lamp (module)；
+### 博客作业一：CentOS 7, lamp (module)；
 
 (1) 三者分离于两台主机；
 
@@ -634,7 +625,7 @@ Connection(tcp三次握手，建立连接)：时间太长，网络带宽有限�
 
 (4) 为phpMyAdmin提供https虚拟主机；
 
-博客作业二：CentOS 7, lamp (php-fpm)；
+### 博客作业二：CentOS 7, lamp (php-fpm)；
 
 (1) 三者分离于三台主机；
 
@@ -642,7 +633,7 @@ Connection(tcp三次握手，建立连接)：时间太长，网络带宽有限�
 
 (3) xcache
 
-博客作业三：CentOS 6, lamp (编译安装，模块或php-fpm)；
+### 博客作业三：CentOS 6, lamp (编译安装，模块或php-fpm)；
 
 (1) 三者分离于两台或三台主机；
 
