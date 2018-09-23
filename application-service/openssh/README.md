@@ -64,12 +64,12 @@
 
 - Linux发行版默认使用
 
-- sshd服务程序: ssh daemon
+- sshd服务程序: `ssh daemon`
   - 配置文件：`/etc/ssh/sshd_config`
 
-- ssh客户端工具: ssh client 客户端
+- ssh客户端工具: `ssh client`
   - 配置文件：`/etc/ssh/ssh_config`
-  - scp, sftp
+  - 工具：scp, sftp
 
 - `# rpm -qa | grep -i ssh`
 
@@ -77,11 +77,21 @@
 
 ## 客户端程序
 
+``` shell
+# rpm -ql | grep -i ssh
+# rpm -ql openssh-clients
+```
+
 - `openssh-clients-VERSION`
 - `ssh [options] [user@]host ['COMMAND']`
 - `ssh [opitons] -l user host ['COMMAND']` 不同登录直接执行command
 
 - 省略用户名：使用本地用户名作为远程登录的用户名
+
+``` shell
+# ssh 172.10.100.67
+# ssh 172.18.100.67 'ifconfig'
+```
 
 ### 常用选项
 
@@ -93,10 +103,10 @@
 
 -l login_name：以指定的用户的身份进行远程登录
 -p port：远程服务器的端口
--o option：**覆盖远程服务器sshd服务配置选项**
+-o option：覆盖远程服务器sshd服务配置选项
   `StrictHostKeyChecking` 严格检查主机密钥(第一次要不要接受提示信息)
   `ForwardX11`
--X：**支持X11转发**（把本地服务当作图形服务器（图形转发））
+-X：支持X11转发（把本地服务当作图形服务器（图形转发））
   xshell:
 -Y：支持授信任的X11转发
 -b bind_address：本地的源地址（本地有多个接口地址时指定连接地址）
@@ -104,27 +114,41 @@
 ~/.ssh/{identity(v1), id_dsa,id_ecdsa, id_ed25519, id_rsa（v2）}其中某一个文件
 ```
 
-### 配置文件
+``` shell
+连接远程并打开远程firefox
+# ssh -X root@172.10.100.67
+# firefox
+
+```
+
+### ssh客户端配置文件
 
 ``` SHELL
 # /etc/ssh/ssh_config
-HOST host1.lingyima.com
-HOST host2.lingyima.com
-HOST *.lingyima.com
-HOST * 连接任意主机
-特殊的放在前面
+  HOST host1.wovert.com
+  HOST host2.wovert.com
+  HOST *.lingyima.com
+  HOST * 连接任意主机
+  
+  特殊的放在前面
 
-Host * # 默认配置
-  option value
-  ...
+  Host * # 默认配置
+    option value
+    ...
 
-Host PATTERN # 匹配模式
-  option value
-  ...
+  Host PATTERN # 匹配模式
+    option value
+    ...
 
-Host host1.lingyima.com # 指定唯一主机模式
-  StrictHostKeyChecking no
-  ...
+  Host host1.lingyima.com # 指定唯一主机模式
+    StrictHostKeyChecking no
+    ...
+```
+
+``` shell
+# vim /etc/ssh/ssh_config
+  Host 172.18.100.67
+    StrictHostKeyChecking no
 ```
 
 ### Windows的客户端程序
@@ -133,71 +157,91 @@ Host host1.lingyima.com # 指定唯一主机模式
 
 ### 基于密钥的认证
 
-1. 生成一个密钥对儿;非对称密钥
+> 只能单项登录
+
+- 远程主机：172.18.100.67
+- 本地主机：172.18.100.68
+
+1. 生成一个密钥对儿; 非对称密钥
 
 ``` SHELL
-ssh-keygen 命令
+# ssh-keygen [-b bits] [-t type] [-f output_keyfile] [-N new_passphrase]
+  -t type
+    rsa: 默认算法，密钥默认长度为2048bits
+    dsa: 密钥长度固定位1024),
+    ecdsa: 椭圆曲线算法,密钥长度256/384/521bits
+    ed255519
 
--t type
-  rsa1
-  dsa(密钥长度固定位1024),
-  ecdsa(椭圆曲线算法,密钥长度256/384/521),
-  ed255519
-  rsa默认) 密钥类型
--b bits 密钥长度 (RSA: 最短768)， 默认2048 bits
+  -b bits 密钥长度 (RSA: 最短768)， 默认2048 bits
 
--f out_keyfile 指明文件保存位置
--N new_passphrase 私钥加密
+  -f out_keyfile 指明私钥文件保存位置
+  -N new_passphrase 私钥加密
 ```
 
 ``` SHELL
-# ssh-keygen -t rsa -b 2048
+[172.18.100.68~]# ssh-keygen -t rsa -b 2048
   ~/.ssh/id_rsa: 私钥文件路径
-  passphrase: 私钥加密
+  passphrase: 私钥加密密令
   [RSA 2048] 二维码
   id_rsa.pub 公钥文件
-# rm -rf ~/.ssh
-# ssh-key -t rsa -f ~/.ssh/id_rsa -N ''
-  id_rsa: 600权限
+[172.18.100.68~]# rm -rf ~/.ssh
+[172.18.100.68~]# ssh-key -t rsa -f ~/.ssh/id_rsa -N ''
+  id_rsa文件必须是600权限
 
+[172.18.100.68~]# ls ~/.ssh
+  id_rsa
+  id_rsa.pub
+```
 
-将生成的公钥文件复制到远程主机用户的家目录下.ssh目录下的文件`authorized_keys`（644）文件当中追加
+2. 将生成的密钥对儿中的公钥`rd_rsa.pub`的内容复制到远程主机用户的家目录下`.ssh`目录下的文件`authorized_keys`（644）文件当中追加
 
-ssh-copy-id [-i [identity_file]] [-p port] [user@host]
+``` SHELL
+# ssh-copy-id [-i [identity_file]] [-p port] [user@host]
   -p port: 远程主机的监听的端口号
   user@host: 远程主机的用户名主机号
 
 可以使用不同的用户名登陆
-# ssh-copy-id -i .ssh/id_rsa.pub root@远程IP地址
-# ssh-copy-id -i .ssh/id_rsa.pub cents@远程IP地址
-
-测试
-# ssh user@hostname
+[172.18.100.68~]# ssh-copy-id -i .ssh/id_rsa.pub root@172.18.100.67
+[172.18.100.68~]# ssh-copy-id -i .ssh/id_rsa.pub centos@172.18.100.67
 ```
 
-## scp命令：secure cp，跨主机进行安全文件的传输工具
+3. 测试
+
+``` shell
+[172.18.100.68]# ssh user@hostname
+[172.18.100.67]# cat .ssh/id_rsa.pub
+```
+
+## scp命令
+
+> secure cp，跨主机进行安全文件的传输工具
 
 ``` SHELL
 scp [options] SRC... DEST/
 scp [options] SRC DEST
 ```
 
-### 存在两种使用方式：
+### 存在两种使用方式
 
 #### 1. PUSH 推送(src to dest)
 
-`# scp [options] /path/from/somefile ... [user@hostname]:/path/to/somewhere`
+``` shell
+# scp [options] /path/from/somefile ... [user@hostname]:/path/to/somewhere
+```
+
 本地文件（一个或多个）复制到远程主机的目录下
 
-#### 2. PULL 拉取（from dest to src  ）
-
-`# scp [options] [user@hostname]:/path/from/somefile ... /path/to/somewhere`
-远程主机的目录下复制文件到本地的目录下
+#### 2. PULL 拉取(from dest to src)
 
 ``` shell
-常用选项：
+# scp [options] [user@hostname]:/path/from/somefile ... /path/to/somewhere
+```
+
+远程主机的目录下复制文件到本地的目录下
+
+``` 常用选项
   -r : recursive
-  -p : 保存源文件的**权限**及**从属关系**
+  -p : 保存源文件的权限及从属关系
   -q : 静默模式
   -p PORT: 指明远程主机ssh协议监听的端口
 ```
@@ -209,9 +253,8 @@ scp [options] SRC DEST
 ### sftp子系统：OpenSSH服务自带
 
 - sftp：C/S架构
-
-S: 由sshd服务进程实现，是ssh的一个子系统；在CentOS上默认启用
-C: sftp命令
+- S: 由sshd服务进程实现，是ssh的一个子系统；在CentOS上默认启用
+- C: sftp命令
 
 - 客户端命令
 
@@ -222,9 +265,12 @@ sftp> get destfile srcfile 下载文件destfile到本地重命名为srcfile
 ```
 
 Linux设置SFTP服务用户目录权限: http://www.cnblogs.com/luyucheng/p/6094729.html
+
 基于vsftpd+pam+mysql架设ftp并实现虚拟用户登录: http://littershare.blog.51cto.com/6188016/1192609/
 
-### ftp协议: file transfer proctocol
+### ftp协议
+
+> file transfer proctocol
 
 - 明文协议
 - 安全传输机制：
