@@ -250,7 +250,9 @@ scp [options] SRC DEST
 
 - 不够灵活
 
-### sftp子系统：OpenSSH服务自带
+### sftp子系统
+
+> OpenSSH 服务自带
 
 - sftp：C/S架构
 - S: 由sshd服务进程实现，是ssh的一个子系统；在CentOS上默认启用
@@ -260,15 +262,16 @@ scp [options] SRC DEST
 
 ``` shell
 # sftp root@远程主机` 密钥认证不需要输入密码
+# sftp root@172.18.100.67
 sftp> help
 sftp> get destfile srcfile 下载文件destfile到本地重命名为srcfile
 ```
 
-Linux设置SFTP服务用户目录权限: http://www.cnblogs.com/luyucheng/p/6094729.html
+[Linux设置SFTP服务用户目录权限](http://www.cnblogs.com/luyucheng/p/6094729.html)
 
-基于vsftpd+pam+mysql架设ftp并实现虚拟用户登录: http://littershare.blog.51cto.com/6188016/1192609/
+[基于vsftpd+pam+mysql架设ftp并实现虚拟用户登录](http://littershare.blog.51cto.com/6188016/1192609/)
 
-### ftp协议
+## ftp协议
 
 > file transfer proctocol
 
@@ -281,11 +284,9 @@ Linux设置SFTP服务用户目录权限: http://www.cnblogs.com/luyucheng/p/6094
 
 ## sshd 服务器端程序
 
-`openssh-server-VERSION`
-
-配置文件：`/etc/ssh/sshd_config`
-
-格式：directive value
+- 程序包文件：`openssh-server-VERSION`
+- 配置文件：`/etc/ssh/sshd_config`
+- 格式：`directive value`
 
 常用指令
 
@@ -313,14 +314,13 @@ HostKey /etc/ssh/ssh_host_ed25519_key
 # KeyRegenerationInterval 1h  v1 每隔一个小时换密钥
 # ServerKeyBit 1024 密钥长度
 
-
 ## loging
 #SyslogFacility AUTH
 SyslogFacility AUTHPRIV   日志记录方式，AUTHPRIV表示日志记录与/var/log/secure 登录信息（成功，失败等）
 
-**运维技巧**：分析/var/log/secure日志文件，并且定期执行。发送给邮件，第二日查看邮件。
+**运维技巧**：分析/var/log/secure日志文件，并且定期执行。发送给邮件，第二日查看邮件
 
-# LogLevel INFO 	日志事件级别（事件重要程度）
+# LogLevel INFO 日志事件级别（事件重要程度）
 
 ## Authentication 认证相关
 # LoginGraceTime 2m 登录宽限期
@@ -369,13 +369,13 @@ DenyGroups group1 grup2 拒绝使用ssh服务的用户组白名单
 **运维技巧**: AllowUsers与DenyUsers不能同时使用，建议使用AllowUsers
 ```
 
-- CentOS 6: /etc/rc.d/init.d/sshd
-- CentOS 7: /usr/lib/systemd/system/sshd.service
+- CentOS 6: `/etc/rc.d/init.d/sshd`
+- CentOS 7: `/usr/lib/systemd/system/sshd.service`
 
 ``` shell
 # rpm -ql openssh-server
-sshd.service 
-sshd.socket 访问时启动，systemd来监听启动sshd服务
+  sshd.service
+  sshd.socket 访问时启动，systemd来监听启动sshd服务
 ```
 
 ## 手册页
@@ -390,34 +390,23 @@ sshd.socket 访问时启动，systemd来监听启动sshd服务
 - 客户端
 
 ``` shell
-# man ssh_config`
-# man ssh`
+# man ssh_config
+# man ssh
 ```
 
 ### 最佳实践
 
 1. 不要使用默认端口，设置成随机端口 `Port 22022`
-
 2. 不要使用第一版协议 `Protocol 2`
-
 3. 限制可登陆的用户
-
-``` SHELL
-AllowUsers usr1 use2 ...
-AllowGroups grp1 grp2 ...
-```
-
+  - `AllowUsers usr1 use2 ...`
+  - `AllowGroups grp1 grp2 ...`
 4. 设定空闲会话超时时长 `ClientAliveCountMax 2m`
-
-5. 利用防火墙设定ssh的远程访问策略
-
-仅允许来自于指定网络中的主机访问
-
+5. 利用防火墙设定ssh的远程访问策略; 仅允许来自于指定网络中的主机访问
 6. 仅监听与指定的IP地址 `ListenAddress ipv4|ipv6|any(default)`
-
 7. 基于口令认证时，使用强密码策略
 
-``` SHELL
+``` shell
 # openssl rand -base64 30
 # tr -dc A-Za-z0-9_ < /dev/urandom | head -c 30 | xargs
 ```
@@ -461,8 +450,11 @@ dss:Digest Signature Standard, -s 1024 bit固定长度
 
 运行服务：
 # dropbear -h`
+```
 
-手动启动（前台）
+2. 手动启动（前台）
+
+``` shell
 # dropbear -F -E -p 22022
 
 守护进程
@@ -472,12 +464,17 @@ dss:Digest Signature Standard, -s 1024 bit固定长度
 -F：front,让进程运行于前台
 -p：port,指明监听的地址和端口
 -w : 进制root登录
+```
 
-测试登录
+3. 测试登录
+
+``` shell
 # ssh -p 22022 username@host
+```
 
-将其运行为守护进程
+4. 将其运行为守护进程
 
+``` shell
 CentOS 7: systemd unit file的环境配置文件
 # vim /usr/lib/systemd/sytem/dropbear.service
   [Service]
@@ -488,12 +485,15 @@ CentOS 7: systemd unit file的环境配置文件
   OPTIONS="-p 23332"
 
 # systemctl start dropbear.service
+```
 
-客户端程序：dbclient
+### 客户端程序：dbclient
 
+``` SHELL
 # dbclient -h`
 
 dbclient [options] [user@]host[/port] [command]`
+
 选项：
   -l <username>
 ```
