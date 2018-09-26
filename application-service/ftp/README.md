@@ -48,7 +48,7 @@
     - 911=>24bits(ANSI): 文本
     - 911=>16bits(binary): 图片
 
-## 用户：资源位于用户的家目录下
+## 用户：资源位于用户的家目录下 -
 
 - 匿名用户(映射至某一固定的系统用户)：ftp,vsftp,/var/ftp/
 - 本地用户(系统用户)：注意明文协议，root及系统用户(0-999)
@@ -62,7 +62,7 @@
 
 > Very Secure FTP Deamon
 
-- 软件包：`vsftpd-VERSION`
+- 软件报名：`vsftpd-VERSION`
 - 程序：`/usr/sbin/vsftpd`
 - 配置文件: `/etc/vsftpd/vsftpd.conf`
 
@@ -76,6 +76,7 @@
 - CentOS 7
 
 ``` shell
+# rpm -ql vsftpd
 # vim /usr/lib/systemd/system/vsftpd.service
 # systemctl enable vsftpd.service
 
@@ -94,9 +95,10 @@
 
 `/etc/vsftpd/vsftpd.conf`
 
-指令格式 `directive value`
+指令格式 `directive=value`
 
 ``` shell
+查看所有配置指令
 # man vsftpd.conf
 
 # 全局权限
