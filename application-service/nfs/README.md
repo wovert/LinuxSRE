@@ -1,14 +1,17 @@
 # NFS
 
 > Network File System，网络文件系统, SUN公司研发，Unix-like，文件系统共享
+> NFS 基于 RPC
 
 - 内核级文件系统
 - RPC: Remote Procedure Call，远程过程调用
+  - PC: Procedure Call 过程调用(没有返回，有返回则称为函数)
+  - RPC 是远程要运行的代码
 - root_squash(降权), nfsnobody(guest)
 - all_squash
 
 - nfsv1 SUN公司内部内测
-- nfsv2, nfsv3, nfsv4(CentOS 7)
+- nfsv2, nfsv3(CentOS 6), nfsv4(CentOS 7)
 
 - **nfsd: tcp/2049端口**
 
@@ -21,7 +24,7 @@
 返回给客户端
 mountd, 固定端口，tcp/111
 
-## 2. nfsd
+## 2. nfsd: tcp/2049端口(监听socket文件)
 
 - 客户端请求，nfsd响应（携带令牌）给客户端
 
