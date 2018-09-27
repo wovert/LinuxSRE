@@ -492,7 +492,7 @@ CentOS 7: systemd unit file的环境配置文件
 ``` SHELL
 # dbclient -h`
 
-dbclient [options] [user@]host[/port] [command]`
+dbclient [options] [user @]host[/port] [command]`
 
 选项：
   -l <username>
