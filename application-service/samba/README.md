@@ -178,14 +178,14 @@ guest ok 是否允许来宾还在那个号访问
 public 是否是公开的服务
 
 可用的宏列表：
-%m：客户端的主机的NetBIOS名称
-%M：客户端的internet主机名，即HOSTNAME
-%H：当前用户的家目录
-%U：当前用户的用户名
-%g：当前用户的所属组名
-%h：当前SAMBA主机的HOSTNAME
-%i：客户端主机IP
-%T：当前的日期时间
+  %m：客户端的主机的NetBIOS名称
+  %M：客户端的internet主机名，即HOSTNAME
+  %H：当前用户的家目录
+  %U：当前用户的用户名
+  %g：当前用户的所属组名
+  %h：当前SAMBA主机的HOSTNAME
+  %i：客户端主机IP
+  %T：当前的日期时间
 ```
 
 ## 交互式访问
@@ -193,13 +193,13 @@ public 是否是公开的服务
 - 查看：`# smbclient -L SAMBA_SERVER -U USERNAME`
 - 访问：`# smbclient //SAMBA_SERVER/SERVICE_NAME -U USERNAME`        
 
-## 挂载访问：
+## 挂载访问
 
 ``` shell
 # mount -t cifs -o username=USERNAME,password=PASSWORD //SERVER/SERVICE /MOUNT
 
 # mkdir /mydata/data -pv
-# mount -t cifs //SAMBA_SERVER/SERVICE_NAME -o username=centos /mydata/data
+# mount -t cifs //172.18.100.67/mysqldata -o username=centos /mydata/data
 # mount
 ```
 
