@@ -164,18 +164,16 @@ comment 注释信息
 path 共享对应本地文件系统路径
 browseable 是否可浏览，是否可被所有用户看到
   no：只有用户或属组内的用户可以看到
-writable 是否可写
+writable 是否对于所有用户可写
 read only 与writable只能使用一个，是否为只读
 writelist 可写用户或组列表
   用户名
   @组名
   +组名
   用户与访问目录权限
-
-writeable和write list不应该同时使用
-
-guest ok 是否允许来宾还在那个号访问
-public 是否是公开的服务
+guest ok 是否允许来宾账号访问；
+public 是否是公开的服务；是否允许匿名用户访问
+  writeable 和 write list 不应该同时使用
 
 可用的宏列表：
   %m：客户端的主机的NetBIOS名称
@@ -186,14 +184,100 @@ public 是否是公开的服务
   %h：当前SAMBA主机的HOSTNAME
   %i：客户端主机IP
   %T：当前的日期时间
+
+# vim /etc/samba/smb.conf
+[mysqldata]
+comment = Home Directory %H
+
+# smbclient -L 172.18.100.67 -U centos
+# smbclient -L 172.18.100.67 -U gentoo
+
+```
+
+``` shell
+# ls /mydata/data/
+# vim /etc/samba/sms.conf
+[mysqldata]
+  comment = mysql data dir
+  path = /mydata/data
+  browseable = yes 允许所有人访问
+  writeable = yes 允许可写
+  write list = @dbaadmins 只有dba组可写
+# groupadd dbadmins
+# testparm 测试配置samba配置文件
+# useradd centos
+# useradd gentoo
+# man smbpasswd
+# smbpasswd -a centos
+# smbpasswd -a gentoo
+# usermod -aG dbadmins centos
+# cp /etc/resolv.conf /mydata/data/
+
+在客户端172.18.100.68访问
+# smbclient //172.18.10.67/mysqldata -U centos
+smb: /> ls
+smb: /> lcd /tmp
+smb: \> get resolve.conf
+smb: /> exit
+# ls /tmp
+# smbclient //172.18.10.67/mysqldata -U centos
+smb: /> lcd /etc
+smb: /> put issue 上传文件
+  dbadmins 组用户对 /mydata/data没有写权限
+# ls -ld /mydata/data
+# setfactl -m g:dbadmins:rwx /mydata/data
+# getfactl /mydata/data
+
+在客户端172.18.100.68访问
+# smbclient //172.18.10.67/mysqldata -U centos
+smb: /> lcd /etc
+smb: /> put issue
+
+# usermod -aG dbadmins gentoo
+
+在客户端172.18.100.68访问
+# smbclient //172.18.10.67/mysqldata -U gentoo
+smb: \> lcd /etc
+smb: \> put fstab
+
+# useradd hbase
+# smbpasswd -a hbase
+
+在客户端172.18.100.68访问
+# smbclient -L 172.18.100.67 -U hbase
+
+hbase对文件系统有写权限
+# setfacl -m u:hbase:rwx /mydata/data/
+
+在客户端172.18.100.68访问
+# smbclient -L 172.18.100.67 -U hbase
+smb: \> lcd /etc
+smb: \> put grub2.cfg 可以上传，为什么？
+
+# vim /etc/samba/smb.conf
+[mysqldata]
+  #writeable = yes
+# systemctl reload smb.serivce
+
+在客户端172.18.100.68访问
+# smbclient -L 172.18.100.67 -U hbase
+smb: \> lcd /etc
+smb: \> put inputrc 不能上传
+smb: \> exit
+
+在客户端172.18.100.68访问
+# smbclient -L 172.18.100.67 -U centos
+smb: \> lcd /etc
+smb: \> put inputrc 可以上传
+smb: \> exit
 ```
 
 ## 交互式访问
 
-- 查看：`# smbclient -L SAMBA_SERVER -U USERNAME`
-- 访问：`# smbclient //SAMBA_SERVER/SERVICE_NAME -U USERNAME`        
+- 查看共享：`# smbclient -L SAMBA_SERVER -U USERNAME`
+- 访问共享：`# smbclient //SAMBA_SERVER/SERVICE_NAME -U USERNAME`
 
-## 挂载访问
+## 挂载访问方式
 
 ``` shell
 # mount -t cifs -o username=USERNAME,password=PASSWORD //SERVER/SERVICE /MOUNT
@@ -201,6 +285,7 @@ public 是否是公开的服务
 # mkdir /mydata/data -pv
 # mount -t cifs //172.18.100.67/mysqldata -o username=centos /mydata/data
 # mount
+# ls /mydata/data/
 ```
 
 ## 练习
@@ -209,6 +294,28 @@ public 是否是公开的服务
 - 要求仅cenos和gentoo能上传文件；
 - 此路径对其他用户不可见
 
+``` shell
+- 服务端 172.18.100.67
+# mkdir -pv /ftp/data
+# vim /etc/samba/smb.conf
+  [data]
+  comment = data
+  path = /ftp/data
+  write list = centos,gentoo
+  public = no
+# setfact -m u:centos:rwx /ftp/data
+# setfact -m u:gentoo:rwx /ftp/data
+# testparm
+
+- 客户端访问
+# man smbstats
+# smbclient -L //172.18.100.67
+# smbclient //172.18.100.67/data -U centos
+smb: \> lcd /etc/pam.d/
+smb: \> put cups
+smb: \> exit
+```
+
 ## pdbedit命令
 
 > 类似于smbpasswd，用于管理smb用户
@@ -216,14 +323,39 @@ public 是否是公开的服务
 ``` shell
 pdbedit [options]
   -L：列出所有的smb用户
-  -v：verbose
+    -v：verbose
   -a：添加用户
-  -u USERNAME
+    -u USERNAME
   -x：删除指定用户
   -u USENRAME
   -r：修改用户的相关信息
+```
 
-- smbstatus命令：显示samba server相关共享的访问状态
+``` shell
+# pdbedit -L
+# useradd hadoop
+# pdbedit -a -u hadoop
+# pdbedit -L
+
+```
+
+## smbstatus命令
+
+> 显示samba server相关共享的访问状态；正在被那些客户端访问
+
+``` shell
+# man smbstatus
   -b 简要格式信息
   -v verbose
 ```
+
+``` shell
+# smbstatus -b 简要格式
+# smbstatus -v 详细格式
+```
+
+## 预习
+
+- IPv4报文首部格式
+- tcp 报文首部格式
+- tcp finite machine
