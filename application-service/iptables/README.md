@@ -143,7 +143,7 @@ RoMNiF
 - 第一行：
   - IP Version(4 bits)
   - Header Length(4 bits [x4])
-  - Type of Server(TO, 8 bits)
+  - Type of Server(TOS：服务类型, 8 bits)
   - Total Length(16 bits [65535-60=65475]，包括Data)
 - 第二行：
   - Identification (Fragmen ID, 16 bits)
@@ -152,7 +152,7 @@ RoMNiF
 - 第三行：
   - Time-To-Live(TTL), 8 bits (下一跳减掉1)， 0时丢包
   - Protocol, 8 bits （TCP：6， UDP：17）
-  - Header Checksum (16 bits)
+  - Header Checksum (首部校验码 16 bits)
 - 第四行: Soure IP Address (32bits)
 - 第五行: Destination IP Address (32bits)
 - 第六行: Options
