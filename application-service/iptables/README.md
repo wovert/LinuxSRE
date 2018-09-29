@@ -66,14 +66,14 @@
 
 ## iptables
 
-- 内置链：默认，不能删除， 内置链与钩子意义对应
+- 内置链：默认，不能删除，内置链与钩子意义对应
   - PREROUTING
   - INPUT
   - FORWARD
   - OUTPUT
   - POSTROUTING
 
-- 自定义链：
+- 自定义链
   - 手动添加
   - 附加在钩子上才有效果
 
@@ -86,7 +86,9 @@
 
 ## 同一个链上的不同的表的规则的应用优先级（高-->低）：
 
-- raw 令牌
+RoMNiF
+
+- raw 令牌(连接追踪，之前请求报文与之后请求报文有没有关联关系)
 - mangle 修改报文
 - nat 修改IP:port
 - filter 过滤
@@ -141,7 +143,7 @@
 - 第一行：
   - IP Version(4 bits)
   - Header Length(4 bits [x4])
-  - Type of Server(TOS，8 bits)
+  - Type of Server(TO, 8 bits)
   - Total Length(16 bits [65535-60=65475]，包括Data)
 - 第二行：
   - Identification (Fragmen ID, 16 bits)
@@ -210,7 +212,7 @@ target = -j targetname [per-target-options]
 
 ## iptable 命令格式
 
-`iptables [-t table] SUBCOMMAND chain [-m matchname [per-match-options]] -j targetname [per-target-options]`	
+`iptables [-t table] SUBCOMMAND chain [-m matchname [per-match-options]] -j targetname [per-target-options]`
 
 ### -t table
 
