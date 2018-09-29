@@ -21,24 +21,23 @@
 - 流入缓冲区，流出缓冲区
 - 转发：接口进来，另外一个接口发送，不会到本机
 
-## iptables历史
+## iptables历史演变
 
 - ipfw --> ipchains -> iptables
 
 ## iptables/netfilter
 
 - iptables/netfilter
-  - netfilter：kernel（钩子），编译内核服务安装
-  - hook function(钩子)，报文流经的卡点（prerouting, input,output,）
+  - netfilter：报文流向 kernel（钩子），编译内核服务安装
+    - hook function(钩子)，报文流经的卡点（prerouting, input,output,）
   - iptables可以向每个钩子写上rules（规则）
-- iptables: cli interface
+    - rules utility 规则效应
+- `iptables`: cli interface 命令行客户端程序
   - 规则（链->列，表）, IPv4支持， 客户端程序，rpm包,cli接口
 
-- rules utility 规则效应
+## netfilter(内核里叫法)
 
-## netfilter：内核里叫法
-
-- prerouting：刚到本机网卡->prerouting->缓冲队列中->**路由之前**
+- prerouting：刚到本机网卡->prerouting->内核缓冲队列中->路由之前
 - input：路由到达之后到本机内部->input->输入队列
 - forward：到本机，没有到达本机内部而转发队列
 - output：有本机内部发出的，输出队列
