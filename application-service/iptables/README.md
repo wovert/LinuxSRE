@@ -212,15 +212,114 @@ target = -j targetname [per-target-options]
 
 ## iptable 命令格式
 
-`iptables [-t table] SUBCOMMAND chain [-m matchname [per-match-options]] -j targetname [per-target-options]`
+``` shell
+iptables [-t table默认是filter] SUBCOMMAND chain [-m matchname [per-match-options]] -j targetname [per-target-options]
+
+iptables [-t table] {-A|-C|-D} chain rule-specification
+
+ip6tables [-t table] {-A|-C|-D} chain rule-specification
+
+iptables [-t table] -I chain [rulenum] rule-specification
+
+iptables [-t table] -R chain rulenum rule-specification
+
+iptables [-t table] -D chain rulenum
+
+iptables [-t table] -S [chain [rulenum]]
+
+iptables [-t table] {-F|-L|-Z} [chain [rulenum]] [options...]
+
+iptables [-t table] -N chain
+
+iptables [-t table] -X [chain]
+
+iptables [-t table] -P chain target
+
+iptables [-t table] -E old-chain-name new-chain-name
+
+rule-specification = [matches...] [target]
+
+match = -m matchname [per-match-options]
+
+target = -j targetname [per-target-options]
+```
 
 ### -t table
 
-- raw, mangle, nat, 默认filter
+- raw, mangle, nat, [filter]
 
-### SUBCOMMAND：
+### SUBCOMMAND
 
-- 链管理：
+``` shell
+关闭防火墙：CentOS6
+# service iptables stop
+# checkconfig iptables off
+
+关闭防火墙：CentOS7
+# systemctl stop firewalld.service
+# systemctl disable firewalld.service
+
+终端访问并查看规则
+# iptables -nL
+# iptables -t nat -nL
+# iptables =t raw -nL
+# iptables -t mangle -nL
+
+新建自定义空链
+# iptables -N testchain
+# iptables -nL
+  Chain testchain (0 references) 引用计数为0时，可以重命名)
+  target prot opt source destination
+
+重命名
+# iptables -E testchian mychain
+# iptables -nL
+  Chain mychain (0 references)
+
+删除空链
+# iptables -X mychain
+# iptables -nL
+
+设置默认策略
+# iptables -t filter -P INPUT DROP
+
+远程SSH不能连接
+
+# iptables -t filter -P INPUT DROP
+# iptables -t filter -P OUTPUT DROP
+# iptables -t filter -P FORWARD DROP
+
+远程ping
+# ping 172.18.100.6
+
+远程ssh连接
+# ssh root@172.18.100.6
+
+查看INPUT链规则
+# iiptable -nL INPUT
+
+# iptables -vnL
+  Chain INPUT (policy DROP 2642 packets, 341K bytes)
+  pkts bytes target prot opt in out source
+
+# iptables -vnxL --line-numbers
+  Chain INPUT (policy DROP 2736 packets, 363609 bytes)
+  num pkts bytes target prot opt in out source
+
+# iptables -vvnxL --line-numbers
+
+命令行格式规则
+# iptables -S
+
+INPUT命令行格式规则
+# iptables -S INPUT
+
+输出重定向到文件中
+# iptables-save
+
+```
+
+- 链管理
   - `-N`：new，新增一条自定义链
   - `-X`：delete，删除自定义的空链
   - `-P`：policy，设置链的默认策略
@@ -230,8 +329,8 @@ target = -j targetname [per-target-options]
   - `-E`：rename，重命名自定义的未被引用（引用计数为0）的chain
   - `-F`：清空规则
 
-- 查看：
-  - `-L`：列出规则
+- 查看
+  - `-L`：列出规则;一下是L的补充选项，所以L必须是第一个选项
     - `-n`：numeric，以数字格式显示地址和端口
     - `-v`：verbose，详细信息；-vv, -vvv
     - `-x`：exactly，显示计数器的精确值而非单位换算后的结果;报文个数/报文体积大小
@@ -244,7 +343,7 @@ target = -j targetname [per-target-options]
 # iptables -N testchain
 # iptables -nL
   Chain testchain (0 **references**) 引用计数
-  target prot opt source			destination
+  target prot opt source destination
 ```
 
 ### 重命名，references必须是0
@@ -274,29 +373,29 @@ target = -j targetname [per-target-options]
 -A: append，追加，默认为最后一个
 -I：insert, 插入，默认为第一个
 -D：delete, 删除
-(1) rule specification
-(2) rule number
-  --line-numbers
+  (1) rule specification
+  (2) rule number
+    --line-numbers
 
 -R：replace，替换
-(1) rule specification
-(2) rule number
-  --line-numbers
+  (1) rule specification
+  (2) rule number
+    --line-numbers
 
 -F：flush，清洗
 -L：list
 -Z：zero，置0
-
-iptables的每条规则都有两个计数器：
-(1)有本规则匹配到的所有的packets
-(2)有本规则匹配到的所有的bytes；
+  iptables的每条规则都有两个计数器
+    (1)有本规则匹配到的所有的packets
+    (2)有本规则匹配到的所有的bytes
 -S：selected, 以iptables-save命令的格式显示链上的规则，显示指定chain上的所有规则
 ```
 
 ### 命令行格式显示：命令格式导出链上的规则
 
 ``` shell
-# iptables-save 保存输出重定向命令
+保存输出重定向命令
+# iptables-save
 ```
 
 ``` shell
@@ -314,8 +413,8 @@ iptables的每条规则都有两个计数器：
 
 ``` shell
 # rpm -ql iptables
-小写.so => matches匹配条件扩展
-大写.so => target匹配条件扩展
+  [a-z]+.so => matches匹配条件扩展(怎么匹配)
+  [A-Z]+.so => target匹配条件扩展(怎么处理)
 
 [!] -s, --source address[/mask][,...]：源地址匹配[非]
 [!] -d, --destination address[/mask][,...]：目标地址匹配[非]
