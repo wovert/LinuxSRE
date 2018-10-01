@@ -416,13 +416,15 @@ INPUT命令行格式规则
   [a-z]+.so => matches匹配条件扩展(怎么匹配)
   [A-Z]+.so => target匹配条件扩展(怎么处理)
 
+!表示非
 [!] -s, --source address[/mask][,...]：源地址匹配[非]
 [!] -d, --destination address[/mask][,...]：目标地址匹配[非]
 [!] -i, --in-interface name：限制数据报文流入的接口
-**只能用于PREROUTING,INPUT,FORWARD**
+  只能用于PREROUTING,INPUT,FORWARD
 [!] -o, --out-interface name：限制数据报文流处的接口
-**只能用于OUTPUT,FORWARD,POSTROUTING**
+  只能用于OUTPUT,FORWARD,POSTROUTING
 
+能进来
 # iptables -A INPUT -s 192.168.0.0/16 -j ACCEPT
 # iptables -A OUPUT -d 192.168.0.0./16 -j ACCEPT
 # iptables -nvL
@@ -447,12 +449,14 @@ INPUT命令行格式规则
   C->S : syn=0,act=1,fin=0,rst=0
 ```
 
-#### 扩展匹配：经由扩展模块引入的匹配机制，-m matchname
+#### 扩展匹配：经由扩展模块引入的匹配机制，
+
+`-m matchname`
+
+- 显示扩展：需要加载扩展模块，必须由-m加载相应模块
+- 隐式扩展：可以不用使用-m选项加载相应模块；前提是要使用-p选项匹配协议
 
 ``` shell
-显示扩展：需要加载扩展模块，必须由-m加载相应模块
-隐式扩展：可以不用使用-m选项加载相应模块；前提是要使用-p选项匹配协议
-
 protocol：tcp, udp, icmp, icmpv6, esp, ah, sctp, mh or "all"
 tcp: 隐含指明了-m加载模块，"-m tcp"，有专用选项
 
