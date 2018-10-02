@@ -164,9 +164,9 @@ RoMNiF
   - Source Port Number (16 bits)
   - Destination Port Number (16 bits)
 - 第二行：
-  - Sequence Number (32 bits)
+  - Sequence Number (32 bits) 发送随机序列号
 - 第三行：
-  - Acknowledgement Number (32 bits)
+  - Acknowledgement Number (32 bits) 确认序列号=发送的随机序列号+1
 - 第四行：
   - Header Lenght(4 bits)
   - Reserverd (6 bits)
@@ -193,21 +193,6 @@ RoMNiF
 ``` shell
 # service iptables stop
 # chkconfig iptables off
-
-命令格式：iptables [-t table] SUBCOMMAND chain [matches...] [target]
-iptables [-t table] {-A|-C|-D} chain rule-specification
-iptables [-t table] -I chain [rulenum] rule-specification
-iptables [-t table] -R chain rulenum rule-specification
-iptables [-t table] -D chain rulenum
-iptables [-t table] -S [chain [rulenum]]
-iptables [-t table] {-F|-L|-Z} [chain [rulenum]] [options...]
-iptables [-t table] -N chain
-iptables [-t table] -X  [chain]
-iptables [-t table] -P chain target
-iptables [-t table] -E old-chain-name new-chain-name
-rule-specification = [matches...]  [target]
-match = -m matchname [per-match-options]
-target = -j targetname [per-target-options]
 ```
 
 ## iptable 命令格式
@@ -246,7 +231,7 @@ target = -j targetname [per-target-options]
 
 ### -t table
 
-- raw, mangle, nat, [filter]
+- table: raw|mangle|nat|[filter]
 
 ### SUBCOMMAND
 
@@ -436,32 +421,34 @@ INPUT命令行格式规则
 
 # rpm -ql iptables
 # man iptables-extension
-
-三次握手:
-  C->S : syn=1,act=0,fin=0,rst=0
-  S->C : syn=1,act=1,fin=0,rst=0
-  C->S : syn=0,act=1,fin=0,rst=0
-
-四次断开：
-  C->S : syn=0,act=1,fin=1,rst=0
-  S->C : syn=0,act=1,fin=0,rst=0
-  S->C : syn=0,act=0,fin=1,rst=0
-  C->S : syn=0,act=1,fin=0,rst=0
 ```
+
+#### 三次握手
+
+- C->S : syn=1,act=0,fin=0,rst=0
+- S->C : syn=1,act=1,fin=0,rst=0
+- C->S : syn=0,act=1,fin=0,rst=0
+
+#### 四次断开：
+
+- C->S : syn=0,act=1,fin=1,rst=0
+- S->C : syn=0,act=1,fin=0,rst=0
+- S->C : syn=0,act=0,fin=1,rst=0
+- C->S : syn=0,act=1,fin=0,rst=0
 
 #### 扩展匹配：经由扩展模块引入的匹配机制，
 
 `-m matchname`
 
-- 显示扩展：需要加载扩展模块，必须由-m加载相应模块
-- 隐式扩展：可以不用使用-m选项加载相应模块；前提是要使用-p选项匹配协议
+- 显示扩展：需要加载扩展模块，必须由`-m`加载相应模块;前提是要使用`-p`选项
+- 隐式扩展：可以不用使用`-m`选项加载相应模块；前提是要使用`-p`选项匹配协议
 
 ``` shell
 protocol：tcp, udp, icmp, icmpv6, esp, ah, sctp, mh or "all"
 tcp: 隐含指明了-m加载模块，"-m tcp"，有专用选项
 
 [!]-p, --protocol PROTOCOL PROTOCOL {tcp|udp|icmp}：限制协议
-[!] --source-port, --sport port[:port]：匹配报文中的tcp首部的源端口；可以是端口范围
+[!] --source-port, --sport port[:port]：匹配报文中的tcp首部的源端口；可个以是端口范围
 [!] --destination-port, --dport port[:port]：匹配报文中的tcp首部的目标端口；可以是端口范围；
 
 [!] --tcp-flags mask comp：检查报文中mask指明的tcp标志位,而要这些标志位comp中必须为1
@@ -473,13 +460,16 @@ tcp: 隐含指明了-m加载模块，"-m tcp"，有专用选项
 udp: 隐含指明了-m加载模块，"-m udp"，有专用选项
   [!] --source-port, --sport port[:port]：匹配报文中的udp首部的源端口；可以是端口范围；
   [!] --destination-port, --dport port[:port]：匹配报文中的udp首部的目标端口；可以是端口范围；
+  注意：DNS服务 A <-> B <-> C
 
 icmp: 隐含指明了-m加载模块，"-m icmp"，有专用选项
   [!] --icmp-type {type[/code]|typename}
 
   type/code
-    0/0：echo reply，回显应答
-    8/0：echo request, 请求显应
+    0/0：echo reply，回显应答(ping响应)
+    8/0：echo request, 请求显应(ping请求)
+
+  注意：A<0--8>B<0--8>C
 
 # yum -y install httpd telnet-socket
 # systemctl start httpd.service
@@ -487,9 +477,12 @@ icmp: 隐含指明了-m加载模块，"-m icmp"，有专用选项
 # systemctl start telnet.socket
 # ss -tnl
 
-己ping别人可以，别人不能ping我
+我ping别人可以，别人不能ping我
 # iptables -A OUTPUT -s 本机IP -d 0/0 -p icmp -icmp-type 8 -j ACCEPT
 # iptables -A INPUT -d 本机IP -s 0/0 -p icmp -icmp-type 0 -j ACCEPT
+# ping 别的IP地址
+在别的服务端
+# ping 请求IP地址
 
 [root@Test ~]# iptables -t filter -A INPUT -s 0/0 -d 172.16.0.3 -p icmp --icmp-type 8 -j ACCEPT
 [root@Test ~]# iptables -t filter -A OUTPUT -d 0/0 -s 172.16.0.3 -p icmp --icmp-type 0 -j ACCEPT
@@ -535,7 +528,7 @@ num      pkts      bytes target     prot opt in     out     source              
   ACCEPT, DROP, REJECT
   RETURN：返回调用的链
   REDIRECT：端口重定向
-  LOG：日志
+  LOG：日志(仅作日志)
   MARK：防火墙标记
   DNAT：目标地址转换
   SNAT：源地址转换
