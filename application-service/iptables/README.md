@@ -604,30 +604,31 @@ state: 是conntract模块的子集，用于对报文的状态连接追踪（与�
   ESTABLISHED：连接追踪模版当中存在记录的连接，超时之前都此状态
   NEW：连接追踪模版当中不存在的连接请求,第一次请求
   RELATED：相关联的连接, ftp(21,20)
-  UNTRACKED：未追踪的连接，追踪连接关掉,raw
+  UNTRACKED：未追踪的连接，追踪连接关掉, raw
 
 防火墙默认不认识连接追踪机制
 
-已经追踪到的并记录下来的连接：
+已经追踪到的并记录下来的连接
 # cat /proc/net/nf_contract
   nf: netfilter
 
 连接追踪功能能够记录的最大连接数量（可调整）
 # cat /pro/sys/net/nf_contract_max
 
-修改连接追踪机制修改最大值: 
+修改连接追踪机制修改最大值
 # sysctl -w net.nf_contract_max=300000
 # echo 300000 > /proc/sys/net/nf_contract_max
 
 conntract所能够追踪的连接数量的最大值取决于/proc/sys/net/nf_conntract_max的设定；已经追踪到的并记录下来的连接位于/proc/net/nf_conntract文件中，超时的连接将会被删除；当模版满载时，后续的新连接有可能会超时；
 解决办法：
 
-(1) 加大nf_conntract_max的值；
-(2) 降低nf_conntract条目的超时时长；
-不同协议的连接追踪超时时长：`/proc/sys/net/netfilter`
-`nf_conntract_tcp_timeout_close`
-`nf_conntract_tcp_timeout_close_wait`
-`nf_conntract_tcp_timeout_established`
+(1) 加大nf_conntract_max的值
+(2) 降低nf_conntract条目的超时时长
+不同协议的连接追踪超时时长：
+# ls -l /proc/sys/net/netfilters
+  nf_conntract_tcp_timeout_close
+  nf_conntract_tcp_timeout_close_wait
+  nf_conntract_tcp_timeout_established
 
 连接追踪：任何一个主机与本机通信，本机内核记录了src:port,dst:port使用什么协议什么时间连接并保存在内存缓冲区中。连接会话表（每条记录都有倒计时）=》追踪机制
 
@@ -650,6 +651,7 @@ input,ouput => drop
 ### 规则的检查次序：规则在链接上的次序即为其检查的生效次序；
 
 因此，其优化使用有一定法则；
+
 1. 同类规则（访问同一应用），匹配范围小的放前面；用于特殊处理；
 2. 不同类的规则（访问不同应用），匹配范围大的放前面；http, ssh
 3. 应将将那些可由一条规则描述的的多个规则合并为一；端口范围,地址范围
@@ -665,9 +667,9 @@ input,ouput => drop
 数据连接RELATED
 ```
 
-### 如何放行被动模式的ftp服务？
+### 如何放行被动模式的ftp服务
 
-1) 内核加载nf_conntrack_ftp模块，才能装载RELATED连接 
+1) 内核加载nf_conntrack_ftp模块，才能装载RELATED连接
 
 ``` shell
 # modprobe nf_conntrack_ftp`
