@@ -1,11 +1,12 @@
 # nsswitch
 
 > Name Service Switch
+
 名称解析：用户名、组名、主机名、服务名
 
 ## 解析：根据已知的信息（key）查找某存储库，获取其他信息的过程
 
-### 存储：文件、SQL、NoSQL、LDAP，DNS ...
+### 存储：文件、SQL、NoSQL、LDAP、DNS
 
 - 文件系统接口：系统调用
 - SQL：SQL接口
@@ -42,10 +43,10 @@ hosts: files dns
 
 - 每种存储中的根据查找键进行查找的**结果状态**
   - STATUS => success | notfound | unavail | tryagain
-  - success: 成功找到 return
-  - notfound：未发现服务 continue
-  - unavail: 找到解析库了，但服务不可用 continue
-  - tryagain: 重试 continue
+    - success: 成功找到 return
+    - notfound：未发现服务 continue
+    - unavail: 找到解析库了，但服务不可用 continue
+    - tryagain: 重试 continue
 
 - 对应于每种**状态结果**的行为(action)
   - return | continue
@@ -92,12 +93,12 @@ hosts: files [NOTFOUND=return] dns 没有hosts直接返回，永远找不到
 配置文件语法格式
 
 ``` shell
-# vim /etc/pam.conf`
+# vim /etc/pam.conf
   application type control module-path module-arguments
 ```
 
 ``` shell
-# vim /etc/pam.d/APP_NAME`
+# vim /etc/pam.d/APP_NAME
   type control module-path module-arguments
 ```
 
@@ -141,15 +142,17 @@ module-arguments：模块的专用的参数
 
 ## 模块示例
 
-### pam_shells.so：检查用户的shell程序
+### pam_shells.so
+
+> 检查用户的shell程序
 
 ``` shell
 # vim /etc/pam.d/sshd
 # 在auth栈的第一行添加
-auth required pam_shells.so
+  auth required pam_shells.so
 ```
 
-没有csh测试是否能登录
+没有 csh 测试是否能登录
 
 ``` shell
 # useradd -s /bin/csh docker
@@ -167,7 +170,7 @@ auth required pam_shells.so
 定义或修改资源限制
 
 1. ulimit命令
-2. 配置文件：
+2. 配置文件
 
 ``` shell
 # vim /etc/security/limits.conf
@@ -183,7 +186,7 @@ auth required pam_shells.so
   <domain>：应用于哪些对象
     username：单个用户
     @group：组内的所有用户
-    `*：通配符，设定默认值；所有用户`
+    *：通配符，设定默认值；所有用户
 
   <type>：限制的类型
     soft：可超过的限制（大家尽量不要迟到）
@@ -194,9 +197,10 @@ auth required pam_shells.so
     nofile：max number of open file descriptors
     nproc：max number of processes
 
-fedora hard nofile 2
+  fedora hard nofile 2
+
 # su - fedora
-# lsof`
+# lsof
 ```
 
 ### ulimit命令：用于临时调整软硬限制或查看，仅root用户能执行
