@@ -518,7 +518,7 @@
 
 - 注意：此类设定仅对当前 shell 进程有效
 
-### 练习
+### 练习用户命令
 
 1. 新建系统组mariadb，新建系统mariadb，属于mariadb组且没有家目录，shell为/sbin/nologin；尝试root切换至用户，查看其命令提示符；
 
