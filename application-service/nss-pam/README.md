@@ -34,11 +34,14 @@
 文件格式
 
 ``` shell
-db: store1 store2 ...
+db: store1 store2 ... 在store1查找，找到不在继续store2中查找
 passwd: files sss
 shadow: files sss
 group: files sss
 hosts: files dns
+
+库名：files
+[NOTFOUND=RETURN] 解析后的动作
 ```
 
 - 每种存储中的根据查找键进行查找的**结果状态**
@@ -49,10 +52,12 @@ hosts: files dns
     - tryagain: 重试 continue
 
 - 对应于每种**状态结果**的行为(action)
-  - return | continue
+  - return 返回 | continue 继续
   - 一般success返回return，其他都是continue
 
-例：hosts: files nis [NOTFOUND=return] dns
+- 例：hosts在files查找，找到sucess, 没有找到继续在nis中查找，找到return，没有找到也reutrn。因为设置了[NOTFOUND=return]。因为nis挂了不用再dns在查找。但有些场景会continue, nis不可用时。nis不给我们响应，继续查找下一个 dns
+
+`hosts: files nis [NOTFOUND=return] dns`
 
 ## getent命令
 
