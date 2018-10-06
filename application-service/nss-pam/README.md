@@ -61,13 +61,19 @@ hosts: files dns
 
 ## getent命令
 
-`getent database [key ...]`
+``` shell
+# man getent
+# getent database [key ...]
+```
 
 ``` shell
 passwd解析库查找root
 # getent passwd root
+
 # getent passwd fedora
+
 # getent hosts 192.168.1.71
+
 # getent hosts web.lingyima.com
 
 hosts: files [SUCCESS=continue] dns
@@ -75,6 +81,23 @@ hosts: files [SUCCESS=continue] dns
 
 hosts: files [NOTFOUND=return] dns 没有hosts直接返回，永远找不到
 # getent hosts web.lingyima.com
+```
+
+### 去掉本机 DNS 解析
+
+``` shell
+# vim /etc/nsswitch.conf
+  hosts: files dns 改成 hosts: dns
+# gentent hosts lingyima.com
+
+# vim /etc/nsswitch.conf
+  hosts: files [SUCCESS=continue]  dns
+# gentent hosts lingyima.com
+
+# vim /etc/nsswitch.conf
+  files没有找到 直接返回不在继续dns服务查找
+  hosts: files [NOTFOUND=return]  dns
+# gentent hosts lingyima.com
 ```
 
 ## pam
@@ -85,7 +108,7 @@ hosts: files [NOTFOUND=return] dns 没有hosts直接返回，永远找不到
 
 ### 实现
 
-> 提供与各种类型的存储进行交互的通用实现，以及多种辅助类的功能模块
+> 提供与各种类型的存储进行交互的通用实现，以及多种辅助类的功能模块(比如：密码弱口令提示语)
 `/lib64/security/*`
 
 配置文件：每个基于pam做认证的应用程序都需要有其专用的配置
@@ -108,7 +131,7 @@ hosts: files [NOTFOUND=return] dns 没有hosts直接返回，永远找不到
 ```
 
 - type
-  - auth：账号的**认证和授权**
+  - auth：账号的认证和授权
   - account：与账号管理相关的非认证类的功能（审计生效，认证成功，未必能使用，账号过期）
   - password：用户修改密码时密码复杂度检查机制等功能
   - session：用户获取到服务之前或使用服务完成之后需要进行一些附加的操作
@@ -116,9 +139,9 @@ hosts: files [NOTFOUND=return] dns 没有hosts直接返回，永远找不到
 - control：同一种type的多个检查之间如何进行组合
   - 有两种实现方式：
     - 简单实现：使用一个关键词来定义
-    - 详细实现：使用一个或多个"status=action”进行组合定义
+    - 详细实现：使用一个或多个"status=action"进行组合定义
 
-  - 简单实现关键词：
+  - 简单实现关键词
     - required：必须成功通过，否则即为失败；无论成功还是失败，都需要参考同种type下的其他定义；本检查**不成功一定不能过**
 
     - requisite：**必须成功通过，否则立即返回失败（1票否决）**；成功时，还需要参考同种type下的其他定义；失败时，不参考同种type的定义
@@ -129,23 +152,25 @@ hosts: files [NOTFOUND=return] dns 没有hosts直接返回，永远找不到
 
 ``` shell
 # vim /etc/pam.d/password-auth
-  详细实现：[status1=action, status2=action, ...]
-  status：检查结果的返回状态；
-  action：采取的行为，比如ok,done,die,bad,igonre,...
-  ok:通过
-  done：一票通过
-  die：一票否决，挂掉
-  bad: 挂掉
-  ignore: 忽略
-
-module-path：模块文件路径
-  相对路径：相对于`/lib64/security/`目录
-  绝对路径：
-
-module-arguments：模块的专用的参数
 ```
 
-## 模块示例
+### 详细实现
+
+`[status1=action, status2=action, ...]`
+
+- status：检查结果的返回状态；
+- action：采取的行为，比如ok,done,die,bad,igonre,...
+- ok:通过
+- done：一票通过
+- die：一票否决，挂掉
+- bad: 挂掉
+- ignore: 忽略
+
+- module-path：模块文件路径
+  - 相对路径：相对于`/lib64/security/`目录
+  - 绝对路径：
+
+- module-arguments：模块的专用的参数
 
 ### pam_shells.so
 
@@ -153,7 +178,7 @@ module-arguments：模块的专用的参数
 
 ``` shell
 # vim /etc/pam.d/sshd
-# 在auth栈的第一行添加
+  # 在auth栈的第一行添加
   auth required pam_shells.so
 ```
 
