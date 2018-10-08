@@ -647,15 +647,13 @@ server {
 3. 右侧`*`通配符匹配
 4. 正则表达式模式(`~`)匹配
 
-1. `server_name www.lingyima.com;`s
-
-2. `server_name *.lingyima.com`
-
-3. `server_name www.lingyi.*;`
-
-4. `server_name ~^.*\.lingyima\..*$;`
-
-5. `mail.lingyima.com, www.lingyima.com`
+``` shell
+1. server_name www.lingyima.com;
+2. server_name *.lingyima.com
+3. server_name www.lingyi.*;
+4. server_name ~^.*\.lingyima\..*$;
+5. mail.lingyima.com, www.lingyima.com
+```
 
 ---
 
@@ -1268,10 +1266,9 @@ if ($invalid_referer) {
 
 > 当前虚拟主机使用的PEM格式的证书文件
 
-### ssl_certificate_key file;	
+### ssl_certificate_key file;
 
-> 当前虚拟主机使用的证书文件中的公钥配对儿的私钥文件路径
-- PEM 格式
+> 当前虚拟主机使用的证书文件中的公钥配对儿的私钥文件路径 - PEM 格式
 
 ### ssl_protocol [SSLv2] [SSLv3] [TLSv1] [TLSv1.1] [TLSv1.2]
 
@@ -1282,7 +1279,7 @@ if ($invalid_referer) {
 > ssl会话的缓存机制
 
 - off 禁止使用会话
-- none 
+- none
 - builtin：使用openssl内建的缓存机制，此为各worker独有
 - shared: 由各worker共享的缓存
   - name：缓存空间的名称
@@ -1295,7 +1292,6 @@ if ($invalid_referer) {
 
 - 默认为5m(分钟)
 
-- 示例：
 ``` shell
 # cd /etc/nginx
 # (umask 077;openssl genrsa -out ssl/nginx.key 1024)
@@ -1308,8 +1304,9 @@ if ($invalid_referer) {
 `# openssl req -new -key nginx.key -out nginx.csr -days 365`
 CN,Beijing,Beijng,Lingyima, Ops, www.lingyima.com,adminmaster@lingyima.com
 
-- 生成私钥
-```
+生成私钥
+
+``` shell
 # cd /etc/pki/CA
 # (umask 077;openssl genrsa -out primate/cakey.pem 2048)
 # openssl req -new -x509 -key private/cakey.pem -out cacert.pem -days 365
@@ -1384,8 +1381,8 @@ CN,Beijing,Beijng,Lingyima, Ops, ca.lingyima.com,camaster@lingyima.com
 
 `# nginx -t -c /etc/nginx/nginx.conf`
 
-
 ### open_log_file_cache max=N[inactive=time] [min_uses=N] [valid=time];
+
 > Default: open_log_file_cache off
 
 - max：最大缓存条目
@@ -1394,7 +1391,9 @@ CN,Beijing,Beijng,Lingyima, Ops, ca.lingyima.com,camaster@lingyima.com
 - valid:验证缓存条目有效性的频率
 
 ## ngx_http_rewrite_module模块
+
 ### rewrite regex replacement [flags]
+
 > 把用户请求的URI基于regex做检查，匹配到时将替换为replacement指定的字符串
 
 - 在同一个location中存在的多个rewrite规则会自上而下逐个被检查(循环)；可以使用flag控制次循环功能；
@@ -1419,7 +1418,7 @@ CN,Beijing,Beijng,Lingyima, Ops, ca.lingyima.com,camaster@lingyima.com
 
   - permanent：重写完成后以**永久重定向**方式直接返回重写后生成的新URL给客户端，由客户对新URL进行请求,301
 
- ```
+``` shell
   location / {
     root html;
     index index.html index.htm;
@@ -1471,7 +1470,7 @@ error_log日志中
 
 > 用户自定义变量
 
-## ngx_http_gzip_module模块:
+## ngx_http_gzip_module模块
 
 > 过滤器，对指定类型的资源压缩传输以节约带宽；
 
@@ -1518,7 +1517,7 @@ error_log日志中
 
 ### gzip_vary on | off （是否传输gzip压缩标志）
 
-```
+``` shell
 http {
   gzip on;
   gzip_buffers 32 4k;
@@ -1540,16 +1539,16 @@ http {
   - httpd+php:
     - Module
     - cgi
-    - fastcgi (proxy_fastcgi_module)	
+    - fastcgi (proxy_fastcgi_module)
 - LNMP
   - nginx+php
     - fastcgi
 
   - php: 编译时，支持fpm; (fastcgi进程管理器)
     - ./configure ... -enable-fpm ...
-    - php-fpm工作方式（类似于httpd的prefork） 
+    - php-fpm工作方式（类似于httpd的prefork）
 
-```
+``` shell
 listen = 127.0.0.1:9000
 listen.allowed_clients = 127.0.0.1
 pm = dynamic | static
@@ -1561,7 +1560,7 @@ user = UERNAME
 group = GROUPNAME`
 ```
 
-```
+``` shell
 # yum info php-fpm
 # yum -y install php-fpm php-mysql php-mystring php-gd php-xml
 # rpm -ql php-frpm | less
@@ -1570,8 +1569,8 @@ group = GROUPNAME`
 # systemctl stat php-fpm.service
 ```
 
-```
-./configure --prefix=/usr/local/fastphp \
+``` shell
+# ./configure --prefix=/usr/local/fastphp \
 --with-mysql=mysqlnd \
 --enable-mysqlnd \
 --with-gd \
@@ -1582,7 +1581,7 @@ group = GROUPNAME`
 
 ## nginx + php-fpm 结合
 
-```
+``` shell
 # cd /etc/nginx/
 # vim nginx.conf
   location ~ \.php$ {
@@ -1623,6 +1622,7 @@ group = GROUPNAME`
   - 128/4 = 32  
 
 ### fastcgi_cache_path path [levels=levels] [key_zone=name:size];
+
 > path：文件系统路径，用于存储缓存的文件数据；
 
 - max_size=size 定义此路径下的多大空间用于存储缓存数据
@@ -1636,28 +1636,35 @@ group = GROUPNAME`
 - 注意：只能定义在http上下文
 
 ### fastcgi_cache_key string;
+
 > 定义要使用的缓存键
 - 示例： fastcgi_cache_key $request_uri;
 
 ### fastcgi_cache zone | off;
+
 > 是否启用cache，如果启用，数据缓存存于哪个zone
 
 ### fastcgi_cache_methods GET | HEAD | POST ...;
+
 > 缓存哪些类型的请求的相关数据
 
 ### fastcgi_cache_min_uses number;
+
 ### fastcgi_cache_valid [code...] time
+
 > 对不同响应码设定其可缓存时长
 
 - 注意：调用缓存时，至少应该指定三个参数
-```
+
+``` shell
 fastcgi_cache_valid 200 302 10m;
 fastcgi_cache_valid 301 1h;
 fastcgi_cache_valid any 1m;
 ```
 
-- 示例：
-```
+- 示例
+
+``` shell
 http {
   fastcgi_cache_path /var/cache/nginx/fastcgi levels=1:2 keys_zone=fcgicache:10m;
 
@@ -1682,11 +1689,11 @@ http {
 
 ## 定时任务日志切割
 
-```
-# vim /usr/local/nginx/nginx.conf`
+``` shell
+# vim /usr/local/nginx/nginx.conf
   access_log logs/domain.com.access.log main;
 
-# vim /usr/local/nginx/sh/log.sh`
+# vim /usr/local/nginx/sh/log.sh
   LOGPATH=/usr/local/nginx/logs/domain.com.access.log
   BASEPATH=/data
 
@@ -1705,15 +1712,15 @@ http {
 
 - 批匹配模式包含{}时，必须使用双引号("模式")
 - 模式匹配最长的优先重写
-```
+
+``` shell
 location /ecshop {
   rewrite "goods-(\d{1,7})-.*\.html$" /ecshop/goods.php?id=$1;
 }
 ```
 
-# 静态资源Web服务
-
 ## 静态资源类型
+
 - image/jpeg
 - text/html
 
@@ -1721,7 +1728,7 @@ location /ecshop {
 
 ## 文件读取
 
-```
+``` shell
 Syntax: sendfile on | off;
 Default: sendfil off;
 Context: http, server, location, if in location
@@ -1734,7 +1741,7 @@ Context: http, server, location, if in location
 > sendfile 开启的情况下，提高网络包的传输速率
 - nopush 意思是多个包一次性发送包
 
-```
+``` shell
 Syntax: tcp_nopush on | off;
 Default: tcp_nopush off;
 Context: http,server,location
@@ -1744,14 +1751,15 @@ Context: http,server,location
 
 > keepalive(长)连接下，提高网络包的传输实时性
 
-```
+``` shell
 Syntax: tcp_nodelay on | off;
 Default: tcp_nodelay on;
 Context: http,server,location
 ```
 
 ## gzip 压缩
-```
+
+``` shell
 Syntax: gzip on | off;
 Default: gzip off;
 Context: http,server,location, if in location
@@ -1760,20 +1768,23 @@ Context: http,server,location, if in location
 - 浏览器(解压) <-----> (解压)Nginx
 
 ### 压缩比率
+
 - Syntax: gzip_comp_level level[1-9];
 - Default: gzip_comp_level 1; 推荐6，占用 CPU 
 - Context: http,server,location
 
 ### http 版本
+
 - Syntax: gzip_http_version 1.0 or 1.1;
 - Default: gzip_comp_level 1.1; 
 - Context: http,server,location
 
 ## 扩展Nginx 压缩模块
+
 - http_gzip_static_module - 预读 gzip 功能
 - http_gunzip_module - 应用支持gunzip的压缩方式
 
-```
+``` shell
 # vim static_server.conf
 server {
   listen 80;
@@ -1824,13 +1835,14 @@ server {
 - Default: expires off;
 - Context: http, server, location, if in location
 
-```
+``` shell
 location /test.html {
   expires 24h;
 }
 ```
 
 ### 跨域访问
+
 > 浏览器禁止跨域访问
 
 `CSRF`
@@ -1841,12 +1853,13 @@ location /test.html {
 
 - 响应 Access-Control-Allow-Origin 信息
 
-```
+``` shell
 location /cross.html {
   add_header Access-Control-Allow-Origin https://www.allow.com;
   add_header Access-Control-Allow-Methods GET,POST,PUT,DELETE,OPTIONS;
 }
 ```
+
 打开了CSRF攻击：`add_header Access-Control-Allow-Origin *;`
 
 ### 防盗链
@@ -1861,7 +1874,7 @@ location /cross.html {
 - Default:
 - Context:
 
-```
+``` shell
 location / {
   # none: 允许没有代理信息
   # blocked: 允许携带没有协议信息的
@@ -1875,7 +1888,7 @@ location / {
 }
 ```
 
-```
+``` shell
 # curl -I http://domain.com
  -I: header
 
@@ -1896,6 +1909,7 @@ location / {
 > 代理的对象是服务器端
 
 ## proxy_pass URL;
+
 - Syntax: proxy_pass URL;
 - Default:-
 - Context: location, ifin locatin, limit_except
@@ -1909,7 +1923,7 @@ location / {
 
 `/opt/app/fan/1.html`
 
-```
+``` shell
 1. 本地服务
 # vim /etc/nginx/conf.d/realserver.conf listen 8080
 
@@ -1927,7 +1941,7 @@ location / {
 
 123.2.30.2的服务器才可以访问一下配置的服务器
 
-```
+``` shell
 # vim admin.conf
   location / {
     if ($http_x_forwarded_for !~* "^123.2.30.2"){
@@ -1948,14 +1962,15 @@ Chrome插件 SwitchySharp
 
 ### 缓冲区
 
-```
+``` shell
 proxy_buffering on | off
 default: on;
 http,server,location;
 ```
 
 扩展
-```
+
+``` shell
 proxy_buffer_size
 proxy_buffers
 proxy_busy_buffers_size
@@ -1963,7 +1978,7 @@ proxy_busy_buffers_size
 
 ### 跳转重定向
 
-```
+``` shell
 proxy_redirect default;
 proxy_redirect off;
 proxy_redirect redirect replacement;
@@ -1973,7 +1988,7 @@ Context: http, server, location
 
 ### 头信息
 
-```
+``` shell
 Syntax:proxy_set_header field vluae;
 default: proxy_set_header Host $proxy_host;
 proxy_set_header Connection close;
@@ -1984,7 +1999,7 @@ context: http,server,location
 
 ### 超时
 
-```
+``` shell
 Syntax: proxy_connect_timeout time;
 Default: proxy_connect_timeout 60s;
 Context: http, server, location
@@ -1994,14 +2009,14 @@ Context: http, server, location
 
 ## 生产代理服务配置
 
-```
+``` shell
 location / {
   proxy_pass http://127.0.0.1:8000;
   include proxy_param.conf;
 }
 ```
 
-```
+``` shell
 # vim proxy_param.conf
 # 后端服务器返回301地址跳转
 proxy_redirect default;
@@ -2027,7 +2042,7 @@ proxy_max_temp_file_size 256k`
   - 加载图pain
   - ajax调用jsp
 
-```
+``` shell
 # vim dongjingfenli.conf
 upstream java_api {
   server 127.0.0.1:8000;
@@ -2050,28 +2065,28 @@ server {
 
 > 实现url重写以重定向
 
-1. URL 访问跳转，支持开发设计
+### 1. URL 访问跳转，支持开发设计
 
 页面跳转、兼容性支持、展示效果等
 
-2. SEO 优化
+### 2. SEO 优化
 
-3. 维护
+### 3. 维护
 
 后台维护、流量转发等
 
-4. 安全-伪静态
+### 4. 安全-伪静态
 
 ---
 
-```
+``` shell
 Syntax: rewrite regex replacement [flag];
 Context: server, location ,if
 ```
 
 所有的请求重定向到maintain.html页面
 
-```
+``` shell
 rewrite ^(.*)$ /pages/maintain.html break;
 rewrite ^(.*)$ => /msie/$1 break
 ```
@@ -2090,7 +2105,7 @@ rewrite ^(.*)$ => /msie/$1 break
 - permanent 返回301永久重定向，地址栏会显示跳转后de地址
   - 解释关闭了服务，页面可以直接重定向到新的页面。不影响访问效果。
 
-```
+``` shell
 location ~ ^/break {
   # break 匹配之后停止，所有返回403
   rewrite ^/break /test/ break;
@@ -2108,7 +2123,7 @@ location /test/ {
 
 先测试-last
 
-```
+``` shell
 # curl -vL domain/last 请求过程`
   结果：200
 ```
@@ -2116,7 +2131,8 @@ location /test/ {
 ---
 
 redirect
-```
+
+``` shell
 # curl -vL domain/last`
   结果：302，再次请求Location 返回200
 
@@ -2136,7 +2152,7 @@ if (!-f $request_filename) {
 - location匹配
 - 选定的location匹配
 
-```
+``` shell
 if($http_host = nginx.org) {
   rewrite (.*) http://doamin.com$1;
 }
@@ -2173,7 +2189,8 @@ if($http_host = nginx.org) {
 - server3.conf 8003 
 
 - upstream
-```
+
+``` shell
 upstream bakcend {
   # weight 值越大权重越大,有7个请求，5个请求分发到这个服务器
   server domain.com weight=5;
@@ -2191,7 +2208,9 @@ upstream bakcend {
 - fail_timeout: 经过max_fails失败后，服务暂停de时间
 - max_conns: 限制最大的接受的连接数
 
-`iptable -I input -t tcp --dport 8002 -j `
+``` shell
+# iptable -I input -t tcp --dport 8002 -j
+```
 
 ## 调度算法
 
@@ -2239,7 +2258,8 @@ upstream bakcend {
 ## 配置缓存
 
 vip server: cache_test.conf
-```
+
+``` shell
 upstream domain {
   ...
 }
@@ -2278,7 +2298,8 @@ location / {
 
 - proxy_no_cache string ...;
 - context: http,server,location
-```
+
+``` shell
 if ($request_uri ~ ^/(url3|login|register|password\/reset)) {
   set $cookie_nocache 1;
 }
@@ -2340,7 +2361,7 @@ location / {
 }
 ```
 
-```
+``` shell
 # vim md5url.sh
 #!/bin/sh
 servername="lingima.com"
