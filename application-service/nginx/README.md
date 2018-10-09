@@ -1392,13 +1392,11 @@ CN,Beijing,Beijng,Lingyima, Ops, ca.lingyima.com,camaster@lingyima.com
 
 ## ngx_http_rewrite_module模块
 
-### rewrite regex replacement [flags]
+### `rewrite regex replacement [flags]`
 
 > 把用户请求的URI基于regex做检查，匹配到时将替换为replacement指定的字符串
-
-- 在同一个location中存在的多个rewrite规则会自上而下逐个被检查(循环)；可以使用flag控制次循环功能；
-
-- 如果replacement是以http://或https://开头，则替换结果以重定向方式返回给客户端
+> 在同一个location中存在的多个rewrite规则会自上而下逐个被检查(循环)；可以使用flag控制次循环功能；
+> 如果replacement是以`http://`或`https://`**开头**，则替换结果以重定向方式返回给客户端
 
 - regex：模式引用
 - replacement：不能使用模式，但可是用反向应用$n
@@ -1407,16 +1405,17 @@ CN,Beijing,Beijng,Lingyima, Ops, ca.lingyima.com,camaster@lingyima.com
 - `(.*)\.jpg => $1.html`
 - `(.*)\.html => $1.jpg`
 - `http://server/hi.html`
-- 死循环
+- nginx内部死循环
+- 循环不会超过10次
 
-- [flag]:
-  - last:（重启匹配）重写完成后停止对当前uri在当前location中的后续其他的重写操作，改为对新uri的新一轮处理；提前结束本轮，进入重新下一轮,continue（不返回客户端，从新开始匹配新的location）
+- `[flag]`: 查找替换循环控制
+  - `last`:（重启匹配）重写完成后停止对当前uri在当前location中的后续其他的重写操作，改为对新uri的新一轮处理；提前结束本轮，进入重新下一轮,continue（不返回客户端，从新开始匹配新的location）
 
-  - break: 重写完成后停止对当前uri在当前location中的后续其他的重写操作
+  - `break`: 重写完成后停止对当前uri在当前location中的后续其他的重写操作
 
-  - redirect：重写完成后以**临时重定向**方式直接返回重写后生成的新URL给客户端，由客户对新URL进行请求, 302
+  - `redirect`：重写完成后以**临时重定向**方式直接返回重写后生成的新URL给客户端，由客户对新URL进行请求, 302
 
-  - permanent：重写完成后以**永久重定向**方式直接返回重写后生成的新URL给客户端，由客户对新URL进行请求,301
+  - `permanent`：重写完成后以**永久重定向**方式直接返回重写后生成的新URL给客户端，由客户对新URL进行请求,301
 
 ``` shell
   location / {
@@ -1446,10 +1445,10 @@ error_log日志中
 
 - Condition
   - compare expression
-    - =, !=
-    - ~：模式匹配，区分字母大小写
+    - `=, !=`
+    - `~`：模式匹配，区分字母大小写
     - `~*`：模式匹配，不区分字母大小写
-    - !~：模式不匹配，区分字母大小写
+    - `!~`：模式不匹配，区分字母大小写
     - `!~*`：模式不匹配，不区分字母大小写
 
   - 文件或目录存在性判断：
