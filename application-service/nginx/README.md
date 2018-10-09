@@ -1556,7 +1556,7 @@ pm.min_spare_servers：最少空间进程数
 pm.max_spare_servers：最大空间进程数
 pm.max_children：最大工作进程数
 user = UERNAME
-group = GROUPNAME`
+group = GROUPNAME
 ```
 
 ``` shell
@@ -1622,12 +1622,13 @@ group = GROUPNAME`
 
 ### fastcgi_cache_path path [levels=levels] [key_zone=name:size];
 
-> path：文件系统路径，用于存储缓存的文件数据；
-
+- path：文件系统路径，用于存储缓存的文件数据；
 - max_size=size 定义此路径下的多大空间用于存储缓存数据
 - levels=#[:#[:#]] 缓存目录层级定义
-- levels=1:2
-- keys_zone=name:size 
+  - 最多3级
+  - levels=1:2
+    - 16个以一级子目录，每个一级子目录下有256个二级子目录
+- keys_zone=name:size
   - 内存中用于缓存k/v映射关系的空间名称及大小
 - inactive=time
   - 非活动时间
@@ -1717,13 +1718,6 @@ location /ecshop {
   rewrite "goods-(\d{1,7})-.*\.html$" /ecshop/goods.php?id=$1;
 }
 ```
-
-## 静态资源类型
-
-- image/jpeg
-- text/html
-
-## 静态资源服务场景-CDN
 
 ## 文件读取
 
