@@ -2,7 +2,7 @@
 
 集群：将多台主机组织起来满足同一个需求
 
-## 系统扩展的方式：
+## 系统扩展的方式
 
 - Scale UP：向上扩展，垂直扩展
 - Scale OUT：向外扩展，水平扩展
@@ -31,7 +31,7 @@
     - MTBF: Mean Time Between Failures，平均故障间隔时间
     - MTTR: Mean Time To Repaire，修复前平均时间
 - HP：High Performance，高性能集群
-  - www.top500.org排名的的超级计算机
+  - [top500](https://www.top500.org)排名的的超级计算机
   - 天气预报、地形
   - 天河一号超级计算机系统
 - DS: Distributed System，分布式系统
@@ -51,7 +51,7 @@
   - LVS: Linux Virtual Server
   - Haproxy
   - Nginx
-  - ats(apache traffice server)
+  - ats(apache traffice server, 雅虎捐给apache软件基金会)
   - perbal
 
 ## 基于工作的协议层次划分
@@ -60,6 +60,7 @@
 - 应用层(用户空间，负载大)：haproxy(mode http), nginx, ats, perlbal
 
 - CDN？
+- 并发（由峰值决定）
 
 ## HA集群的实现方案
 
