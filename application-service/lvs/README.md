@@ -84,8 +84,7 @@
 
 > Linux Virtual Server 章文嵩(song1)
 
-L4：四层路由，四层交换
-根据请求报文的目标IP和目标PORT将其调度转发至后端的某主机
+L4：四层路由，四层交换；根据请求报文的目标IP和目标PORT将其调度转发至后端的某主机
 
 ### iptbles
 
@@ -97,24 +96,21 @@ L4：四层路由，四层交换
 ### LVS 命令
 
 - ipvsadm/ipvs
-  - ipvsadm: 用户空间命令行工具，用于管理集群服务及集群服务上的RS
-
+  - ipvsadm: 用户空间命令行工具，用于管理集群服务及集群服务上的Real Server
   - ipvs: 工作于内核上的netfilter的INPUT钩子之上的程序(强行逆行到POSTROUTING)，可根据用户定义的集群实现请求转发，
     - input->postrouting
-
   - 支持基于TCP、UDP、SCTP、AH、EST、AH_EST等协议进行调度；
 
-## lvs集群的专用术语
+### lvs集群的专用术语
 
-- VS: Virtual Server, Director, Dispatcher, Balancer
-- RS: Real Server
-
-- CIP：Client IP
+- VS: Virtual Server, Director(调度器), Dispatcher(分发器), Balancer(负载均衡器)
+- RS: Real Server(后端主机)
+- CIP：Client IP(客户端IP)
 - VIP: Vitural Server IP(公网IP)
-- DIP: Director IP(内网IP)
-- RIP: Real Server IP
+- DIP: Director IP(调度器IP，内网IP)
+- RIP: Real Server IP(后端IP)
 
-## LVS集群的类型
+### LVS集群的类型
 
 - lvs-nat
 - lvs-dr
@@ -139,7 +135,6 @@ L4：四层路由，四层交换
     - a.在路由器上静态绑定VIP和Director的MAC地址；禁止RS响应VIP的ARP请求，静止RS的VIP进行通告
     - b. arptables
     - c. 修改RS的内核参数，并把VIP绑定lo的别名上；arp_ignore, arp_announce
-
 2. RS的RIP可以使用私有地址，也可以使用公网地址；
 3. RS跟Director必须在同一物理网络；RS的网关必须不能指向DIP；
 4. 请求报文必须由Director调度，但响应报文必须不能经由Director；
@@ -171,7 +166,7 @@ L4：四层路由，四层交换
 2. 会话集群：session cluster (复制)
 3. 会话服务器：session server (单点)
 
-## lvs scheduler，调度方法：
+## lvs scheduler，调度方法
 
 > 根据其调度时是否考虑后端主机的当前负载，可分为静态方法和动态方法两类
 
