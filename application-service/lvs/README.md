@@ -106,7 +106,7 @@ L4：四层路由，四层交换；根据请求报文的目标IP和目标PORT将
 - VS: Virtual Server, Director(调度器), Dispatcher(分发器), Balancer(负载均衡器)
 - RS: Real Server(后端主机)
 - CIP：Client IP(客户端IP)
-- VIP: Vitural Server IP(公网IP)
+- VIP: Vitural Server IP(公网IP，网卡别名上绑定)
 - DIP: Director IP(调度器IP，内网IP)
 - RIP: Real Server IP(后端IP)
 
@@ -117,29 +117,34 @@ L4：四层路由，四层交换；根据请求报文的目标IP和目标PORT将
 - lvs-tun
 - lvs-fullnat
 
-### lvs-nat类型
+### lvs-nat类型：目标地址转换
 
 > 多目标的DNAT，通过将请求报文中的目标地址和目标端口修改为挑选出的某RS的RIP和PORT实现转发
 
-1. RIP和DIP应该在同一IP网络，且应该使用私有地址；RS的网关要指向DIP（保证响应报文必须经由vs）
+1. RIP和DIP必须在同一IP网络，且应该使用私有地址；RS的网关要指向DIP（保证响应报文必须经由vs）
 2. 请求报文和响应报文都经由Director转发(使用连接追踪机制，但是影响并发性能。400万并发管理连接追踪文件)，较高负载下，Director易于称为系统性能瓶颈；
 3. 支持端口映射；
 4. VS必须是Linux，RS可以是任意OS；
 
-### lvs-dr类型：Direct Routing，VS和RS并列（默认类型）
+### lvs-dr类型：Direct Routing直接路由，VS和RS并列（默认类型）
 
 > 通过为请求报文的重新封装一个MAC地址进行转发，源MAC是DIP所在接口的MAC，目标MAC是挑选出某RS的RIP所在接口的MAC地址；IP首部不会发送变化(CIP<-->VIP)；
 
-1. 确保前段路由器将目标IP为VIP的请求报文发往Director;
-  - 解决方案：
-    - a.在路由器上静态绑定VIP和Director的MAC地址；禁止RS响应VIP的ARP请求，静止RS的VIP进行通告
-    - b. arptables
-    - c. 修改RS的内核参数，并把VIP绑定lo的别名上；arp_ignore, arp_announce
-2. RS的RIP可以使用私有地址，也可以使用公网地址；
-3. RS跟Director必须在同一物理网络；RS的网关必须不能指向DIP；
-4. 请求报文必须由Director调度，但响应报文必须不能经由Director；
-5. 不支持端口映射；
-6. RS可以使用大多的OS；
+1. 确保前段路由器将目标IP为VIP的请求报文发往Director
+
+- 解决方案：
+  - a. 在路由器上静态绑定VIP和Director的MAC地址；禁止RS响应VIP的ARP请求，禁止RS的VIP进行通告
+  - b. arptables
+  - c. 修改RS的内核参数，并把VIP绑定本地回环接口lo的别名上；`arp_ignore, arp_announce`
+2. RS的RIP可以使用私有地址，也可以使用公网地址
+3. RS跟Director必须在同一物理网络；RS的网关必须不能指向DIP
+4. 请求报文必须由Director调度，但响应报文必须不能经由Director
+5. 不支持端口映射
+6. RS可以使用大多的OS
+
+每一个RS和DS都有VIP，地址冲突？本地局域网arp请求，如果有相关的arp请求，则出现IP地址冲突。隔离RIP地址，避免IP地址冲突。每一个 RS 设置 arptables控制arp请求和响应报文。Linux较新版本当中提供与外部通信的接口之外，还有 lo 接口。一个报文从外网接口进来，经过lo接口到达主机（转发），RIP配置在物理接口上，VIP配置在lo的别名上。比如：lo:0 接口（内网接口）对arp请求不给响应。调整内核参数之后，只在他们网络断响应，其其他网络接口地址不会响应ARP请求。避免IP地址不会冲突。
+
+RS隔离广播ARP请求的响应
 
 ### lvs-tun类型：tunnel
 
@@ -151,55 +156,70 @@ L4：四层路由，四层交换；根据请求报文的目标IP和目标PORT将
 4. 不支持端口映射；
 5. RS的OS必须支持隧道功能；
 
+- VIP(北京)
+  - RS(纽约) 有VIP
+  - RS(东京) 有VIP
+  - RS(伦敦) 有VIP
+
 ### lvs-fullnat类型：alibaba开发，不是标准类型
 
-> 转发方式：通过同时修改请求报文的源地址(CIP-->DIP)和目标IP地址(VIP-->RIP)进行转发
+> 基于DNA模型，转发方式：通过同时修改请求报文的源地址(CIP-->DIP)和目标IP地址(VIP-->RIP)进行转发
 
-1. VIP是公网地址，RIP他DIP是私网地址，且通常不在同一网络中，但需要经由路由器互通；
-2. RS收到的请求报文源IP为DIP，因此响应报文将直接响应给DIP；
-3. 请求和响应报文都经由Director；
-4. 支持端口映射；
+1. VIP是公网地址，RIP他DIP是私网地址，且通常不在同一网络中，但需要经由路由器互通
+2. RS收到的请求报文源IP为DIP，因此响应报文将直接响应给DIP
+3. 请求和响应报文都经由Director
+4. 支持端口映射
 
 ## 负载均衡集群中会话保持的方式
 
-1. 源地址哈希： session sticky
+1. 源地址哈希：session sticky (LVS:SH)
 2. 会话集群：session cluster (复制)
 3. 会话服务器：session server (单点)
 
-## lvs scheduler，调度方法
+## lvs scheduler 调度方法
 
 > 根据其调度时是否考虑后端主机的当前负载，可分为静态方法和动态方法两类
 
-- 静态方法：仅根据算法本身进行调度（不考虑后端负载）
-  - RR: Round Robin, 轮询/轮调/轮叫
-  - WRR: Weighted RR，加权轮询
-  - SH: Source Hashing，源地址哈希（用户会话保持机制，购物车）
-    - Director会话表（CIP与RIP对应表，问题：RIP挂掉）
-  - DH: Destination Hasing，目标地址哈希
-    - 正向web代理（缓存）集群，负载均衡内网用户对外部服务器的请求
+### 静态方法：仅根据算法本身进行调度（不考虑后端负载）
+
+- RR: Round Robin, 轮询/轮调/轮叫
+- WRR: Weighted RR，加权轮询
+  - 1,2,3 => RS1
+  - 4,5,6 => RS2
+  - 7,8,9 => RS3
+- SH: Source Hashing 源地址哈希（用户会话保持机制，购物车）
+  - Director会话表（CIP与RIP对应表，问题：RIP挂掉）
+  - 第一次CIP与RIP对应表，设置超时时长
+  - 之后从对应表查找，找到在对应表的RIP中查找，没有则记录对应表
+  - Redis服务器存储会话，主从会话集群
+- DH: Destination Hasing 目标地址哈希(用于正向代理负载算法)
+  - 正向web代理（缓存）集群，负载均衡内网用户对外部服务器的请求
+  - 保存的是目标地址哈希
   - 哈希的是目标地址
     - 提高缓存命中率
 
-- 动态方法：根据算法及各RS当前的负载状态进行调度
-  - LC: Least connection, 最少连接
-    - Overhead=Active(活动连接数) x 256 + Inactive(非活动连接)
-    - 值越大负载大
-  - WLC: Weighted LC，加权最少连接
-    - Overhead=(Active x 256 + Inactive)/weight
-    - 值越大负载大
-    - 默认调度，通用
-  - SED: Shorted Expections Delay，最短期望延迟
-    - Overhead=(Active+1) x 256/weight
-    - 最开始使用,w:1,w:3,w:8, (0+1)x256/{1,3,8}=...
-    - 第二次使用时问题，始终在w:8服务器里
-    - 放弃了非活动连接
-  - NQ: Never Queue，永不排队
-    - 第一轮没有权重计算，第二次开始计算权重计算
-  - LBLC: Locality-Based LC，动态的DH算法
-    - 提高了均衡性
-    - 失去了命中率
-  - LBLCR：LBLC with Replication 带复制功能的LBLC
-    - 两个缓存服务器同步数据，比原始服务器上获取资源节省
+### 动态方法：根据算法及各RS当前的负载状态进行调度
+
+- LC: Least connection, 最少连接
+  - Overhead=Active(活动连接数量) x 256 + Inactive(非活动连接)
+  - 活动连接：要求请求/处理请求/响应请求
+  - 值越大负载大
+- WLC: Weighted LC，加权最少连接
+  - Overhead=(Active x 256 + Inactive)/weight
+  - 值越大负载大
+  - 默认调度，通用
+- SED: Shorted Expections Delay，最短期望延迟
+  - Overhead=(Active+1) x 256/weight
+  - 最开始使用,RS1(w:1),RS2(w:3),RS3(w:8), (0+1)x256/{1,3,8}=...
+  - 第二次使用时问题，始终在w:8服务器里
+  - 放弃了非活动连接
+- NQ: Never Queue，永不排队
+  - 第一轮没有权重计算，第二次开始计算权重计算
+- LBLC: Locality-Based LC，动态的DH算法
+  - 提高了均衡性
+  - 失去了命中率
+- LBLCR：LBLC with Replication 带复制功能的LBLC
+  - 两个缓存服务器同步数据，比原始服务器上获取资源节省
 
 ## ipvs
 
@@ -494,9 +514,11 @@ RS1:
 ```
 
 1. 配置网络
+
 所有网卡桥接
 
 2. Director
+
 ``` shell
 # ip addr add 172.18.100.7/16 dev eno16777736
 # ip addr del 172.18.100.7/16 dev eno16777736
