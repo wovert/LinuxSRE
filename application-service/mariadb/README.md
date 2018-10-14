@@ -217,6 +217,31 @@
 
 ### 安装方式
 
+#### Windows下安装 mysql
+
+- 初始化
+  - 服务端：E:\wupeiqi\mysql-5.7.16-winx64\mysql-5.7.16-winx64\bin\mysqld --initialize-insecure
+    - `# 用户名 root 密码：空`
+- 启动服务端：E:\wupeiqi\mysql-5.7.16-winx64\mysql-5.7.16-winx64\bin\mysqld\mysqld
+
+- 客户端连接：`E:\wupeiqi\mysql-5.7.16-winx64\mysql-5.7.16-winx64\bin\mysqld\mysql -u root -p`
+
+- 发送指令：
+  - show databases;
+  - create database db1;
+
+- 环境变量的配置：E:\wupeiqi\mysql-5.7.16-winx64\mysql-5.7.16-winx64\bin
+  - mysqld
+
+- windows服务：
+  - E:\wupeiqi\mysql-5.7.16-winx64\mysql-5.7.16-winx64\bin\mysqld --install
+  - net start MySQL
+
+  - E:\wupeiqi\mysql-5.7.16-winx64\mysql-5.7.16-winx64\bin\mysqld --remove
+
+  - net start MySQL
+  - net stop MySQL
+
 #### 1. 包管理器的程序包（rpm,deb包等）
 
 (a) 由OS的发行商提供
@@ -2229,9 +2254,40 @@ P1,P2
 - 重命名用户：`rename user old_username to new_username`
 - 删除用户：`drop user 'username'@'host'`
 
+``` sql
+-- 创建用户
+create user 'alex'@'%' identified by '123456';
+
+-- 删除用户
+drop user 'alex'@'%';
+
+-- 修改用户
+rename user 'alex'@'%' to 'bob'@'%';
+
+-- 修改密码
+set password for 'alex'@'%' = Password('new_password')
+
+
+-- 授权
+grant select,insert,update on db_name.table_name to 'alex'@'%';
+
+-- 除了 grant命令之外什么命令都可以拥有
+grant all privileges on db_name.table_name to 'alex'@'%';
+
+-- 移除select授权
+revoke select on db_name.table_name from 'alex'@'%'
+
+-- 查看授权
+show grants for 'alex'@'%'
+
+```
+
+[mysql笔记](http://www.cnblogs.com/wupeiqi/articles/5713315.html)
+[mysql练习](http://www.cnblogs.com/wupeiqi/articles/5729934.html)
+
 修改密码
 
-``` SQL
+``` sql
 第一种方法
 > set password for root@localhost = password('123');
 

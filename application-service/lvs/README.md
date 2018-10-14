@@ -223,27 +223,31 @@ RS隔离广播ARP请求的响应
 
 ## ipvs
 
-> 内核中的协议栈上实现
-
-- ipvsadmin： 用户空间的服务管理工具
-- 一个ipvs主机可以同时定义多个cluster service
-- 一个ipvs服务至少应该有一个rs
+- `ipvs`: 内核中的协议栈上实现
+  - `ipvsadmin`：用户空间的服务管理工具
+  - 四层交换和四层路由
+  - 一个ipvs主机(DS)可以同时定义多个 cluster service
+    - 一个DS 提供2个Web服务器或2个MySQL服务器
+  - 一个 `ipvs` 服务至少应该有一个 RS
 
 ## ipvsadm命令用法
 
-- 内核是否支持ipvs
+### 内核是否支持ipvs
 
 ``` shell
 # uname -r
 # grep -A 11 -i 'IPVS' /boot/config-3.10.0-229......
+```
 
-安装ipvsadm工具
+### 安装ipvsadm工具
+
+``` shell
 # yum -y install ipvsadm
 # rpm -ql ipvsadm
 # man ipvsadm
 ```
 
-- 管理集群服务：CRUD
+### 管理集群服务：CRUD
 
 ``` shell
 ipvsadm -A|E -t|u|f service-address [-s scheduler]
@@ -266,7 +270,7 @@ ipvsadm -D -t|u|f service-address
   -D 删除
 ```
 
-管理集群上的RS
+### 管理集群上的RS
 
 ``` shell
 ipvsadm -a|e -t|u|f service-address -r server-address [-g|i|m] [-w weight]
@@ -773,10 +777,10 @@ test server
 
 1. Director不可用时，整个系统不可用；SPOF
 2. 某RS不可用时，Director是否仍会向其调度请求
-  - 对RS做健康状态监测，并按需增删
-    - a.网络层探测；ping命令
-    - b.传输层探测；nmap命令
-      - 端口可用性探测
-    - c.应用层探测；curl命令
+- 对RS做健康状态监测，并按需增删
+  - a.网络层探测；ping命令
+  - b.传输层探测；nmap命令
+    - 端口可用性探测
+  - c.应用层探测；curl命令
 
-  - 脚本性能很差，建议使用C语言编写
+- 脚本性能很差，建议使用C语言编写
