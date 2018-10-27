@@ -106,8 +106,6 @@
 
 ### 3. 物理数据文件
 
-
-
 ### RDMBS设计范式基础概念
 
 设计关系数据库时，遵从不同的规范要求，设计出合理的关系型数据库，这些不同的规范要求被称为不同的范式，各种范式呈递次规范，越高的范式数据库冗余越小。
@@ -216,6 +214,31 @@
 ## 安装和使用 MariaDB
 
 ### 安装方式
+
+#### Windows下安装 mysql
+
+- 初始化
+  - 服务端：E:\wupeiqi\mysql-5.7.16-winx64\mysql-5.7.16-winx64\bin\mysqld --initialize-insecure
+    - `# 用户名 root 密码：空`
+- 启动服务端：E:\wupeiqi\mysql-5.7.16-winx64\mysql-5.7.16-winx64\bin\mysqld\mysqld
+
+- 客户端连接：`E:\wupeiqi\mysql-5.7.16-winx64\mysql-5.7.16-winx64\bin\mysqld\mysql -u root -p`
+
+- 发送指令：
+  - show databases;
+  - create database db1;
+
+- 环境变量的配置：E:\wupeiqi\mysql-5.7.16-winx64\mysql-5.7.16-winx64\bin
+  - mysqld
+
+- windows服务：
+  - E:\wupeiqi\mysql-5.7.16-winx64\mysql-5.7.16-winx64\bin\mysqld --install
+  - net start MySQL
+
+  - E:\wupeiqi\mysql-5.7.16-winx64\mysql-5.7.16-winx64\bin\mysqld --remove
+
+  - net start MySQL
+  - net stop MySQL
 
 #### 1. 包管理器的程序包（rpm,deb包等）
 
@@ -1085,11 +1108,37 @@ insert into department(depName) values('教学部'),
 
 -- 员工表：employee（子表）
 create table if not exists employee(
-id smallint unsigned auto_increment key,
-username varchar(20) not null unique,
-depId tinyint unsigned,
-constraint emp_fk_dep foreign key(depId) references department(id)
-)engine=InnoDB default charset=utf8;
+  id smallint unsigned auto_increment key,
+  username varchar(20) not null unique,
+  depId tinyint unsigned,
+  constraint emp_fk_dep foreign key(depId) references department(id)
+)engine=InnoDB auto_increment=4 default charset=utf8;
+-- auto_increment=4 自动导出数据时的，自动编号下一个编号
+
+-- 设置自增长下一个编号
+table table tbl auto_increment=2;
+
+-- 设置自增步长
+  - 基于会话级别（例如打开多个客户端窗口）
+
+- 查看会话级别步长
+show session variables like 'auto_incretment_increment';
+
+- 设置会话级别步长
+set session auto_increment_increment=2;
+
+- 全局级别修改步长
+set global auto_increment_incremnt=100; -- 下一个添加自增编号步长100，推荐使用session
+
+- 全局设置起始值
+set global auto_increment_offset=10;
+
+-- 基于 SQL Server 数据库自增步长
+table table tbl auto_increment=2,步长=20;
+
+- 查看表结构
+show tables;
+
 
 insert employee(username,depId) values('king',1),
 ('queen',2),
@@ -1335,11 +1384,17 @@ end
 > 缺点是创建和维护索引需要耗费时间
 > 索引可以提高查询速度、会减慢写入速度
 
+## 主键索引
+
+> 不能重复且不能为空
+
 ## 普通索引
 
 `index|key idx_name(filed[,filed2])`
 
 ## 唯一索引
+
+> 不能重复，但可以为空
 
 `unique idx_name(filed[,filed2])`
 
@@ -2229,9 +2284,40 @@ P1,P2
 - 重命名用户：`rename user old_username to new_username`
 - 删除用户：`drop user 'username'@'host'`
 
+``` sql
+-- 创建用户
+create user 'alex'@'%' identified by '123456';
+
+-- 删除用户
+drop user 'alex'@'%';
+
+-- 修改用户
+rename user 'alex'@'%' to 'bob'@'%';
+
+-- 修改密码
+set password for 'alex'@'%' = Password('new_password')
+
+
+-- 授权
+grant select,insert,update on db_name.table_name to 'alex'@'%';
+
+-- 除了 grant命令之外什么命令都可以拥有
+grant all privileges on db_name.table_name to 'alex'@'%';
+
+-- 移除select授权
+revoke select on db_name.table_name from 'alex'@'%'
+
+-- 查看授权
+show grants for 'alex'@'%'
+
+```
+
+[mysql笔记](http://www.cnblogs.com/wupeiqi/articles/5713315.html)
+[mysql练习](http://www.cnblogs.com/wupeiqi/articles/5729934.html)
+
 修改密码
 
-``` SQL
+``` sql
 第一种方法
 > set password for root@localhost = password('123');
 
@@ -2487,6 +2573,13 @@ GRANT priv_type,... ON [object_type] db_name.tbl_name TO 'user'@'host' [IDENTIFI
   - Using where: MySQL服务器将在存储引擎检索后，在进行一次过滤
   - Using temporary: MySQL对结果排序时会使用临时表
   - Using filesort: 对结果使用一个外部索引排序
+
+## 临时表
+
+``` sql
+-- 临时表(select num, course_id from score whre num > 60) as B2
+select num from (select num, course_id from score whre num > 60) as B2;
+```
 
 ## 存储过程
 

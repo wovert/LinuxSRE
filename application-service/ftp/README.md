@@ -248,7 +248,7 @@ ftp> anonymous 匿名登录
 
 ## 虚拟用户
 
-1. 基于db文件
+### 1. 基于db文件
 
 ``` SHELL
 # vim /etc/vsftpd/vusers.txt文件
@@ -256,13 +256,13 @@ ftp> anonymous 匿名登录
   偶数行：密码
 ```
 
-2. 基于mysql服务: pam-mysql
+### 2. 基于mysql服务: pam-mysql
 
 - pam不支持mysql
-- pam:  `# ls -l /lib64/security/`
+- pam: `# ls -l /lib64/security/`
 - pam-mysql-0.7RC1.tar.gz
 
-## CentOS 7：编译安装
+#### CentOS 7：编译安装 MariaDB
 
 ``` shell
 # yum -y groupinstall "Development Tools" "Server Platform Developemnt"
@@ -272,7 +272,9 @@ ftp> anonymous 匿名登录
 # mysql
 ```
 
-## 安装pam-mysql-0.7RC1.tar.gz
+#### 下载 [pam-mysql-0.7RC1.tar.gz](http://prdownloads.sourceforge.net/pam-mysql/pam_mysql-0.7RC1.tar.gz)
+
+#### 安装 pam-mysql(http://pam-mysql.sourceforge.net/)
 
 ``` shell
 # ./configure --with-mysql=/usr \
@@ -283,9 +285,9 @@ ftp> anonymous 匿名登录
 # ls -l /lib64/security/pam_mysql.so
 ```
 
-## 创建MySQL用户表账号和密码
+#### 创建MySQL用户表账号和密码
 
-``` shell
+``` sql
 create database vsftpd;
 CREATE TABLE users(
   id int AUTO_INCREMENT NOT NUL PRIMARY,
@@ -294,35 +296,41 @@ CREATE TABLE users(
 );
 INSERT INTO users(name,password) VALUES ('tom',password('tom'));
 INSERT INTO users(name,password) VALUES ('jerry',password('jerry'));
-GRANT select ON vsftpd.* TO vsftpd@localhost IDENTIFIED BY 'vsftpd’;
-GRANT select ON vsftpd.* TO vsftpd@'127.0.0.1' IDENTIFIED BY 'vsftpd’;
+GRANT select ON vsftpd.* TO vsftpd@localhost IDENTIFIED BY 'vsftpd';
+GRANT select ON vsftpd.* TO vsftpd@'127.0.0.1' IDENTIFIED BY 'vsftpd';
+flush privileges;
 ```
 
-## 配置vsftpd
+#### 配置vsftpd
 
 ``` shell
 # vim /etc/vsftpd/vsftpd.conf
   pam_service_name=vsftpd vsftpd使用哪个pam配置文件
-# vim /etc/pam.d/vsftpd
+# man vsftpd.conf
+  pam_service_name ...
+# less /etc/pam.d/vsftpd
 ```
 
-## 配置文件pam_mysql
+#### 配置文件pam_mysql
 
 ``` shell
-# vim /etc/pam.d/vsftpd.mysql
-# pam_mysql.so相对于/lib64/security目录
-# required必须认证
-# user和passwd是mysql账号和密码
-# usercolum用户名的字段
-# passwdcolum密码字段
-# crypt加密方式， 0:plain, 1:crypt(3) function, 2:mysql PASSWORD()
-3:md5, 4:sha1
+# less pam_mysql-0.7RC1/README
+  auth: 认证
+  account: 账号
+  pam_mysql.so相对于/lib64/security目录
+  required：必须认证
+  user和passwd：mysql账号和密码
+  usercolum：用户名的字段
+  passwdcolum：密码字段
+  crypt: (加密方式) 0:plain | 1:crypt(3) function | 2:mysql PASSWORD() |
+  3:md5 | 4:sha1
 
+# vim /etc/pam.d/vsftpd.mysql
 auth required pam_mysql.so user=vsftpd passwd=vsftpd host=localhost db=vsftpd table=users usercolumn=name passwdcolumn=password crypt=2
 account required pam_mysql.so user=vsftpd passwd=vsftpd host=localhost db=vsftpd table=users usercolumn=name passwdcolumn=password crypt=2
 ```
 
-## 创建虚拟用户：映射用户
+#### 创建虚拟用户：映射用户
 
 ``` shell
 # useradd -s /sbin/nologin -d /ftproot vuser
@@ -337,7 +345,7 @@ account required pam_mysql.so user=vsftpd passwd=vsftpd host=localhost db=vsftpd
   pam_service_name=vsftpd.mysql
 
   # 来宾账号映射为vuser
-  guset_enable=YES
+  guest_enable=YES
   guest_username=vuser
 # systemctl start vsftpd.service
 # chown vuser /ftproot/upload
@@ -345,9 +353,16 @@ account required pam_mysql.so user=vsftpd passwd=vsftpd host=localhost db=vsftpd
 # vim /etc/vsftpd/vsftpd.conf
   anon_upload_enable=YeS
 # systemctl retart vsftpd.service
+# ftp 172.18.100.67
+: tom
+ftp> ls
+ftp>bye
+# ftp 172.18.100.67
+: jerry
+ftp> ls
 ```
 
-## tom与jerry只能一个用户上传权限
+#### tom与jerry只能一个用户上传权限
 
 ``` shell
 # vim /etc/vsfptd/vsftpd.conf
@@ -373,9 +388,9 @@ account required pam_mysql.so user=vsftpd passwd=vsftpd host=localhost db=vsftpd
 # systemctl restart vsftpd.service
 ```
 
-## 测试：登录ftp，上传文件
+#### 测试：登录ftp，上传文件
 
-## 基于vsftpd+pam+mysql架设ftp并实现虚拟用户登录
+### 基于vsftpd+pam+mysql架设ftp并实现虚拟用户登录
 
 - 测试之前需要保证本机的SElinux是关闭的，否则会造成失败的！ 
 
@@ -437,14 +452,13 @@ account required pam_mysql.so user=vsftpd passwd=vsftpd host=localhost db=vsftpd
 ## 总结
 
 - ftp: 命令连接，数据连接(PORT,PASV)
-- vsftpd:/etc/vsftpd/vsftpd.conf
-- 用户类型：
-- 匿名用户
-- 本地用户：
-- 禁锢
-- 黑名单
-- 白名单
-- 虚拟用户：
-- 权限
+- 用户类型
+  - 匿名用户
+  - 本地用户
+    - 禁锢
+    - 黑名单
+    - 白名单
+- 虚拟用户
+  - 权限
 
 ## 博客：vsftpd的基于pam_mysql的虚拟用户机制
