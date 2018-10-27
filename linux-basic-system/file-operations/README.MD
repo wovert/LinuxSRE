@@ -152,9 +152,9 @@
 
 - 但是有些命令不能接受过长的参数，此时命令执行会失败，另一种方式可规避此问题；
 
-`find | xargs COMMAND`
+- `find | xargs COMMAND`
 
-``` 示例
+``` sh
 查找/var目录下属主为root，且属组为mail的所有文件或目录；
 # find /var -user root -a -group mail -ls
 
@@ -184,7 +184,7 @@
 
 ---
 
-``` shell
+``` sh
 find 示例
 # find /data -type f -NAME "file.txt" -exec rm {} \;
 # find /data -type f -NAME "file.txt" | xargs rm -f
@@ -199,7 +199,4 @@ find 示例
 data]# touch {1...10}.txt
 data]# cd ..
 /]# mv `find /data -type f -name  "*.txt"` /tmp/
-
-
-
 ```
