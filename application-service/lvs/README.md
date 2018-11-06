@@ -1,6 +1,6 @@
 # Linux Cluster
 
-集群：将多台主机组织起来满足同一个需求
+> 集群：将多台主机组织起来满足同一个需求
 
 ## 系统扩展的方式
 
@@ -84,7 +84,7 @@
 
 > Linux Virtual Server 章文嵩(song1)
 
-L4：四层路由，四层交换；根据请求报文的目标IP和目标PORT将其调度转发至后端的某主机
+- L4：四层路由，四层交换；根据请求报文的目标IP和目标PORT将其调度转发至后端的某主机
 
 ### iptbles
 
@@ -96,18 +96,19 @@ L4：四层路由，四层交换；根据请求报文的目标IP和目标PORT将
 ### LVS 命令
 
 - ipvsadm/ipvs
-  - ipvsadm: 用户空间命令行工具，用于管理集群服务及集群服务上的Real Server
-  - ipvs: 工作于内核上的netfilter的INPUT钩子之上的程序(强行逆行到POSTROUTING)，可根据用户定义的集群实现请求转发，
+  - ipvsadm: **用户空间命令行工具**，用于管理集群服务及集群服务上的Real Server
+  - ipvs: **工作于内核上的netfilter的INPUT钩子之上的程序**(强行逆行到POSTROUTING)，i可根据用户定义的集群实现请求转发
     - input->postrouting
-  - 支持基于TCP、UDP、SCTP、AH、EST、AH_EST等协议进行调度；
+  - 支持基于TCP、UDP、SCTP、AH、EST、AH_EST等协议进行调度
 
 ### lvs集群的专用术语
 
 - VS: Virtual Server, Director(调度器), Dispatcher(分发器), Balancer(负载均衡器)
 - RS: Real Server(后端主机)
+  
 - CIP：Client IP(客户端IP)
 - VIP: Vitural Server IP(公网IP，网卡别名上绑定)
-- DIP: Director IP(调度器IP，内网IP)
+- DIP: Director IP(调度器IP，内网IP,与RIP通信的IP)
 - RIP: Real Server IP(后端IP)
 
 ### LVS集群的类型
@@ -120,6 +121,8 @@ L4：四层路由，四层交换；根据请求报文的目标IP和目标PORT将
 ### lvs-nat类型：目标地址转换
 
 > 多目标的DNAT，通过将请求报文中的目标地址和目标端口修改为挑选出的某RS的RIP和PORT实现转发
+
+![lvs-net流程图](./images/lvs-net.png)
 
 1. RIP和DIP必须在同一IP网络，且应该使用私有地址；RS的网关要指向DIP（保证响应报文必须经由vs）
 2. 请求报文和响应报文都经由Director转发(使用连接追踪机制，但是影响并发性能。400万并发管理连接追踪文件)，较高负载下，Director易于称为系统性能瓶颈；
@@ -136,6 +139,7 @@ L4：四层路由，四层交换；根据请求报文的目标IP和目标PORT将
   - a. 在路由器上静态绑定VIP和Director的MAC地址；禁止RS响应VIP的ARP请求，禁止RS的VIP进行通告
   - b. arptables
   - c. 修改RS的内核参数，并把VIP绑定本地回环接口lo的别名上；`arp_ignore, arp_announce`
+
 2. RS的RIP可以使用私有地址，也可以使用公网地址
 3. RS跟Director必须在同一物理网络；RS的网关必须不能指向DIP
 4. 请求报文必须由Director调度，但响应报文必须不能经由Director
