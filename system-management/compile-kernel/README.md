@@ -14,7 +14,7 @@
 # make
 
 安装（编译好的文件复制对应的目录下）
-# make install`
+# make install
 ```
 
 - 开源：源代码 -> 可执行格式

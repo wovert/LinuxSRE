@@ -86,8 +86,12 @@ directive=value
   browseable = yes no:自己能看到，别人不能浏览
   guest ok = yes 来宾用户
   writeable = yes 是否可以写入
-  valid users = %S
-  valid users = MYDOMAIN\%S
+  valid users = %S 是指登陆用户可以访问
+  valid users = MYDOMAIN\%S\
+
+  valid users = user(@group) 设定能够使用该共享服务的用户和组，其值的格式与user选项一样
+  invalid users = user(@group) 设定不能够使用该共享服务的用户和组，其值的格式与user选项一样
+
 
 # systemctl reload smb.service
 
