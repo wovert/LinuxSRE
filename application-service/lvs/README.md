@@ -86,6 +86,8 @@
 
 - L4：四层路由，四层交换；根据请求报文的目标IP和目标PORT将其调度转发至后端的某主机
 
+[LVS 介绍博客](http://superproxy.github.io/docs/lvs/index.html)
+
 ### iptbles
 
 - iptables/netfilter
