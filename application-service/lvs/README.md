@@ -162,6 +162,8 @@ RS隔离广播ARP请求的响应
 
 > 转发方式：不修改请求报文的IP首部（源IP为CIP，目标IP为VIP），而是原IP首部之外再封装一个IP首部（源IP为DIP，目标IP为挑选出RS的RIP）
 
+![lvs-tun流程图](./images/lvs-tun.png)
+
 1. RIP，DIP，VIP全得就公网地址；
 2. RS网管不能指向也不可能指向DIP；
 3. 请求报文经由Director转发，但响应报文将直接发送CIP；
@@ -173,13 +175,17 @@ RS隔离广播ARP请求的响应
   - RS(东京) 有VIP
   - RS(伦敦) 有VIP
 
+DS 如何将请报文转发出 VS 的 VIP？伪装VIP:RIP报文给RS
+
 ### lvs-fullnat类型：alibaba开发，不是标准类型
 
 > 基于DNA模型，转发方式：通过同时修改请求报文的源地址(CIP-->DIP)和目标IP地址(VIP-->RIP)进行转发
 
-1. VIP是公网地址，RIP他DIP是私网地址，且通常不在同一网络中，但需要经由路由器互通
-2. RS收到的请求报文源IP为DIP，因此响应报文将直接响应给DIP
-3. 请求和响应报文都经由Director
+![lvs-fullnet](./images/lvs-fullnet.png)
+
+1. VIP是公网地址，RIP 和 DIP 是私网地址，且通常不在同一网络中，但需要经由路由器互通
+2. RS收到的请求报文源 IP 为 DIP，因此响应报文将直接响应给 DIP
+3. 请求和响应报文都经由 Director
 4. 支持端口映射
 
 ## 负载均衡集群中会话保持的方式
@@ -209,27 +215,29 @@ RS隔离广播ARP请求的响应
   - 保存的是目标地址哈希
   - 哈希的是目标地址
     - 提高缓存命中率
+  - client -> DS(1.1.1.1/index.html => Proxy1 1.2.3.4/index => Proxy2) -> Proxy1, Proxy2 ->
 
 ### 动态方法：根据算法及各RS当前的负载状态进行调度
 
 - LC: Least connection, 最少连接
   - Overhead=Active(活动连接数量) x 256 + Inactive(非活动连接)
-  - 活动连接：要求请求/处理请求/响应请求
-  - 值越大负载大
+    - 活动连接：要求请求/处理请求/响应请求
+    - 非活动连接：服务器等待客户端请求
+    - 值越大负载大
 - WLC: Weighted LC，加权最少连接
   - Overhead=(Active x 256 + Inactive)/weight
   - 值越大负载大
-  - 默认调度，通用
+  - **默认调度，通用的调用都方法**
 - SED: Shorted Expections Delay，最短期望延迟
   - Overhead=(Active+1) x 256/weight
   - 最开始使用,RS1(w:1),RS2(w:3),RS3(w:8), (0+1)x256/{1,3,8}=...
   - 第二次使用时问题，始终在w:8服务器里
-  - 放弃了非活动连接
+  - **放弃了非活动连接**
 - NQ: Never Queue，永不排队
   - 第一轮没有权重计算，第二次开始计算权重计算
 - LBLC: Locality-Based LC，动态的DH算法
   - 提高了均衡性
-  - 失去了命中率
+  - **失去了命中率**，但可以拿到之前的缓存数据
 - LBLCR：LBLC with Replication 带复制功能的LBLC
   - 两个缓存服务器同步数据，比原始服务器上获取资源节省
 
