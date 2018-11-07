@@ -123,6 +123,8 @@
 > 多目标的DNAT，通过将请求报文中的目标地址和目标端口修改为挑选出的某RS的RIP和PORT实现转发
 
 ![lvs-net流程图](./images/lvs-net.png)
+![lvs-net流程图](./images/lvs-net-detail.png)
+![lvs-net流程图](./images/lvs-net2.png)
 
 1. RIP和DIP必须在同一IP网络，且应该使用私有地址；RS的网关要指向DIP（保证响应报文必须经由vs）
 2. 请求报文和响应报文都经由Director转发(使用连接追踪机制，但是影响并发性能。400万并发管理连接追踪文件)，较高负载下，Director易于称为系统性能瓶颈；
@@ -131,15 +133,19 @@
 
 ### lvs-dr类型：Direct Routing直接路由，VS和RS并列（默认类型）
 
-> 通过为请求报文的重新封装一个MAC地址进行转发，源MAC是DIP所在接口的MAC，目标MAC是挑选出某RS的RIP所在接口的MAC地址；IP首部不会发送变化(CIP<-->VIP)；
+> 通过为请求报文的重新封装一个MAC地址进行转发，源MAC是DIP所在接口的MAC，目标MAC是挑选出某RS的RIP所在接口的MAC地址；IP首部不会发送变化(CIP<-->VIP)
+
+![lvs-dr流程图](./images/lvs-dr.png)
+![lvs-dr流程图](./images/lvs-dr.jpg)
+![lvs-dr流程图](./images/lvs-dr2.png)
 
 1. 确保前段路由器将目标IP为VIP的请求报文发往Director
-
 - 解决方案：
-  - a. 在路由器上静态绑定VIP和Director的MAC地址；禁止RS响应VIP的ARP请求，禁止RS的VIP进行通告
-  - b. arptables
-  - c. 修改RS的内核参数，并把VIP绑定本地回环接口lo的别名上；`arp_ignore, arp_announce`
-
+  - 1.在路由器上静态绑定VIP和Director的MAC地址；
+  
+  - 2.禁止RS响应VIP的ARP请求，禁止RS的VIP进行通告(运营商的路由器不能控制)
+    - 2.1 arptables
+    - 2.2 推荐使用：修改RS的内核参数，并把VIP绑定本地回环接口lo的别名上；`arp_ignore, arp_announce`
 2. RS的RIP可以使用私有地址，也可以使用公网地址
 3. RS跟Director必须在同一物理网络；RS的网关必须不能指向DIP
 4. 请求报文必须由Director调度，但响应报文必须不能经由Director
