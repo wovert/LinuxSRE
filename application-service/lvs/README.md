@@ -243,90 +243,120 @@ DS 如何将请报文转发出 VS 的 VIP？伪装VIP:RIP报文给RS
 
 ## ipvs
 
-- `ipvs`: 内核中的协议栈上实现
-  - `ipvsadmin`：用户空间的服务管理工具
-  - 四层交换和四层路由
-  - 一个ipvs主机(DS)可以同时定义多个 cluster service
-    - 一个DS 提供2个Web服务器或2个MySQL服务器
-  - 一个 `ipvs` 服务至少应该有一个 RS
+> 内核中的协议栈上实现
+
+- `ipvsadmin`：用户空间的集群服务管理工具
+- 四层交换和四层路由
+- 一个 ipvs 主机(DS)可以同时定义多个 cluster service
+- 一个 DS 提供2个Web服务器或2个MySQL服务器
+- 一个 `ipvs` 服务至少应该有一个 `RS`
 
 ## ipvsadm命令用法
 
-### 内核是否支持ipvs
+### 1. 内核是否支持ipvs
 
-``` shell
+``` sh
 # uname -r
-# grep -A 11 -i 'IPVS' /boot/config-3.10.0-229......
+# grep -A 11 -i 'IPVS' /boot/config-`uname -r`
+CONFIG_NETFILTER_XT_MATCH_IPVS=m 模块编译
+
+CONFIG_IP_vs_PROTO_TCP=Y
+CONFIG_IP_vs_PROTO_UDP=Y
+CONFIG_IP_vs_PROTO_AH-ESP=Y
+CONFIG_IP_vs_PROTO_ESP=Y
+CONFIG_IP_vs_PROTO_AH=Y
+CONFIG_IP_vs_PROTO_SCTP=Y
+
+CONFIG_IP_VS_SH_TAB_BITS=8 源地址哈希
 ```
 
-### 安装ipvsadm工具
+### 2. 安装ipvsadm工具
 
-``` shell
+``` sh
 # yum -y install ipvsadm
 # rpm -ql ipvsadm
+/usr/lib/systemd/system/ipvsadm.service 装载规则
+/usr/sbin/ipvsadm-restore 载入规则
+/usr/sbin/ipvsadm-save 保存规则
+
 # man ipvsadm
 ```
 
-### 管理集群服务：CRUD
+### 管理集群服务CRUD
 
-``` shell
+``` sh
 ipvsadm -A|E -t|u|f service-address [-s scheduler]
-  -A: append
-  -E: edit
+  -A: append 增
+  -E: edit 改
   -D: delete
 
   -t: tcp
   -u: udp
-  -f: firewall mark
+  -f: firewall mark 防火墙标记
 
-  service-address:
-    -t,tcp => vip:port
-    -u,udp, vip:port
-    -f fwm, mark
+  service-address: 集群服务地址
+    -t, tcp, vip:port
+    -u, udp, vip:port
+    -f, fwm, mark
 
-  -s scheduler：默认为wlc
+  -s scheduler：调度方法；默认为 wlc
 
 ipvsadm -D -t|u|f service-address
-  -D 删除
+  -D 删除集群服务地址
 ```
 
 ### 管理集群上的RS
 
-``` shell
+``` sh
 ipvsadm -a|e -t|u|f service-address -r server-address [-g|i|m] [-w weight]
-  -a: append
-  -e: edit
-  -r server-address
-    RS的地址
-    rip[:port]
-  -g,gateway,dr类型，默认类型
-  -i,ipip,tun类型
-  -m,masquerade,nat
+  -a: append 增
+  -e: edit 改
+  -r server-address 指明RS的地址
+    rip[:port] 端口映射
+  
+  -g, gateway: dr类型(默认类型)
+  -i, ipip: tun类型
+  -m, masquerade: nat类型
 
-  -w weight
+  -w weight 权重
+```
 
-查看
+### 查看
+
+``` sh
 ipvsadm -L|l [options]
   -n,--numeric：数字格式显示ip:port
   --exact：精确值，不做单位换算
   -c,--connection：显示ipvs连接
   --stats：统计数据
   --rate：速率，单位：秒，接发报文数、字节数等
+```
 
-清空
-  -C: clear
+### 清空
 
+``` sh
+# ipvsadm -C
+```
+
+### 保存和重载
+
+``` sh
 保存
-ipvsadm -S > /path/to/some_rule_file
-ipvsadm-save > /path/to/some_rule_file
+# ipvsadm -S > /path/to/some_rule_file
+# ipvsadm-save > /path/to/some_rule_file
 
 重载
-ipvsadm -R < /path/to/some_rule_file
-ipvsadm-restore < /path/to/some_rule_file
+# ipvsadm -R < /path/to/some_rule_file
+# ipvsadm-restore < /path/to/some_rule_file
+```
 
-清空计数器
-  -Z： zero
+### 清空计数器
+  
+``` sh
+# ipvsadm -Z
+```
 
+``` sh
 # ipvsadm -Ln
 # ipvsadm -A -t 172.18.100.6:80 -s rr
 # ipvsadm -Ln
@@ -335,7 +365,7 @@ ipvsadm-restore < /path/to/some_rule_file
   CPS: Connection per Second 每秒连接数
   InPPS: input Packet Per Second 每秒入栈报文数
   OutPPS: Ouput Packet Per Second
-  InBPS: In Byte Per Second
+  InBPS: In Byte Per Second 每秒出栈的字节数
   OutBPS: Out Byte Per Second
 
 # ipvsadm -Ln --stats
@@ -378,7 +408,7 @@ ipvsadm-restore < /path/to/some_rule_file
 # cat /etc/sysconfig/ipvsadm
 # ipvsadm -C
 # ipvsadm -Ln
-# systemctl stat ipvsadm.service
+# systemctl start ipvsadm.service
 # ipvsadm -Ln
 # systemctl enable ipvsadm.service
 
@@ -398,7 +428,7 @@ RS2:192.168.10.12/24
 2. RS安装httpd,telnet-service服务
 3. Director
 
-``` shell
+``` sh
 # iptables -F
 # less /usr/lib/systemd/system/firewalld.service
 # vim /etc/sysctl.conf
@@ -409,7 +439,7 @@ RS2:192.168.10.12/24
 
 4. RS1
 
-``` shell
+``` sh
 # vim /var/www/html/index.html
   <h1>RS1</h1>
 # systemctl start httpd.service
@@ -417,7 +447,7 @@ RS2:192.168.10.12/24
 
 5. RS2
 
-``` shell
+``` sh
 # vim /var/www/html/index.html
  <h1>RS2</h1>
 # systemctl start httpd.service
@@ -425,7 +455,7 @@ RS2:192.168.10.12/24
 
 6. Director
 
-``` shell
+``` sh
 # curl http://192.168.10.11
 # curl http://192.168.10.12
 # ipvsadm -Ln
@@ -437,7 +467,7 @@ RS2:192.168.10.12/24
 
 7. Test Server
 
-``` shell
+``` sh
 # curl http://172.19.100.6
 # curl http://172.19.100.6
 # curl http://172.19.100.6
@@ -445,7 +475,7 @@ RS2:192.168.10.12/24
 
 8. Director
 
-``` shell
+``` sh
 # ipvsadm -Ln
 # ipvsadm -E -t 172.19.100.6:80 -s wrr
 # ipvsadm -Ln
@@ -453,7 +483,7 @@ RS2:192.168.10.12/24
 
 9. Test Server
 
-``` shell
+``` sh
 # curl http://172.19.100.6
 # curl http://172.19.100.6
 # curl http://172.19.100.6
@@ -528,7 +558,7 @@ RS2:192.168.10.12/24
 
 先限制通告，在设置IP
 
-``` shell
+``` sh
 Director:
   VIP: 172.18.100.7,DIP:172.17.100.6
 RS1:
@@ -543,7 +573,7 @@ RS1:
 
 2. Director
 
-``` shell
+``` sh
 # ip addr add 172.18.100.7/16 dev eno16777736
 # ip addr del 172.18.100.7/16 dev eno16777736
 # ifconfig eno16777736:0 172.18.100.7 netmask 255.255.255.255 broadcast 172.18.100.7
@@ -552,7 +582,7 @@ RS1:
 
 3. RS1
 
-``` shell
+``` sh
 lo的别名上配置VIP
 # vim skp.sh
 #!/bin/bash
@@ -580,7 +610,7 @@ esac
 
 4. RS2
 
-``` shell
+``` sh
 # ./skp.sh start
 # cat /proc/sys/net/ipv4/conf/arp_ignore
 # cat /proc/sys/net/ipv4/conf/arp_announce
@@ -591,7 +621,7 @@ esac
 
 5. test server
 
-``` shell
+``` sh
 # ping 172.18.100.7
 # arp -vn | grep 172.18.100.7
 mac地址
@@ -599,7 +629,7 @@ mac地址
 
 6. Director
 
-``` shell
+``` sh
 # ipvsadm -C
 # ipvsadm -A -t 172.18.100.7:80 -s rr
 # ipvsadm -a -t 172.18.100.7:80 -r 172.18.100.11 -g -w 1
@@ -609,7 +639,7 @@ mac地址
 
 7. test server
 
-``` shell
+``` sh
 # curl http://172.18.100.7
 # curl http://172.18.100.7
 # curl http://172.18.100.7
@@ -622,7 +652,7 @@ mac地址
 
 7. test server
 
-``` shell
+``` sh
 # curl http://172.18.100.7
 # curl http://172.18.100.7
 ```
@@ -634,7 +664,7 @@ mac地址
 3. RIP和DIP通常在同一网络，但此二者未必会在VIP在同一网络
 4. 各RS需要先设置讷河参数，在设置VIP和路由
 
-``` shell
+``` sh
 echo 1 > /proc/sys/net/ipv4/conf/all/apr_ignore
 echo 1 > /proc/sys/net/ipv4/conf/lo/apr_ignore
 echo 2 > /proc/sys/net/ipv4/conf/all/apr_announce
@@ -649,7 +679,7 @@ echo 2 > /proc/sys/net/ipv4/conf/lo/apr_announce
 
 > 在netfilter上给报文打标记;mangle表
 
-``` shell
+``` sh
 172.18.100.6
 # ipvsadm -C
 
@@ -677,7 +707,7 @@ echo 2 > /proc/sys/net/ipv4/conf/lo/apr_announce
 
 ### 定义持久连接服务的方法：
 
-``` shell
+``` sh
 # ipvsadm .... -p [timeout] second
 
 # ipvsadm -LN
@@ -712,7 +742,7 @@ test server
 
 ### PCC，两个服务访问同一个服务器持久连接
 
-``` shell
+``` sh
 # ipvsadm -C
 # iptables -t mangle -F
 
@@ -728,7 +758,7 @@ test server: 两个服务访问同一个服务器
 
 ### 80,443
 
-``` shell
+``` sh
 Director
 # cd /etc/pki/CA
 # (umask 077;openssl genrsa -out private/cakey.pem 2048)
