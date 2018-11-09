@@ -426,6 +426,7 @@ RS2:192.168.10.12/24
 - 网卡类型
 - IP地址、子网掩码、网关
 2. RS安装httpd,telnet-service服务
+
 3. Director
 
 ``` sh
@@ -506,17 +507,17 @@ RS2:192.168.10.12/24
 
 2. 数据共享
 - 共享存储
-  - NAS: Network Attached Storage
-    - 文件服务器,访问接口是**文件**级别（FNS,Samba）
-  - SAN: Storage Area Network
+  - NAS: Network Attached Storage 网络附加存储
+    - 文件服务器(FNS,Samba)访问接口是**文件**级别
+  - SAN: Storage Area Network 存储区域网络
     - 访问接口是**块**级别
     - SCSI协议借助于其他网络技术（FC,以太网）
   - DS：Distributed Storage，常用方法
     - 访问接口通常是**文件**级别
     - 接口可以是文件系统，也可以API
-    - ceph，内核级分布式存储
+    - `ceph` 内核级分布式存储
 - 数据同步
-  - 博客：rsync + inotify 实现数据同步
+  - 博客：`rsync + inotify` 实现数据同步(性能很差)
   - 主从服务器
     - 主服务器：仅写操作
     - 从服务器：仅读操作
@@ -532,7 +533,7 @@ RS2:192.168.10.12/24
 2. 支持端口映射
 3. 是否用到共享存储取决于业务需求
 
-实战作业：负载均衡一个PHP应用
+- 实战作业：负载均衡一个PHP应用
 
 - 测试：NAS
 
@@ -545,13 +546,13 @@ RS2:192.168.10.12/24
 
 1. 再前段的网关接口上静态绑定
 2. 在各RS上使用arptables
-3. 在个RS上修改内核参数，来限制arp响应通告
-  - 限制响应界别：arp_ignore = 1
+3. 在各RS上修改内核参数，来限制arp响应和通告
+  - 限制响应界别：`arp_ignore = 1`
     - 0: default, 使用本地任意接口上配置的地址进行响应
     - 1: 仅在请求的目标IP配置在本地主机的接口报文的接口上时，才给予响应
     - 2-8
 
-  - 限制通告界别：apr_announce = 2
+  - 限制通告界别：`apr_announce = 2`
     - 0: 默认，把本机所有的所有每个接口进行通告
     - 1: 尽量避免向非本地网络通告
     - 2: 总是避免
@@ -583,8 +584,9 @@ RS1:
 3. RS1
 
 ``` sh
-lo的别名上配置VIP
+lo接口的别名上配置VIP
 # vim skp.sh
+#
 #!/bin/bash
 case $1 in
 start)
@@ -603,6 +605,8 @@ esac
 # cat /proc/sys/net/ipv4/conf/arp_ignore
 # cat /proc/sys/net/ipv4/conf/arp_announce
 # scp skp.sh root@172.18.100.12:/root/
+
+设置接口IP
 # ifconfig lo:0 172.19.100.7 netmask 255.255.255.255 broadcast 172.18.100.7
 # route add -host 172.18.100.7 dev lo:0
 # ifconfig
