@@ -1,63 +1,57 @@
-# Linux Cluster
-- LB,HA,HP
-
-- LB: lvs
-	+ Directory: HA
-	+ RS: 健康状态监测方式
-		(1) 网络层：icmp ping
-		(2) 传输层：tcp ping
-		(3) 应用层：对响应服务下的关键点发起请求
-
-		监测超时限定：timeout
-		监测次数限定：times
-			soft failure --> soft failure --> hard failure
-			OK --> PROBLEM: 3+
-			PROBLEM --> OK: 1+
-		各监测之间的时间间隔：duration time
-
 # HA
+
 > High Availability
 
+- Linux Cluster: LB, HA, HP
+
+- LB: lvs
+  - Directory: HA
+  - RS: 健康状态监测方式
+
 - 前段调度器高可用
-- RS： 健康状态检测方式
-	a.网络层：icmp ping
-	b.传输层：tcp ping
-	c.应用层：对相应服务下的关键点发起请求
-		
-		检测超时限定：timeout
-		检测次数限定：times
-			soft failure -> soft failure -> hard failure
-			OK -> problem: 3+检测
-			Problem -> OK: 1+检测
-		各检测之间的时间间隔：duration
 
-- Avalability=MTBF/MTBF+(MTTR)
-	+ MTBF：平均无故障时间
-	+ MTTR：平均修复时间
-		减低MTTR: 冗余(redundant)技术
+## RS：健康状态检测方式
 
-	+ 拉锯战：A正常，发送B,C正常，B,C收不到A发送的信息
-		* 切断电源(brain split, network partition)
-		* B，C的总票数大于总票数的一半，B，C为主
-			width quorun = total/2
-		* A自己放弃
+- a.网络层：`icmp ping`
+- b.传输层：`tcp ping`
+- c.应用层：对相应服务下的关键点发起请求
 
-	+ 仅有A，B独特的集群
-	
-	+ 建议：奇数节点集群（3,5,7）
+- 检测超时限定：**timeout**
+- 检测次数限定：**times**
+  - soft failure(第一次失败) -> soft failure(第二次失败) -> hard failure(真失败)
+  - OK -> problem: 3+检测
+  - Problem -> OK: 1+检测
+- 各检测之间的时间间隔：**duration**
+
+- **Avalability=MTBF/(MTBF+MTTR)**
+  - MTBF：平均无故障时间
+  - MTTR：平均修复时间
+    - 减低MTTR: 冗余(redundant)技术
+
+  - 拉锯战：A正常，发送B, C正常，B,C收不到A发送的信息
+    - 切断电源(brain split, network partition)
+    - B，C的总票数大于总票数的一半，B，C为主
+      - width quorun = total/2
+    - A自己放弃
+
+  - 仅有A，B独特的集群
+
+  - 建议：奇数节点集群（3,5,7）
 
 - HA Cluster的实现方案
-	+ vrrp协议的实现
-		* keepalived
-	+ ais：完备HA集群
-		* hearbear
-		* corosync
-		* cman(早期)
+  - vrrp协议的实现
+    - keepalived
+  - ais：完备HA集群
+    - hearbear
+    - corosync
+    - cman(早期)
 
 ## VRRP协议
+
 > Virtual Redundant Routing Protocol，虚拟冗余路由协议
 
 ### VRRP协议术语
+
 - 虚拟路由器：由一个Master路由器和多个Backup路由器组成。主机将虚拟路由器当作默认网关。
 - VRID：0-255，虚拟路由器的标识。有相同VRID一组路由器构成一个虚拟路由器。
 - Master(Active)：虚拟路由器中承担报文转发任务的路由器
