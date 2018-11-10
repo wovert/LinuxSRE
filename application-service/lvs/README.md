@@ -688,8 +688,13 @@ echo 2 > /proc/sys/net/ipv4/conf/lo/apr_announce
 # ipvsadm -C
 
 打标记的方法
+# iptables -t mangle -A PREROUTING -d $vip -p $protocol --dport $scport -j MARK --set-mark #
+  #: 整数
+
+
 # iptables -t mange -A PREROUTING -d 172.18.100.7 -p tcp --dport 80 -j MARK --set-mark 1
 # iptables -t mange -vnL
+
 # ipvsadm -A -f 1 -s rr
 # ipvsadm -a -f 1 -r 172.18.100.11 -g -w 1
 # ipvsadm -a -f 1 -r 172.18.100.12 -g -w 2
@@ -705,13 +710,14 @@ echo 2 > /proc/sys/net/ipv4/conf/lo/apr_announce
 - 基于持久连接模版，能实现无使用任何算法调度，都能进行在一段时间内，将来自于同一源IP的请求始终发往同一RS
 
 - ipvs的持久类型
-  - 每端口持久（PPC: per port connection）一个服务
-  - 每客户端持久（PCC:per client connection）
-  - 每FWM持久（PFWMC）同一标记服务
+  - 每端口持久（PPC: per port connection）单个服务持久
+  - 每客户端持久（PCC:per client connection，22，23，80，3306同一个RS）多个服务持久
+  - 每FWM持久（PFWMC）同一防火墙标记下的服务持久
 
-### 定义持久连接服务的方法：
+### 定义持久连接服务的方法
 
 ``` sh
+-p 指明持久，默认持久时长5分钟，即300秒
 # ipvsadm .... -p [timeout] second
 
 # ipvsadm -LN
@@ -815,8 +821,10 @@ test server
 
 Director，两个服务绑定在一起
 # ipvsadm -C
+
 # iptables t mangle -A PREROUTING -d 172.18.100.7 -p tcp -m multiport --dports 80,443 -j MARK --set-mark 10
 # iptables -t mangle -vnL
+  10 => 0xa
 # ipvsadm -A -f 10 -s rr -p 300
 # ipvsadm -a -f 10 -r 172.18.100.11 -g -w 1
 # ipvsadm -a -f 10 -r 172.18.100.12 -g -w 2
@@ -829,12 +837,13 @@ test server
 
 ### 注意
 
-1. Director不可用时，整个系统不可用；SPOF
+1. Director不可用时，整个系统不可用；SPOF 单点
 2. 某RS不可用时，Director是否仍会向其调度请求
 - 对RS做健康状态监测，并按需增删
-  - a.网络层探测；ping命令
-  - b.传输层探测；nmap命令
-    - 端口可用性探测
-  - c.应用层探测；curl命令
+  - a.网络层探测；`ping`命令
+  - b.传输层探测；`nmap`命令; 端口可用性探测
+  - c.应用层探测；`curl`命令
 
-- 脚本性能很差，建议使用C语言编写
+- 解决方案
+  - **脚本性能很差，建议使用C语言编写**
+  - keepalived
