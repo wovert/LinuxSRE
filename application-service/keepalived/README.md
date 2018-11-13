@@ -41,7 +41,7 @@
 - HA Cluster的实现方案
   - 1.vrrp协议的实现
     - keepalived
-  - 2.AIS 家族：完备HA集群
+  - 2.AIS 家族(补刀、应用程序心跳)：完备HA集群
     - hearbear
     - corosync
     - cman(早期)
@@ -50,7 +50,7 @@
 
 > Virtual Redundant Routing Protocol，虚拟冗余路由协议
 
-### VRRP协议术语
+### VRRP 协议术语
 
 - 虚拟路由器：由一个Master路由器和多个Backup路由器组成。主机将虚拟路由器当作默认网关。
 - VRID：0-255，虚拟路由器的标识。有相同VRID一组路由器构成一个虚拟路由器。
@@ -79,7 +79,9 @@
 
 > 是vrrp协议的实现，原生设计目的为高可用ipvs服务；keepalived能够配置文件中定义生成ipvs规则，并能够对各RS的将健康状态进行检测
 
-vrrp_script,vrrp_track;
+[Keepalived documentation](https://media.readthedocs.org/pdf/keepalived/stable/keepalived.pdf)
+
+vrrp_script, vrrp_track;
 
 - 组件：
   - 控制组件：配置文件分析器
