@@ -95,10 +95,10 @@ vrrp_script, vrrp_track;
 
 ## HA Cluster配置的前提
 
-1. 各节点时间同步；ntp协议，chrony服务(CentOS 7)
-2. 确保iptables及selinux不会阻碍
-3. 各节点之间可通过主机名互相通信（对ka并非必须）；名称解析服务的解析结果必须与'uname -n'命令结构一致
-4. 各节点之间的root用户可以基于密钥认证的ssh通信（对ka并非必须）
+1. 各节点时间同步；`ntp协议`，`chrony服务`(CentOS 7)
+2. 确保`iptables及selinux不会阻碍`
+3. 各节点之间可通过`主机名互相通信`（对ka并非必须）；名称解析服务的解析结果必须与`uname -n`命令结构一致
+4. 各节点之间的root用户可以`基于密钥认证的ssh通信`（对ka并非必须）
 
 ## 示例
 
@@ -113,10 +113,11 @@ vrrp_script, vrrp_track;
 ``` sh
 # ntpdate 172.16.0.1
 # crontab -e
-  */5 * * * * /sbin/ntpdate 172.18.0.1 &> /dev/null
+  */5 * * * * /sbin/ntpdate 172.16.0.1 &> /dev/null
 ```
 
 3. HA1, HA2分别安装keepalived
+
 - 安装keepalived
   - CentOS 6.4 base源
   - CentOS 6.4- epel源
