@@ -214,13 +214,14 @@ vrrp_instance VI_1 { 虚拟路由配置
 
   track_interface { 定义要监控的接口
     eth0
-    eth1s
+    eth1
+    ...
   }
 
   nopreempt: 非抢占模式
-  Dreempt_delay 300 抢占延迟
+  Dreempt_delay 300 抢占延迟（等待多长时间抢占）
 
-  通告脚本定义
+  通告脚本定义，脚本文件路径
   notify_master <STRONG>|<QUOTED-STRING>
   notify_backup <STRONG>|<QUOTED-STRING>
   notify_fault <STRONG>|<QUOTED-STRING>
