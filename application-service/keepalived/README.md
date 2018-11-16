@@ -97,7 +97,7 @@ vrrp_script, vrrp_track;
 
 1. 各节点时间同步；`ntp协议`，`chrony服务`(CentOS 7)
 2. 确保`iptables及selinux不会阻碍`
-3. 各节点之间可通过`主机名互相通信`（对ka并非必须）；名称解析服务的解析结果必须与`uname -n`命令结构一致
+3. 各节点之间可通过`主机名互相通信`（对ka并非必须）；名称解析服务的解析结果必须与`uname -n`命令的结果一致
 4. 各节点之间的root用户可以`基于密钥认证的ssh通信`（对ka并非必须）
 
 ## 示例
@@ -108,19 +108,26 @@ vrrp_script, vrrp_track;
 - RS2: 172.18.100.12
 
 1. 配置IP地址
-2. HA1, HA2分贝时间同步设置
+2. HA1, HA2分配时间同步设置
 
 ``` sh
 # ntpdate 172.16.0.1
 # crontab -e
-  */5 * * * * /sbin/ntpdate 172.16.0.1 &> /dev/null
+  */5 * * * * /sbin/ntpdate 172.18.0.1 &> /dev/null
+# crontab -l
+# ntpdate 172.18.0.1
+# which ntpdate
+
+# iptables -nL
+# getenforce
+
 ```
 
 3. HA1, HA2分别安装keepalived
 
 - 安装keepalived
-  - CentOS 6.4 base源
-  - CentOS 6.4- epel源
+  - CentOS 6.4+,程序包已经在base源
+  - CentOS 6.4- 程序包在epel源
 
 ``` sh
 # yum -y install keepalived
@@ -134,29 +141,38 @@ vrrp_script, vrrp_track;
 - 配置文件内容块
 
 ``` sh
-  GLOBAL CONFIGURATIONS
+# cd /etc/keepalived
+# cp keepalived.conf{,.bak}
+# vim keepalived.conf
+# man keepalivcd.conf
+  GLOBAL CONFIGURATIONS 全局配置
     global_defs {
       ...
     }
+
   VRRP CONFIGURATION
     vrrp_sync_group GRP_NAME {
       ...
     }
-  vrrp_instance INST_NAME{
-    ...
-  }
+
+    vrrp_instance INST_NAME{
+      ...
+    }
+  
   LVS CONFIGURATIONS
     virtual_server_group GRP_NAME {
       ...
     }
-  virtual_server IP port | virtual_server fwmark int {
-    protocol TCP
-    ...
-    real_server <IPADDR> <PORT> {
+
+    virtual_server IP port | virtual_server fwmark int {
+      protocol TCP
       ...
-    }
-    real_server <IPADDR> <PORT> {
-      ...
+      real_server <IPADDR> <PORT> {
+        ...
+      }
+      real_server <IPADDR> <PORT> {
+        ...
+      }
     }
   }
 ```
@@ -169,26 +185,26 @@ vrrp_script, vrrp_track;
 # man keepalived
 # vim keepalived.conf
 global_defs {
-  notification_email {
+  notification_email { 接受通告邮件的地址
     root@localhost
   }
-  notification_email_from kaadmin@lingyima.com
-  smtp_server 127.0.0.1
-  smtp_connect_timeout 30
-  router_id node1 路由器设备的ID号
-  vrrp_mcast_group4 224.0.100.18
-  vrrp_mcast_group6 ff02::12
+  notification_email_from kaadmin@wovert.com 发件人邮箱地址
+  smtp_server 127.0.0.1 邮件服务器（163，126，qq smtp）
+  smtp_connect_timeout 30 超时时长
+  router_id node1 路由器设备的ID号(必须是主机名)
+  vrrp_mcast_group4 224.0.100.18 ipv4多播地址
+  vrrp_mcast_group6 ff02::12 ipv6多播地址
 }
 
 vrrp_instance VI_1 { 虚拟路由配置
-  state MASTER 此路由器中初始状态MASTER|BACKUP
+  state MASTER 当前节点在此虚拟路由器中初始状态 MASTER|BACKUP
   interface eno16777736 哪个接口上配置，vrrp实例工作的网络接口
   virtual_route_id 171 当前虚拟路由器ID号，0-255之间
   priority 100 当前物理节点在此虚拟路由器中的优先级
-  advert_int 1 广播通告的时间间隔，1秒
-  authentication {
-    auth_type PASS|AH 默认PASS
-    auth_pass 12345678 默认8位，# openssl rand -base 64 8	
+  advert_int 1 广播通告的时间间隔(心跳时间间隔)，1秒
+  authentication { 认证机制
+    auth_type PASS|AH 默认PASS简单字符串认证，AH:IPSEC(验证头协议)
+    auth_pass 12345678 默认8位，# openssl rand -base64 8
   }
   virtual_ipaddress { 定义虚拟IP，默认使用eno16777736
     172.18.100.66 别名
