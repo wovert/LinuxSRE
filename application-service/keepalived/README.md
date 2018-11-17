@@ -32,11 +32,14 @@
     - 切断电源(brain split, network partition)
     - B，C的总票数大于总票数的一半，B，C为主
       - width quorun = total/2
+      - 两个节点的不可用
     - A自己放弃
 
   - 仅有A，B独特的集群
 
   - 建议：奇数节点集群（3,5,7）
+
+- HA Service: ip, httpd, store
 
 - HA Cluster的实现方案
   - 1.vrrp协议的实现
@@ -257,7 +260,7 @@ priority 98
 
 ``` sh
 在另一个ssh查看
-# tail -f /var/log/messages 
+# tail -f /var/log/messages
 # systemctl stop keepalived.service
 ```
 
