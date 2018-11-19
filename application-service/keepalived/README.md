@@ -24,8 +24,10 @@
 - 各检测之间的时间间隔：**duration** (限定范围内时间间隔)
 
 - **Avalability=MTBF/(MTBF+MTTR)**
-  - MTBF：平均无故障时间
-  - MTTR：平均修复时间
+  - MTBF：mean time between failure 平均无故障时间
+  - MTTR：mean time to repair 平均修复时间
+    - 0<A<1: 90%，95%，99%，99.9%， 99.99%
+      - 99.99%比99.9提高了10倍
     - 减低MTTR: 冗余(redundant)技术
 
   - 拉锯战：A正常，发送B, C正常，B,C收不到A发送的信息
