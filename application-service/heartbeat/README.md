@@ -112,82 +112,84 @@ message layer（向特定的地址或发送信号）
   - keepalived(完全不同于上述三种)
 
 - CRM：资源管理器
-	+ heartbeat v1 haresources
-		* 配置接口：配置文件、文件名为haresources
-	+ heartbeat v2 crm
-		* 在各节点运行于一个crmd进程，配置接口；
-		* 命令行客户端程序crmsh,GUI客户端；hb_gui
-	+ heartbeat v3 
-		* pacemaker可以以插件或独立方式进行
-		* 配置接口，CLI接口：crmsh, pcs
-		* GUI接口：hawk(webgui), LCMC, pacemaker-mgmt
-	+ rgmanager (配置接口)
-		* CLI: clustat,cman_tool
-		* GUI: Conga(luci组件、ricci组件)
+  - heartbeat v1 haresources
+    - 配置接口：配置文件、文件名为haresources
+  - heartbeat v2 crm
+    - 在各节点运行于一个crmd进程，配置接口；
+    - 命令行客户端程序crmsh,GUI客户端；hb_gui
+  - heartbeat v3 
+    - pacemaker可以以插件或独立方式进行
+    - 配置接口，CLI接口：crmsh, pcs
+    - GUI接口：hawk(webgui), LCMC, pacemaker-mgmt
+  - rgmanager (配置接口)
+    - CLI: clustat,cman_tool
+    - GUI: Conga(luci组件、ricci组件)
 
 - 组合方式
-	+ heartbeat v1
-	+ heartbeat v2
-	+ heartbeat v3 + pacemaker
-	+ corosync + pacemaker
-	+ cman + rgmanager (RHCS)
-	+ cman + pacemaker
+  - heartbeat v1
+  - heartbeat v2
+  - heartbeat v3 + pacemaker
+  - corosync + pacemaker
+  - cman + rgmanager (RHCS)
+  - cman + pacemaker
 
 - LRM: Local Resource Manager, 由CRM通过子程序提供（激活脚本）
 - RA: Resource Agent，资源代理（脚本）
-	+ heartbeat legacy: heartbeat传统类型的RA，
-		* 通常位于/etc/ha.d/haresources.d/目录下
-	+ LSB：Linux Standard Base, 
-		* /etc/rc.d/init.d/目录下的脚本
-		* 至少接受4个参数：{start|stop|restart|status}
-	+ OCS: Open Cluster Framework，开发集群框架
-		* 子类别：provider
+  - heartbeat legacy: heartbeat传统类型的RA，
+    - 通常位于/etc/ha.d/haresources.d/目录下
+  - LSB：Linux Standard Base, 
+    - /etc/rc.d/init.d/目录下的脚本
+    - 至少接受4个参数：{start|stop|restart|status}
+  - OCS: Open Cluster Framework，开发集群框架
+    - 子类别：provider
 
-	+ STONITH: 专用于实现调用STONITH设备功能的资源；通常为clone类型
+  - STONITH: 专用于实现调用STONITH设备功能的资源；通常为clone类型
 
 ## Heartbeat：心跳信息传递机制
 
 - serial cable: 作用范围有限，不建议使用
 - ethernet cable:
-	+ UDP Unicast 单播
-	+ UDP Multicast 多播（使用）
-	+ UDP Broadcast 广播
+  - UDP Unicast 单播
+  - UDP Multicast 多播（使用）
+  - UDP Broadcast 广播
 
 - 组播地址：用于表示一个IP组播域；
-	+ IANA(Internet Assigned Number Authority) 把D类地址空间分配给IP组播使用，其范围是：224.0.0.0-239.255.255.255;
+  - IANA(Internet Assigned Number Authority) 把D类地址空间分配给IP组播使用，其范围是：224.0.0.0-239.255.255.255;
 
-	+ 永久组播地址：224.0.0.0 - 224.0.0.255
-	+ 临时组播地址：224.0.1.0 - 238.255.255.255
-		* 高可用集群使用
-	+ 本地组播地址：239.0.0.1 - 239.255.255.255
-		* 仅在特定本地范围内有效
-
+  - 永久组播地址：224.0.0.0 - 224.0.0.255
+  - 临时组播地址：224.0.1.0 - 238.255.255.255
+    - 高可用集群使用
+  - 本地组播地址：239.0.0.1 - 239.255.255.255
+    - 仅在特定本地范围内有效
 
 ## HA案例：ha web services
 
 - 资源有三个：ip, httpd, filesystem
-	+ fip: floating ip 流动IP
-		* 172.16.100.17
-	+ daemon: httpd
+  - fip: floating ip 流动IP
+    - 172.16.100.17
+  - daemon: httpd
 
 - 约束关系：使用“组”资源，或通过排列约束让资源运行于同一节点
-	+ 顺序约束：有次序的启动资源
+  - 顺序约束：有次序的启动资源
 - 程序选型：
-	+ heartbeat v2 + haresources
-	+ heartbeat v2 + crm(hb_gui)
-	+ crosync + pacemaker
+  - heartbeat v2 + haresources
+  - heartbeat v2 + crm(hb_gui)
+  - crosync + pacemaker
 
 ## 配置HA集群的前提
 
 1. 节点间时间必须同步：使用ntp协议实现
 2. 节点间需要通过主机名互相通信，必须解析主机至IP地址
-	a) 建议名称解析功能使用hosts文件来实现
-	b) 通信中使用的名字与节点名字必须保持一致：`uname -n`或`hostname`显示出的名字保持一致
+
+a) 建议名称解析功能使用hosts文件来实现
+
+b) 通信中使用的名字与节点名字必须保持一致：`uname -n`或`hostname`显示出的名字保持一致
+
 3. 考虑仲裁设备是否会用到
+
 4. 建立各节点之间的root用户能够基于密钥认证
 
-- 注意：定义成为集群服务中的资源，一定不能开机自动启动；
-因为他们将由crm管理
+- 注意：定义成为集群服务中的资源，一定不能开机自动启动；因为他们将由crm管理
 
 ## 安装部署
 
@@ -195,202 +197,228 @@ message layer（向特定的地址或发送信号）
 - node2 : 172.16.100.7
 
 - node1, node2
-	+ 同步时间
-		* 172.16.0.1网关设置时间服务器
-	+ `# ntpmdate 172.16.0.1` 强制同步
-	+ `# crontab -e`
-		`*/3 * * * * /usr/sbin/nptdate 172.16.0.1 &> /dev/null`
+  - 同步时间
+    - 172.16.0.1网关设置时间服务器
 
-`# date; ssh 172.16.100.7 'date'`
-
-- node1
-	`# uname -n`
-	`# hostname`
-	`# vim /etc/hosts`
-		172.16.100.6 node1.lingyima.com node1 (简写形式)
-		172.16.100.7 node2.lingyima.com node2
-		172.16.100.8 node3.lingyima.com node3
-		172.16.100.9 node4.lingyima.com node4
-
-- node2
-	`# uname -n`
-	`# hostname`
-	`# vim /etc/hosts`
-		172.16.100.6 node1.lingyima.com node1 (简写形式)
-		172.16.100.7 node2.lingyima.com node2
-		172.16.100.8 node3.lingyima.com node3
-		172.16.100.9 node4.lingyima.com node4
+``` sh
+强制同步
+# ntpmdate 172.16.0.1 
+# crontab -e
+  */3 * * * * /usr/sbin/nptdate 172.16.0.1 &> /dev/null
+# date; ssh 172.16.100.7 'date'
+```
 
 - node1
-`# ssh-keygen -t rsa -P ''`
-`# ssh-copy-id -i ~/.ssh/id_rsa.pub root@172.16.100.7`
-`# ssh node2.lingyima.com 'ifconfig'`
+
+``` sh
+# uname -n
+# hostname
+# vim /etc/hosts
+  172.16.100.6 node1.lingyima.com node1 (简写形式)
+  172.16.100.7 node2.lingyima.com node2
+  172.16.100.8 node3.lingyima.com node3
+  172.16.100.9 node4.lingyima.com node4
+```
 
 - node2
+
+``` sh
+# uname -n
+# hostname
+# vim /etc/hosts
+	172.16.100.6 node1.lingyima.com node1 (简写形式)
+	172.16.100.7 node2.lingyima.com node2
+	172.16.100.8 node3.lingyima.com node3
+	172.16.100.9 node4.lingyima.com node4
+```
+
+- node1
+
+``` sh
+# ssh-keygen -t rsa -P ''
+# ssh-copy-id -i ~/.ssh/id_rsa.pub root@172.16.100.7
+# ssh node2.lingyima.com 'ifconfig'
+```
+
+- node2
+
 `# ssh node1.lingyima.com 'ifconfig'`
 
 ### node1
-`# lftps`
-`/pub> cd Sources/6.x86_64/`
-`/pub/Sources/6.x86_64> mirror heartbeat2/`
-`# ls && cd heartbeat2/`
-`# rpm -qpi heartbeat-2.1.4-12.el6.x86_64.rpm`
+
+``` sh
+# lftps
+/pub> cd Sources/6.x86_64/
+/pub/Sources/6.x86_64> mirror heartbeat2/
+# ls && cd heartbeat2/
+# rpm -qpi heartbeat-2.1.4-12.el6.x86_64.rpm
+```
+
 - 解决依赖关系
+
 `# yum -y install net-snmp-libs libnet PyXML`
+
 - heartbeat-VERSION 主程序包
 - heartbeat-gui-VERSION: hb GUI包
 - heartbeat-stonith-VERSION: 节点隔离包
-- heartbeat-ldirectord-VERSION: ipvs检查健康状态工具 
+- heartbeat-ldirectord-VERSION: ipvs检查健康状态工具
 - heartbeat-pills-VERSION: 库
-- heartbeat-devel-VERSION: 
-- heartbeat-debuginfo-VERSION: 
-- heartbeat-devel-VERSION: 
+- heartbeat-devel-VERSION:
+- heartbeat-debuginfo-VERSION:
+- heartbeat-devel-VERSION:
 
 `# rpm ivh heartbeat-VERSION heartbeat-pills-VERSION heartbeat-stonith-VERSION `
 
 - 配置文件
-`# ls -l /etc/ha.d/`目录下
-	ha.cf：主配置文件，定义各节点上的heartbeat HA集群的基本属性
-		`/usr/share/beartbeat-2.1.4/ha.cf`
+- `# ls -l /etc/ha.d/`目录下
+  - ha.cf：主配置文件，定义各节点上的heartbeat HA集群的基本属性
+	  - `/usr/share/beartbeat-2.1.4/ha.cf`
+	- authkeys：集群内节点间彼此传递消息时使用的加密算法及密钥；指纹算法（单向加密）
+	- haresources: 为heartbeat v1提供的资源管理器配置接口；v1版本专用的配置接口
 
-	authkeys：集群内节点间彼此传递消息时使用的加密算法及密钥；指纹算法（单向加密）
-	haresources: 为heartbeat v1提供的资源管理器配置接口；v1版本专用的配置接口
-
-
-- 复制安装包到node2节点上
-`# scp -r heartbeat2/ node2:/root`
+- 复制安装包到node2节点上 `# scp -r heartbeat2/ node2:/root`
 
 ### node2安装heartbeat包
 
 `# rpm ivh heartbeat-VERSION heartbeat-pills-VERSION heartbeat-stonith-VERSION` 
 
-### node1
+### node1配置
 
 `# cd /etc/ha.d/`
 
-- 资源代理
+- 资源代理：`# ld /etc/ha.d/resources.d`
 
-`# ld /etc/ha.d/resources.d`
-
-- 服务脚本
-
-`# ld /etc/rc.d/init.d`
+- 服务脚本：`# ld /etc/rc.d/init.d`
 
 - 复制配置文件
 
-`# cp /usr/share/doc/heartbeat-2.1.4/{ha.cf,haresources,authkeys} /etc/ha.d/`
-`# chmod 600 authkeys`
+```sh
+# cp /usr/share/doc/heartbeat-2.1.4/{ha.cf,haresources,authkeys} /etc/ha.d/
+# chmod 600 authkeys
+```
 
 - 配置authkeys
-	`# vim authkeys`
-		auth 2
-			启动第二项
-		2 sha1 密钥
 
-	`# openssl rand -base64 16`
-	复制到 2 sha1 => 密钥
+``` sh
+# vim authkeys
+  auth 2
+    启动第二项
+  2 sha1 密钥
+
+# openssl rand -base64 16
+复制到 2 sha1 => 密钥
+```
 
 - 配置ha.cf配置文件
-	#logfacility local0 由syslog进行日志管理
-		# vim /etc/rsyslog.conf
-			local0.* 		/var/log/heartbeat.log
-		# service rsyslog restart
-	logfile /var/log/ha-log
-	
-	#keepalive 2
-		多长时间发一次心跳，默认2s
 
-	#deadtime 30
-		多长时间没有收到信息挂掉节点，秒
+``` sh
+#logfacility local0 由syslog进行日志管理
+  # vim /etc/rsyslog.conf
+    local0.* /var/log/heartbeat.log
+  # service rsyslog restart
+logfile /var/log/ha-log
 
-	#varntime 10
-		多长时间警告对方的心跳信息延迟了
-		一般小于deadtime,大于keepalive	
-		10秒钟探测5次了，都没有收到对方心跳，对方可能故障问题，所以在日志中记录对方节点有可能故障
+#keepalive 2
+  多长时间发一次心跳，默认2s
 
-	#initdead 120
-		初始开始dead time，因为有可能有多个节点，只在第一个节点运行，其他节点正常，但由于第一节点问题而收不到其他节点心跳信息
+#deadtime 30
+  多长时间没有收到信息挂掉节点，秒
 
-	#udpport 694 
-		iana
+#varntime 10
+  多长时间警告对方的心跳信息延迟了
+  一般小于deadtime,大于keepalive	
+  10秒钟探测5次了，都没有收到对方心跳，对方可能故障问题，所以在日志中记录对方节点有可能故障
 
-	#baud 19200
-		串行速度，字节
-	#serial /dev/ssyS0
-		串行线缆
-	
-	#bcast eth0
-		广播
+#initdead 120
+  初始开始dead time，因为有可能有多个节点，只在第一个节点运行，其他节点正常，但由于第一节点问题而收不到其他节点心跳信息
 
-	mcast eth0 225.23.190.1 694 1 0
-		1: ttl,只允许一次
-		0: 不允许循环传递
-		使用多播
+#udpport 694
+  iana
 
-		网卡支持多播：UP MULTICAST
-		- 启用多播
-			`# ip link set eth0 multicast on`
-		- 关闭多播
-			`# ip link set eth0 multicast off`
-	
-	auto_failback on
-		故障修复之后，资源是否被重新failback
+#baud 19200
+  串行速度，字节
 
-	node node1.lingyima.com
-	node node2.lingyima.com
-		node节点，不许uname -n必须一致
-	
-	ping 172.16.0.1
-		仲裁设备
-	
-	# ping_group group1 10.10.10.254
-		ping不够时使用ping_group
+#serial /dev/ssyS0
+  串行线缆
 
-	compression bz2
-		节点是否压缩
+#bcast eth0
+  广播
 
-	compression_threshold 2
-		最少压缩大小2kb 
+mcast eth0 225.23.190.1 694 1 0
+  1: ttl,只允许一次
+  0: 不允许循环传递
+  使用多播
+
+网卡支持多播：UP MULTICAST
+- 启用多播
+  `# ip link set eth0 multicast on`
+- 关闭多播
+  `# ip link set eth0 multicast off`
+
+auto_failback on
+  故障修复之后，资源是否被重新failback
+
+node node1.lingyima.com
+node node2.lingyima.com
+  node节点，不许uname -n必须一致
+
+ping 172.16.0.1
+  仲裁设备
+
+# ping_group group1 10.10.10.254
+  ping不够时使用ping_group
+
+compression bz2
+  节点是否压缩
+
+compression_threshold 2
+  最少压缩大小2kb
+```
 
 - haresoures
-	#just.linux-ha.org 135.9.26.110 http
-		主节点的名字 有多少个资源(ip) 每个资源代理的名字
+  #just.linux-ha.org 135.9.26.110 http
+    主节点的名字 有多少个资源(ip) 每个资源代理的名字
 
-	#just.linux-ha.org 135.9.216.3/28/eth0/135.9.216.12 httpd
-		135.9.216.12 广播地址
-	
-	node1.lingyima.com 172.16.100.17/16/eth0/172.16.255.255 httpd
+  #just.linux-ha.org 135.9.216.3/28/eth0/135.9.216.12 httpd
+    135.9.216.12 广播地址
 
+  node1.lingyima.com 172.16.100.17/16/eth0/172.16.255.255 httpd
 
-`# scp -p authkeys ha.cf haresources node2:/etc/ha.d/`
-`# service heartbeat start`
-`# yum -y install httpd`
-`# vim /var/www/html/index.html`
+``` sh
+# scp -p authkeys ha.cf haresources node2:/etc/ha.d/
+# service heartbeat start
+# yum -y install httpd
+# vim /var/www/html/index.html
 	node1.lingyima.com
-`# service httpd start`
-`# curl 172.16.100.6`
-`# service httpd stop`
-`# chkconfig httpd off`
+# service httpd start
+# curl 172.16.100.6
+# service httpd stop
+# chkconfig httpd off
+```
 
 ### node2
 
-`# service heartbeat start`
-`# yum -y install httpd`
-`# vim /var/www/html/index.html`
-	node2.lingyima.com
-`# service httpd start`
-`# curl 172.16.100.7`
-`# service httpd stop`
-`# chkconfig httpd off`
+``` sh
+# service heartbeat start
+# yum -y install httpd
+# vim /var/www/html/index.html
+  node2.lingyima.com
+# service httpd start
+# curl 172.16.100.7
+# service httpd stop
+# chkconfig httpd off
+```
 
 ### node1
 
-`# ss -tunl` 
-`# tail /var/log/heartbeat.log`
-`# service heartbeat start; ssl node2.lingyima.com 'service heartbeat start'`
-`# ss -tunl`
-`# ifconfig`
+``` sh
+# ss -tunl
+# tail /var/log/heartbeat.log
+# service heartbeat start; ssl node2.lingyima.com 'service heartbeat start'
+# ss -tunl
+# ifconfig
 访问网页: node1.lingyima.com
+```
 
 - node1故障
 
@@ -399,20 +427,26 @@ message layer（向特定的地址或发送信号）
 
 ### node2
 
-`# ss -tunl`
-`# ifconfig`
+```sh
+# ss -tunl
+# ifconfig
+```
 
 ### node1
 
-`# service heartbeat start`
+```sh
+# service heartbeat start
 访问网页: node1.lingyima.com
-`# ss -tunl`
-`# ifconfig`
+# ss -tunl
+# ifconfig
+```
 
 ### node2
 
-`# ss -tunl`
-`# ifconfig`
+```sh
+# ss -tunl
+# ifconfig
+```
 
 ## HA Web Services
 
@@ -420,86 +454,61 @@ message layer（向特定的地址或发送信号）
 - 通过资源转义，保证其可用性
 
 - HA Cluster
-	+ Messaging Layer: Infrastructure 实现心跳信息传递、集群事务消息传递
-		* heartbeat,corosync,cman,keepalived
-	+ CRM: Cluster Resoucres Manager 集群资源管理器
-		* haresources,crm,pacemaker,rgmanager
-	+ LRM：Local Resources Manager 本地资源管理器
+  - Messaging Layer: Infrastructure 实现心跳信息传递、集群事务消息传递
+    - heartbeat,corosync,cman,keepalived
+  - CRM: Cluster Resoucres Manager 集群资源管理器
+    - haresources,crm,pacemaker,rgmanager
+  - LRM：Local Resources Manager 本地资源管理器
 
-	+ RA：Resource Agent
-		* heartbeat legacy,lsb,ocf(provider),stonith
+  - RA：Resource Agent
+    - heartbeat legacy,lsb,ocf(provider),stonith
 
 - partitioned cluster
-	+ vote system
-		* with quorum
-		* without quorum
-	+ fencing
-		* 节点：stonith
-		* 资源：fencing
+  - vote system
+    - with quorum
+    - without quorum
+  - fencing
+    - 节点：stonith
+    - 资源：fencing
 
 - 资源的约束
-	+ location: -oo,+00
-	+ colocation
-	+ order
+  - location: -oo,+00
+  - colocation
+  - order
 
 - 资源的类型
-	+ primitive,group,clone,master/slave
+  - primitive,group,clone,master/slave
 
 - HA Cluster
-	heartbeat v2(v1 crm)
-	heartbeat v2(v2 crm)
-	corosync + pacemaker
-	cman + rgmanger
+  - heartbeat v2(v1 crm)
+  - heartbeat v2(v2 crm)
+  - corosync + pacemaker
+  - cman + rgmanger
 
 - partitioned
-	with quorum
-	without quorum
-		stopped
-		ignore
-		freeze
-		suicide
-
+  - with quorum
+  - without quorum
+    - stopped
+    - ignore
+    - freeze
+    - suicide
 
 - HA Cluster的工作模型
-	+ A/P: 两节点集群，active,passive；工作于主备模型
-		* HA Service通过只有一个，HA Resources可能会有多个
+  - A/P: 两节点集群，active,passive；工作于主备模型
+    - HA Service通过只有一个，HA Resources可能会有多个
 
-	+ A/A：两节点集群，active/active;
-		* 工作于双方模型
-	+ N-M：N个节点，M个服务，通常N>M
-	+ N-N：N个节点，M个服务
+  - A/A：两节点集群，active/active;
+    - 工作于双方模型
+  - N-M：N个节点，M个服务，通常N>M
+  - N-N：N个节点，M个服务
 
 - 资源运行的倾向性
-	+ rgmanager 
-		* failover domain, node priority
+  - rgmanager
+    - failover domain, node priority
 
-	+ pacemaker
-		* 资源黏性：运行于当前节点的倾向性
-		* 资源约束：
-			位置约束：资源对运行于其节点的倾向性
-				inf: 正无穷
-				-inf: 负无穷
-	40:00
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  - pacemaker
+    - 资源黏性：运行于当前节点的倾向性
+    - 资源约束：
+    - 位置约束：资源对运行于其节点的倾向性
+      - inf: 正无穷
+      - inf: 负无穷
