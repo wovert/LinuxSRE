@@ -570,7 +570,7 @@ cat > /PATH/TO/SOMEFILE << EOF
 
 ### 增强型赋值：变量做某种算术运算后回存至此变量中；
 
-``` SHELL
+``` sh
 let i=$i+#
 let i+=#
 +=，-=，*=, /=, %=
@@ -578,7 +578,7 @@ let i+=#
 
 ### 自增
 
-``` SHELL
+``` sh
 VAR=$[$VAR+1]
 let VAR+=1
 let VAR++
@@ -586,7 +586,7 @@ let VAR++
 
 ### 自减
 
-``` SHELL
+``` sh
 VAR=$[$VAR-1]
 let VAR-=1
 let VAR--
@@ -901,7 +901,7 @@ fi
 
 ### read [option]... [name ...]
 
-``` OPTIONS
+``` sh
 -p 'PROMPT
 -t TIMEOUT
 ```
@@ -912,7 +912,7 @@ fi
 
 ### 示例
 
-``` SHELL
+``` sh
 #!/bin/bash
 # Version: 0.0.1
 # Author: MageEdu
@@ -931,7 +931,7 @@ fi
 
 > 用户交互：通过键盘输入数据，从而完成变量赋值操作
 
-``` SHELL
+``` sh
 #!/bin/bash
 read -p "Enter a username: " name
 [ -z "$name" ] && echo "a username is needed." && exit 2
@@ -956,7 +956,7 @@ fi
 
 - 单分支的if语句
 
-``` shell
+``` sh
 if  CONDITION; then
 if-true-分支
 fi
@@ -964,7 +964,7 @@ fi
 
 - 双分支的if语句
 
-``` shell
+``` sh
 if  CONDITION; then
   if-true-分支
 else
@@ -974,7 +974,7 @@ fi
 
 - 多分支的if语句
 
-``` shell
+``` sh
 if  CONDITION1; then
   条件1为真分支
 elif  CONDITION2; then
@@ -988,7 +988,7 @@ fi
 
 ### 示例：脚本参数传递一个文件路径给脚本，判断此文件的类型
 
-``` shell
+``` sh
 #!/bin/bash
 if [ $# -lt 1 ]; then
   echo "At least on path."
@@ -1093,7 +1093,7 @@ fi
 
 - 遍历列表
 
-``` shell
+``` sh
 for  VARAIBLE  in  LIST; do
   循环体
 done
@@ -1115,7 +1115,7 @@ done
 
 ### 直接给出列表
 
-``` shell
+``` sh
 #!/bin/bash
 for username in user21 user22 user23; do
   if id $username &> /dev/null; then
@@ -1128,7 +1128,7 @@ done
 
 ### 求100以内所有正整数之和；
 
-``` shell
+``` sh
 #!/bin/bash
 declare -i sum=0
 for i in {1..100}; do
@@ -1140,7 +1140,7 @@ echo $sum
 
 ### 判断/var/log目录下的每一个文件的内容类型
 
-``` shell
+``` sh
 #!/bin/bash
 for filename in /var/log/*; do
   if [ -f $filename ]; then
@@ -1171,7 +1171,7 @@ done
 - 循环执行：for, while, until
 - for循环格式：
 
-``` shell
+``` sh
 for VARAIBLE in LIST; do
   循环体
 don
@@ -1179,7 +1179,7 @@ don
 
 - while循环
 
-``` shell
+``` sh
 while  CONDITION; do
   循环体
   循环控制变量修正表达式
@@ -1190,7 +1190,7 @@ done
 
 - until循环
 
-``` shell
+``` sh
 until  CONDITION; do
   循环体
   循环控制变量修正表达式
@@ -1201,7 +1201,7 @@ done
 
 ### 示例：求100以内所有正整数之和
 
-``` shell
+``` sh
 #!/bin/bash
 #
 declare -i sum=0
@@ -1214,7 +1214,7 @@ done
 echo $sum
 ```
 
-``` shell
+``` sh
 #!/bin/bash
 #
 declare -i sum=0
@@ -1234,7 +1234,7 @@ echo $sum
 3. 打印九九乘法表；
 4. 打印逆序的九九乘法表；
 
-``` xx
+``` sh
 1X1=1
 1X2=2  2X2=4
 1X3=3  2X3=6  3X3=9
@@ -1242,7 +1242,7 @@ echo $sum
 
 - 外循环控制乘数，内循环控制被乘数；
 
-``` shell
+``` sh
 #!/bin/bash
 for j in {1..9}; do
   for i in $(seq 1 $j); do

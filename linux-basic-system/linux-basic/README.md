@@ -1,4 +1,4 @@
-# Linux 基础入门-[零壹码博客](https://lingyima.com)
+# Linux 基础入门-[沃尔特](https://www.wovert.com)
 
 ## 终端
 
@@ -115,18 +115,18 @@
 
 关机命令
 
-``` CentOS 7
+``` sh
 ~]# systemctl poweroff
 ~]# systemctl reboot
 ```
 
-``` 通用命令
+``` sh
 ~]# poweroff
 ~]# hatl
 ~]# reboot
 ```
 
-``` shutdown
+``` sh
 shutdown [OPTIONS...] [TIME] [WALL...]
 OPTIONS:
   -h: halt
@@ -139,12 +139,12 @@ TIME:
   +0=now
 ```
 
-```
+``` sh
 WALL
 向所有终端发送信息
 ```
 
-```
+``` sh
 # shutdown -r +5 "after 5 minutes shutdown"
 # wall "message information"
 ```
@@ -223,7 +223,7 @@ open(), read(), write(), close(), delete(), create()
 
 ### 工作目录
 
-```
+``` sh
 /etc/sysconfig/network-scripts/ifcfg-eno16777736
 `basename` 最右侧的文件或目录名
 `dirname` basename 左侧的路径
@@ -240,9 +240,9 @@ open(), read(), write(), close(), delete(), create()
 
 ## 命令格式
 
-### 命令的语法通用格式:
+### 命令的语法通用格式
 
-```
+``` sh
 COMMAND [OPTIONS...] [ARGUMENTS...]
 命令     选项    参数
 ```
@@ -391,7 +391,8 @@ man1, man2, ...
 - 注意：并非每个command在所有章节都有手册
 
 查看命令有哪些章节
-```
+
+``` sh
 ~]# whatis COMMAND
 ~]# man -f Keyword 精确查找
 ```
@@ -403,7 +404,7 @@ man1, man2, ...
 
 - 指定目录下查找手册
 
-```
+``` sh
 ~]# man -M /PAHT/TO/SOMEDIR COMMAND
 /usr/share/man 目录复制到其他目录下
 man1, man5, man8 等
@@ -475,14 +476,14 @@ man1, man5, man8 等
 
 1. 添加用户 gentoo
 
-```
+``` sh
 ~]# useradd gentoo
 ~]# id gentoo
 ```
 
 2. 添加用户 slackware，要求指定其所用的 shell 为 /bin/tcsh
 
-```
+``` sh
 ~]# useradd -s /bin/tcsh slackware
 ~]# tail -1 /etc/passwd
 ```
@@ -506,7 +507,7 @@ man1, man5, man8 等
 
 - 环境变量
 
-```
+``` sh
 ~]# echo $HOME
 ~]# echo $PWD
 ~]# echo $OLDPWD
@@ -514,7 +515,7 @@ man1, man5, man8 等
 
 #### 列出指定目录下的文件列表 - list
 
-```
+``` sh
 ls [OPTIONS]... [FILE]...
 
 ls options
@@ -545,7 +546,7 @@ ls options
 
 #### mkdir：make directories
 
-```
+``` sh
 mkdir [OPTION]... DIRECTORY...
 
 -p 自动按需创建父目录
@@ -559,7 +560,7 @@ mkdir [OPTION]... DIRECTORY...
 
 #### rmdir：remove empty directories
 
-```
+``` sh
 rmdir [OPTION]... DIRECTORY...
 
 p 删除某目录后，如果其父目录为空，则一并删除之；
@@ -570,7 +571,7 @@ v verbose
 
 #### mktemp 命令：create a temporary file or directory
 
-```
+``` sh
 mktemp [OPTION]... [TEMPLATE]
 -d, --directory` 创建临时目录
 -u, --dry-run` do not create anything
@@ -592,7 +593,7 @@ mktemp [OPTION]... [TEMPLATE]
 
 #### 查看文件内容
 
-```
+``` sh
 cat [OPTION]... [FILE]..
 
 options
@@ -606,19 +607,19 @@ options
 
 ---
 
-```
+``` sh
 tac [-n] [-E]
 ```
 
 ---
 
-```
+``` sh
 more/less
 ```
 
 ---
 
-```
+``` sh
 head
 查看文件的前n行
 n # 或者 -#
@@ -626,7 +627,7 @@ n # 或者 -#
 
 ---
 
-```
+``` sh
 tail
 查看文件的后n行
 
@@ -636,13 +637,13 @@ n #  或者 -#
 
 #### 从标准输入获取内容创建和执行命令
 
-```
+``` sh
 xargs -n 数字
 
 一行显示列数(空白字符分割)
 ```
 
-``` shell
+``` sh
 # echo 1 2 3 4 5 > file.txt
 # xargs -n 4 < file.txt
 ```
@@ -651,7 +652,7 @@ xargs -n 数字
 
 #### 回显
 
-```
+``` sh
 echo [SHORT-OPTION]... [STRING]...
 
 echo OPTIONS
@@ -701,7 +702,7 @@ echo OPTIONS
 
 ---
 
-```
+``` sh
 date [OPTIONS]... [+FORMAT]
 
 系统时钟
@@ -724,14 +725,14 @@ date [OPTIONS]... [+FORMAT]
 
 ---
 
-```
+``` sh
 clock 硬件时钟
 
 是 hwclcok 的软链接
 ```
 ---
 
-```
+``` sh
 hwclock - query or set the hardware clock(RTC)
 
 -s, --hctosys : Set the System Time from the Hardware Clock.
@@ -740,13 +741,13 @@ hwclock - query or set the hardware clock(RTC)
 
 ---
 
-```
+``` sh
 cal [options] [[[day] month] year]
 ```
 
 ---
 
-```
+``` sh
 which OPTIONS
 
 OPTIONS:
@@ -755,7 +756,7 @@ OPTIONS:
 
 ---
 
-```
+``` sh
 whereis OPTIONS
 
 OPTIONS:
@@ -766,7 +767,7 @@ OPTIONS:
 
 ---
 
-```
+``` sh
 who options
 
 options:
@@ -777,7 +778,7 @@ options:
 
 ---
 
-```
+``` sh
 w 
 
 增强版的 who 命令
@@ -808,7 +809,7 @@ w
 
 `touch` options
 
-```
+``` sh
 -c : 指定的文件路径不存在时不予创建
 -a : 修改access time
 -m : 修改modify time
@@ -817,7 +818,7 @@ w
 
 #### mv 命令
 
-```
+``` sh
 mv [OPTION]... SOURCE... DIRECTORY
 mv [OPTION]... -t DIRECTORY SOURCE...
 
@@ -828,7 +829,7 @@ options
 
 ---
 
-```
+``` sh
 rm
 
 options
@@ -841,7 +842,7 @@ options
 
 ---
 
-```
+``` sh
 cp 命令 - copy
 ```
 
@@ -884,7 +885,7 @@ cp 命令 - copy
 
 ---
 
-```
+``` sh
 install 命令
 ```
 
@@ -915,7 +916,7 @@ install 命令
 
 ---
 
-```
+``` sh
 dd 命令 - convert and copy a file
 
 # dd if=/PATH/FROM/SRC of=/PATH/TO/DEST bs=block size count=数量`

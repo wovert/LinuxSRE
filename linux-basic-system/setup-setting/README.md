@@ -1,4 +1,4 @@
-# Linux 安装与配置-[零壹码博客](https://lingyima.com)
+# Linux 安装与配置-[沃尔特](https://www.wovert.com)
 
 ## Linux 发行版安装
 
@@ -41,7 +41,7 @@
 
 #### 如何区分 32 位和 64 位
 
-- 查看系统位数方法: 
+- 查看系统位数方法
 
 `~]# uname -m` x86_64
 
