@@ -159,3 +159,87 @@ Web服务器和POP3服务器都需要用户验证需要用户验证。在`/etc/p
 - 发送邮件：Postfix + SASA(认证，或 courier-authlib） + MysQL
 - 收邮件: Dovecot + MySQL
 - webmail: Extmail + Extman + httpd
+
+- redhat: postfix rpm编译的时候不支持SASL的虚拟用户的认证
+
+``` sh
+# netstat -tnlp
+# service sendmail stop
+# chkconfig sendmail off
+# rpm -e sendmail --nodeps
+
+安装
+```
+
+1. 安装cyrus-sasl
+
+``` sh
+# yum list all | grep sasl
+cyrus-sasl-devel-xxx 安装就没有问题
+
+# yum install cyrus-sasl
+# rpm -ql cyrus-sasl-devel
+  /usr/include/sasl 头文件
+  /usr/lib/libsasl2  库文件
+
+# ls -l /usr/lib/sasl2
+
+启动saslauthd服务，并将其加入到自动启动队列
+# service saslauthd start
+# chkconfig saslauthd on
+``
+
+1. 安装 mariadb并设置root用户密码
+
+``` sh
+
+# service mysqld start
+# chkconfig mysqld on
+# mysqladmin -root password 'password'
+
+```
+
+2. 安装 [postfix](http://www.postfix.org/)
+
+
+[postfix-2.11.11](ftp://ftp.cuhk.edu.hk/pub/packages/mail-server/postfix/official/postfix-2.11.11.tar.gz)
+
+``` sh
+
+邮件发送用户
+# groupadd -g 2525 postfix
+# useradd -g postfix -u 2525 -g /sbin/nologin -M postfix
+
+投递邮件用户
+# groupadd -g 2526 postdrop
+# useradd -g postdrop -u 2526 -s /sbin/nologin -M postdrop
+
+# id postfix
+# id postdrop
+
+# cd /usr/local/src
+# wget ftp://ftp.cuhk.edu.hk/pub/packages/mail-server/postfix/official/postfix-2.11.11.tar.gz
+# tar xcvf postfix-2.11.11.tar.gz
+# cd postfix-2.11.11
+# ls
+# less INSTALL
+
+CCARGS 哪里查找头文件
+AUXLIBS 辅助的库文件路径
+DUSE_TLS 支持SMTPS协议（加密传输）
+-lz 压缩库文件
+-lm 模块
+-lssl 库
+-lssl2 库
+-lcrypto 库
+
+yum安装
+# make makefiles 'CCARGS=-DHAS_MYSQL -I/usr/include/mysql -DUSE_SASL_AUTH -DUSE_CYRUS_SASL -I/user/include/sasl -DUSE_TLS' 'AUXLIBS=-L/usr/lib/mysql -lmysqlclient -lz -lm -L/usr/lib/sasl2 -lsasl2 -lssl -lcrypto'
+
+源码安装
+# make makefiles 'CCARGS=-DHAS_MYSQL -I/usr/local/mysql/include/mysql -DUSE_SASL_AUTH -DUSE_CYRUS_SASL -I/user/include/sasl -DUSE_TLS' 'AUXLIBS=-L/usr/local/mysql/lib -lmysqlclient -lz -lm -L/usr/lib/sasl2 -lsasl2 -lssl -lcrypto'
+
+
+# make
+# make install
+```
