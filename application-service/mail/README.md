@@ -30,8 +30,6 @@
   
   - SMTP客户端 -----SMTP协议-----> 远程SMTPD -> 远程MDA(Mail Deliver Agent, 邮件投递代理) -> 邮件邮筒 -> MUA来查看邮件内容
 
-- 邮件传输代理：MTA(Mail Transfer Agent)
-
 早期计算机有 Unix 主机用户都有自己的家目录
 
 主机A的用户Alice(alice@a.com)向主机B的用户Bob(bob@b.com)发送邮件。
@@ -96,3 +94,68 @@ Web服务器和POP3服务器都需要用户验证需要用户验证。在`/etc/p
 > Internet Mail Access Protocol 4
 
 比 POP3 功能强大，但消耗性能更多
+
+## postfix
+
+- MTA(Mail Transfer Agent)邮件传输代理
+  - SMTP服务器
+  - SMTP服务软件
+    - sendmail 软件（使用 UUCP 协议）
+      - 单体结构，SUID，配置文件语法（`m4`编写）
+    - qmail
+      - 数学家开发的，速度比sendmail快20倍，体积比sendmail 小
+      - 短小精悍，性能超强
+      - 使用短，所以抛弃了
+      - 有些商业邮件，使用qmail核心
+    - postfix
+      - 新贵, 设计避免于sendmail缺陷和SUID
+      - **模块化**设计
+      - **安全**
+      - 跟sendmail兼容性好
+      - 投递**效率**高于sendmail 40倍
+    - exim
+      - 英国剑桥大学，exim(MTA)
+      - 使用配置很简单
+    - Exchange(Windows OS)
+      - 异步消息协作平台
+      - 必须装有 AD
+
+- SASL(v1，v2用的比较多)：
+  - cyrus-sasl 提供
+    - yum list all | grep sasl
+      - cyrus-sasl.xxx 核心组件 （服务器端）
+  - courier-authlib 带认证机制
+    - 美籍俄罗斯人开发的
+
+- MDA: 邮件投递代理
+  - 投递软件
+    - procmail
+    - maildrop
+      - 美籍俄罗斯人，配有垃圾邮件过滤
+
+- MRA：邮件检索代理 (pop3, imap4)
+  - MRA 软件
+    - cyrus-imap
+    - dovecot
+      - 功能强大，性能很好
+
+- MUA：邮件用户代理
+  - Outlook Express(精简版), Outlook(专业版)
+  - Foxmail(腾讯)
+  - Thunderbird(Linux)
+  - Evolution(Linux)
+  - mutt（基于文本界面的）
+
+- Webmail
+  - Openwebmail（Perl开发的）
+  - squirerelmail(PHP开发的)
+    - yum list all | grep mail
+  - Extmail(Extman 界面)（Perl开发的）
+    - 国内开源, 在OS中定制版
+    - EMOS，CentOS 商业版
+
+### 邮箱配置架构程序
+
+- 发送邮件：Postfix + SASA(认证，或 courier-authlib） + MysQL
+- 收邮件: Dovecot + MySQL
+- webmail: Extmail + Extman + httpd
