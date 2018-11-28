@@ -118,18 +118,29 @@ Free & open source, high-performance, distributed object caching system
 
 ## memcached客户端程序
 
-- telnet: `# telnet 172.16.100.6 11211`
+- telnet
+  - `# yum -y install telnet`
+  - `# telnet 172.16.100.6 11211`
 - 命令
-  - 统计类：`stats,stat items,stats slabs,stats sizes`
+  - 统计类：`stats, stat items, stats slabs, stats sizes`
+    - stats
+      - pid
+      - uptime 运行多长时间 秒
+      - time 当前系统时间戳
+      - version 版本号
+      - libevent 基于那个并发库
+      - cmd_get get命令运行过多少次
+      - get_hits get命中了多少次
   - 存储类：`set, add, replace, append, prepend`
   - 获取数据：`get keyname, delete keyname, incr/decr (加+)`
   - 清空：`flush_all`
 
-``` sh
+```
 add key flag expires length
 
 mykey键名 flag 缓存有效时间(秒) 5个字节
 set mykey 0  60 5
+hello
 stats items
 get mykey
 
@@ -150,7 +161,7 @@ incr mykey 1
 ## memcached程序的常用选项
 
 - -l <ip_addr>：监听的地址
-- -u <username>
+- -u <username>：assume the identify of <username>
 - -m <num>：缓存空间大小，单位为MB; 默认为64MB
 - -c <num>：最大并发连接数，默认为1024
 - -p <num>：TCP port, 11211
@@ -161,16 +172,16 @@ incr mykey 1
 - t <thread>：处理用于请求的线程数
 - B <proto>：ascii or binary
 
-- memcached默认没有认证机制，但可借助于SASL进行认证
+- memcached 默认没有认证机制，但可借助于SASL进行认证
 
-## slab： 内存分配器
+## slab：内存分配器
 
 `stats slab`
 
 ## PHP连接memecached服务的模块
 
 - memcache：php-perl-memcache 扩展
-- memcached：php-perl-memcached 
+- memcached：php-perl-memcached
 
 ## 可提供工具程序的程序包
 
@@ -190,4 +201,3 @@ incr mykey 1
 《LVS Web PHP session memcached.txt》
 
 - 博客作业：nginx调度负载均衡用户请求至后端多个ammp主机，PHP的会话保存于memcached中
-
