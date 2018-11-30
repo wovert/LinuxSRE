@@ -95,6 +95,35 @@
   - 修改属性：path= ownver= mode= group=
   - 创建目录：path=/tmp/tmpdir state=directory
 
+- filesystem 模块：Makes file system on block device
+- hostname 模块：管理主机名
+  - name= # Name of the host
+- pip 模块：管理 python 依赖库模块
+- yum 模块：Manages packages with the 'yum' package manager
+  - name= 程序包名称，可以带版本号(必填)
+  - state= present或latest(最新版本) |  | absent(删除)
+  - disablerepo=
+
+- service 模块：管理服务
+  - name= 指明管理服务名（必填）
+  - state= started | stopped | restarted 服务状态
+  - enabled=
+  - runlevel=
+
+- user 模块：管理用户和组账号
+  - name= 用户账号(必填)
+  - state= absent | present
+  - system= 是否为系统账号
+  - uid=
+  - shell=
+  - group= 基本组
+  - groups 附加组
+  - comment=
+  - home=
+  - move_home=
+  - password=
+  - remove=
+
 ``` sh
 参数帮助
 # ansible-doc -h
@@ -155,9 +184,54 @@
 
 创建目录
 # ansible all -m file -a "path=/tmp/tmpdir state=directory"
+
+yum包管理
+# ansible-doc -s yum
+
+安装 httpd 服务
+# ansible all -m yum -a "name=httpd state=latest"
+
+卸载 httpd 服务
+# ansible all -m yum -a "name=httpd state=absent"
+
+# ansible-doc -s service
+
+启动服务
+# ansible all -m shell -a "ss -tnl | grep :80"
+# ansible all -m service -a "name=httpd state=started"
+# ansible all -m shell -a "ss -tnl | grep :80"
+
+管理用户账号
+# ansible-doc -s user
+# ansible all -m user -a "name=use2 system=yes state=present uid=306"
+
+
 ```
 
+## YAML
 
+> Yet Another Markup Language(仍是一种表一语言)
+
+[YAML官网](http://www.yaml.org)
+
+``` yaml
+packages:
+  - httpd
+  - php
+  - php-mysql
+version: 0.1
+
+```
+
+有两个键值对儿组成的叫做字典
+
+## playbook 的核心元素
+
+- Tasks(任务)
+- Variables(变量)
+- Templates(模板)：包含了模板语法的文本文件
+- Handlers(处理器)：由特定条件下的任务
+- Roles(角色)
 
 ## 示例
 
