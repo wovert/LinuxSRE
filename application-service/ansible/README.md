@@ -245,6 +245,9 @@ version: 0.1
     - action: module arguments (最新版本)
     - module: arguments (通用版本)
 
+    - 注意：shell 和 command 模块后面直接跟命令，而非key=value类的参数列表
+  - 某任务的状态在运行后为 changed 时，可通过"notify"通知给相应的handlers
+
 ### 运行playbook 的方式
 
 1. 测试
@@ -256,9 +259,6 @@ version: 0.1
 2. 运行
 
 - 运行任务:`# ansilbe-playbook first.yaml`
-
-
-20:00
 
 ``` sh
 # cd ~
@@ -284,6 +284,75 @@ version: 0.1
 # ansible 172.18.100.69 -m setup
 
 # ansible-playbook first.yaml
+
+启动服务剧本
+# mkdir working
+# cd working
+# mkdir files
+# rpm -q httpd
+# cp /etc/httpd/conf/httpd.conf files/
+# vim files/http.conf
+  Listen 8080
+# vim web.yaml
+- hosts: webservers
+  remote_user: root
+  tasks:
+  - name: install httpd package
+    yum: name=httpd state=present
+  - name: install configure file
+    copy: src=files/httpd.conf dest=/etc/httpd/conf/
+  - name: start httpd service
+    service: name=httpd state=started
+  - name: execute ss command
+    shell: ss -tnl | grep :80
+# ansible-playbook --check web.yaml
+
+ 关闭 httpd 服务
+# ansible all -m yum -a "name=httpd state=absent"
+# ansible-playbook --check web.yaml
+# ansible-playbook web.yaml
+# ansible webservers -m shell -a "ss -tnl | grep :80"
+
+
+# vim web.yaml
+# vim file/httpd.conf
+  Listen 80
+# ansible-playbook --check web.yaml
+# ansible-playbook web.yaml
+# ansible webservers -m shell -a "ss -tnl | grep :80"
+
+
+
+
+```
+
+### handlers
+
+- 任务，在特定条件下触发
+- 接收到其他任务的通知时被处罚
+
+
+
+``` sh
+# cp web.yaml web-2.yaml
+# vim web-2.yaml
+- hosts: webservers
+  remote_user: root
+  tasks:
+  - name: install httpd package
+    yum: name=httpd state=present
+  - name: install configure file
+    copy: src=files/httpd.conf dest=/etc/httpd/conf/
+    notify: restart httpd
+  - name: start httpd service
+    service: name=httpd state=started
+  - name: execute ss command
+    shell: ss -tnl | grep :80
+  handlers:
+  - name: restart httpd  与notify 后面的名字保持一致
+    service: name=httpd state=restarted
+# ansible-playbook --check web-2.yaml
+# ansible-playbook web-2.yaml
 ```
 
 ## 示例
