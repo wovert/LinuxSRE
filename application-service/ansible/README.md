@@ -227,11 +227,64 @@ version: 0.1
 
 ## playbook 的核心元素
 
+- Hosts
 - Tasks(任务)
 - Variables(变量)
 - Templates(模板)：包含了模板语法的文本文件
 - Handlers(处理器)：由特定条件下的任务
 - Roles(角色)
+
+### playbook 基础组建
+
+- Hosts: 运行指定任务的目标主机
+- remote_user: 在远程主机上执行任务的用户
+- sudo_user
+- tasks: 任务列表
+  - 模块，模块参数
+  - 格式：
+    - action: module arguments (最新版本)
+    - module: arguments (通用版本)
+
+### 运行playbook 的方式
+
+1. 测试
+
+- 运行测试(只检测可能会发生的改变，但不真正执行操作): `# ansilbe-playbook --check first.yaml`
+
+- 列出运行在任务的主机:`# ansilbe-playbook --list-hosts  first.yaml`
+
+2. 运行
+
+- 运行任务:`# ansilbe-playbook first.yaml`
+
+
+20:00
+
+``` sh
+# cd ~
+# vim first.yaml
+- hosts: all
+  remote_user: root
+  tasks:
+  - name: create a user user3
+    uer: name=user3 system=true uid=307
+  - name: create a user user4
+    uer: name=user4 system=true uid=308
+
+# man ansible-playbook
+
+运行测试
+# ansilbe-playbook --check first.yaml
+
+运行在哪个主机上
+# ansilbe-playbook --list-hosts first.yaml
+
+查看各个主机的FACTS变量（报告主机状态信息）
+# ansible-doc -s setup
+# ansible 172.18.100.69 -m setup
+
+# ansible-playbook first.yaml
+```
 
 ## 示例
 
