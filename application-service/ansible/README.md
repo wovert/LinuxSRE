@@ -124,6 +124,8 @@
   - password=
   - remove=
 
+- setup 模块
+
 ``` sh
 参数帮助
 # ansible-doc -h
@@ -246,7 +248,8 @@ version: 0.1
     - module: arguments (通用版本)
 
     - 注意：shell 和 command 模块后面直接跟命令，而非key=value类的参数列表
-  - 某任务的状态在运行后为 changed 时，可通过"notify"通知给相应的handlers
+  - 1.某任务的状态在运行后为 changed 时，可通过"notify"通知给相应的handlers
+  - 2.任务可以通过“tags”打标签，而后可在ansible-playbook 命令上使用-t指定进行调用；多个标签可以使用都好分割
 
 ### 运行playbook 的方式
 
@@ -320,20 +323,16 @@ version: 0.1
 # ansible-playbook --check web.yaml
 # ansible-playbook web.yaml
 # ansible webservers -m shell -a "ss -tnl | grep :80"
-
-
-
-
 ```
 
 ### handlers
 
 - 任务，在特定条件下触发
 - 接收到其他任务的通知时被处罚
-
-
+  - 例如：监控的资源被change的时候，触发handlers
 
 ``` sh
+配置文件修改是触发handler => 重启服务
 # cp web.yaml web-2.yaml
 # vim web-2.yaml
 - hosts: webservers
@@ -353,6 +352,117 @@ version: 0.1
     service: name=httpd state=restarted
 # ansible-playbook --check web-2.yaml
 # ansible-playbook web-2.yaml
+```
+
+``` sh
+# cp web-2.yaml web-3.yaml
+# vim web-3.yaml
+- hosts: webservers
+  remote_user: root
+  tasks:
+  - name: install httpd package
+    yum: name=httpd state=present
+  - name: install configure file
+    copy: src=files/httpd.conf dest=/etc/httpd/conf/
+    tags: instconf
+    notify: restart httpd
+  - name: start httpd service
+    service: name=httpd state=started
+  handlers:
+  - name: restart httpd  与notify 后面的名字保持一致
+    service: name=httpd state=restarted
+# ansible-playbook --check web-3.yaml
+
+# vim files/httpd.conf
+  改变一下端口
+
+# ansible-playbook --check -t instconf web-3.yaml
+  仅显示配置文件修改
+# ansible-playbook web-3.yaml
+
+# vim web-3.yaml
+- hosts: webservers
+  remote_user: root
+  tasks:
+  - name: install httpd package
+    yum: name=httpd state=present
+    tags: insthttpd
+  - name: install configure file
+    copy: src=files/httpd.conf dest=/etc/httpd/conf/
+    tags: insthttpd
+    notify: restart httpd
+  - name: start httpd service
+    service: name=httpd state=started
+    tags: starthttpd
+  handlers:
+  - name: restart httpd  与notify 后面的名字保持一致
+    service: name=httpd state=restarted
+# ansible-playbook --check -t insthttpd web-3.yaml
+  安装包和配置文件标签
+
+运行配置文件标签任务
+# ansible-playbook -t instconf web-3.yaml
+```
+
+### variable
+
+1. facts: 可直接调用
+2. ansible-playbook 命令的命令行中自定义变量; `-e VARS, --extra-vars=VARS`
+3. 通过 role 传递变量
+4. Host Inventory;
+  - 向不同的主机传递不同的变量; IP/HOSTNAME var1=value var2=value
+  - 向组中的主机传递相同的变量
+    - [groupname:vars]
+    - variable=value
+- invertory 参数;
+  - 用于定义ansible 远程主机目标主机时使用的参数，而非传递给playbook 的变量；
+    - ansible_ssh_host
+    - ansible_ssh_port
+    - ansible_ssh_user
+    - ansible_ssh-pass
+    - ansible_sudo_pass
+    - `172.18.100.12 ansible_ssh_user=root ansible_ssh_pass=pass`
+
+``` sh
+# man ansible-playbook
+# vim forth.yaml
+- hosts: dbservers
+  remot_usrs: root
+  tasks:
+  - name: install {{ pkname }}
+    yum: name={{ pkname }} state=present
+# ansible-playbook -e pkname=emecached -- check forth.yaml
+
+节点上测试是否安装memecached
+# rpm -q memecached
+
+主机变量
+# vim /etc/ansible/hosts
+  [webservers]
+  172.18.100.10  hname=www1 http_port=808
+  172.18.100.11  hname=www2 http_port=8080
+
+  组变量
+  [webserers:vars]
+  mysql_port=3306
+
+  [dbservers]
+  172.18.100.11
+  172.18.100.12 ansible_ssh_user=root ansible_ssh_pass=pass
+
+# ansible-dc -s hostname
+# vim hostname.aml
+- hosts: webservers
+  remote_user: root
+  tasks:
+  - name: set hostname
+    hostname: name={{ hname }}
+# ansible-playbook --check hostname.yaml
+# ansible-playbook hostname.yaml
+
+节点主机上检测 hostname
+# hostname
+
 ```
 
 ## 示例
