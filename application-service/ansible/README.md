@@ -2,6 +2,7 @@
 
 ## 1. 操作系统安装
 
+- 运维工具：pxe, cobbler
 - bare metal(裸机上安装): pxe(网卡->raw设备->预引导执行环境， 只能引导)
   - cobbler(二次封装 pxe环境)
   - 硬件支持 PXE 技术
@@ -33,8 +34,8 @@
 3. 不能导致系统故障或造成系统完全不可用
 
 - 程序发布基于灰度模型
-  - 1. 基于主机
-  - 2. 基于用户
+  - 1.基于主机
+  - 2.基于用户
 
 - 发布路径：
   - /webapp/tuangou(应用程序)
@@ -55,7 +56,7 @@
 > Configuration, Command and Control 功能的轻量级运维工具
 
 - 2012年十佳 OSS
-- 被RedHat收购（1亿美元）
+- 被 RedHat 收购（1亿美元）
 
 ## Ansible Features
 
@@ -67,6 +68,8 @@
 - 幂等性
 
 ## ansible的常用模块
+
+- command,shell,cron,copy,file,ping,yum,service,user,setup,hostname,group,script
 
 - 获取支持模块列表 `# ansible-doc -l`
 - command 模块：在远程主机运行命令
