@@ -121,13 +121,8 @@
 3. 不能导致系统故障或造成系统完全不可用
 
 - 程序发布基于灰度模型
-<<<<<<< HEAD
   - 1.基于主机
   - 2.基于用户
-=======
-  -1. 基于主机
-  -2. 基于用户
->>>>>>> 13dd2ed2e7560158525aa933deb8f5f9957be6be
 
 - 发布路径：
   - /webapp/tuangou(应用程序)
@@ -221,6 +216,22 @@
 
 - setup 模块
 
+- group 模块: 添加和删除组
+  - name
+  - state
+  - system
+  - gid
+
+- script 模块：执行本地路径上的脚本复制远程主机上脚本
+  - -a "/PATH/TO/SCRIPT_FILE"
+
+- template 模块：给予模板方式生成一个文件复制到远程主机
+  - *src=
+  - *dest=
+  - owner=
+  - group=
+  - mode=
+
 ``` sh
 参数帮助
 # ansible-doc -h
@@ -301,6 +312,10 @@ yum包管理
 管理用户账号
 # ansible-doc -s user
 # ansible all -m user -a "name=use2 system=yes state=present uid=306"
+
+管理组
+# ansible-doc -s group
+
 ```
 
 ## YAML
@@ -503,10 +518,11 @@ version: 0.1
 2. ansible-playbook 命令的命令行中自定义变量; `-e VARS, --extra-vars=VARS`
 3. 通过 role 传递变量
 4. Host Inventory;
-  - 向不同的主机传递不同的变量; IP/HOSTNAME var1=value var2=value
-  - 向组中的主机传递相同的变量
-    - [groupname:vars]
-    - variable=value
+
+- 向不同的主机传递不同的变量; IP/HOSTNAME var1=value var2=value
+- 向组中的主机传递相同的变量
+  - [groupname:vars]
+  - variable=value
 - invertory 参数;
   - 用于定义ansible 远程主机目标主机时使用的参数，而非传递给playbook 的变量；
     - ansible_ssh_host
@@ -556,6 +572,260 @@ version: 0.1
 节点主机上检测 hostname
 # hostname
 
+```
+
+### template 模板
+
+> 文本文件，嵌套有脚本（使用模板编程语言编写）
+
+### Jinja2：模板编程语言
+
+- 字面量：
+  - 字符串：使用单引号或双引号；
+  - 数字：整数，浮点数
+  - 列表：[item1, item2, ...]
+  - 元祖：(item1, item2, ...)
+  - 字典：{k1: v2, k2: v3, ...}
+  - 布尔：true | false
+- 算数运算：
+  - +, -, *, /, //, %, **
+- 比较操作：
+  - ==, !=, <, >=, <, <=
+- 逻辑运算符：
+  - and, or, not
+
+```sh
+检查各个节点CPU核心数量
+# ansible all -m setup | grep ansible_processor_vcpus
+主机1：4个
+主机2：2个
+
+每台主机上部署 Nginx
+# cd working
+# vim files/epel.repo
+[epel]
+name=Fedora EPEL
+baseurl=http://172.18.0.1/fedora-epel/$releasever/$basearch
+enabled=1
+gpgcheck=0
+
+复制文件
+# ansible all -m copy -a "src=files/epel.repo dest=/etc/yum.repos.d"
+
+安装 nginx
+# ansible all-m yum -a "name=nginx state=present"
+
+本地安装 nginx
+# yum -y install nginx
+# cp /etc/nginx/nginx.conf fiels/
+# mv files/nginx.conf files/nginx.conf.j2
+
+模板配置文件
+# vim files/nginx.conf.j2
+  worker_processes {{ ansible_processor_vcpus }};
+  listen {{ http_port }};
+
+# ansible webservers -m template -a "src=files/nginx.conf.j2 dest=/etc/nginx/nginx.conf"
+错误提示
+
+# vim nginx.yaml
+- hosts: webserers
+  remote_user: root
+  tasks:
+  - name: install nginx
+    yum: name=nginx state=present
+  - name: install conf file
+    template: src=files/nginx.conf.j2 dest=/etc/nginx/nginx.conf
+    notify: restart nginx
+    tags: instconf
+  - name: start nginx service
+    service: name=nginx state=started
+  handlers:
+  - name: restart nginx
+    service: name=nginx state=restarted
+
+# ansible-playbook --check nginx.yaml
+# ansible-playbook nginx.yaml
+
+验证各个节点主机
+# ps aux
+
+
+# vim /etc/ansible/hosts
+
+[webservers]
+172.18.100.67 http_port=80
+172.18.100.68 http_port=8080
+
+
+# ansible-playbook --check nginx.yaml
+# ansible-playbook nginx.yaml
+
+验证主机上的端口
+# ss -tnl
+
+-----------------------
+
+算数运算：CPU 核心数减掉1
+# vim files/nginx.conf.j2
+  worker_processes {{ ansible_processor_vcpus }};
+
+# ansible-playbook --check nginx.yaml
+# ansible-playbook nginx.yaml
+
+验证各个节点主机
+# ps aux
+
+```
+
+### 条件测试
+
+- when 语句：在task 中使用, jinja2 的语法格式
+  
+
+
+- CentOS: httpd 报名
+- Ubuntu: Apache2 包名
+- CentOS 7 vs CentOS 6
+
+``` sh
+# ansible all -m setup
+# ansible all -m setup | grep ansible_distribution
+
+tasks:
+- name: intall conf file to centos7
+  template: src=files/nginx.conf.c7.j2
+  when: ansible_distribution_major_version == "7"
+- name: install conf file to cento6
+  template: src=files/nginx.conf.c6.j2
+  when: ansible_distribution_major_version == "6"
+
+
+
+# scp root@172.18.100.69:/etc/nginx/nginx.conf files/nginx.conf.c6.j2
+# vim files/nginx.conf.c6.j2
+  worker_processes {{ ansible_processor_vcpus }};
+# vim nginx.yaml
+- hosts: all
+  remote_user: root
+  tasks:
+  - name: install nginx
+    yum: name=nginx state=present
+  - name: install conf file to centos7
+    template: src=files/nginx.conf.c7.j2 dest=/etc/nginx/nginx.conf
+    when: ansible_distribution_major_version == "7"
+    notify: restart nginx
+    tags: instconf
+  - name: install conf file to centos6
+    template: src=files/nginx.conf.c6.j2 dest=/etc/nginx/nginx.conf
+    when: ansible_distribution_major_version == "6"
+    notify: restart nginx
+    tags: instconf
+  - name: start nginx service
+    service: name=nginx state=started
+  handlers:
+  - name: restart nginx
+    service: name=nginx state=restarted
+
+# ansible-playbook --check nginx.yaml
+# ansible-playbook nginx.yaml
+```
+
+### 循环：迭代，需要重复执行的任务
+
+> 对迭代项的引用，固定变量名位"item"；而后，要在task 中使用 with_items 给定迭代的元素列表
+
+- 列表方法
+  - 字符串
+  - 字典 
+
+``` sh
+- name: install some packeges
+  yum: name={{ item }} state=present
+  with_items:
+  - nginx
+  - memcached
+  - php-fpm
+```
+
+``` sh
+# cd working
+# vim iter.yaml
+- hosts: webservers
+  remote_user: root
+  tasks:
+  - name: install some packages
+    yum: name={{ item }} state=present
+    with_items:
+    - nginx
+    - memcached
+    - php-fpm
+# ansible-playbook --check item.yaml
+# ansible-playbook  item.yaml
+```
+
+``` sh
+不同组的不用用户
+
+# vim user.yaml
+- hosts: all
+  remote_user: root
+  tasks:
+  - name: add some groups
+    group: name={{ item }} state=present
+    - group11
+    - group12
+    - group13
+  - name: add some users
+    user: name={{ item.name }} group={{ item.group }} state=present
+    with_items:
+    - { name: 'user11', group: 'group11'}
+    - { name: 'user12', group: 'group12'}
+    - { name: 'user13', group: 'group13'}
+
+# ansible-playbook --check item.yaml
+# ansible-playbook  item.yaml
+
+检查各个节点用户
+# tail /etc/passwd
+# tail /etc/group
+```
+
+## 角色(roles)
+
+- 角色集合：每一个角色都是一个目录
+  - /etc/ansible/roles/
+    - mysql/
+    - httpd/
+    - nginx/
+    - memcached/
+
+- 每个角色，以特定的层级目录结构进行组织
+  - mysql/
+    - files/: 存放由 copy 或 script 模块等调用的文件
+    - templates/: template模块查找所需要模板文件的目录
+    - tasks/: 至少应该包含一个名为main.yaml文件；其他的文件需要在此文件中通过 include 进行包含
+    - handlers/:至少应该包含一个名为 main.yaml 文件；其他的文件需要在此文件中通过 include 进行包含
+    - vars/:至少应该包含一个名为 main.yaml 文件；其他的文件需要在此文件中通过 include 进行包含
+    - meta/:至少应该包含一个名为 main.yaml 文件,定义当前角色的特殊设定及其依赖关系；其他的文件需要在此文件中通过 include 进行包含
+    - default/: 设定默认变量时使用此目录中的main.yaml 文件
+
+``` yaml
+在playbook调用角色
+- hosts: webservers
+  remote_user:root
+  roles:
+  - mysql
+  - memcached
+  - nginx
+```
+
+### 创建角色
+
+``` sh
+# mkdir /etcansible/roles/nginx/{files,tasks,templates, handlers, vars, meta, default}
+# tree /ec/ansible/roles/nginx
+17:48
 ```
 
 ## 示例
