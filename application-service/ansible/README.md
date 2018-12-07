@@ -145,6 +145,8 @@
 - 2012年十佳 OSS
 - 被 RedHat 收购（1亿美元）
 
+[Ansible-cn](wwww.ansible.com.cn)
+
 ## Ansible Features
 
 - 模块化：调用特定的模块，完成特定任务
@@ -514,10 +516,18 @@ version: 0.1
 
 ### variable
 
-1. facts: 可直接调用
+1. ansible facts: 可直接调用
 2. ansible-playbook 命令的命令行中自定义变量; `-e VARS, --extra-vars=VARS`
 3. 通过 role 传递变量
 4. Host Inventory;
+5. roels
+
+调用：{{ variable }}
+
+- 在playbook中定义变量的方法：
+  - vars:
+    - var1: value1
+    - var2: value2
 
 - 向不同的主机传递不同的变量; IP/HOSTNAME var1=value var2=value
 - 向组中的主机传递相同的变量
@@ -804,28 +814,215 @@ tasks:
   - mysql/
     - files/: 存放由 copy 或 script 模块等调用的文件
     - templates/: template模块查找所需要模板文件的目录
-    - tasks/: 至少应该包含一个名为main.yaml文件；其他的文件需要在此文件中通过 include 进行包含
-    - handlers/:至少应该包含一个名为 main.yaml 文件；其他的文件需要在此文件中通过 include 进行包含
-    - vars/:至少应该包含一个名为 main.yaml 文件；其他的文件需要在此文件中通过 include 进行包含
-    - meta/:至少应该包含一个名为 main.yaml 文件,定义当前角色的特殊设定及其依赖关系；其他的文件需要在此文件中通过 include 进行包含
-    - default/: 设定默认变量时使用此目录中的main.yaml 文件
+    - tasks/: 至少应该包含一个名为main.yml文件；其他的文件需要在此文件中通过 include 进行包含
+    - handlers/:至少应该包含一个名为 main.yml 文件；其他的文件需要在此文件中通过 include 进行包含
+    - vars/:至少应该包含一个名为 main.yml 文件；其他的文件需要在此文件中通过 include 进行包含
+    - meta/:至少应该包含一个名为 main.yml 文件,定义当前角色的特殊设定及其依赖关系；其他的文件需要在此文件中通过 include 进行包含
+    - default/: 设定默认变量时使用此目录中的main.yml 文件
 
 ``` yaml
-在playbook调用角色
+在playbook调用角色方法1 
 - hosts: webservers
   remote_user:root
   roles:
   - mysql
   - memcached
   - nginx
+
+在playbook调用角色方法2: 传递给角色
+- hosts:
+  remote_user:
+  roles:
+  - { role: nginx, username: nginx }
+    键 role 用于指定角色名称；后续的k/v用于传递变量给角色
+  还可以基于条件测试实现角色调用
+  roles:
+  - { role: nginx, when: "ansible_distribution_major_version == '7' "}
 ```
 
 ### 创建角色
 
 ``` sh
 # mkdir /etcansible/roles/nginx/{files,tasks,templates, handlers, vars, meta, default}
+# cp working/files/nginx.conf.j2 templates/
 # tree /ec/ansible/roles/nginx
-17:48
+# vim tasks/main.yml
+- name: install nginx package
+  yum: name=nginx state=present
+- name: install conf file
+  template: src=nginx.conf.j2 dest=/etc/nginx/nginx.conf
+- name: start nginx
+  service: name=nginx state=started enabled=true
+# tree .
+
+调用角色
+# cd ~ && mkdir ansible && cd ansible
+# vim nginx.yml
+- hosts: webservers
+  remote_user: root
+  roles:
+  - nginx
+
+# ansible-playbook --check nginx.yml
+# ansible-playbook nginx.yml
+
+检查各个节点
+# ss -tnlp
+
+复制文件
+# cd /etc/ansible/roles
+# tree .
+# cd nginx/handlers
+# vim main.yml
+- name: restart nginx
+  service: name=nginx starte=restarted
+# vim tasks/main.yml
+- name: install nginx package
+  yum: name=nginx state=present
+- name: install conf file
+  template: src=nginx.conf.j2 dest=/etc/nginx/nginx.conf
+  notify: restart nginx
+  tags: instconf
+- name: start nginx
+  service: name=nginx state=started enabled=true
+# vim templates/nginx.conf.j2
+ 修改配置
+
+# ansible-playbook -t instaconf --check nginx.yml
+# ansible-playbook -t instaconf nginx.yml
+
+# cd ~/working
+# vim myuser.yml
+- hosts: all
+  remote_user: root
+  vars:
+  - username: testuser1
+  - groupname: testgroup1
+  tasks:
+  - name: create group
+    group: name={{ groupname }} state=present
+  - name: create user
+    user: name={{ usrname }} state=present
+# ansible-playbook --check myuser.yml
+
+覆盖
+# ansible-playbook -e "groupname=mygrp1" --check myuser.yml
+# ansible-playbook -e "groupname=mygrp1" myuser.yml
+
+检查用户
+# tail /etc/group
+
+
+服务进程用户
+# vim vars/main.yml
+username: daemon
+
+# vim templates/nginx.conf.j2
+user {{ username }};
+
+# cd ~ && mkdir ansible && cd ansible
+# vim nginx.yml
+- hosts: webservers
+  remote_user: root
+  roles:
+  - nginx
+
+# ansible-playbook --check nginx.yml
+# ansible-playbook nginx.yml
+
+验证进程用户
+# ps aux
+
+以adm用户启动服务进程
+# ansible-playbook -t instconf -e "username=adm" --check nginx.yml
+# ansible-playbook -t instconf -e "username=adm"  nginx.yml
+
+验证进程用户
+# ps aux
+
+角色传递变量
+# cd ~ && mkdir ansible && cd ansible
+# vim nginx.yml
+- hosts: webservers
+  remote_user: root
+  roles:
+  - { role: nginx, username: nginx }
+
+# ansible-playbook -t instconf --check nginx.yml
+# ansible-playbook -t instconf nginx.yml
+
+验证进程用户
+# ps aux
+
+角色调用时条件判断
+# vim nginx.yml
+- hosts: all
+  remote_user: root
+  roles:
+  - { role: nginx, username: nginx, when: ansible_distribution_major_version == '7' }
+
+
+# ansible-playbook -t instconf --check nginx.yml
+# ansible-playbook -t instconf nginx.yml
+
+
+Memcached 配置
+
+在节点上修改主机名
+# hostname memcached
+
+# ansible IP地址 -m setup
+
+# cd roles/nginx
+# mkdir -pv /etc/ansible/roles/memcached/tasks
+# cd ../memcached/
+# vim tasks/main.yml
+- name: install package
+  yum: name=memcached state=present
+- name: start memcached
+  service: name=memcached state=started enabled=true
+
+# cd /etc/ansible/lnm.yml
+- hosts: all
+  remote_user: root
+  roles:
+  - { role: nginx, when: ansible_distribution_major_version == '7' }
+  - { role: memcached, when: ansible_hostname == 'memcached'}
+
+# ansible-playbook --check lnm.yml
+# ansible-playbook lnm.yml
+
+
+当前可用主机的1/4内存
+# vim /etc/sysconfig/memcached
+CACHESIZE=64
+
+# mkdir memcached/templates
+# scp root@172.18.100.69:/etc/sysconfig/memcached ./templates/
+# vim templates/memcached.j2
+CACHESIZE="{{ ansible_memtotal_mb // 4 }}"
+
+# vim tasks/main.yml
+- name: install package
+  yum: name=memcached state=present
+- name: install conf file
+  template: src=memcached.j2 dest=/etc/sysconfig/memecahed
+  notify: restart memcached
+  tags: memconf
+- name: start memcached
+  service: name=memcached state=started enabled=true
+
+# mkdir handlers
+# vim handlers/main.yml
+- name: restart memcached
+  service: name=memcached state=restarted
+
+# ansible-playbook -t memconf --check lnm.yml
+# ansible-playbook -t memconf lnm.yml
+
+检查内存空间
+# /etc/sysconfig/memcached
+
 ```
 
 ## 示例
@@ -896,3 +1093,11 @@ tasks:
 ### 172.18.100.11
 
 ### 172.18.100.12
+
+## 实战项目
+
+- 2台主机 (nginx，主从 keepalived)
+- 2台主机 (PHP，AP)
+- 2台主机 (MariadB)
+- 1台主机 (ansible)
+
