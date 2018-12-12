@@ -107,6 +107,182 @@ DHCP 协议由 bootp 协议发展而来，是 BOOTP 的**增强版本**，**boot
 
     - dhcp discover(找其他房子)：广播
 
+## rpm安装 dhcp
+
+- dhclient-version.rpm 客户端
+- dpcp-common-version.rpm DHCP客户端和服务端共同需要一些的文件
+- dhcp-version.rpm DHCP服务端
+
+``` sh
+# yum -y install dhcp
+
+查看未安装的软件包
+# rpm -qpi /mnt/Packages/dhcp-verison.rpm
+
+dhcp 配置文件
+# ls /etc/dhcp/dhcpd.conf
+
+复制配置文件
+# cp /usr/share/doc/dhcp-4.2.5/dhcpd.conf.example /etc/dhcp/dhcpd.conf -f
+
+修改配置文件
+# vim /etc/dhcp/dhcpd.conf
+  全局配置
+
+  定义客户端所属的域
+  option domain-name "wovert.com";
+
+
+  DNS服务器
+  option domain-name-servers ns1.example.org ns2.example.org;
+
+
+  租约（时间）：客户端可以使用这个IP地址的时间
+  默认租约期限（50%=>续约，87.5% => 续约）
+  default-lease-time 43200; 单位：秒
+
+  最大租约期限：定义客户端IP租约时间的最大值，当客户端超过租约时间，却尚未更新IP时，最长可以使用该IP的时间；比如机器在开机获得IP地址后，然后关机了。这是，当时间过了 default-lease-time 600秒后，没有机器向 DHCP 续约，DHCP会保留 7200秒，保留此IP地址不用于分配给其他机器。当超过7200秒后，将不再保留此IP地址给此机器。
+  max-lease-time 86400;
+
+
+  网管配置
+  option routers 182.18.100.6;
+
+
+  定义日志类型为 Local7
+  log-facility local7;
+  
+
+  局部配置：网络配置
+  作用域：可以分配IP的范围
+  subnet 172.18.0.0(网段号) netmask 255.255.0.0(子网掩码) {
+    range 172.18.100.101 172.18.100.120; 地址池：可以分配给客户端的IP
+    option domain-name-servers ns1.internal.example.org; DNS服务器
+    option domain-name "internal.example.org"; 客户端所属域
+    options routers 网关; 网关地址
+    option broadcast-address 10.5.5.31; 广播地址
+    default-lease-time 600;
+    max-lease-time 7200;
+  
+  
+  };
+
+  保留地址：指定某个客户端使用一个特定的IP，通过 host配置
+
+
+租约文件：DHCP服务运行之后就可以在租约数据库文件查看
+# cat /var/lib/dhcpd/dhcpd.leases
+
+
+启动服务
+# service dhcpd start
+
+开机自动启动方法
+# chkconfig dhcpd on
+# chkconfig --level 3 dhcpd
+
+开机关闭服务
+# chkconfig --level 3 dhcpd off
+
+查看开机自动启动状态
+# chkconfig --list dhcpd
+```
+
+## 应用案例
+
+公司有60台计算机，IP地址段为 192.168.0.1 - 192.168.0.254， 子网掩码是255.255.255.0，网管为 192.168.0.1， 192.168.0.2-192.168.0.30 网段地址给服务器配置，客户端可以使用的地址段为 192.168.0.100-200， 其余剩下的IP地址为保留地址
+
+- 网络连接方式：vment1(仅主机)
+- 虚拟网络编辑器 -> 使用本地DHCP服务器将IP地址分配给虚拟机（去掉勾选）
+
+![网卡模式修改](./images/vm-setting.png)
+
+![虚拟网络编辑器配置](./images/vm-net-editor.png)
+
+修改配置文件
+
+``` sh
+DHCP 主机
+
+# vim /etc/dhcp/dhcpd.conf
+  subnet 192.168.0.0  netmask 255.255.255.0 {
+    range 192.168.0.100 192.168.0.200;
+    option domain-name-servers 192.168.0.1; 路由器作为DNS
+    option domain-name "wovert.com";
+    option routers 192.168.0.1;
+    option broadcast-address 192.168.0.255;
+    default-lease-time 600;
+    max-lease-time 7200;
+  }
+
+确保IP地址网段为 192.168.0.0
+修改IP地址/网管/子网掩码：192.168.0.63、255.255.255.0
+# service network restart
+
+重启服务
+# service dhcpd restart
+
+```
+
+验证登录-另外一台主机
+
+``` sh
+使用 Use DHCP: YES
+# service network restart
+
+查看分配的IP地址
+# ifconfig
+
+查看默认网关
+# route -n
+
+查看DNS
+# cat /etc/resolv.conf
+
+没有变化就删除 /etc/sysconfig/network-scripts/ifcfg-eth0 文件的 DNS1 配置
+
+# service network restart
+
+# cat /etc/resolve.conf
+  nameserver 192.168.0.1
+```
+
+DHCP 主机查看租约数据库文件
+
+``` sh
+# cat /var/lib/dhcpd/dhcpd.leases
+```
+
+地址绑定：在DHCP 中的IP地址绑定用于给客户端分配固定IP地址。比如服务器需要使用固定IP地址就可以使用IP地址绑定，通过MAC地址与IP地址的对应关系为物理地址计算机分配固定IP地址。整个配置过程需要用到 host 声明和hardware、fixed-address 参数。
+
+1. host 主机名 {.....}; 用于定义保留地址
+2. hardware 类型 硬件地址; 定义网络接口类型和硬件地址。常用类型为以太网(ethernet)，地址为 MAC 地址
+3. fixed-address IP地址; 定义DHCP客户端指定的IP地址
+
+``` sh
+# vim /etc/dhcp/dhcpd.conf
+  subnet 192.168.0.0  netmask 255.255.255.0 {
+    range 192.168.0.100 192.168.0.200;
+    option domain-name-servers 192.168.0.1; 路由器作为DNS
+    option domain-name "wovert.com";
+    option routers 192.168.0.1;
+    option broadcast-address 192.168.0.255;
+    default-lease-time 600;
+    max-lease-time 7200;
+
+    host 客户端主机名 {
+      hardware ethernet 00:0C:29:0F:90:AF;
+      fixed-address 192.168.0.254;
+    }
+  }
+# service network restart
+
+客户端主机名登录验证
+# ifconfig
+```
+
+注意：划分子网时，如果选择直接配置多作用域实现动态IP分配的任务，则必须要为DHCP服务器添加多块网卡，并配置多个IP地址，否则DHCP服务器只能分配与其现有的网卡IP地址对应网段的作用域
+
 ## CentOS
 
 - dhcp(ISC, named)
