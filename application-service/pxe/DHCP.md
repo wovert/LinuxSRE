@@ -4,14 +4,17 @@
   - IP/mask
   - Gateway
   - DNS Server
-  - Wins Server, NTP Server
+  - Wins Server
+  - NTP Server
   - 参数配置方式
     - 静态指定
     - 动态分配
-      - 早期：bottp: boot protocol
+      - 早期：bootp: boot protocol 一次性租约
       - 后来：dhcp， 引入了“租约”的bootp；也可以实现为特定主机保留某固定地址
 
-## DHCP: 动态主机配置协议 Dynamic Host Configuration Protocol
+## DHCP Introduction
+
+> 动态主机配置协议 Dynamic Host Configuration Protocol
 
 - 为局域网主机动态配置IP地址协议，是局域网的网络协议
 
@@ -23,6 +26,8 @@
   - ip -> mac
 - rarp: reverse arp
   - mac -> ip
+  - 我有MAC地址进行广播有谁知道我的IP地址，服务器收到之后在地址池获取IP地址返回给客户端
+  - 多个DHCP服务器响应，以最早响应的IP地址为主
 
 - 监听的端口：
   - Server: 67/UDP
@@ -92,12 +97,14 @@ DHCP 协议由 bootp 协议发展而来，是 BOOTP 的**增强版本**，**boot
 
 ## 工作流程
 
+- 整个流程都基于广播形式
+
 1. client: dhcp discover
 2. Server: dhcp offer(IP/mask, gw, ...) lease time(租约期限)
 3. Client: dhcp request
 4. Server: dhcp ack
 
-- 续租(50%)：整个租约一般的时候续租
+- 续租(50%，75%, 87.5%)：整个租约一般的时候续租
   - 单播给服务器:
     - dhcp request
     - dhcp ack
@@ -106,6 +113,14 @@ DHCP 协议由 bootp 协议发展而来，是 BOOTP 的**增强版本**，**boot
     - dhcp nak(不给租了，服务器地址列表可能改了)
 
     - dhcp discover(找其他房子)：广播
+
+## 在两个局域网的其中一个局域网获取IP地址
+
+- 一个局域网请求另一个局域网DHCP服务器
+- 在没有DHCP服务的局域网部署中继服务器或路由器中继
+- 中继服务器做什么？
+  - 局域网主机广播请求中继服务器（第一步），中继服务器没有资源，则单播的形式向另一个局域网上的DHCP服务器（第二步），DHCP服务器已单播的形式响应给另一个局域网上的中继服务器（第三步）。中继在以广播的形式响应给客户端（第四步）。
+- 给一个局域网上分配一个作用域，在给另一个局域网分配另一个作用域
 
 ## rpm安装 dhcp
 
@@ -138,7 +153,7 @@ dhcp 配置文件
 
 
   租约（时间）：客户端可以使用这个IP地址的时间
-  默认租约期限（50%=>续约，87.5% => 续约）
+  默认租约期限（50%=>续约，75%=>续租，87.5% => 续约）
   default-lease-time 43200; 单位：秒
 
   最大租约期限：定义客户端IP租约时间的最大值，当客户端超过租约时间，却尚未更新IP时，最长可以使用该IP的时间；比如机器在开机获得IP地址后，然后关机了。这是，当时间过了 default-lease-time 600秒后，没有机器向 DHCP 续约，DHCP会保留 7200秒，保留此IP地址不用于分配给其他机器。当超过7200秒后，将不再保留此IP地址给此机器。
@@ -285,12 +300,12 @@ DHCP 主机查看租约数据库文件
 
 ## CentOS
 
-- dhcp(ISC, named)
-- dnsmasq: dhcp & dns
+- 支持dhcp(ISC, named)
+- 支持dnsmasq: dhcp & dns
 
 - dhcp:
   - dhcpd: dhcp 服务
-  - dhcrelay: 中间服务
+  - dhcrelay: 中继服务
 
 - 192.18.100.6
 
@@ -323,6 +338,13 @@ DHCP 主机查看租约数据库文件
   subnet 172.18.0.0 netmask 255.255.0.0 {
     range 172.18.100.101 172.18.100.120;
   };
+
+  加载文件
+  host passcaglia {
+    hardware ethernet 0:0:c0:5d:bd:95;
+    filename "加载文件路径";
+    server-name "主机名";
+  }
 
   动态分配地址
 
