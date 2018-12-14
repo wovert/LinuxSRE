@@ -342,11 +342,11 @@ DHCP 主机查看租约数据库文件
   加载文件
   host passcaglia {
     hardware ethernet 0:0:c0:5d:bd:95;
-    filename "加载文件路径";
-    server-name "主机名";
+    filename "pxelinux.O"; 指明加载引导文件名称
+    next-server {host|IP}; 指明引导所在的服务器主机的IP地址
   }
 
-  动态分配地址
+  tftp: trvial ftp, udp
 
 # systemctl start dhcpd.service
 # ss -unl
