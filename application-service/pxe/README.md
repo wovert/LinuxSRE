@@ -226,4 +226,68 @@ default menu.c32
 
 再次启动虚拟机运行
 
-63:17
+## 配置怕PXE环境
+
+### CentOS 7
+
+```sh
+# yum -y install syslinux
+# cp /usr/share/syslinux/pxelinux.0 /var/lib/tftpboot/
+# cp /media/cdrom/images/pxeboot/{vmlinuz,initrd.img] /var/lib/tftpboot
+# cp /usr/share/syslinux/{chain.c32, mboot.c32, menu.c32, memdiskt} /var/lib/tftpboot
+
+# mkdir /var/lib/tftpboot/pxelinux,cfg/
+# vim /var/lib/tftpboot/pxelinux,cfg/default
+  default menu.c32
+    prompt 5
+    timeout 5
+    MENU TITLE CentOS 7 PXE Menu
+
+    LABEL linux
+    MENU LABEL Install CentOS 7 x86_64
+    KERNEL vmlinuz
+    APPEND initrd=initrd.img inst.repo=http://192.168.10.9/centos/7/x86_64/
+
+    LABEL linux auto inst
+    MENU LABEL Install CentOS 7 x86_64 auto
+    KERNEL vmlinuz
+    APPEND initrd=initrd.img inst.repo=http://192.168.10.9/centos/7/x86_64/ ks=http://192.168.10.9/kickstarts/centos7.cfg
+```
+
+### CentOS 6
+
+```sh
+# yum -y install dhcp tftp-server tftp syslinux vsftpd
+
+获取kickstart文件
+# wget http://182.18.0.1/centos6.cfg
+
+主机配置：Host-Only
+
+# cp /usr/share/syslinux/pxelinux.0 /var/lib/tftpboot/
+# cp /media/cdrom/images/pxeboot/{vmlinuz,initrd.img] /var/lib/tftpboot/
+
+
+# cp /media/cdrom/isolinux/{boot.cfg, vesamenu.c32, splash.png} /var/lib/tftpboot
+
+# mkdir /var/lib/tftpboot/pxelinux.cfg/
+
+# cp /media/cdrom/isolinux/isolinux.cfg /var/lib/tftpboot/pxelinux.cfg/default
+# vim /var/lib/tftpboot/pxelinux,cfg/default
+
+  default menu.c32
+    prompt 5
+    timeout 5
+    MENU TITLE CentOS 7 PXE Menu
+
+    LABEL linux
+    MENU LABEL Install CentOS 7 x86_64
+    KERNEL vmlinuz
+    APPEND initrd=initrd.img inst.repo=http://192.168.10.9/centos/7/x86_64/
+
+    LABEL linux auto inst
+    MENU LABEL Install CentOS 7 x86_64 auto
+    KERNEL vmlinuz
+    APPEND initrd=initrd.img inst.repo=http://192.168.10.9/centos/7/x86_64/ ks=http://192.168.10.9/kickstarts/centos7.cfg
+```
+
