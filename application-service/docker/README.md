@@ -2,6 +2,48 @@
 
 > 容器是一种基础工具；泛指任何可以用于容纳其他物品的工具，可以部分或完全封闭，被用于容纳、存储、运输物品；物体可以被防止在容器中，而容器则可以保护内容物；
 
+- 主机级虚拟化
+  - Type-I
+  - Type-II
+- 容器级虚拟化
+  - CPU 可压缩机制（挂起等待）
+  - Mem 不可压缩机制
+    - 大量占用内存，OOM kill掉 ——> 内核Control Groups, CGroups实现
+
+## Control Groups(CGroups)
+
+- cgroups
+  - blkio: 块设备IO
+  - cpu: CPU
+  - cpuacct: CPU资源使用报告
+  - cpuset: 多处理器平台上的CPU集合
+  - devices: 设备访问
+  - freezer: 挂起或恢复任务
+  - memory: 内存用量及报告
+  - pref_event: 对cgroup中的任务进行统一性能测试
+  - net_cls: cgroup 中的任务创建的数据报文的类型标识符
+
+
+创建进程并保护其进程不被其他进程所干扰——容器
+
+1. FreeBSD, jail 隔离技术
+2. Linux, vserver(chroot)
+
+- Linux内核级名称空间机制
+  - 6个 namespace + chroot 实现容器技术
+
+| namespace | 系统调用参数 | 隔离内容 | 内核版本
+| --------- | ----------- | ------- | ------ |
+| UTS | CLONE_NEWUTS | 主机名和域名 | 2.6.19 |
+| PIC | CLONE_NEWIPC | 信号量、消息队列和共享内存 | 2.6.19 |
+| PID | CLONE_NEWPID | 进程编号 | 2.6.24 |
+| Network | CLONE_NEWUTS | 网络设备、网络栈、端口等 | 2.6.29 |
+| Mount | CLONE_NEWNS | 挂载点（文件系统） | 2.4.19 |
+| User | CLONE_NEWUSER | 用户和用户组 | 3.8 |
+
+- CentOS 6 不支持 Docker，内核2.6
+
+
 ## LXC
 
 > LinuX Container
