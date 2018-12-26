@@ -2,54 +2,81 @@
 
 > 容器是一种基础工具；泛指任何可以用于容纳其他物品的工具，可以部分或完全封闭，被用于容纳、存储、运输物品；物体可以被防止在容器中，而容器则可以保护内容物；
 
-- 主机级虚拟化
-  - Type-I
-  - Type-II
-- 容器级虚拟化
-  - CPU 可压缩机制（挂起等待）
-  - Mem 不可压缩机制
-    - 大量占用内存，OOM kill掉 ——> 内核Control Groups, CGroups实现
+## 主机级虚拟化和容器级虚拟化
 
-## Control Groups(CGroups)
+- 虚拟化目的：隔离进程，不影响其他进程，彼此之间不受影响。
 
-- cgroups
+![虚拟化对比](./images/hostos-container.jpg)
+
+### 主机级虚拟化（完整物理平台，VMwareStation）
+
+- Type-I()
+- Type-II(hostOS，vmware,workerstation)
+
+为每一个封闭的实例，提供的是一个**从底层硬件开始一直到高层**的基础环境。也就意味着说我们每一个对应的虚拟机实例就拥有自己可视的，而且是隔离于其它实例的基础硬件，包括CPU,内存等等，所以它在硬件完成资源划分以后，提供给了我们每一个实例一个基础环境，使得我们每一个实例都得安装操作系统，从而就拥有自己的内核空间和用户空间，所以这么一来不当紧，做为当前实例的使用者，就得安装操作系统，提供环境，安装程序并提供配置文件，最终才可用服务。
+
+主机级虚拟化，由于做了两级内核，虚拟机自己有一级，hypervisor会有**性能损耗**，但是**隔离性是非常好**的。但**过于重量级**。
+
+### 容器级虚拟化
+
+- CPU 可压缩机制（挂起等待）
+- Mem 不可压缩机制
+  - 大量占用内存，OOM kill掉 ——> 内核Control Groups, CGroups实现
+
+为什么出现容器技术：
+如果现在我打算在一台完全隔离的环境中，尽量不影响其它应用的情况下，安装一个tomcat。做为一个程序猿来讲，发部一个新程序就要运行在tomcat上测试下。这时候我提供给用户的仅仅是一个虚拟机，即便安装好操作系统，用户还得安装tomcat等，会非常麻烦，过程就感觉很重量。因为我们额外步骤会非常的多。所以这种虚拟化方式过于重量级，尤其在某些轻量级的需求面前它就显得欲发重量。所以在这种情况下就出现了容器技术。
+
+容器技术：
+
+用户空间仅仅运行用户进程而以，就不需要在主机级虚拟化技术上，它自己管理自己的内核，把虚拟出来的内核给剥离掉。给用户一个chroot环境，在这个虚根下，能够隔离和其它用户相关的用户环境。
+
+在内核中的一个逻辑级别能够设置为隔离开来的区域，彼此之间互相不干扰，不影响的话。那么我们就可以做出来**仅在用户空间**，就能实现**隔离的组件**来。那这个在用户空间就能实现的**组件**就称为“**容器**”。每一个空间就称为一个容器，因为每一个空间都容纳了一堆的**进程和用户帐号文件**等等
+
+将内核分为**多个空间**，然后每个空间能够提供一个完整意义上的**程序运行环境**，容纳了文件，系统和进程以及彼此间职离的一些组件。我们把这些技术称之为容器。
+
+1. FreeBSD, jail 隔离技术
+2. Linux, vserver(chroot)
+
+## LXC
+
+> LinuX Container - LXC
+
+创建进程并保护其进程不被其他进程所干扰——容器
+
+容器技术实现：**chroot+namespaces+cgroups**
+
+- chroot, 根切换
+- namespaces: 名称空间
+- CGroups(Control): 控制组
   - blkio: 块设备IO
   - cpu: CPU
   - cpuacct: CPU资源使用报告
-  - cpuset: 多处理器平台上的CPU集合
-  - devices: 设备访问
+  - cpuset: 多处理器平台上的CPU集合(比例分配，核分配)
+  - devices: 设备访问(启用一个用户空间对该光驱设备可资源分配)
   - freezer: 挂起或恢复任务
   - memory: 内存用量及报告
   - pref_event: 对cgroup中的任务进行统一性能测试
   - net_cls: cgroup 中的任务创建的数据报文的类型标识符
 
+### Control Groups
 
-创建进程并保护其进程不被其他进程所干扰——容器
+- group1
+- group1-1 自动拥有group1的拥有权限
+- group1-2
+- group2
+- group2-1
+- group3
 
-1. FreeBSD, jail 隔离技术
-2. Linux, vserver(chroot)
+- cgroups隔离性不如主机虚拟化，为了防止一个用户空间通过访问其他用户使用selinux技术加固用户空间的容器的边界。但大多数不启用其就技术。
 
-- Linux内核级名称空间机制
+- Linux内核级创建名称空间(namespaces)
   - 6个 namespace + chroot 实现容器技术
 
-| namespace | 系统调用参数 | 隔离内容 | 内核版本
-| --------- | ----------- | ------- | ------ |
-| UTS | CLONE_NEWUTS | 主机名和域名 | 2.6.19 |
-| PIC | CLONE_NEWIPC | 信号量、消息队列和共享内存 | 2.6.19 |
-| PID | CLONE_NEWPID | 进程编号 | 2.6.24 |
-| Network | CLONE_NEWUTS | 网络设备、网络栈、端口等 | 2.6.29 |
-| Mount | CLONE_NEWNS | 挂载点（文件系统） | 2.4.19 |
-| User | CLONE_NEWUSER | 用户和用户组 | 3.8 |
+- 使用内核级的名称空间及时+chroot实现
+- namespace()
+  - clone() -> setns() 放置容器
 
-- CentOS 6 不支持 Docker，内核2.6
-
-
-## LXC
-
-> LinuX Container
-- chroot, 根切换
-- namespaces: 名称空间
-- CGroup(Control): 控制组
+### Linux Namespaces
 
 - 虚拟机目的：隔离（测试环境、生产环境）
   - 运行mongodb服务，主机虚拟化运行两个内核，浪费资源
@@ -57,15 +84,37 @@
 - 一个内核上实现多个用户空间
   - 用户空间（真特权） | 用户空间 | 用户空间
     - 各自有根文件系统、进程、管理、用户，按名称空间分割
-    - 限制各个空间资源：CPU，内存等，按控制组
-  - OS 
+    - 限制各个空间资源：CPU(可压缩性资源)，内存(内存耗完 **OOM**内存不足)等，按控制组
+      - 内存：按照用户空间比例配置或单个用户空间最大分配资源
+        - 3个用户空间内存分配: 1:2:1
+        - 4个用户空间内存分配: 1:2:1
+        - 单个用户空间最多可使用最大分配资源
+  - OS
   - 硬件
 
-## 安装 lxc, lxc-templates
+| namespace | 系统调用参数   | 隔离内容                 | 内核版本
+| --------- | -----------   | -------                      | ------ |
+| UTS       | CLONE_NEWUTS  | 主机名和域名                  | 2.6.19 |
+| PIC       | CLONE_NEWIPC  | 信号量、消息队列和共享内存     | 2.6.19 |
+| PID       | CLONE_NEWPID  | 进程编号                      | 2.6.24 |
+| Network   | CLONE_NEWNET  | 网络设备、网络栈、端口等       | 2.6.29 |
+| Mount     | CLONE_NEWNS   | 挂载点(文件系统)              | 2.4.19 |
+| User      | CLONE_NEWUSER | 用户和用户组                  | 3.8 |
 
-- epel仓库
+- CentOS 6 不支持 Docker，内核2.6
 
-``` shell
+### 安装 LXC
+
+> lxc-templates
+
+基于模板，就是脚本，这个脚本创建名称空间以后自动执行，在脚本执行环境。这个脚本自动的去实现安装过程。这个安装
+指向了你说打算创建那个类的名称空间系统发行版所属的仓库，从仓库中拉取下载各种包进行安装，生成这个行的名称空间。这个名称空间就像虚拟机一样可以使用。
+
+在子目录执行脚本并创建名称空间，然后chroot，就可以拥有虚拟机了
+
+**epel仓库**
+
+``` sh
 # yum clean all
 # yum repolist
 # yum info lxc
@@ -74,11 +123,14 @@
 # lxc-checkconfig
 # rpm -ql lxc-templates
 
-# lxc-create -h 
+# lxc-create -h
 # cd /etc/sysconfig/network-scripts/
 # cp ifcfg-eno16777736 ifcfg-virbr0
+```
 
-- 创建物理桥
+**创建物理桥**
+
+``` sh
 # vim ifcfg-virbr0
   UUID 删除
   DEVICE=virbr0
@@ -92,7 +144,7 @@
 # systemctl restart network.servie
 ```
 
-## 创建容器
+**创建容器**
 
 ``` shell
 # lxc-create -h
@@ -111,7 +163,7 @@
 # ls /var/lib/lxc/centos7
 ```
 
-## 运行容器
+**运行容器**
 
 ``` shell
 # lxc-start -n centos7
@@ -128,9 +180,11 @@
 # yum repolist
 # yum -y install net-tools
 # ss -tunl
+```
 
-- ssh远程登录
+**ssh远程登录**
 
+``` sh
 # lxc-info -n centos7
 # lxc-top
 # lxc-monitor -n centos7
@@ -203,6 +257,7 @@ ctrl+a,q
 
 ## Docker
 
+- 基于LXC的二次开发的
 - Docker的只能运行一个进程，docker没有init
 - 主要为了实现，进程的**分发**和**部署**
 - LNMP要运行三个Docker
@@ -216,7 +271,7 @@ docker中的容器
 
 - OCL规范
 
-## Docker architecture
+### Docker architecture
 
 - Docker objects
   - images
@@ -226,7 +281,7 @@ docker中的容器
 - Docker client
 - Docker registries
 
-## 安装Docker
+### 安装Docker
 
 - 依赖的基础环境
   - 64 bits CPU
@@ -238,7 +293,7 @@ docker中的容器
 - Docker Daemon
   - `systemctl start docker.service`
 - Docker Client
-  - `docker [options] 	COMMAND [arg...]`
+  - `docker [options] COMMAND [arg...]`
 
 1. 修改yum源，启用[extras]源
 
