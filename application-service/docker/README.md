@@ -275,7 +275,26 @@ docker中的容器
 
 - OCL规范
 
-68：30
+批量创建容器
+
+- 镜像构建：分层构建，联合挂在实现
+
+- nginx(挂载) | apache(挂载) | tomcat(挂载)
+- 挂载数据存储（另外一个服务器独立存放的数据服务器）
+
+- 镜像层
+  - nginx(只读的) | apache(只读的) | tomcat(只读的)
+  - centos(底层共享，只读)
+
+- 编排工具
+  - nmp
+  - machine+swarm+compose
+  - mesos + maratbon(统一资源调度)
+  - kubernetes -> k8s
+  - libcontainer->runC(容器运行时的环境标准，工业标准)
+
+- Moby(Enterprise Docker)
+- CNCF(google,IBM) 另外一个docker
 
 ### Docker architecture
 
