@@ -255,7 +255,50 @@ ctrl+a,q
   admin:admin
 ```
 
+## OCI
+
+> Open Container Initiative
+
+- Linux基金会主导与2015年6月创立
+- 围绕容器格式和运行时机制顶一个开放的工业化标准
+
+- contains two specifications
+  - The **Runtime** Specifications(runtime-spec)
+  - The **Image** Specifications(image-spec)
+
+- The Runtie Specification outlines how to run a "filesystem bundle" that is unpacked on disk
+- At a high-level an OCI implementation would download an OCI Image then unpack that image into an OCI Runtime filesystem bundle.
+
+## runC
+
+OCF: Open Container Format(开发容器格式)
+
+- runC(实现的) is a CLI tool for spawning and running container according to the OCI specification
+
 ## Docker
+
+[docker镜像源](https://hub.docker.com)
+
+[docker架构](./images/architecture.png)
+
+- Client
+  - docker build
+  - docker pull
+  - docker run
+- DOCKER_HOST
+  - Docker daemon (守护进程)
+    - ipv4
+    - ipv5
+    - unix sock file
+  - Images(从Registry下载镜像)
+    - Ubuntu
+    - Redis
+  - Containers
+    - 容器1
+    - 容器2
+    - 容器3
+
+- 为了加速下载镜像，
 
 - 基于LXC的二次封装发行版的增强版
 - Docker的只能运行一个进程，docker没有init
