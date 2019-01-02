@@ -316,7 +316,7 @@ docker中的容器
 
 - 运行环境: lxc->libcontainer->runC
 
-- OCL规范
+- OCL(Oopen Container Initiative)规范
 
 批量创建容器
 
@@ -348,6 +348,11 @@ docker中的容器
   - volumes
 - Docker client
 - Docker registries
+  - 镜像存储的仓库
+  - 用户认证
+  - 一个仓库(nginx)只有一个应用程序的镜像(包含多个标签，nginx:1.15,  nginx:stable, nginx:latest)
+  - 镜像：静态
+  - 容器：动态，声明周期
 
 ### 安装Docker
 
@@ -356,28 +361,46 @@ docker中的容器
   - Linux Kernel 3.10+
   - Linux Kernel cgroups and namespace
 - CentOS 7
-  - extras repository
+  - "extras" repository
+  - `/etc/yum.repos.d/extras`
 
 - Docker Daemon
   - `systemctl start docker.service`
 - Docker Client
   - `docker [options] COMMAND [arg...]`
 
-1. 修改yum源，启用[extras]源
+- extras源: docker
+- 自定义源: docker-ce
 
-``` shell
+1. 修改yum源
+
+``` sh
+
+# cd /etc/yum.repos.d
+
+下载配置文件
+# wget https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/centos/docker-ce.repo
+# vim docker-ce.repo
+:%s@https://download.docker.com@https://mirrors.tuna.tsinghua.edu.cn/docker-ce
 # yum repolist
-# yum info docker
-# yum -y install docker
+
+
+启用[extras]源 使用docker, 上面镜像使用docker-ce
+# yum info docker-ce
+# yum -y install docker-ce
 # ifconfig
 
 # systemctl start docker.service
 # ifconfig
   docker0: 172.17.0.1
 # iptables -t nat -vnL
+```
 
 2. 镜像文件
+
 [HubDocker](https://hub.docker.com)
+
+``` sh
 # docker search centos
   docker.io docker.io/centos 官方镜像
 # docker pull NAME[:tag]
