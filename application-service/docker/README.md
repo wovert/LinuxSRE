@@ -353,8 +353,9 @@ docker中的容器
   - 一个仓库(nginx)只有一个应用程序的镜像(包含多个标签，nginx:1.15,  nginx:stable, nginx:latest)
   - 镜像：静态
   - 容器：动态，声明周期
+  - 镜像与容器是程序与进程的关系
 
-### 安装Docker
+### 安装及使用Docker
 
 - 依赖的基础环境
   - 64 bits CPU
@@ -369,10 +370,25 @@ docker中的容器
 - Docker Client
   - `docker [options] COMMAND [arg...]`
 
-- extras源: docker
-- 自定义源: docker-ce
+- extras源: `docker`
+- 自定义源: `docker-ce`
 
-1. 修改yum源
+- 常用操作
+  - docker search: Search the Docker Hub for images
+  - docker pull: Pull an image or a repository from a registry
+  - docker images: List images
+  - docker create: Create a new container
+  - docker start: Start one or more stopped containers
+  - docker run: Run a command in a new container
+  - docker attach: Attach to a running container
+  - docker ps: List containers
+  - docker logs: Fetch the logs of a container
+  - docker restart: Restart a container
+  - docker stop: Stop one or more running containers
+  - docker kill: Kill one or more running containers
+  - docker rm: Remove one or more containers
+
+#### 1. 修改yum源
 
 ``` sh
 
@@ -390,35 +406,78 @@ docker中的容器
 # yum -y install docker-ce
 # ifconfig
 
+镜像加速器
+# vim /etc/docker/daemon.json
+  {
+    "registry-mirrors": ["https://registry.docker-cn.com"]
+  }
+
+
+docker帮助
+# docker
+# docker container --help
+# docker version
+# docker info
+
+docker info报错docker bridge-nf-call-iptables is disabled解决办法
+
+在CentOS中
+# vim /etc/sysctl.conf
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+net.bridge.bridge-nf-call-arptables = 1
+
 # systemctl start docker.service
 # ifconfig
   docker0: 172.17.0.1
 # iptables -t nat -vnL
 ```
 
-2. 镜像文件
+#### 2. 镜像文件
 
 [HubDocker](https://hub.docker.com)
 
 ``` sh
 # docker search centos
+  CIAL AUTOMATED
+  nginx 顶级仓库/官方仓库
+  jwilder/nginx-proxy 个人用户仓库
+
+  alpine: 微型发行版，空间小，缺少调试的工具
+
   docker.io docker.io/centos 官方镜像
-# docker pull NAME[:tag]
-# docker pull busybox:lastest
-- 显示本地镜像
-# docker images -h
+
+- 拉取nginx-alpine镜像
+# docker [image] pull NAME[:tag]
+# docker image pull nginx:1.14-alpine
+# docker image pull nginx:1.14-alpine
+
+- 刪除镜像
+# docker rmi busybox
+
+- 显示本地镜像列表
+# docker images ls
+# docker image ls --help
 
 - 拉取centos，默认7
 # docker pull centos
 
 - 拉取centos6
 # docker pull centos:6
+```
 
-3. 启动容器
+#### 3. 容器操作 - docker container
+
+``` sh
+- 创建容器
+# docker container ls
+
+52:00
+
 - 创建并启动
-# docker run --help
-# docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
-# docker run --name c1 -it centos:latest /bin/bash
+# docker [container] run --help
+# docker [container] run [OPTIONS] IMAGE [COMMAND] [ARG...]
+# docker [container] run --name c1 -it centos:latest /bin/bash
 # vim /etc/um.repos.d/CentOS7-base.repo
 # yum repolist
 # yum -y install net-tools
@@ -464,9 +523,36 @@ docker run= docker create + docker start
   - CentOS Base | Image
   - bootts
   - kernel
+```
 
+### docker 组件
 
+- docker程序环境
+  - 环境配置文件
+    - /etc/sysconfig/docker-network
+    - /etc/sysconfnig/docker-storage
+    - /etc/sysconfig/docker
 
+  - Unit File
+    - /usr/lib/systemd/system/docker.service
+  - Docker REgistry 配置文件
+    - /etc/containers/registries.conf
+  - docker-ce
+    - 配置文件：`/etc/docker/daemon.json`
+      - {"registry-mirrors": ["https://registry.docker-cn.com"]}
+
+- Docker镜像加速
+  - docker cn
+  - 阿里云加速器
+  - 中国科技大学
+
+- 注册阿里云账号，专用加速器地址获得路径
+  - https://cr.console.aliyun.com/#/accelerator
+
+- 物理：client <--> Daemon <--> Registry Server
+- 逻辑
+  - Containers
+  - 
 
 
 
