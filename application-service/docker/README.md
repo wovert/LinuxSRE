@@ -602,6 +602,7 @@ net.bridge.bridge-nf-call-arptables = 1
 ``` sh
 - 创建容器
 # docker container ls
+# docker container create
 
 - 创建并启动
 # docker [container] run --help
@@ -621,18 +622,17 @@ Ctrl+c 退出 httpd
 
 激活停止的容器(attach,interactive)
 # docker container start -i -a b1
-# docker kill (强制终止)
+# docker kill (强制终止) 不推荐强制终止
 # docker ps -a
-# docker container rm b1 (删除容器)
+# docker container rm b1 (停止的容器，可以删除容器)
 # docker ps -a
 
 打开终端
 # docker ps
 # docker inspect b1
-# curl 172.17.0.2
+# curl 172.17.0.2 两个虚拟机之间通信
 
-
-启动nginx(没有下载镜像会自动从docker镜像站下载镜像) -d：daemon 后台
+启动nginx(没有下载镜像会自动从docker镜像站下载镜像) -d：detach(分离) 后台
 # docker container run --name web1 -d nginx:1.14-alpine
 
 打开终端
@@ -654,6 +654,10 @@ Ctrl+c 退出 httpd
 查看日志
 # docker container logs web1
 
+查看网络
+# docker network ls
+# ifconfig
+  docker0: 172.17.0.1 net桥(地址转换)
 
 - 安装网络查看工具
 # yum -y install net-tools
@@ -674,20 +678,6 @@ Ctrl+c 退出 httpd
 - 删除容器
 # docker rm c1
 # docker rm -f c1
-
-- 常用操作：
-# docker search : Search the Docker Hub for images
-# docker pull : Pull a image or a repository from a registry
-# docker images : List images
-# docker create : Create a new container
-# docker start: Start one or more stopped container
-# docker run: Run a command in a new container
-# docker attach: Attach to a running container
-# docker ps: List containers
-# docker logs: Fetch the logs of a container
-# docker stop: Stop one or more running containers
-# docker kill: Kill one or more running containers
-# docker rm: Remove one or more containers
 
 docker run= docker create + docker start
 
@@ -758,3 +748,46 @@ Docker 镜像含有启动容器所需要的**文件系统**及其内容，因此
 - 最上层为“可读写”层，其下层为“只读”层
 
 ![Docker Image Layer](./images/docker-image-layer.png)
+
+Apache镜像在底层最基础纯净的，最小化的系统镜像上添加编辑器emacs,每添加一个都是一个独立的镜像，bootfs容器启动时，被rootfs引导完成之后再内存中移除。所以，真正的用户空间在只有三层，且彼此之间有层级关系。Base Image构建系统的基本构成。添加一个emacs程序就在系统层之上创建新的层。在emacs层上创建nginx应用程序。启动nginx应用程序，必须三层都启动起来。先启动底层，挂载。在底层挂载基础之上，挂载第二层，然后挂载第三层，叠加在一起挂载。所以我们叫做**联合挂载**。这三层都是只读的，如果某个进程创建临时文件，再创建可以编写的层，可供底下各个层可共享的层。所有写操作都在writable层次上实现。删除了容器，writable会被删除的（docker container rm）。删除容器之后，该容器层的可写层一并被删除。
+
+### Aufs
+
+镜像的**分层构建**和**联合挂载**依赖于**文件系统**的支撑才能实现。早起使用Aufs文件系统实现。
+
+- Advanced multi-layered unification filesystem 高级多层统一文件系统
+- 用于为Linux文件系统实现“联合挂载”
+- aufs是之前的**UnionFS**的重新实现，2006年由Junjiro Okajima开发
+- Docker最初使用aufs作为容器文件系统层，它目前仍作为存储后端之一来支持
+- aufs的竞争产品是**overlayfs**(叠加文件系统)，后者自从**3.18版本**开始被合并到**Linux内核**
+- docker的分层镜像，除了aufs，docker还支持**btrfs, devicemappper(dm)和vfs**等
+  - 在Ubuntu系统下，docker默认**Ubuntu**的**aufs**; 而在**CentOS7**上，用的是**devicemapper**
+
+``` sh
+# docker info
+  Storage Driver: overlay2 是抽象的二级文件系统（前段）
+    Backing Filesystem: xfs
+```
+
+### Docker Registry
+
+> 镜像统一存储的位置
+
+启动容器时，docker daemon会试图从本地获取相关的镜像；本地镜像不存在时，其将从Registry中下载该镜像并保存到本地。没有特别指定registry 默认docker hub。指明访问地址，指明的地址下载registry。
+
+The Registry is a stateless, highly scalable server side application that stores and lets you distribute Docker images.
+
+![Docker Registry](./images/docker-registry.png)
+
+harbor
+
+### docker Registry 分类
+
+- Registry用于保存 docker 镜像，包括镜像的层次结构和元数据
+- 用户可自建 Registry，也可使用官方的 Docker Hub
+- 分类
+  - Sponsor Registry: 第三方的 registry, 供客户和Docker社区使用
+  - Mirror Registry(aliyun,docker-cn): 第三方的 registry, 只让客户使用
+  - Vendor Registry(买了Redhat OS客户使用): 由发布Docker镜像的供应商提供的 registry
+  - Private Registry: 通过设有防火墙和额外的安全层的私有实体提供的registry
+    - 不消耗互联网带宽
