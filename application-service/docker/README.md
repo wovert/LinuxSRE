@@ -791,3 +791,37 @@ harbor
   - Vendor Registry(买了Redhat OS客户使用): 由发布Docker镜像的供应商提供的 registry
   - Private Registry: 通过设有防火墙和额外的安全层的私有实体提供的registry
     - 不消耗互联网带宽
+
+### Registry(repository and index)
+
+- Repository
+  - 有某特定的docker镜像的所有迭代版本组成镜像仓库
+  - 一个 Registry中可以存在多个 Repository
+    - Repository可分为"顶层仓库"和“用户仓库”
+    - 用户仓库名称格式为“用户名/仓库名”
+  - 每个仓库可以包含多个Tag（标签），每个标签对应一个镜像
+- Index
+  - 维护用户账户、镜像的校验以及公共命名空降的信息
+  - 相当于为 Registry 提供了一个完成用户认证等功能的检索接口
+
+### Docker Registry
+
+Docker Registry中的镜像通常有开发人员制作，而后推送至“公共”或“私有” Registry上保存，共其他人员使用，例如“部署”到生产环境
+
+![docker registry](./images/docker-registry2.png)
+
+开发人员在从Public或Private 拉去镜像额外的修改并生成新的层次的镜像，把此镜像推送到自己私有的仓库中去。而后，由我们的运维人员所使用。把此镜像拖到服务器上完成部署并启动。不同镜像他们配置所不同。有可能会有不同配置的同一个镜像。
+
+Cloud Native(云原生)：面向云环境的运行的程序，调用云系统本身既有的功能而开发的应用程序。
+
+程序员写程序是针对某个开发环境编写程序。比如：编写C程序针对C开发环境编写。系统级开发，针对系统库编程接口，写了C程序的系统调用库或第三方库当中库文件去生成自己的代码。此代码会运行在系统级的环境之上。
+
+早起容器**配置文件**通过启动容器时传入**环境变量**，容器启动时从环境变量获取自动注入到配置文件中。
+
+### Docker Hub
+
+- Image Repositories 镜像仓库(个人账号)
+- Automated Builds 自动构建(commit构建新的镜像)
+- Webhooks
+- Organizations
+- GitHub and Bitbucket Integration
