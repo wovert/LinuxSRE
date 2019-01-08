@@ -820,8 +820,103 @@ Cloud Native(云原生)：面向云环境的运行的程序，调用云系统本
 
 ### Docker Hub
 
-- Image Repositories 镜像仓库(个人账号)
-- Automated Builds 自动构建(commit构建新的镜像)
-- Webhooks
+- **Image Repositories** 镜像仓库(个人账号)
+  - Find and pull images from community and official libraries, and manage, push to, and pull from private image libraries to which you have access.
+- **Automated Builds** 自动构建(commit构建新的镜像,yum install操作做成镜像)
+  - Automatically create new images when you make changes to a source code repository.
+    - Github
+      - project, dockerfile 文件推送到github仓库中，与docker hub仓库产生关联关系。而Docker hub 仓库可以持续监控Github的仓库的dockerfile文件，Docker hub拉取dockerfile文件自动做成镜像并放在仓库中。制作新的镜像文件，在开发主机上修改dockerfile文件并推送到github仓库中。github的仓库中改动，dockerhub自动拉取改动的dockerfile做成新的镜像。
+- **Webhooks**
+  - A feature of Automated Builds, Webhooks let you trigger actions after a sucessful push to a repository.
+    - 在开发服务器上修改之后推送到Github，Github的变动通知Dockerhub, Dockerhub会拉取自动构建镜像。
 - Organizations
+  - Create work groups to manage access to image repositories.
 - GitHub and Bitbucket Integration
+  - Add the Hub and your Docker iamges to your current workflows
+
+### Getting images from remote Docker registries
+
+`# docker pull <registry>[:<port>]/[<namespace>/]<name>:<tag>`
+
+- `<registry>[:<port>]/` 不设置此项，默认为Dockerhub
+- `<namespace>`
+  - Namespace : Exampmle(<namespace>/<name>)
+    - organization : redhat/kubernetes, google/kubernetes
+    - login(user name): alice/application, bob/application
+    - role: devel/database, test/database, prod/database
+
+### 仓库服务器
+
+- [quay.io](https://quay.io)
+  - flannel
+
+``` sh
+# docker pull quay.io/coreos/flannel:v0.10.0-amd64
+# docker image ls
+```
+
+### 制作镜像
+
+- 镜像的生成途径
+  - Dockerfile
+  - 基于容器制作
+    - 容器的最上层的可写成单独做成镜像层
+  - Docker Hub automated builds
+    - 基于Dockerfile
+
+![制作镜像流程](./images/create-image.png)
+
+#### 基于容器制作镜像
+
+- Create a new image from a container's changes
+- Usage
+  - docker commit [OPTIONS] CONTAINER [REPOSITORY[:TAG]]
+
+``` sh
+# docker run --name b1 -it busybox
+/ # mkdir -p /data/html
+/ # vi /data/html/index.html
+  <h1>Busybox httpd server.</h1>
+......
+
+开启新的ssh
+# docker commit -h
+
+暂停docker并制作镜像
+# docker commit -p b1
+
+标签
+# docker tag --help
+
+默认执行busybox的默认命令
+# docker tag 758ec7f3a1ee wovert/httpd:v0.1-1
+
+一个镜像有多个标签
+# docker tag wovert/httpd:v0.1-1 wovert/httpd:latest
+
+删除一个标签(删除一个引用)
+# docker image rm wovert/httpd:latest
+
+# docker inspect busybox
+  "Cmd": 默认执行的命令
+# docker inspect nginx:1.14-alpine
+# docker inspect wovert/httpd:v0.1-1
+
+# docker run --name t1 -it wovert/httpd:v0.1-1
+/ # ls /
+/ # ls /data/html
+/ # cat /data/html/index.html
+
+暂停docker并制作镜像并打标签, 默认运行httpd
+# docker commit -a "wovert <wovert@126.com>" -c 'CMD ["/bin/httpd", "-f", "-h", "/data/html"]' -p b1 wovert/httpd:v0.2
+# docker image ls
+
+基于v0.2 启动镜像
+# docker run --name t3 wovet/http:v0.2
+
+# docker container ls
+# docker inspect t3
+# curl 192.17.0.5
+```
+
+62:00
