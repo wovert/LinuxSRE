@@ -919,4 +919,61 @@ Cloud Native(云原生)：面向云环境的运行的程序，调用云系统本
 # curl 192.17.0.5
 ```
 
-62:00
+### 推送仓库
+
+1. 创建仓库：wovert/httpd
+
+2. 推送仓库
+
+``` sh
+# docker image push --help
+
+登录 dockerhub
+# docker login --help
+# docker login -u wovert
+
+推送
+# docker push wovert/httpd
+```
+
+### 阿里云镜像推送
+
+服务器名/名称空间/仓库名
+
+1. vim /etc/docker/daemon.json
+{
+  "registry-mirrors": ["https://mglzycoz.mirror.aliyuncs.com","https://registry.docker-cn.com"]
+}
+
+2. 打标签: `# docker tag wovert/httpd:v0.2 registry.cn-qingdao.aliyuncs.com/wovert/httpd:v0.2`
+
+3. 推送:  `docker login --username=ap1283g8i@aliyun.com registry.cn-qingdao.aliyuncs.com`
+
+注意：在阿里云设置Registry登录密码
+
+### 镜像导入导出
+
+- docker save 保存打包
+  - Save one or more iamges to a tar archive(streamed to STDOUT by default)
+  - Usage: `docker save [OPTIONS] IMAGE [IMAGE...]`
+    - `--output, -o: Write to a file, instead of STDOUT`
+- docker load 装入
+  - Load an image from a tar archive or STDIN
+  - Usage: doker load [OPTIONS]
+    - `--input, -i: Read from tar archive file, instead of STDIN`
+    - `--quiet, -q: Suppress the load output`
+
+- 案例：测试docker镜像，已有的镜像服务器上打包压缩，在另外一个服务器上解压装入
+
+``` sh
+Node1服务器上
+# hostnamectl set-hostname node1
+[root@node1 ~]# docker save --help
+[root@node1 ~]# docker save -o myimages.gz wovert/httpd:v0.1-1 wovert/httpd:v0.2
+[root@node1 ~]# scp myiamges.gz node02:/root/
+
+
+Node2服务器上
+[root@node2 ~]# docker load -i myimages.gz
+[root@node2 ~]# docker image ls
+```
