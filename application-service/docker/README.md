@@ -1012,7 +1012,69 @@ docker安装完之后，自动提供了3中网络
 
 ![docker 软交换机](./images/docker-s-switch.png)
 
-bridge 桥接式网络，是net桥（不是物理网络）,说明他在本机之上创建了软交换机 docker0，可以当**交换机或网卡**使用。不给地址只能以交换机来使用，给地址可以当网卡使用。每一次启动容器自动分配一对儿网卡地址。
+bridge 桥接式网络，是net桥（不是物理网络）,说明他在本机之上创建了软交换机 docker0，可以当**交换机或网卡**使用。不给地址只能以交换机来使用，给地址可以当网卡使用。每一次启动容器自动分配一对儿网卡地址（一个在容器上，另一个在软交换机上）。
 
-28:00
+``` sh
+# yum -y instal bridge-utils
+# brctl show
+# ip link show
+# iptables -t net -vnL
 
+Chain PREROUTING (policy ACCEPT 1306 packets, 220K bytes)
+ pkts bytes target     prot opt in     out     source               destination
+   32  2230 DOCKER     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ADDRTYPE match dst-type LOCAL
+
+Chain INPUT (policy ACCEPT 1306 packets, 220K bytes)
+ pkts bytes target     prot opt in     out     source               destination
+
+Chain OUTPUT (policy ACCEPT 273 packets, 20069 bytes)
+ pkts bytes target     prot opt in     out     source               destination
+    0     0 DOCKER     all  --  *      *       0.0.0.0/0           !127.0.0.0/8          ADDRTYPE match dst-type LOCAL
+
+Chain POSTROUTING (policy ACCEPT 273 packets, 20069 bytes)
+ pkts bytes target     prot opt in     out     source               destination
+    0     0 MASQUERADE  all  --  *      !docker0  172.17.0.0/16        0.0.0.0/0
+
+Chain DOCKER (2 references)
+ pkts bytes target     prot opt in     out     source               destination
+    1    84 RETURN     all  --  docker0 *       0.0.0.0/0            0.0.0.0/0
+
+# docker exec -it web1 /bin/sh
+# docker network ls
+NETWORK ID          NAME                DRIVER              SCOPE
+b411f731fae4        bridge              bridge              local
+bf0aeb882076        host                host                local
+954b2c09a7e0        none                null                local
+
+bridge: 容器使用桥接试网络(net网络，宿主机的虚拟网卡)
+host: 让容器使用宿主机的网络名称空间
+none: 容器没有网络，只有IO接口，不能网络通信
+```
+
+### Four network container archetypes
+
+![4中网络容器架构](./images/4-network-container.png)
+
+- none
+- bridge
+- 联盟式网络
+  - 两个容器有一部分是隔离的，文件系统/用户/pid各个容器里，但是UTS/NET/IPC共享同一组，两个容器使用同一个网络设备，同一个网卡和同一个lo设备，共享设备在容器里。
+- 开放式容器
+  - 共享物理机的名称空间
+  - 共享设备在宿主机的名称空间
+
+``` sh
+# docker container run --help
+  --network string                 Connect a container to a network (default "default")
+# docker netowkr ls
+  bridge 是 default网络
+
+# docker network insepct bridge
+  "Subnet": "172.17.0.0/16"
+  "Gateway": "172.17.0.1"
+  "com.docker.network.bridge.name": "docker0"
+
+# docker inspect web1
+  "Gateway": "172.17.0.1",
+  "IPAddress": "172.17.0.3"
+```
