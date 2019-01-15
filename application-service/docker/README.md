@@ -1078,3 +1078,53 @@ none: 容器没有网络，只有IO接口，不能网络通信
   "Gateway": "172.17.0.1",
   "IPAddress": "172.17.0.3"
 ```
+
+## Docker 容器网络
+
+``` sh
+# rpm -q iproute
+
+添加网络名称空间
+# ip netns help
+# ip netns add r1 默认只有lo设备
+# ip netns add r2
+# ip netns list
+
+在r1网络名称空间中执行命令
+# ip netns exec r1 ifconfig
+# ip netns exec r1 ifconfig -a
+
+创建虚拟网卡对儿
+# ip link help
+# ip link add veth1.1 type veth peer name veth1.2
+# ip link sh
+# ifconfig
+
+veth1.1留在宿主机上，veth1.2挪到网络名称空间r1中
+# ip link help
+# ip link set veth1.2 netns r1
+# ip link show
+
+查看r1名称空间中是否有虚拟网卡设备
+# ip netns exec r1 ifconfig -a
+
+r1名称空间中的虚拟网卡其别名eth0
+# ip netns exec r1 ip link set dev veth1.2 name eth0
+
+激活虚拟网卡设备
+# ifconfig veth1.1 10.1.0.1/24 up
+# ip netns exec r1 ifconfig eth0 10.1.0.2/24 up
+# ip netns exec r1 ifconfig
+
+检测网络设备是否可以通信
+# ping 10.1.0.2
+
+# ip link set dev veth1.1 netns r2
+# ifconfig
+# ip netns exec r2 ifconfig
+# ip netns exec r2 ifconfig -a
+# ip netns exec r2 ifconfig vnet1.1 10.1.0.3/24 up
+# ip netns exec r2 ifconfig
+
+# ip netns exec r2 ping 10.1.0.2
+```
