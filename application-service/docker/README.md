@@ -1056,9 +1056,12 @@ none: 容器没有网络，只有IO接口，不能网络通信
 ![4中网络容器架构](./images/4-network-container.png)
 
 - none
+  - 不设置虚拟网卡设备，只有lo接口
 - bridge
+  - 创建一对儿蓄念网卡设备，一半在网络名称空间，另一半儿在宿主机的Docker桥接上。
 - 联盟式网络
   - 两个容器有一部分是隔离的，文件系统/用户/pid各个容器里，但是UTS/NET/IPC共享同一组，两个容器使用同一个网络设备，同一个网卡和同一个lo设备，共享设备在容器里。
+  - 容器A和容器B共享网络名称空间，容器A和容器B可以本地通信lo。
 - 开放式容器
   - 共享物理机的名称空间
   - 共享设备在宿主机的名称空间
@@ -1127,4 +1130,106 @@ r1名称空间中的虚拟网卡其别名eth0
 # ip netns exec r2 ifconfig
 
 # ip netns exec r2 ping 10.1.0.2
+```
+
+### 桥接式容器-一对儿虚拟网卡设备
+
+> 对外通信
+
+``` sh
+关闭自动删除
+# docker run --name t1 -it --rm
+/ # ifconfig
+# exit
+
+退出之后容器自动删除
+# docker ps -a
+
+手动指定bridge
+# docker run --name t1 -it --network bridge --rm busybox:latest
+/ # ifconfig
+eth0      Link encap:Ethernet  HWaddr 02:42:AC:11:00:04  
+          inet addr:172.17.0.4  Bcast:172.17.255.255  Mask:255.255.0.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:6 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:508 (508.0 B)  TX bytes:0 (0.0 B)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+# eixt
+
+
+手动指定bridge
+# docker run --name t1 -it --network bridge --rm busybox:latest
+/ # ifconfig
+
+容器的ID-主机名
+/ # hostname
+
+设置正常主机名
+# docker run --help
+# docker run --name t1 -it --network bridge -h t1.wovert.com --rm busybox:latest
+
+/ # hostname
+t1.wovert.com
+
+/ # cat /etc/hosts
+127.0.0.1	localhost
+::1	localhost ip6-localhost ip6-loopback
+fe00::0	ip6-localnet
+ff00::0	ip6-mcastprefix
+ff02::1	ip6-allnodes
+ff02::2	ip6-allrouters
+172.17.0.4	t1.wovert.com t1
+
+/ # cat /etc/resolv.conf
+nameserver 114.114.114.114
+nameserver 8.8.8.8
+
+/ # nslookup -type=A www.qq.com
+
+
+使用hosts文件解析DNS
+# docker run --help
+# docker run --name t1 -it --network bridge -h t1.wovert.com --dns 114.114.114.114 --dns-search ilinux.io  --rm busybox:latest
+/ # cat /etc/resolv.conf
+nameserver 114.114.114.114
+
+# docker run --name t1 -it --network bridge -h t1.wovert.com --dns 114.114.114.114 --dns-search ilinux.io --add-host www.wovert.com:1.1.1.1  --rm busybox:latest
+/ # cat/etc/hosts
+127.0.0.1	localhost
+::1	localhost ip6-localhost ip6-loopback
+fe00::0	ip6-localnet
+ff00::0	ip6-mcastprefix
+ff02::1	ip6-allnodes
+ff02::2	ip6-allrouters
+1.1.1.1	www.wovert.com
+172.17.0.4	t1.wovert.com t1
+```
+
+### 封闭式容器 - 不创建虚拟网卡设备，只有lo接口
+
+``` sh
+# docker run --name t1 -it --network none --rm busybox:latest
+/ # ifconfig -a
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+```
+
+### 开放式容器 26:00
+
+``` sh
 ```
