@@ -1214,6 +1214,104 @@ ff02::2	ip6-allrouters
 172.17.0.4	t1.wovert.com t1
 ```
 
+#### Openning inbound communication 桥接式容器到宿主机外部通信
+
+- docker0：桥设备
+  - 172.17.0.1
+
+``` sh
+暴露80端口
+# docker run --name myweb --rm -p 80 wovert/httpd:v0.2
+# docker inspect myweb
+  "IPAddress": "172.17.0.2" 用于内部通信
+# curl 172.17.0.2
+  <h1>Busybox httpd server.</h1>
+
+与外部通信使用宿主机地址(DNET)
+# ifconfig
+  ens33: inet 192.168.1.201  netmask 255.255.255.0  broadcast 192.168.1.255
+
+80端口映射为？端口
+# iptables -t nat -vnL
+Chain DOCKER (2 references)
+ pkts bytes target     prot opt in     out     source               destination
+    1    84 RETURN     all  --  docker0 *       0.0.0.0/0            0.0.0.0/0
+    0     0 DNAT       tcp  --  !docker0 *       0.0.0.0/0            0.0.0.0/0            tcp dpt:32768 to:172.17.0.2:80
+
+外部容器服务，宿主机的32768端口映射为容器的80端口
+
+# curl 192.168.1.201:32768
+
+-p 80 添加选项之后自动添加iptables。容器删除自动也会删除iptables端口映射
+# docker kill myweb
+# iptables -t nat -vnL
+[root@node1 ~]# iptables -t nat -vnL
+Chain PREROUTING (policy ACCEPT 1 packets, 328 bytes)
+ pkts bytes target     prot opt in     out     source               destinationa         
+  184 13634 DOCKER     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ADDRTYPE match dst-type LOCAL
+
+Chain INPUT (policy ACCEPT 1 packets, 328 bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain OUTPUT (policy ACCEPT 0 packets, 0 bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 DOCKER     all  --  *      *       0.0.0.0/0           !127.0.0.0/8          ADDRTYPE match dst-type LOCAL
+
+Chain POSTROUTING (policy ACCEPT 0 packets, 0 bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+    1    56 MASQUERADE  all  --  *      !docker0  172.17.0.0/16        0.0.0.0/0           
+
+Chain DOCKER (2 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    1    84 RETURN     all  --  docker0 *       0.0.0.0/0            0.0.0.0/0 
+
+查看映射主机
+# docker port myweb
+  80/tcp -> 0.0.0.0:32768
+宿主机任意接口(0.0.0.0)的端口32769映射到容器端口80/tcp
+```
+
+浏览器访问
+![外网访问容器服务](./images/access-container-service.png)
+
+**指定宿主机接口**
+
+``` sh
+192.168.1.201::80 宿主机的192.168.1.201网卡的随机端口映射到容器端口80
+# docker run --name myweb --rm -p 192.168.1.201::80 wovert/httpd:v0.2
+# docker port myweb
+  80/tcp -> 192.168.1.201:32768
+# docker kill myweb
+# docker run --name myweb --rm -p 192.168.1.201:80:80 wovert/httpd:v0.2
+# docker port myweb
+  80/tcp -> 192.168.1.201:80
+
+# curl 192.168.1.201
+
+-p 选项使用格式
+-p <containerPort>
+  将指定的容器端口<containerPort>应设置宿主机所有地址的一个动态端口
+-p <hostPort>:<containerPort>
+  将容器端口<containerPort>应映射至指定的宿主机端口<hostPort>
+-p <ip>::<containerPort>
+  将指定的容器端口<containerPort>映射至宿主机指定地址<ip>的一个动态端口
+-p <p>:<hostPort>:<containerPort>
+  将指定的容器端口<containerPort>映射至宿主机<hostPort>指定地址的端口<hostPort>
+
+-P, --publish-all 向Nginx镜像使用默认使用80端口，但是，禁止暴露端口。-P选项之后暴露默认的端口80
+将容器的所有计划要暴露端口全部映射至宿主机端口
+
+计划要暴露的端口使用 --expose选项指定
+例如：
+
+# docker run -d -P --expose 2222 --expose 3333 --name web busybox:latest /bin/httpd -p 2222 -f
+# docker port web
+
+如果不想使用默认的docker0桥接口，或者需要修改此桥接的网络属性，可通过 `docker daemon`命令使用 `-b, --bip, --fixed-cidr, --default-gateway, --dns以及--mtu`等选项进行设定
+
+
+```
+
 ### 封闭式容器 - 不创建虚拟网卡设备，只有lo接口
 
 ``` sh
@@ -1229,7 +1327,6 @@ lo        Link encap:Local Loopback
 
 ```
 
-### 开放式容器 26:00
+### joined containers 联盟式容器
 
-``` sh
-```
+### 开放式容器
