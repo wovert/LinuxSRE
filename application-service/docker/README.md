@@ -934,6 +934,10 @@ Cloud Native(云原生)：面向云环境的运行的程序，调用云系统本
 
 推送
 # docker push wovert/httpd
+
+拉取
+# docker pull wovert/httpd:v0.2
+
 ```
 
 ### 阿里云镜像推送
@@ -1429,6 +1433,68 @@ inet 10.0.0.1  netmask 255.255.0.0  broadcast 10.0.255.255
 
 
 另一个docker客户端连接
-# docker -H 192.168.1.201:2375 ps
-# docker -H 192.168.1.201:2375 image ls
+# docker -H tcp://192.168.1.201:2375 ps
+# docker -H tcp://192.168.1.201:2375 image ls
+
+```
+
+### 创建自定义桥
+
+```sh
+# docker info
+  Network: bridge host macvlan null overlay
+# docker network --help
+
+mybr0网络名
+# docker network create -d dridge --subnet "172.26.0.0/16" --gateway "172.26.0.1" mybr0
+
+# docker network ls
+  NETWORK ID          NAME                DRIVER              SCOPE
+  aed1a92997c9        bridge              bridge              local
+  df8bd38aa079        host                host                local
+  2ea8c613a8fd        mybr0               bridge              local
+  a5c706058e19        none                null                local
+
+# ifconfig
+  br-2ea8c613a8fd: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+          inet 172.26.0.1  netmask 255.255.0.0  broadcast 172.26.255.255
+
+  docker0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+          inet 10.0.0.1  netmask 255.255.0.0  broadcast 10.0.255.255
+          ether 02:42:34:ae:77:94  txqueuelen 0  (Ethernet)
+
+  ens33: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+          inet 192.168.1.201  netmask 255.255.255.0  broadcast 192.168.1.255
+
+  lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+          inet 127.0.0.1  netmask 255.0.0.0
+
+修改接口名
+# ifconfig br-2ea8c613a8fd down
+# ip link set dev br-2ea8c613a8fd name docker1
+# ifconfig docker1 up
+# ifconfig
+  ...
+  docker1: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+          inet 172.26.0.1  netmask 255.255.0.0  broadcast 172.26.255.255
+  ...
+
+# docker run --name t1 -it --net mybr0 busybox
+/ # ifconfig
+  eth0      Link encap:Ethernet  HWaddr 02:42:AC:1A:00:02  
+            inet addr:172.26.0.2  Bcast:172.26.255.255  Mask:255.255.0.0
+
+默认桥
+# docker run --name t2 -it --net bridge busybox
+/ # ifconfig
+eth0      Link encap:Ethernet  HWaddr 02:42:0A:00:00:02  
+          inet addr:10.0.0.2  Bcast:10.0.255.255  Mask:255.255.0.0
+
+宿主机打开核心转发
+# cat /proc/sys/net/ipv4/ip_forward
+1
+
+不同通信，因为自动在iptables阻断(阻断打开才能通信)
+(10.0.0.2) / # ping 172.26.0.2
+
 ```
