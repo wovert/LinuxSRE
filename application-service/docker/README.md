@@ -1309,7 +1309,6 @@ Chain DOCKER (2 references)
 
 如果不想使用默认的docker0桥接口，或者需要修改此桥接的网络属性，可通过 `docker daemon`命令使用 `-b, --bip, --fixed-cidr, --default-gateway, --dns以及--mtu`等选项进行设定
 
-
 ```
 
 ### 封闭式容器 - 不创建虚拟网卡设备，只有lo接口
@@ -1329,4 +1328,107 @@ lo        Link encap:Local Loopback
 
 ### joined containers 联盟式容器
 
-### 开放式容器
+> 使用某个已存在的容器的网络接口的容器，接口被联盟内的各种容器共享使用；联盟式容器彼此间完全无隔离
+
+```sh
+创建一个监听2222端口的http服务容器
+# docker run -d -it --rm -p 2222 busybox:latest /bin/httpd -p 2222 -f
+
+创建一个联盟式容器，并查看其监听的端口
+# docker run -it --rm --net container:web --name joined busybox:latest nestat -tan
+```
+
+联盟式容器彼此之间虽然共享一个网络名称空间，但其他名称空间如 User, Mount等还是隔离的
+
+联盟式容器彼此之间存在端口冲突的可能性，因此，通常只会在多个容器上的程序需要程序loopback接口互相通信、或对某已存的容器的网络属性进行监控时才使用此种模式的网络模型。
+
+``` sh
+# docker run --name b1 -it --rm busybox
+# docker run --name b2 -it --rm busybox
+
+两个容器彼此彼此之间隔离，使用不同的IP地址172.17.0.2和172.17.0.3
+
+退出b2并重新创建已b1容器作为网络名称空间
+# exit
+# docker run --name b2 -it --network container:b1 --rm busybox
+(b2) / # ifconfig
+inet addr:172.17.0.2  Bcast:172.17.255.255  Mask:255.255.0.0
+
+(b1) / # ifconfig
+inet addr:172.17.0.2  Bcast:172.17.255.255  Mask:255.255.0.0
+
+
+两个容器文件系统是隔离的
+
+(b1) / # mkdir /tmp/testdir
+
+找不到目录
+(b2) / # ls -l /tmp
+
+
+(b2) / # echo "hello world" > /tmp/index.html
+(b2) / # httpd -h /tmp/
+(b2) / # netstat -tnl
+
+(b1) / # wget -O - -q 127.0.0.1
+hello world
+```
+
+### host containers 宿主机容器
+
+``` sh
+# docker run --name b2 -it --network host --rm busybox
+(b2) / # ifconfig
+docker0   Link encap:Ethernet  HWaddr 02:42:6D:28:24:96  
+          inet addr:172.17.0.1  Bcast:172.17.255.255  Mask:255.255.0.0
+
+ens33     Link encap:Ethernet  HWaddr 00:0C:29:EF:07:22  
+          inet addr:192.168.1.201  Bcast:192.168.1.255  Mask:255.255.255.0
+
+(b2) / # echo "hello container" > /tmp/index.html
+(b2) / # httpd -h /tmp/
+(b2) / # netstat -tnl
+
+外部访问：192.168.1.201
+
+与宿主机安装有什么区别？宿主机需要安装nginx等服务，但是容器只需要docker run
+
+```
+
+### 修改 docker0 默认网络地址
+
+- 自定义docker0桥的网络属性信息：`/etc/docker/daemon.json`文件
+
+``` json
+{
+  "bip": "172.16.0.5/24",             docker0桥的IP地址和掩码
+  "fixed-cidr": "10.20.0.0/16",
+  "fixed-cidr-v6": "2001:db8::/64",
+  "mtu": 1500,
+  "default-gateway": "10.20.1.1",     默认网关
+  "default-gateway-v5": "2001:db8:abcd::89",
+  "dns": ["10.20.1.2", "10.20.1.3"]   dns服务器地址，至少1个，至多3个
+}
+```
+
+```sh
+# systemctl stop docker
+# vim /etc/docker/daemon.json
+# systemctl start doker
+# ifconfig
+inet 10.0.0.1  netmask 255.255.0.0  broadcast 10.0.255.255
+
+```
+
+- dockerd守护进程的C/S，其默认进监听**Unix Socket**格式的地址，`/var/run/docker.sock`；如果使用TCP套接字家庭，那么设置，`/etc/docker/daemon.json`: `"host": ["tcp://0.0.0.0:2375", "unix:///var/run/docker.sock"]`
+
+``` sh
+# systemctl stop docker
+# vim /usr/lib/systemd/system/docker.service
+  ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock
+
+
+另一个docker客户端连接
+# docker -H 192.168.1.201:2375 ps
+# docker -H 192.168.1.201:2375 image ls
+```
