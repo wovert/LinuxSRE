@@ -1583,4 +1583,27 @@ Bind-mount Volume
 # docker inspect -f {{.Mounts}} b2
 # docker inspect -f {{.NetworkSettings.IPAddress}} b2
 ```
-42:00
+
+### Sharing volumes
+
+- 多个容器的卷使用同一个主机目录，例如
+  - `# docker run -it --name c1 -v /docker/volumes/v1:/data busybox`
+  - `# docker run -it --name c2 -v /docker/volumes/v1:/data busybox`
+- 复制使用其他容器的卷，为docker run 命令使用 --volumes-from选项
+  - `# docker run -it --name bbox1 -v /docker/volumes/v1:/data busybox`
+  - `# docker run -it --name bbox2 --volumes-from bbox1 busybox`
+
+``` sh
+基础容器
+# docker run --name infracon -it -v /data/infracon/volumes/:/data/web/html busybox
+
+复制卷
+# docker run --name nginx --network container:infracon --volumes-from infracon -it busybox
+
+# docker inspect infracon
+# docker inspect nginx
+```
+
+## docker-compose
+
+> 容器编排和容器镜像工具
