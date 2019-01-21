@@ -1508,4 +1508,79 @@ eth0      Link encap:Ethernet  HWaddr 02:42:0A:00:00:02
 
 容器内部与宿主机文件绑定关系，相对于容器来讲被称之为volume(存储卷)。容器关闭时，数据持久化。
 
-20:00
+### Why Data Volume?
+
+- 关闭并重启容器，其数据不受影响；但删除Docker容器，则其更改将会全部丢失
+- 存在的问题
+  - 存储于联合文件系统中，不易于宿主机访问
+  - 容器间数据共享不便
+  - 删除容器其数据会丢失
+
+- 解决方案：卷（volume）
+  - 卷是容器上的一个或多个目录，此类目录可绕过联合文件系统，与宿主机上某个目录绑定（关联）
+
+![volume](./images/data-volume1.png)
+
+### Data volumes
+
+- Volume于容器初始化之时即会创建，由 base image提供的卷中的数据会于此期间完成复制
+- Volume的初衷是独立于容器的声明周期实现数据持久化，因此删除容器之时即不会删除卷，不不会对哪怕未被引用的卷做垃圾回收操作
+
+![volume](./images/data-volume2.png)
+
+- 卷为docker提供了独立于容器的数据管理机制
+  - 可以把“镜像“想象成静态文件，例如”程序“，把卷类比为动态内容，例如“数据”，于是，镜像可以重用，而卷可以共享
+  - 卷实现了“程序（镜像）”和“数据（卷）”分离，以及“程序（镜像）”和“制作镜像的主机”分离，用户制作镜像时无需再考虑镜像运行的容器所在的主机的环境
+
+### 卷类型
+
+> 每种类型都在容器中存在一个挂载点，但其在宿主机上位置所不同
+
+- Bind mount volume
+  - a volume that points to a user-specified location on the host file system
+- Docker-mangaed volume
+  - the Docker daemon creates managed volumes in a portion of the host's file system that's owned by Docker
+
+![volume类型](./images/volume-type.png)
+
+### 容器中使用 volume
+
+Docker-managed volume
+
+``` sh
+# docker run -it -name b2 -v /data busybox
+# docker inspect b2
+ "Mounts": [
+            {
+                "Type": "volume",
+                "Name": "93927b5b6b853467bc4c3a3603f0668f235e0336b0faa37d5ff49e71a71b6b04",
+                "Source": "/var/lib/docker/volumes/93927b5b6b853467bc4c3a3603f0668f235e0336b0faa37d5ff49e71a71b6b04/_data",
+                "Destination": "/data",
+                "Driver": "local",
+                "Mode": "",
+                "RW": true,
+                "Propagation": ""
+            }
+        ],
+
+# cd /var/lib/docker/volumes/93927b5b6b853467bc4c3a3603f0668f235e0336b0faa37d5ff49e71a71b6b04/_data
+
+# echo "hello world" > helloworld.html
+
+/ # ls -l /data
+  -rw-r--r--    1 root     root            12 Jan 18 11:21 helloworld.html
+/ # cd /data
+/ # echo "hello host" >> helloworld.html
+
+```
+
+Bind-mount Volume
+
+绑定关系 `docker run -it -v HOSTDIR:VOLUMEDIR`
+
+``` sh
+# docker run --name b2 -it --rm -v /data/volumes/b2:/data busybox
+# docker inspect -f {{.Mounts}} b2
+# docker inspect -f {{.NetworkSettings.IPAddress}} b2
+```
+42:00
