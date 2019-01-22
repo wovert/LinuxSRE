@@ -1607,3 +1607,83 @@ Bind-mount Volume
 ## docker-compose
 
 > 容器编排和容器镜像工具
+
+## dockerfile
+
+1. docker exec CONTAINVER vi, reload
+2. 宿主机的设置配置文件，容器的应用程序默认加载宿主机设置好的配置文件
+3. 资质镜像：基于容器做配置文件镜像；缺陷：写死在镜像中，变更时还是有问题
+
+### 镜像相关操作
+
+![镜像生成操作](./images/image-opt.png)
+
+- 镜像的生成途径
+  - 1. Dockerfile
+  - 2. 基于容器制作
+
+### About Dockerfile
+
+> Dockerfile is nothing but hte source code for building Docker images
+
+![About Dockerfile](./images/about-dockerfile.png)
+
+- Docker can build images automatically by reading the instructions from a Dockerfile
+- A Dockerfile is a **text document** that contains all the commands a user could call on the command line to assemble an image
+- Using docker build users can create an automated build that executes serveral command-line instruactions in succession
+
+### Dockerfile Format
+
+- Format
+  - `# Comment` 注释
+  - INSTRUCTION arguments 指令及其参数
+
+- The instruction is not case-sensitive 指令不区分大小写
+  - However, **convention** is for them to be **UPPERCASE** to distinguish them from arguments more easily
+- Docker runs instructions in a Dockerfile in **order**
+- The first instruction must be `FROM` in order to specify the Base Image from which you are building
+
+### Dockerfile 工作逻辑
+
+1. 统一所有资源文件及目录在指定的目录放置
+2. 其目录下创建的 .dockerignore 文件中编辑的文件及目录都不会打包
+3. docker build
+
+### Enviroment replacement
+
+``` sh
+${variable:-word} 变量为空，使用word字符串
+${variable:+word} 变量为值，使用word字符串
+```
+
+### Dockerfile Instructions
+
+- `FROM`
+  - FROM指令是最重要的一个且必须为Dockerfile文件开篇的第一个非注释行，用于为映像文件构建过程指定基准镜像，后续的指令云星宇此基准镜像所提供的运行镜像
+  - 实践中，基准镜像可以是任何可用镜像文件，默认情况下，docker build会在docker主机上查找指定的镜像文件，在其不存在时，则会从Docker Hub REgistry 上拉去所需的镜像文件
+    - 如果找不到指定的镜像文件，docker build 会返回一个错误信息
+
+  - Syntax
+    - `FROM <repository>[:<tag>]`或
+    - `FROM <repository>@<digest>`
+      - `<repository>`: 指定作为 base image的名称
+      - `<tag>`: base image 的标签，为可选项，省略时默认为 latest
+
+- `MAINTANIER`(depreacted)
+  - 用于让Dockerfile制作者提供本人的详细信息
+  - Dockerfile并不限制MAINTAINER指令可在出现的位置，但推荐将其放置于FROM指令之后
+  - Syntax
+    - `MAINTAINER <authtor's detail>`
+      - `<author's detail>` 可是任何文本信息，但约定俗称地使用作者名称及邮件地址
+      - `MAINTAINER "wovert <wovert@126.com>"`
+
+- `LABEL`
+  - The LABEL instruction adds metadata to an image
+    - Syntax: LABEL <key>=<value> <key>=<value> <key>=<value> ...
+    - The LABEL instruction adds metaadd to an image
+    - A LABEL is key-value pair
+    - To include spaces within a LABEL value, use quotes and backslashes as you would in command-line parsing
+    - An image can have more that one label
+    - You can specify multiple labels on a single line
+
+    37:00
