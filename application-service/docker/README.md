@@ -1679,11 +1679,40 @@ ${variable:+word} 变量为值，使用word字符串
 
 - `LABEL`
   - The LABEL instruction adds metadata to an image
-    - Syntax: LABEL <key>=<value> <key>=<value> <key>=<value> ...
+    - Syntax: `LABEL <key>=<value> <key>=<value> <key>=<value> ...`
     - The LABEL instruction adds metaadd to an image
     - A LABEL is key-value pair
     - To include spaces within a LABEL value, use quotes and backslashes as you would in command-line parsing
     - An image can have more that one label
     - You can specify multiple labels on a single line
 
-    37:00
+- `COPY`
+  - 用于从Docker主机复制文件至创建的新映像文件
+  - Syntax
+    - `COPY <src> ... <dest>` 或
+    - `COPY ["<sc>",... "<dest>"]`
+      - `<src>`: 要复制的源文件或目录，支持使用通配符
+      - `<dest>`: 目标路径，即正在创建的 image 的**文件系统路径**；建议为`<dest>`使用绝对路径，否则，COPY指定则以`WORKDIR`为其起始路径
+      - 注意：在路径中有**空白字符**时，通常使用第二种格式
+  - 文件复制准则
+    - `<src>` 必须是build上下文中的路径，不能是其父目录中的文件
+    - 如果`<src>` 是目录，则其内部文件或子目录会被递归复制，但`<src>`目录自身不会被复制
+    - 如果指定了多个`<src>`，或在`<src>`中使用了通配符，则`<dest>`必须是一个目录，且必须以`/`结尾
+    - 如果`<dest>`事先不存在，它将会被自动创建，这包括其父目录路径
+
+``` sh
+# mkdir img1
+# cd img1
+# vim index.html
+  <h1>Busybox http server</h1>
+# vim Dockerfile
+# Description: test image
+  FROM busybox:latest
+  #MAINTAINER "wovert <wovert@126.com>"
+  LABEL maintainer="wovert <wovet@126.com>"
+  COPY index.html /data/web/html/
+# docker build -h
+# docker build -t tinyhttpd:v0.1-1 ./
+# docker image
+# docker run --name tinyweb1 --rm tinyhttpd:v0.1-1 cat /data/web/html/index.html
+```
