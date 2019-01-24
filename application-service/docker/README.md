@@ -1700,19 +1700,104 @@ ${variable:+word} 变量为值，使用word字符串
     - 如果指定了多个`<src>`，或在`<src>`中使用了通配符，则`<dest>`必须是一个目录，且必须以`/`结尾
     - 如果`<dest>`事先不存在，它将会被自动创建，这包括其父目录路径
 
+- `ADD`
+  - `ADD`指令类似于COPY指令，ADD支持使用TAR文件和URL路径
+  - Syntax
+    - `ADDD <src> ... <dest>` 或
+    - `ADD ["<src>", ... "<dest>"]`
+  - 操作准则
+    - 同COPY指令
+    - 如果<src>为URL且<dest>不以/结尾，则<src>指令的文件将被下载并直接被创建为<dest>；如果<dest>以/结尾，则文件名URL指令的文件将被直接下载并保存为<dest>/<filename>
+    - 如果<src>是一个本地系统上的压缩格式的tar文件，它将被展开为一个目录，其行为类似于`tar -x`命令； 然而，通过URL获取到的tar文件将不会自动展开
+    - 如果<src>不以/结尾，则其被视作一个普通文件，<src>的内容将被直接写入到<dest>;
+
+- `WORKDIR`
+
+- `VOLUME`
+  - 用于在image中创建一个挂载点目录，以挂载Docker host上的卷或其他容器上的卷
+  - Syntax
+    - `VOLUME <mountpoint>` 或
+    - `VOLUME ["<mountpoint>"]`
+  - 如果挂载点目录路径下此前在文件存在，docker run 命令会在卷挂载完成后将此前的所有文件复制到新挂载的卷中
+
+- `EXPOSE`
+  - 用于为容器打开指定要监听的端口以实现与外部通信 (暴露容器的端口与宿主机的随机端口)
+  - Syntax
+    - `EXPOSE <port>[/<protocol>][<port>[/<protocol>] ...]`
+      - `<protocol>`用于指定传输层协议，可以为tcp或udp二者之一，默认为TCP协议
+  - EXPOSE 指令可一次指定多个端口，例如
+    - `EXPOSE 11211/udp 11211/tcp`
+
+### 制作镜像过程
+
 ``` sh
 # mkdir img1
 # cd img1
-# vim index.html
-  <h1>Busybox http server</h1>
+# cp -r /etc/yum.reposd/ ./
 # vim Dockerfile
-# Description: test image
+  # Description: test image
   FROM busybox:latest
   #MAINTAINER "wovert <wovert@126.com>"
   LABEL maintainer="wovert <wovet@126.com>"
   COPY index.html /data/web/html/
-# docker build -h
-# docker build -t tinyhttpd:v0.1-1 ./
+  COPY yum.repos.d /etc/yum.repos.d/
+  ADD http://nginx.org/download/nginx-1.15.2.tar.gz /usr/local/src/
+# docker build -t tinyhttpd:v0.1-2 ./
 # docker image
-# docker run --name tinyweb1 --rm tinyhttpd:v0.1-1 cat /data/web/html/index.html
+# docker run --name tinyweb1 --rm tinyhttpd:v0.1-1 ls /etc/yum.repos.d/
+# docker run --name tinyweb1 --rm tinyhttpd:v0.1-1 ls /usr/local/src/
+
+# wget http://nginx.org/download/nginx-1.15.2.tar.gz
+# vim Dockerfile
+  FROM busybox:latest
+  #MAINTAINER "wovert <wovert@126.com>"
+  LABEL maintainer="wovert <wovet@126.com>"
+  COPY index.html /data/web/html/
+  COPY yum.repos.d /etc/yum.repos.d/
+  WORKDIR /usr/local/src/
+  ADD nginx-1.15.2.tar.gz ./
+# docker build -t tinyhttpd:v0.1-4 ./
+# docker run --name tinyweb1 --rm tinyhttpd:v0.1-4 ls /usr/local/src/nginx-1.15.2
+
+
+挂载点宿主机
+# vim Dockerfile
+  FROM busybox:latest
+  #MAINTAINER "wovert <wovert@126.com>"
+  LABEL maintainer="wovert <wovet@126.com>"
+  COPY index.html /data/web/html/
+  COPY yum.repos.d /etc/yum.repos.d/
+  WORKDIR /usr/local/src/
+  ADD nginx-1.15.2.tar.gz ./
+  VOLUME /data/mysql
+# docker build -t tinyhttpd:v0.1-5 ./
+# docker run --name tinyweb1 --rm tinyhttpd:v0.1-5 mount
+# docker run --name tinyweb1 --rm tinyhttpd:v0.1-5 sleep 60
+# docker inspect tinyweb1
+
+监听端口
+# vim Dockerfile
+  FROM busybox:latest
+  #MAINTAINER "wovert <wovert@126.com>"
+  LABEL maintainer="wovert <wovet@126.com>"
+  COPY index.html /data/web/html/
+  COPY yum.repos.d /etc/yum.repos.d/
+  WORKDIR /usr/local/
+  ADD nginx-1.15.2.tar.gz ./src/
+  VOLUME /data/mysql/
+  EXPOSE 80/tcp
+# docker build -t tinyhttpd:v0.1-6 ./
+# docker run --name tinyweb1 --rm tinyhttpd:v0.1-6 /bin/httpd -f -h /data/web/html
+# docker inspect tinyweb1
+# curl 10.0.0.2
+# docker port tinyweb1
+
+暴露端口: -P
+# docker run --name tinyweb1 --rm -P tinyhttpd:v0.1-6 /bin/httpd -f -h /data/web/html
+# docker port tinyweb1
+  80/tcp -> 0.0.0.0:32768
+
+浏览器访问：http://192.168.1.201:32768/
 ```
+
+72:00
