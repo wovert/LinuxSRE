@@ -1728,6 +1728,22 @@ ${variable:+word} 变量为值，使用word字符串
   - EXPOSE 指令可一次指定多个端口，例如
     - `EXPOSE 11211/udp 11211/tcp`
 
+- `ENV`
+  - 用于为镜像定义所需的环境变量，并可被Dockerfile文件中位于其后的其他指令（如ENV, ADD, COPY等）所调用
+  - 调用格式为`$variable_name`或`${variable_name}`
+  - Syntax
+    - `ENV <key> <value>` 或
+    - `ENV <key>=<value> ...`
+  - 第一种格式中，<key>之后的所有内容均会被视作其<value>的组成部分，因此，一次只能设置一个变量；
+  - 第二种格式可用一次设置多个变量，每个变量为一个“<key>=<value>”的键值对，如果<value>中包含空格，可以以反斜线`\`进行转义，也可通过对<value>加引号进行标识；另外，反斜线也可用于续行；
+  - 定义多个变量时，建议使用第二种方式，以便在同一层中完成所有功能
+
+- docker build
+  - RUN
+- docker run
+  - CMD
+
+
 ### 制作镜像过程
 
 ``` sh
@@ -1798,6 +1814,64 @@ ${variable:+word} 变量为值，使用word字符串
   80/tcp -> 0.0.0.0:32768
 
 浏览器访问：http://192.168.1.201:32768/
+
+
+设置环境变量
+# vim Dockerfile
+  # Description: test image
+  FROM busybox:latest
+  #MAINTAINER "wovert <wovert@126.com>"
+  LABEL maintainer="wovert <wovet@126.com>"
+  ENV DOC_ROOT /data/web/html/
+  ENV NGINX_PACKAGE=nginx-1.15.2
+  COPY index.html ${DOC_ROOT:-/data/web/html/}
+  COPY yum.repos.d /etc/yum.repos.d/
+  #ADD http://nginx.org/download/nginx-1.15.2.tar.gz /usr/local/src/
+  WORKDIR /usr/local/ADD ${WEB_SERVER_PACKAGE}.tar.gz ./src/
+  ADD ${NGINX_PACKAGE}.tar.gz ./src/
+  EXPOSE 80/tcp
+
+# docker build -t tinyhttpd:v0.1-7 ./
+# docker run --name tinyweb2 --rm -P tinyhttpd:v0.1-7 printenv
+  PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+  HOSTNAME=c6c4818dc979
+  DOC_ROOT=/data/web/html/
+  NGINX_PACKAGE=nginx-1.15.2
+  HOME=/root
+
+# docker run --name tinyweb2 --rm -P -e NGINX_PACKAGE=nginx-1.15.1 tinyhttpd:v0.1-7 ls /usr/local/src
+  nginx-1.15.2
+
+
+
+解压
+# vim Dockerfile
+  # Description: test image
+  FROM busybox:latest
+  #MAINTAINER "wovert <wovert@126.com>"
+  LABEL maintainer="wovert <wovet@126.com>"
+
+  ENV DOC_ROOT /data/web/html/
+  ENV NGINX_PACKAGE=nginx-1.15.2.tar.gz
+
+  COPY index.html ${DOC_ROOT:-/data/web/html/}
+
+  COPY yum.repos.d /etc/yum.repos.d/
+  #ADD http://nginx.org/download/nginx-1.15.2.tar.gz /usr/local/src/
+
+  WORKDIR /usr/local/
+
+  ADD ${NGINX_PACKAGE} ./src/
+
+  EXPOSE 80/tcp
+
+  RUN cd /usr/local/src \
+          tar xf ${NGINX_PACKAGE}
+
+# docker run --name tinyweb2 --rm -P tinyhttpd:v0.1-8 ls /usr/local/src
 ```
 
-72:00
+RUN yum -y install epel-repease \
+  yum makecache \
+  yum -y install nginx
+
