@@ -1738,11 +1738,30 @@ ${variable:+word} 变量为值，使用word字符串
   - 第二种格式可用一次设置多个变量，每个变量为一个“<key>=<value>”的键值对，如果<value>中包含空格，可以以反斜线`\`进行转义，也可通过对<value>加引号进行标识；另外，反斜线也可用于续行；
   - 定义多个变量时，建议使用第二种方式，以便在同一层中完成所有功能
 
-- docker build
-  - RUN
-- docker run
-  - CMD
+- `RUN`
+  - 用于指令 docker build 过程中运行的程序，其可以是任何命令
+  - Syntax
+    - `RUN <command>` 或
+    - `RUN ["<executable>", "<param1>", "<param2>"]`
+  - 第一种格式中，`<command>`通常是一个shell命令，且以`/bin/sh -c`来运行它，这意味着此进程在容器中的PID不为1，不能接受Unix信号，因此，当使用`docker stop <container>`命令停止容器时，此进程接受不到`SIGTERN信号`
+  - 第二种语法格式中参数是一个JSON格式的数组，其中`<executable>`为要运行的命令，后面的`<paramN>`为传递给命令的选项或参数；然而，此种格式指定的命令不会以`/bin/sh -c`来发起，因此常见的shell操作如变量替换以及通配符`(?*)`等替换将不会进行；不过，如果要运行的命令依赖于此shell特性的话，可以将其替换为类似下面的格式
+    - `RUN ["/bin/bash", "c", "<executable>", "<param1>"]`
 
+  - docker build
+  - RUN
+- `CMD`
+  - 类似于RUN指令，CMD指令也可用于运行任何命令或应用程序，不过，二者的运行时间点不同
+    - RUN指令运行与映像文件构建过程中，而CMD指令运行于基于Dockerfile构建出的新映像文件启动一个容器时
+    - CMD指令的首要目的在于为启动的容器指令默认要运行的程序，且其运行结束后，容器也将终止；不过，CMD指令的其可以被docker run 的命令行选项所覆盖
+    - 在Dockerfile中可以存在多个CMD指令，但仅最后一个会生效
+  - Syntax
+    - `CMD <command>`
+    - `CMD ["<executable>", "<param1>", "<param2>"]`
+    - `CMD ["<param1>", "<param2>"]`
+  - 前两中语法格式的意义同RUN
+  - 第三种则用于为ENTRYPOINT指令提供默认参数
+  - docker run
+  - CMD
 
 ### 制作镜像过程
 
@@ -1839,10 +1858,15 @@ ${variable:+word} 变量为值，使用word字符串
   NGINX_PACKAGE=nginx-1.15.2
   HOME=/root
 
+# docker run --name tinyweb2 --rm -P -e NGINX_PACKAGE=nginx-1.15.1 tinyhttpd:v0.1-7 printenv
+  PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+  HOSTNAME=ef727edc3a16
+  NGINX_PACKAGE=nginx-1.15.1
+  DOC_ROOT=/data/web/html/
+  HOME=/root
+
 # docker run --name tinyweb2 --rm -P -e NGINX_PACKAGE=nginx-1.15.1 tinyhttpd:v0.1-7 ls /usr/local/src
   nginx-1.15.2
-
-
 
 解压
 # vim Dockerfile
@@ -1871,7 +1895,18 @@ ${variable:+word} 变量为值，使用word字符串
 # docker run --name tinyweb2 --rm -P tinyhttpd:v0.1-8 ls /usr/local/src
 ```
 
+``` Dckerfile
 RUN yum -y install epel-repease \
   yum makecache \
   yum -y install nginx
 
+    docker build          docker run
+[] ----------------> [] ----------> []
+    RUN                     CMD
+                            CMD(只能执行最后一个CMD)
+
+```
+
+后台守护进程： nginx, redis, mysqk
+
+15:38
