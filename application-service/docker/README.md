@@ -1763,6 +1763,16 @@ ${variable:+word} 变量为值，使用word字符串
   - docker run
   - CMD
 
+- `entrypoint`
+  - 类似CMD指令的功能，用于为容器指定默认运行程序，从而使得容器像是一个单独的可执行程序
+  - 与CMD不同的是，由ENTRYPOINT启动的程序不会被docker build 命令行指定的参数所覆盖，而且，这些命令行参数会被当做参数传递给ENTRYPOINT指定指定的程序
+    - 不过，docker run 命令的 —— entrypoint选项的参数可覆盖ENTRYPOIINT指令指定的程序
+  - Syntax
+    - `ENTRYPOINT <command>`
+    - `ENTRYPOINT ["<executable>", "<param1>", "<param2>"]`
+  - docker run 命令传入的命令参数会覆盖CMD指令的内容并且附加到ENTRYPOIINT命令最后做为其参数使用
+  - Dockerfile 文件中也可以存在多个ENTRYPOINT指令，但仅有最有一个会生效
+
 ### 制作镜像过程
 
 ``` sh
@@ -1909,4 +1919,59 @@ RUN yum -y install epel-repease \
 
 后台守护进程： nginx, redis, mysqk
 
-15:38
+``` sh
+# mkdir img2
+# cd img2
+# vim Dockerfile
+FROM busybox
+LABEL MAINTAINER="wovert@126.com" app="httpd"
+
+ENV WEB_DOC_ROOT = "/data/web/html"
+
+RUN mkdir $WEB_DOC_ROOT
+RUN echo '<h1>busybox httpd server.</h1>' > ${WEB_DOC_ROOT}/index.html
+
+CMD /bin/httpd -f -h ${WEB_DOC_ROOT}
+
+# docker build -t tinyhttpd:v0.2-1 ./
+# docker image inspect tinyhttpd:v0.2-1
+# docker run --name tinyweb2 -it --rm -P tinyhttpd:v0.2-1
+# docker exec -it tinyweb2 /bin/sh
+/ # ps
+
+
+
+# vim Dockerfile
+  #CMD /bin/httpd -f -h ${WEB_DOC_ROOT}
+  #默认并不会以子进程运行
+  CND ["/bin/httpd", "-f", "-h ${WEB_DOC_ROOT}"]
+
+  # 手动运行shell子进程
+  CND ["/bin/sh", "-c","/bin/httpd", "-f", "-h ${WEB_DOC_ROOT}"]
+
+```
+
+``` sh
+默认要运行的命令（覆盖镜像指定的命令）
+# docker run --name tinyweb2 -it --rm -P tinyhttpd:v0.2-4 ls /data/web/html
+# docker run --name tinyweb2 -it --rm -P tinyhttpd:v0.2-4 /bin/httpd -f -h /data/web/html
+
+```
+
+``` sh
+# vim Dockerfile
+FROM busybox
+LABEL MAINTAINER="wovert@126.com" app="httpd"
+
+ENV WEB_DOC_ROOT = "/data/web/html"
+
+RUN mkdir $WEB_DOC_ROOT
+RUN echo '<h1>busybox httpd server.</h1>' > ${WEB_DOC_ROOT}/index.html
+
+ENTRYPOINT /bin/httpd -f -h ${WEB_DOC_ROOT}
+
+# docker build -t tinyhttpd:v0.2-5 ./
+# docker run --name tinyweb2 -it --rm -P tinyhttpd:v0.2-5 ls /data/web/html
+
+并不会指令 ls /data/web/html 但是已执行镜像/bin/httpd命令的参数执行
+```
