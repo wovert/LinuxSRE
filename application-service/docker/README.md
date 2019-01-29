@@ -1773,6 +1773,18 @@ ${variable:+word} 变量为值，使用word字符串
   - docker run 命令传入的命令参数会覆盖CMD指令的内容并且附加到ENTRYPOIINT命令最后做为其参数使用
   - Dockerfile 文件中也可以存在多个ENTRYPOINT指令，但仅有最有一个会生效
 
+**json数组中，要使用双引号**
+
+
+- `user`
+  - 用于指定运行image的时候或运行Dockerfile中任何RUN，CMD或ENTRYPOINT指令指定的程序时的用户名或UID
+  - 默认情况下,container的运行身份为root用户
+  - Syntax
+    - `USER <UID>|<UserName>`
+    - 需要注意的是，<UID>可以为任意数字，但实践中其必须为`/etc/passwd`中某用户的有效UID，否则，docker run 命令将运行失败
+
+75:20
+
 ### 制作镜像过程
 
 ``` sh
@@ -1974,4 +1986,62 @@ ENTRYPOINT /bin/httpd -f -h ${WEB_DOC_ROOT}
 # docker run --name tinyweb2 -it --rm -P tinyhttpd:v0.2-5 ls /data/web/html
 
 并不会指令 ls /data/web/html 但是已执行镜像/bin/httpd命令的参数执行
+```
+
+``` sh
+覆盖命令
+# docker run --name tinyweb2 -it --rm -P --entrypoint "ls /data/web/html" tinyhttpd:v0.2-4
+
+
+第三种则用于为ENTRYPOINT指令提供默认参数
+
+CMD ["/bin/httpd", "-f", "-h ${WEB_DOC_ROOT}"]
+ENTRYPOINT /bin/sh -c
+```
+
+### nginx 配置文件
+
+``` sh
+# mkdir img3
+# cd img3
+# vim entrypoint.sh
+  #!/bin/sh
+  #
+  cat > /etc/nginx/conf.d/www.conf << EOF
+  server {
+    server_name ${HOSTNAME};
+    listen ${IP:-0.0.0.0}:${PORT:-80};
+    root ${NGX_DOC_ROOT:-/usr/share/nginx/html};  
+  }
+  EOF
+  exec "$@"
+# chmod +x entrypoint.sh
+# vim index.html
+  <h1>New Doc Root for Nginx</h1>
+# vim Dockerfile
+  FROM nginx:1.14-alpine
+  LABEL maintainer="wovert wovert@126.com"
+
+  ENV NGX_DOC_ROOT="/data/web/html/"
+
+  # 接受变量
+  ADD index.html ${NGX_DOC_ROOT}
+  ADD entrypoint.sh /bin/
+
+  CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
+
+  ENTRYPOINT ["/bin/entrypoint.sh"]
+# docker build -t myweb:v0.3-1 ./
+# docker run --name myweb1 --rm -P myweb:v0.3-5
+# docker exec -it myweb1 /bin/sh
+/ # cd /etc/nginx/conf.d/
+/ # cat www.conf
+/ # netstat -tnl
+/ # curl -o - -q localhost
+/ # curl -o - -q 89443f2d6adf
+# docker kill myweb1
+
+# docker run --name myweb1 --rm -P -e "PORT=8080" myweb:v0.3-5
+# docker exec -it myweb1 /bin/sh
+/ # netstat -tnl
 ```
