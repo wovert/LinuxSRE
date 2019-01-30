@@ -1775,7 +1775,6 @@ ${variable:+word} 变量为值，使用word字符串
 
 **json数组中，要使用双引号**
 
-
 - `user`
   - 用于指定运行image的时候或运行Dockerfile中任何RUN，CMD或ENTRYPOINT指令指定的程序时的用户名或UID
   - 默认情况下,container的运行身份为root用户
@@ -1783,7 +1782,21 @@ ${variable:+word} 变量为值，使用word字符串
     - `USER <UID>|<UserName>`
     - 需要注意的是，<UID>可以为任意数字，但实践中其必须为`/etc/passwd`中某用户的有效UID，否则，docker run 命令将运行失败
 
-75:20
+- `healthcheck`
+  - healthcheck [options] CMD command (check container health by running a command inside the container)
+  - healthcheck none
+
+  - --interval=duration(default:30s) 每隔3秒检查一次
+  - --timeout=duration(default:30) 超时时长
+  - --start-period=duration(default:0s) 主进程运行之后多长时间检测
+  - --retries=N(default:3) 检查多少次
+
+  - 0: success
+  - 1: unhealthy
+  - 2: resreved
+  - `healthcheck --interval=5m --timeout=3s CMD curl -f http://localhost || exit 1`
+
+- `arg`
 
 ### 制作镜像过程
 
@@ -2044,4 +2057,34 @@ ENTRYPOINT /bin/sh -c
 # docker run --name myweb1 --rm -P -e "PORT=8080" myweb:v0.3-5
 # docker exec -it myweb1 /bin/sh
 / # netstat -tnl
+
+检测健康状态
+# vim Dockerfile
+  FROM nginx:1.14-alpine
+  LABEL maintainer="wovert wovert@126.com"
+
+  ENV NGX_DOC_ROOT="/data/web/html/"
+
+  # 接受变量
+  ADD index.html ${NGX_DOC_ROOT}
+  ADD entrypoint.sh /bin/
+  EXPOSE 80/tcp
+  HEALTHCHECK --start-period=3s CMD wget -O - -q http://{IP:-0.0.0.0}:${PORT:-80}/
+  CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
+
+  ENTRYPOINT ["/bin/entrypoint.sh"]
+# docker build -t myweb:v0.3-7 ./
+# docker run --name myweb1 --rm -P -e "PORT=8080" myweb:v0.3-7
+# docker exec -it myweb1 /bin/sh
+/ # netstat -tnl
+
+
+# vim Dockerfile
+  FROM nginx:1.14.alpine
+  ARG author="wovert wovert@126.com"
+  LABEL maintainer="${author}"
+  ...
+# docker build --build-arg author="wovert wovert@126.com" -t myweb:v0.3-9 ./
 ```
+
+98:00
