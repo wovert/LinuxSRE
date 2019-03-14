@@ -721,7 +721,7 @@ major.minor.release主版本(架构).次版本(功能).发行号(bug) 0.99, 2.0,
   - Gentoo的哲学是自由和选择
   - Portage软件包管理系统
 
-Kali
+- Kali
 
 Kali Linux是前身是BackTrack基于Debian的Linux发行版，设计用于数字取证和渗透测试和黑客攻防。
 
@@ -770,9 +770,6 @@ Android：Linux kernel + busybox + jvm(java) + android(GUI)
   - ArchLinux: pacman
   - Gentoo: portage
 
-## 4G 与 PAE 技术
-
-
 ## 查看32位于64位
 
 ``` shell
@@ -782,3 +779,53 @@ Android：Linux kernel + busybox + jvm(java) + android(GUI)
 # uname -r 内核版本
 # uname -r 查看系统位数
 ```
+
+## IT 技术岗位
+
+### 研发技术
+
+- 硬件：机器语言（二进制的指令和数据）开发的接口代码
+- 软件：程序写的程序代码
+  - 低级语言：汇编语言(机器(CPU能够执行的指令)相关的指令)，汇编器
+  - 高级语言：C/C++, 编译器
+    - 系统级别(接近机器，机器执行性能更好)：C/C++ 性能服务类程序：操作系统, 数据库
+    - 应用级(接近人类，人类易于编写)：Java, Python, Go 应用程序：ansible, puppet
+
+### 应用技术
+
+- 运维：Linux 生态圈中的各应用程序的应用
+  - Shell 脚本编程：某些应用工作能自动完成
+  - Python：专业编程语言
+    - Ansible Openstack
+- DevOps: 开发运维
+
+### Linux运维工程师
+
+- 运维工程师在国内又称为运维开发工程师(Devops)，在国外称为 SRE（Site Reliability Engineering）。
+
+负责维护并确保整个服务的高可用性，同时不断优化系统架构、提升部署效率、优化资源利用率提高整体的ROI. return on investment(投资回报率) 
+运维工程师面对的最大挑战是大规模集群的管理问题，如何管理好几十万台服务器上的服务，同时保障服务的高可用性
+规模较大的公司(比如：Google、FaceBook、百度、阿里、腾讯等)，运维工程师和系统管理员是有一定的区别：
+
+- 系统管理员：主要负责机房网络、服务器等硬件基础设施的运行和维护。
+- 运维工程师：主要负责管理并维护在运行在海量服务器上的软件服务。
+
+### RedHat 认证
+
+- 认证考试 认证培训课程编号 认证培训课程名称
+- RHCSA RH124,RH135 红帽认证系统管理员
+- RHCE RH254 红帽认证工程师
+- RHCA RH401,RH436,RH423,RH442,RHS333 红帽认证架构师
+- RHCSS RedHat Certified Security Specialist 红帽认证安全专家
+- RHCDCS RedHat Certified Datacenter Specialist 红帽认证数据中心专家
+- RHVA RedHat Certified Virtualization Administrator 红帽认证虚拟化管理
+
+- RH033 基础
+- RH133 操作系统管理
+- RH253 服务管理
+- RH401
+- RH423 (ldap)
+- RH442
+- RH436 集群和存储
+- RHS333
+
