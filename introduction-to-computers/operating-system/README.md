@@ -211,10 +211,12 @@ FreeBSD
     - 查询
 
 - Debian: dpkg(.deb), apt-get
-- RedHat: rpm, yum -> dnf
+- RedHat: rpm, yum -> dnf(参考zypper)
 - S.u.S.E: rpm, zypper
 - ArchLinux: port
 - LFS: Linux From Scratch
+
+rpm -> yum -> zyyper > port
 
 ## 什么是操作系统
 
