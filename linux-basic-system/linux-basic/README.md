@@ -263,7 +263,7 @@ COMMAND [OPTIONS...] [ARGUMENTS...]
 
   - 注意：并非所有的命令都有一个在某目录与之对应的可执行程序文件（内置命令）
 
-  - 共享库：**/lib, /lib64, /usr/lib, /usr/lib64, /usr/local/lib, /usr/local/lib64**
+  - 共享库(公共功能性的二进制文件，只能被其他程序调用)：**/lib, /lib64, /usr/lib, /usr/lib64, /usr/local/lib, /usr/local/lib64**
     - 32bits 库：**/lib, /usr/lib, /usr/local/lib**
     - 64bits 库：**/lib64, /usr/lib64, /usr/local/lib64**
 
