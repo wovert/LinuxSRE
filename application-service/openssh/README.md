@@ -501,3 +501,8 @@ dbclient [options] [user @]host[/port] [command]`
 ## 编译安装dropbear
 
 - 提供scp功能, 与ssh的scp功能冲突
+
+## 本地window中安装openssh
+
+github地址：https://github.com/openssl/openssl/blob/master/INSTALL
+这个是需要自己编译的，推荐直接利用window版的安装包：https://www.mls-software.com/opensshd.html
