@@ -277,11 +277,11 @@
 
 ini格式的配置文件；各程序均可通过此配置文件获取配置信息；
 
-``` SHELL
+``` sh
  [program_name]
 
 1. OS Vendor提供mariadb rpm包安装的服务的配置文件查找次序：
- /etc/mysql/my.cnf  --> /etc/my.cnf  --> --default-extra-file=/PATH/TO/CONF_FILE  --> ~/.my.cnf		
+ /etc/mysql/my.cnf  --> /etc/my.cnf  --> --default-extra-file=/PATH/TO/CONF_FILE  --> ~/.my.cnf
 
 2. 通用二进制格式安装的服务程序其配置文件查找次序：
  /etc/my.cnf 越靠后最终生效的 --> /etc/mysql/my.cnf  --> --default-extra-file=/PATH/TO/CONF_FILE --> ~/.my.cnf
@@ -289,7 +289,8 @@ ini格式的配置文件；各程序均可通过此配置文件获取配置信�
 获取其读取次序的方法：
 # mysqld --verbose --help
 
-# cp  support-files/my-large.cnf  /etc/my.cnf
+my-huge.cnf是总控文件
+# cp  support-files/my-huge.cnf  /etc/my.cnf
 
 添加三个选项
 [mysqld] # mysql服务器端配置
@@ -551,6 +552,11 @@ spatial
 
 `net start|stop|restart mysql`
 
+### 查看字符集
+
+- show variables like 'character%'
+- show variables like '%char%'
+
 ### 设定字符集
 
 > Server characterset: utf8
@@ -562,11 +568,14 @@ spatial
 #### my.ini
 
 ``` config
-[mysql]
+[client]
 default-chracter-set=utf8 客户端字符集
 
 [mysqld]
 charcter-set-server=utf8 服务器端字符集
+
+[mysql]
+default-chracter-set=utf8
 ```
 
 #### 登录与退出

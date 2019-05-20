@@ -204,7 +204,7 @@
 - `/var/spool/postfix` postfix邮件目录
 - `/var/spoo/clientmqueue` sendmail 临时邮件文件目录，很多原因导致目录碎片文件很多，比如crontab定时任务命令不加`>/dev/null`
 
-- `/proc` 内核及进程信息虚拟文件系统，基于内存的虚拟文件系统，用于为内核及进程存储其相关信息；多为内核参数；例如：`net.ipv4.ip_forward`, 虚拟为 `net/ipv4/ip_forward`，存储于`/proc/sys/`，因此其完整路径为`/proc/sys/net/ipv4/ip_forward` 参考：https://www.ibm.com/developerworks/cn/linux/l-cn-sysfs/
+- `/proc` **伪文件系统，内核映射文件**内核及进程信息虚拟文件系统，基于内存的虚拟文件系统，用于为内核及进程存储其相关信息；多为内核参数；例如：`net.ipv4.ip_forward`, 虚拟为 `net/ipv4/ip_forward`，存储于`/proc/sys/`，因此其完整路径为`/proc/sys/net/ipv4/ip_forward` 参考：https://www.ibm.com/developerworks/cn/linux/l-cn-sysfs/
 
 - `/proc/filesystems` 目前系统已经加载的文件系统
 - `/proc/uptime`
@@ -225,7 +225,7 @@
 - `/proc/ioports` 目前系统上各个装置所配置的IO位址
 - `/proc/interrupts`IRQ分配状态，正在使用的中断，和曾经有多少个中断
 
-- `/sys` sysfs 虚拟文件系统提供了比 proc 更为理想的访问**内核数据**的途径；其主要作用在于为管理Linux设备提供统一模型的接口；
+- `/sys` **伪文件系统，硬件设备相关的属性映射文件**sysfs 虚拟文件系统提供了比 proc 更为理想的访问**内核数据**的途径；其主要作用在于为管理Linux设备提供统一模型的接口；
 
 - 《奇点临近》
 
