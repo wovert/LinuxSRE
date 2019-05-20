@@ -268,26 +268,24 @@ default menu.c32
 # cp /media/cdrom/images/pxeboot/{vmlinuz,initrd.img] /var/lib/tftpboot/
 
 
-# cp /media/cdrom/isolinux/{boot.cfg, vesamenu.c32, splash.png} /var/lib/tftpboot
+# cp /media/cdrom/isolinux/{boot.msg, vesamenu.c32, splash.jpg} /var/lib/tftpboot
 
 # mkdir /var/lib/tftpboot/pxelinux.cfg/
+
+# mount --bind /media/cdrom /var/ftp/pub
 
 # cp /media/cdrom/isolinux/isolinux.cfg /var/lib/tftpboot/pxelinux.cfg/default
 # vim /var/lib/tftpboot/pxelinux,cfg/default
 
-  default menu.c32
+    default menu.c32
     prompt 5
     timeout 5
     MENU TITLE CentOS 7 PXE Menu
 
-    LABEL linux
-    MENU LABEL Install CentOS 7 x86_64
-    KERNEL vmlinuz
-    APPEND initrd=initrd.img inst.repo=http://192.168.10.9/centos/7/x86_64/
-
-    LABEL linux auto inst
-    MENU LABEL Install CentOS 7 x86_64 auto
-    KERNEL vmlinuz
-    APPEND initrd=initrd.img inst.repo=http://192.168.10.9/centos/7/x86_64/ ks=http://192.168.10.9/kickstarts/centos7.cfg
+    label autoinst
+      menu label ^Auto Install CentOS
+      menu default
+      kernel vmlinuz
+      append initrd=initrd.img ks=http://192.168.10.16/kickstarts/centos7.cfg
 ```
 
