@@ -461,7 +461,7 @@ man1, man5, man8 等
   - `filetype: pdf`
   - `................................0site:lingyima.com`  
     - domain.tld(top level domain)
-  - `intitle: `
+  - `intitle:`
   - `inurl:`
   = `intext:`
 
