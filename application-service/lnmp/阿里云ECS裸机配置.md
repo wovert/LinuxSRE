@@ -190,7 +190,7 @@ $ source ~/.bashrc
 ### 下载安装编译工具
 
 ```sh
-CMake：编译工具
+[CMake：编译工具]
 # wget https://cmake.org/files/v3.12/cmake-3.12.1.tar.gz
 
 解压
@@ -215,9 +215,9 @@ Ncurses：提供功能键定义(快捷键),屏幕绘制以及基于文本终端�
 # cd ncurses-6.1/
 # ./configure
 # make && make install
-# cd ~/soft/
 
-Bison：GNU分析器生成器
+
+[Bison：GNU分析器生成器]
 
 下载
 # wget http://ftp.gnu.org/gnu/bison/bison-3.0.5.tar.gz
@@ -231,7 +231,7 @@ Bison：GNU分析器生成器
 # make && make install
 
 
-Boost库：一个开源可移植的C++库，是C++标准化进程的开发引擎之一
+[Boost库：一个开源可移植的C++库，是C++标准化进程的开发引擎之一]
 
 下载
 # wget https://dl.bintray.com/boostorg/release/1.68.0/source/boost_1_68_0.tar.gz
@@ -322,7 +322,6 @@ Boost库：一个开源可移植的C++库，是C++标准化进程的开发引擎
 
 ```sh
 # make && make install
-# cd
 ```
 
 ### 配置MariaDB
