@@ -156,17 +156,17 @@
   - 0表示下次登录时更改密码
   - 空字段表示密码年龄功能被禁用
 - minimum password age：最短使用期限
-  - 更改密码之后，要等多长时间再次被允许更改密码
+  - 更改密码之后，要等**多长时间再次被允许更改密码**
 - maximum password age：最长使用期限
   - 更改密码之后，经过n天后，用户必须更改密码
   - n 天之后，密码仍然可用，用户将会在下次登陆的时候被要求更改密码。
   - 如果最大密码年龄小于最小密码年龄，用户将会不能更改密码
-  - 修改密码期限：最长-最短
+  - **修改密码期限：最长-最短**
 - password warning period：警告期限，登录时提示修改密码
   - 最长使用期限之前，警告期限天数
   - 登录提示修改密码，但不需要修改，也可以登录
 - password inactivity period：非活动期限，不修改密码不能登录
-  - 最长使用期限之后，延长时间天数
+  - 最长使用期限之后，**延长时间天数**
   - 登录提示修改密码，不改密码不能登录
 - account expiration date：过期期限
   - 禁用账号天数
@@ -180,13 +180,13 @@
 - group_name:password:GID:user_list
 - user_list:改组的用户成员；以此组为附加组的用户的用户列表
 
-### 安装上下文：
+### 安全上下文
 
-- 进程以其发起者的身份运行；
-  - 进程对文件的访问权限，取决于发起此进程的用户的权限；
-- 系统用户：为了能够让那后台进程或服务类进程以非管理员的身份运行，通常需要为此创建多个普通用户；这类用户从不用登录系统；
+- 进程以其发起者的身份运行
+  - 进程对文件的访问权限，取决于发起此进程的用户的权限
+- 系统用户：为了能够让那后台进程或服务类进程以非管理员的身份运行，通常需要为此创建多个普通用户；这类用户从不用登录系统
 
-### groupadd命令 添加组
+### groupadd 添加组
 
 ``` shell
 # groupadd [option] group_name
@@ -194,28 +194,28 @@
 -g GID：默认是上一个组的GID+1
 ```
 
-### groupmod命令：修改组属性
+### groupmod 修改组属性
 
 - `groupmod [option] GROUP`
   - `-g GID`：修改GID
   - `-n new_name`：修改组名
 
-### groupdel命令 删除组
+### groupdel 删除组
 
 `groupdel group_name`
 
-### userdel命令：删除用户
+### userdel 删除用户
 
 `-r`：删除用户时一并删除其家目录
 
-### useradd命令：创建普通用户或更新新用户信息
+### useradd 创建普通用户或更新新用户信息
 
 - `useradd [options] LOGIN`
 - `useradd -D`
 - `useradd -D [options]`
   - `-p`：设置明文密码
   - `-u, --uid UID`：指定UID
-  - `-g, --gid GROUP`：指定基本组ID，此组得事先存在
+  - `-g, --gid GROUP`：指定基本组ID，**此组得事先存在**
   - `-G, --groups GROUP1[,GROUP2,...[,GROUPN]]]`：指明用户所属的附加组，多个组之间用逗号分隔；
   - `-c, --comment COMMENT`：指明注释信息；
   - `-d, --home HOME_DIR`：以指定的路径为用户的家目录；通过复制/etc/skel此目录并重命名实现；指定的家目录路径如果事先存在，则不会为用户复制环境配置文件；即没有任何文件；
@@ -224,10 +224,10 @@
   - `-f, --inactive`：非活动期限天数，账户被彻底禁用之前的天数
     - 0：立即禁用
     - 1：禁用这个功能
-  - `-M`：不创建用户主目录，即使系统在/etc/login.defs中设置CREATE_HOME为yes
-  - `-m, --create-home`：如果不存在，则创建用户主目录。骨架目录中的文件和目录(-k选项指定)将会复制到主目录如果没有指定此选项并且CREATE_HOME没有启用，不会创建主目录
+  - `-M`：**不创建用户主目录**，即使系统在`/etc/login.defs`中设置`CREATE_HOME`为yes
+  - `-m, --create-home`：如果不存在，则创建用户主目录。骨架目录中的文件和目录(-k选项指定)将会复制到主目录如果没有指定此选项并且 `CREATE_HOME` 没有启用，不会创建主目录
 
-  - 注意：创建用户时的诸多默认设定配置文件为 `/etc/login.defs`		
+  - 注意：创建用户时的诸多默认设定配置文件为 `/etc/login.defs`
 
   - `/etc/login.defs` 文件
     - MAIL_DIR /var/spool/mail
@@ -268,9 +268,9 @@
   - `-s, --shell SHELL`
   - `-u, --uid UID`
 
-- 修改的结果保存于/etc/default/useradd文件中 `# useradd -D -s /bin/csh`
+- 修改的结果保存于 `/etc/default/useradd` 文件中 `# useradd -D -s /bin/csh`
 
-### usermod命令：修改用户属性
+### usermod 修改用户属性
 
 - `-u, --uid UID`：修改用户的ID为此处指定的新UID；
 - `-g, --gid GROUP`：修改用户所属的基本组；
@@ -298,7 +298,7 @@
 
 4. 为 `gentoo` 新增附加组 `netadmin`
 
-### passwd命令
+### passwd
 
 `passwd [-k] [-l] [-u [-f]] [-d] [-e] [-n mindays] [-x maxdays] [-w warndays] [-i inactivedays] [-S] [--stdin] [username]`
 
@@ -318,19 +318,19 @@
 
 - `--stdin：echo "PASSWORD" | passwd --stdin USERNAME`
 
-### gpasswd命令
+### gpasswd
 
 - 组密码文件：/etc/gshadow
 - `gpasswd [选项] group`
   - `-a USERNAME`：向组中添加用户
   - `-d USERNAME`：从组中移除用户
 
-### newgrp命令：临时切换指定的组为基本组；使用组密码
+### newgrp 临时切换指定的组为基本组；使用组密码
 
 - `newgrp [-] [group]`
   - `-`: 会模拟用户重新登录以实现重新初始化其工作环境；
 
-### chage 命令：更改用户密码过期信息
+### chage 更改用户密码过期信息
 
 - `chage [选项] 登录名`
   - `-d, --lastday LAST_DAY`
@@ -341,7 +341,7 @@
   - `-E, --expiredate EXPIRE_DATE`
   - `-l, --list Show account aging information`
 
-###　id 命令：显示用户的真和有效ID
+###　id 显示用户的真和有效ID
 
 - `id [OPTION]... [USER]`
   - `-u`: 仅显示有效的UID；
@@ -349,8 +349,9 @@
   - `-G`：仅显示用户所属的所有组的ID；
   - `-n`: 显示名字而非ID；
 
-### su命令：switch user
+### su
 
+> switch user
 > 登录式切换：会通过读取目标用户的配置文件来重新初始化
 
 - `su - USERNAME`
@@ -362,27 +363,27 @@
 
 - 注意：管理员可无密码切换至其它任何用户；`c 'COMMAND'`：仅以指定用户的身份运行此处指定的命令；
 
-### pwck命令
+### pwck
 
 > pwck - verify integrity of password files
 
-### grpck命令
+### grpck
 
 > grpck - verify integrity of group files
 
-### chsh命令 -s SHELL USERNAME
+### chsh -s SHELL USERNAME
 
 > chsh - change your login shell
 
-### chfn命令
+### chfn
 
 > chfn - change your finger information
 
-### finger命令
+### finger
 
 > Finger - user information lookup program 
 
-### whoami命令
+### whoami
 
 > whoami - print effective userid
 
@@ -425,7 +426,7 @@
 ### 权限组合机制
 
 - --- 000 0
-- --x 001 1 
+- --x 001 1
 - -w- 010 2
 - -wx 011 3
 - r-- 100 4
@@ -536,13 +537,15 @@
 
 #### 安全上下文：
 
-1. 进程以某用户的身份运行；进程是发起此进程用户的代理，因此以此用户的身份和权限完成所有操作；
+1. 进程以某用户的身份运行；进程是发起此进程用户的代理，因此以此用户的身份和权限完成所有操作
 
-2. 权限匹配模型；
+2. 权限匹配模型
 
-(1) 判断进程的属主，是否为被访问的文件属主；如果是，则应用属主的权限；否则进入第2步；
-(2) 判断进程的属主，是否属于被访问的文件属组；如果是，则应用属组的权限；否则进入第3步；
-(3) 应用other的权限；
+(1) 判断进程的属主，是否为被访问的文件属主；如果是，则应用属主的权限；否则进入第2步
+
+(2) 判断进程的属主，是否属于被访问的文件属组；如果是，则应用属组的权限；否则进入第3步
+
+(3) 应用other的权限
 
 ### SUID
 

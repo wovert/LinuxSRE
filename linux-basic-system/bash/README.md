@@ -20,7 +20,7 @@
 
 > shell进程会其会话中保存此前用户提交执行过的命令(在内存)
 
-### 定制history的功能，可通过环境变量实现：
+### 定制 history 的功能，可通过环境变量实现：
 
 - `HISTSIZE`：shell进程可保留的命令历史的条数
 - `HISTFILE`：持久保存命令历史的文件；
@@ -248,18 +248,18 @@
 
 ## 10. globbing: 文件名通配
 
-- 注意：整体文件名匹配，而非部分
+- 注意：**整体文件名匹配，而非部分**
   - 显示包括目录下的文件名
 
 ### 匹配模式：meta character
 
-- `*` 匹配任意长度的任意字符
+- `*` 匹配**任意长度的任意字符**
   - `pa*, *pa*, *pa, *p*a*`
   - pa, paa, passwd
 - `?`：匹配任意单个字符
   - pa?, ??pa, p?a, p?a?
   - pa, paa, passwd
-- `[]`：匹配指定范围内的任意单个字符
+- `[]`：匹配指定范围内的**任意单个字符**
   - `[a-z]=[A-Z]`(不区分大小写), [0-9], [a-z0-9]=[A-Z0-9]
   - `[[:digit:]]`：所有数字 [0-9]
   - `[[:upper:]]`：所有大写字母
@@ -288,7 +288,7 @@
 
 4. 复制/etc目录下，所有以m开头，以非数字结尾的文件或目录至/tmp/lingyima.com目录
 
-``` SHELL
+``` sh
 # ls -d /tmp/lingyima.com &> /dev/null \
 || mkdir /tmp/lingyima.com &> /dev/null \
 && \cp -rfv /etc/m*[^0-9] /tmp/lingyima.com
@@ -296,7 +296,7 @@
 
 5. 复制/usr/share/man目录下，所有以man开头，后跟一个数字结尾的文件或目录至/tmp/man/目录下
 
-``` SHELL
+``` sh
 # ls -d /tmp/man &> /dev/null \
 || mkdir /tmp/man \
 && \cp -rfv /usr/share/man/man[0-9] /tmp/man/
@@ -304,7 +304,7 @@
 
 6. 复制/etc/目录下，所有以.conf结尾，且m,n,r,p开头的文件或目录至/tmp/conf.d/目录下
 
-``` SHELL
+``` sh
 # ls -d /tmp/conf.d &> /dev/null \
 || mkdir /tmp/conf.d &> /dev/null \
 && cp -rfv /etc/[mnrp]*.conf /tmp/conf.d/
@@ -312,33 +312,29 @@
 
 ## 11. IO重定向及管道
 
-### 可用于输入的设备：文件
+- 可用于输入的设备：文件
+  - 键盘设备、文件系统上的常规文件、网卡等
+- 可用于输出的设备：文件
+  - 显示器、文件系统上的常规文件、网卡等
 
-- 键盘设备、文件系统上的常规文件、网卡等；
-
-### 可用于输出的设备：文件
-
-- 显示器、文件系统上的常规文件、网卡等；
-
-### 程序的数据流有三种：
+### 程序的数据流有三种
 
 - 输入的数据流；<-- 标准输入(stdin)， 键盘
 - 输出的数据流：--> 标准输出(stdout)，显示器
 - 错误输出流：  --> 错误输出(stderr)，显示器
 
-### fd: file descriptor，文件描述符
+- fd: file descriptor，文件描述符
 
-### IO重定向
+### IO 重定向
 
 - 输出重定向：[1]>
   - 特性：覆盖输出
-
   - `# set -C` 禁止覆盖输出重定向至已存在的文件；
-  - 此时可使用强制覆盖输出：[1]>|
+  - 此时可使用强制覆盖输出：`[1]>|`
 
 - `# set +C` 关闭上述特性
 - `# cat /etc/issue > /dev/tty1`
-- 输出重定向：[1]>>
+- 输出重定向：`[1]>>`
   - 特性：追加输出
 
 - 错误输出流重定向：`2>, 2>>`
@@ -346,10 +342,10 @@
   - `&>, &>>`
   - `COMMAND > /path/to/somefile 2>&1`(&1前面不能有空白字符)
   - `COMMAND >> /path/to/somefile 2>&1`
-  - 特殊设备：/dev/null, 执行结果输出(包括错误输出)重定向到/dev/null
+  - 特殊设备：`/dev/null`, 执行结果输出(包括错误输出)重定向到/dev/null
 - 输入重定向：[0]<，  <<(Here Document)
 
-## tr 命令
+### tr 命令
 
 `tr [OPTION]... SET1 [SET2]`
 > 把输入的数据当中的字符，凡是在SET1定义范围内出现的，通通对位转换为SET2出现的字符
@@ -359,39 +355,39 @@
 
 - 注意：不修改原文件
 
-``` SHELL
+``` sh
 SET: [:lower:] [:upper:] [:digit:] [:alpha:] [:alnum:]
 [:punct:] [:space:] [:blank:] [CHAR1-CHAR2]
 ```
 
-## Here Document：<<
+### Here Document：<<
 
-``` SHELL
+``` sh
 cat << EOF
 cat > /PATH/TO/SOMEFILE << EOF
 ```
 
-## 管道：连接程序，实现将前一个命令的输出直接定向后一个程序当作输入数据流
+### 管道
+
+> 连接程序，实现将前一个命令的输出直接定向后一个程序当作输入数据流
 
 `~]# COMMAND1 | COMMAND2 | COMMAND3 | ...`
 
-## tee命令：read from standard input and write to standard output and files
+### tee
+
+> read from standard input and write to standard output and files
 
 - `~]# COMMAND | tee /PATH/TO/SOMEFILE | tr 'a-z' 'A-Z'`
-
-- 练习：把/etc/passwwd文件的前6行的信息转换为大写字符后输出
-
+- 练习：把 `/etc/passwwd` 文件的前6行的信息转换为大写字符后输出
 - `~]# head -6 /etc/passwd | tr [a-z] [A-Z]`
-
 - `~]# head -6 /etc/passwd | tr 'a-z' 'A-Z'`
-
 - `~]# head -6 /etc/passwd | tr [:lower:] [:upper:]`
 
 ## 12. 多命令执行
 
 `# COMMAND1; COMMAND2; COMMAND3; ...`
 
-## 逻辑运算
+### 逻辑运算
 
 - 真(true,yes,on,1)
 - 假(false,no,off,0)
@@ -507,7 +503,7 @@ cat > /PATH/TO/SOMEFILE << EOF
   - 直接通过某终端输入账号和密码后登录打开的 `shell` 进程；
   - 使用 su 命令：`su - USERNAME`, 或者使用 `su -l USERNAME`执行的登录切换；
 
-- 非交互式登录 `shell` 进程：
+- 非交互式登录 `shell` 进程
   - `su USERNAME` 执行的登录切换
   - 图像界面下打开的终端
   - 运行脚本
@@ -520,9 +516,10 @@ cat > /PATH/TO/SOMEFILE << EOF
 - 用户个人：仅对当前用户有效；
   - `~/.bash_profile`
 
-- 功用：
-1. 用于定义环境变量；
-2. 运行命令或脚本；
+- 功用
+
+1. 用于定义环境变量
+2. 运行命令或脚本
 
 ### bashrc类
 

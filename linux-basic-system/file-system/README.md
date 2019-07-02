@@ -1,8 +1,6 @@
 # Linux文件系统
 
-- 文件是什么？
-
-存储空间存储的一段流式数据，对数据可以做到按名存取	
+- 文件是什么？存储空间存储的一段流式数据，对数据可以做到按名存取
 
 ## 程序编译方式：Linux: glibc(GNU libc)标准库
 
@@ -24,21 +22,21 @@
 
 ## 操作系统自身运行使用的
 
-```
+```sh
 /bin
 /sbin
 ```
 
 ## 运行正常功能的程序存放位置
 
-```
+```sh
 /usr/bin
 /usr/sbin
 ```
 
 ## 用来存放第三方软件的程序
 
-```
+```sh
 /usr/local/bin
 /usr/local/sbin
 ```
@@ -129,7 +127,6 @@
     - `ifdown eth0 && ifup eht0`
   - `# route -n` 查看路由
 
-
 - `# ifdown eth0 && ifup eth0`
 - `/etc/sysct.conf` 内核参数里配置永久生效
 - `/etc/sudoers` 执行使用sudo命令的配置文件
@@ -176,11 +173,11 @@
 - `/usr/src` 源码目录
 - `/usr/X11R6` X-Window程序的安装位置
 - `/usr/local` 系统管理员安装本地应用程序，通常是第三方应用程序安装目录
-- `/usr/local/bin`	应用程序目录
-- `/usr/local/sbin`	管理员程序目录
-- `/usr/local/lib`		32bits库目录
-- `/usr/local/lib64`		64bits库目录
-- `/usr/local/include`	头文件
+- `/usr/local/bin` 应用程序目录
+- `/usr/local/sbin` 管理员程序目录
+- `/usr/local/lib` 32bits库目录
+- `/usr/local/lib64` 64bits库目录
+- `/usr/local/include` 头文件
 
 - `/var` 经常变化的目录
 - `/var/cache/` 应用缓存数据目录
@@ -204,7 +201,7 @@
 - `/var/spool/postfix` postfix邮件目录
 - `/var/spoo/clientmqueue` sendmail 临时邮件文件目录，很多原因导致目录碎片文件很多，比如crontab定时任务命令不加`>/dev/null`
 
-- `/proc` **伪文件系统，内核映射文件**内核及进程信息虚拟文件系统，基于内存的虚拟文件系统，用于为内核及进程存储其相关信息；多为内核参数；例如：`net.ipv4.ip_forward`, 虚拟为 `net/ipv4/ip_forward`，存储于`/proc/sys/`，因此其完整路径为`/proc/sys/net/ipv4/ip_forward` 参考：https://www.ibm.com/developerworks/cn/linux/l-cn-sysfs/
+- `/proc` **伪文件系统，内核映射文件**内核及**进程**信息虚拟文件系统，基于内存的虚拟文件系统，用于为内核及进程存储其相关信息；多为内核参数；例如：`net.ipv4.ip_forward`, 虚拟为 `net/ipv4/ip_forward`，存储于`/proc/sys/`，因此其完整路径为`/proc/sys/net/ipv4/ip_forward` 参考：https://www.ibm.com/developerworks/cn/linux/l-cn-sysfs/
 
 - `/proc/filesystems` 目前系统已经加载的文件系统
 - `/proc/uptime`
@@ -256,7 +253,7 @@
   - 模糊查找；
   - 非实时查找；
 
-- `locate [OPTIONS] ... PATTERN...`	
+- `locate [OPTIONS] ... PATTERN...`
   - -b：只匹配路径中的基名
   - -c：仅显示匹配的数量
   - -r, --regexp：BRE
@@ -265,7 +262,7 @@
 
 - 注意：索引构建过程中需要遍历整个跟文件系统，极消耗资源；
 
-### `find` 命令
+### find 命令
 
 > 实时查找工具，通过遍历指定起始路径下的文件系统层级结构完成文件查找
 
@@ -329,17 +326,17 @@
 
 - 或条件表达式时，必须加上括号`\(....\)`
 
-``` 示例
+``` sh
 ~]# find /tmp \( -nouser -o -uid 1003 \) -ls
 ~]# find /tmp -not \( -user root -o -iname "*fstab*" \) -ls
 ```
 
-``` 示例
+``` sh
 !A -a !B = !(A -o B) -o并(或)
 !A -o !B = !(A -a B) -a交(且)
 ```
 
-```
+```sh
 ~]# find /tmp ! -user root -a ! -name "*fsta*" -a -type f -ls
 ~]# find /tmp ! \( -user root -o -name "*fsta*" \) -a -type f -ls
 ```
@@ -411,43 +408,44 @@
 
 `~]# find | xargs COMMAND`
 
-1. 查找 `/var` 目录下属主为 `root`，且属组为 `mail` 的所有文件或目录；
+1) 查找 `/var` 目录下属主为 `root`，且属组为 `mail` 的所有文件或目录；
 `~]# find /var -user root -a -group mail -ls`
 
-2. 查找 `/usr` 目录下不属于 `root`, `bin` 或 `hadoop` 的所有文件或目录；用两种方法；
+2) 查找 `/usr` 目录下不属于 `root`, `bin` 或 `hadoop` 的所有文件或目录；用两种方法；
 `~]# find /usr -not -user root -a -not -user bin -a -not -user hadoop`
 
 `~]# find /usr -not \( -user root -o -user bin -o -user hadoop \) -ls`
 
-3. 查找 `/etc` 目录下最近一周内其内容修改过，且属主不是 `root` 用户也不是 `hadoop` 用户的文件或目录；
+3)查找 `/etc` 目录下最近一周内其内容修改过，且属主不是 `root` 用户也不是 `hadoop` 用户的文件或目录；
 
-```
+```sh
 ~]# find /etc -mtime -7 -a -not \( -user root -o -user hadoop \) -ls
 ~]# find /etc -mtime -7 -a -not -user root -a -not -user hadoop -ls
 ```
 
-4. 查找当前系统上没有属或属组，且最近一周内曾被访问过的文件或目录；
+4)查找当前系统上没有属或属组，且最近一周内曾被访问过的文件或目录；
 
-```
+```sh
 ~]# find  /  \( -nouser -o -nogroup \)  -atime  -7  -ls
 ```
 
-5. 查找 `/etc` 目录下大于 `1M` 且类型为普通文件的所有文件；
+5)查找 `/etc` 目录下大于 `1M` 且类型为普通文件的所有文件；
 
-```
+```sh
 ~]# find /etc -size +1M -type f -exec ls -lh {} \;
 ```
 
-6. 查找 `/etc` 目录下所有用户都没有写权限的文件；
+6)查找 `/etc` 目录下所有用户都没有写权限的文件；
 
-```
+```sh
 ~]# find /etc -not -perm /222 -type f -ls
 ```
 
-7. 查找 `/etc` 目录至少有一类用户没有执行权限的文件；
-```
+7)查找 `/etc` 目录至少有一类用户没有执行权限的文件
+
+```sh
 ~]# find /etc -not -perm -111 -type f -ls
 ```
 
-8. 查找 `/etc/init.d/`目录下，所有用户都有执行权限，且其它用户有写权限的所有文件；
+8)查找 `/etc/init.d/`目录下，所有用户都有执行权限，且其它用户有写权限的所有文件；
 `~]# find /etc -perm -113 -type f -ls`
