@@ -36,7 +36,7 @@
 # lsb_release -a
 
 安装 git 源码构建
-# git --versrion
+# git --version
 
 安装编译依赖软件
 # yum -y install curl-devel expat-devel gettext-devel openssl-devel zlib-devel asciidoc
