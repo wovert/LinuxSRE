@@ -81,4 +81,26 @@ $ source ~/.bashrc
 
 ```sh
 # curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+
+# export NVM_DIR="$HOME/.nvm"
+# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+# [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+查看nvm版本
+# nvm --version
+
+查看都有哪些版本可以安装
+# nvm ls-remote
+
+安装版本
+# nvm install v10.16.0
+
+查看一下当前已经安装的版本
+# nvm ls
+
+切换版本
+# nvm use v10.16.0
+
+设置默认版本
+# nvm alias default v10.16.0
 ```
