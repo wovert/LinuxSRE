@@ -10,10 +10,10 @@
 # ssh root@IP地址
 
 创建普通登录用户
-# useradd username
+# useradd 用户名
 
 修改普通登录用户密码
-# passwd username
+# passwd 用户名
 ```
 
 3. 禁止root账号远程登录
@@ -106,3 +106,4 @@ $ source ~/.bashrc
 设置默认版本
 # nvm alias default v10.16.0
 ```
+
