@@ -8,8 +8,10 @@
 ```sh
 登录
 # ssh root@IP地址
+
 创建普通登录用户
 # useradd username
+
 修改普通登录用户密码
 # passwd username
 ```
@@ -25,7 +27,9 @@
 ## Setup系统开发工具
 
 ```sh
+安装系统开发工具包
 # yum -y groupinstall "Development Tools" "Server Platform Development"
+
 查看系统版本
 # lsb_release -a
 
@@ -45,13 +49,11 @@
 # tar -vxf git-2.22.0.tar.xz
 # cd git-2.22.0
 
-编译
-编译时发生错误，可能未安装依赖软件包
+编译: 编译时发生错误，可能未安装依赖软件包
 # make prefix=/usr/local/git all
 # make prefix=/usr/local/git install
 
 环境变量设置
-
 [Root 用户添加环境变量]
 # echo "export PATH=$PATH:/usr/local/git/bin" >> /etc/profile
 
