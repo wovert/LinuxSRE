@@ -21,6 +21,8 @@
 ```sh
 # vim /etc/ssh/sshd_config
   PermitRootLogin no
+
+重启 sshd 服务
 # systemctl restart sshd
 ```
 
