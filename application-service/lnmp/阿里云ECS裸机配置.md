@@ -224,6 +224,7 @@ $ source ~/.bashrc
 # cp support-files/mysql.server  /etc/init.d/mysqld
 # chkconfig --add mysqld
 # service mysqld start
+# chkconfig mysqld on
 # ss -nutl | grep 3306
 ```
 
