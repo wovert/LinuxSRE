@@ -247,183 +247,115 @@ Ncurses：提供功能键定义(快捷键),屏幕绘制以及基于文本终端�
 # ./b2 install --prefix=/opt/boost
 ```
 
-### 编译前配置
+### 准备二进制程序
 
 ```sh
-# cd mariadb-10.3.16
+准备二进制程序
 
-> 输入编译参数
-
-# cmake . \
--DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
--DDEFAULT_CHARSET=utf8 \
--DDEFAULT_COLLATION=utf8_general_ci \
--DENABLED_LOCAL_INFILE=1 \
--DENABLE_DOWNLOADS=1 \
--DEXTRA_CHARSETS=all \
--DSYSCONFDIR=/etc \
--DWITHOUT_TOKUDB=1 \
--DWITH_ARCHIVE_STPRAGE_ENGINE=1 \
--DWITH_ARCHIVE_STORAGE_ENGINE=1 \
--DWITH_BLACKHOLE_STORAGE_ENGINE=1 \
--DWITH_DEBUG=0 \
--DWITH_MEMORY_STORAGE_ENGINE=1 \
--DWITH_MYISAM_STORAGE_ENGINE=1 \
--DWITH_INNOBASE_STORAGE_ENGINE=1 \
--DWITH_PARTITION_STORAGE_ENGINE=1  \
--DWITH_READLINE=1 \
--DWITH_SSL=system \
--DWITH_ZLIB=system \
--DWITH_LOBWRAP=0 \
--DMYSQL_DATADIR=/data/mysql \
--DMYSQL_USER=mysql \
--DMYSQL_UNIX_ADDR=/var/run/mysql/mysql.sock \
--DMYSQL_TCP_PORT=3306 \
--DMYSQL_MAINTAINER_MODE=0
-
-如果编译失败请删除CMakeCache.txt
-# rm -f CMakeCache.txt
-
-让指令重新执行，否则每次读取这个文件，命令修改正确也是报错
+默认是放在/usr/local目录下
+# tar xvf mariadb-10.3.16-linux-x86_64.tar.gz -C /usr/local  
+# cd /usr/local
+# ln -sv mariadb-10.3.16-linux-x86_64  mysql
+# cd /usr/local/mysql
+# chown -R root:mysql ./*
 ```
 
-注释版
-
-```txt
-# cmake . \
--DCMAKE_INSTALL_PREFIX=/usr/local/mysql \           [MySQL安装的根目录]
--DDEFAULT_CHARSET=utf8 \                            [设置默认字符集为utf8]
--DDEFAULT_COLLATION=utf8_general_ci \               [设置默认字符校对]
--DENABLED_LOCAL_INFILE=1 \                          [启用加载本地数据]
--DENABLE_DOWNLOADS=1 \                              [编译时允许自主下载相关文件]
--DEXTRA_CHARSETS=all \                              [使MySQL支持所有的扩展字符]
--DSYSCONFDIR=/etc \                                 [MySQL配置文件所在目录]
--DWITHOUT_TOKUDB=1 \
--DWITH_ARCHIVE_STPRAGE_ENGINE=1 \                   [MySQL的数据库引擎]
--DWITH_ARCHIVE_STORAGE_ENGINE=1 \                   [MySQL的数据库引擎]
--DWITH_BLACKHOLE_STORAGE_ENGINE=1 \                 [MySQL的数据库引擎]
--DWITH_DEBUG=0 \                                    [禁用调试模式]
--DWITH_MEMORY_STORAGE_ENGINE=1 \                    [MySQL的数据库引擎]
--DWITH_MYISAM_STORAGE_ENGINE=1 \                    [MySQL的数据库引擎]
--DWITH_INNOBASE_STORAGE_ENGINE=1 \                  [MySQL的数据库引擎]
--DWITH_PARTITION_STORAGE_ENGINE=1  \                [MySQL的数据库引擎]
--DWITH_READLINE=1 \                                 [MySQL的readline library]
--DWITH_SSL=system \                                 [通讯时支持ssl协议]
--DWITH_ZLIB=system \                                [允许使用zlib library]
--DWITH_LOBWRAP=0 \
--DMYSQL_DATADIR=/data/mysql \                       [MySQL数据库文件存放目录]
--DMYSQL_USER=mysql \                                [MySQL用户名] 
--DMYSQL_UNIX_ADDR=/var/run/mysql/mysql.sock \       [MySQL的通讯目录]
--DMYSQL_TCP_PORT=3306 \                             [MySQL的监听端口]
--DMYSQL_MAINTAINER_MODE=0
-```
-
-### 编译和安装
+### 准备配置文件
 
 ```sh
-# make && make install
+# cd /usr/local/mysql/support-files
+# mkdir /etc/mysql/
+# cp wsrep.cnf /etc/mysql/my.cnf
+# vim  /etc/mysql/my.cnf
+  [mysqld]
+
+  # 数据库的数据存放存目
+  datadir = /data/mysql
+
+  # 数据库中有很多表，加上这一行就可以使每个表单独生成一个文件
+  innodb_file_per_table = on
+
+  # 为了加速访问速度，忽略名字的反向解析
+  skip_name_resolve = on  
 ```
 
-### 配置MariaDB
-
-> 使用maria用户执行脚本, 安装数据库到数据库存放目录
-
-`# /usr/local/mysql/scripts/mysql_install_db --user=mysql --datadir=/data/mysql`
-
-### 复制MariaDB配置文件到/etc目录
-
-> 拷贝maria安装目录下 support-files目录下的文件wsrep.cnf到/etc目录并重命名为my.cnf
-
-`# cp /usr/local/mysql/support-files/wsrep.cnf /etc/my.cnf`
-
-### 创建启动脚本
-
-`# cp /usr/local/mysql/support-files/mysql.server /etc/rc.d/init.d/mysqld`
-
-### 启动mysqld服务
-
-`# /etc/rc.d/init.d/mysqld start`
-
-### 配置环境变量
+### 创建数据库文件
 
 ```sh
-打开并新建文件
-# vim /etc/profile.d/mysql.sh
-  export PATH=$PATH:/usr/local/mysql/bin/
+# cd /usr/local/mysql/
+# scripts/mysql_install_db  --user=mysql --datadir=/data/mysql 
+# ls /data/mysql
+```
 
-为脚本赋于可执行权限
-# chmod 0777 /etc/profile.d/mysql.sh
+### 准备日志文件
 
-读取并执行`mysql.sh`脚本, 并执行脚本, 以立即生效环境变量
+```sh
+# mkdir /var/log/mysql  
+# chown mysql /var/log/mysql/  
+```
+
+### 启动服务
+
+```sh
+# cp support-files/mysql.server  /etc/init.d/mysqld
+# chkconfig --add mysqld
+# service mysqld start
+# ss -nutl | grep 3306
+```
+
+### 添加PATH变量，以方便来运行mysql程序
+
+```sh
+# vim  /etc/profile.d/mysql.sh
+  export PATH=$PATH:/usr/local/mysql/bin
+
 # source /etc/profile.d/mysql.sh
 ```
 
-### 初始化MariaDB
+### 运行mysql安全脚本
 
 ```sh
-运行MariaDB初始化脚本
-# /usr/local/mysql/bin/mysql_secure_installation
-Nh123456;
-
-运行MariaDB初始化脚本
-# ./bin/mysql_secure_installation
-
-> 以下提示：
-
-Enter current password for root (enter for none):   输入当前root密码(没有输入)
-
-Set root password? [Y/n]    设置root密码?(是/否)
-
-New password:   输入新root密码
-
-Re-enter new password:      确认输入root密码
-
-Password updated successfully!      密码更新成功
-
-By default, a MariaDB installation has an anonymous user, allowing anyone
-to log into MariaDB without having to have a user account created for
-them.  This is intended only for testing, and to make the installation
-go a bit smoother.  You should remove them before moving into a
-production environment.
-
-默认情况下,MariaDB安装有一个匿名用户,
-允许任何人登录MariaDB而他们无需创建用户帐户。
-这个目的是只用于测试,安装去更平缓一些。
-你应该进入前删除它们生产环境。
-
-Remove anonymous users? [Y/n]       删除匿名用户?(是/否)
-
-Normally, root should only be allowed to connect from 'localhost'.  This
-ensures that someone cannot guess at the root password from the network.
-
-通常情况下，root只应允许从localhost连接。
-这确保其他用户无法从网络猜测root密码。
-
-Disallow root login remotely? [Y/n]     不允许root登录远程?(是/否)
-
-By default, MariaDB comes with a database named 'test' that anyone can
-access.  This is also intended only for testing, and should be removed
-before moving into a production environment.
-
-默认情况下，MariaDB提供了一个名为“测试”的数据库，任何人都可以访问。
-这也只用于测试，在进入生产环境之前应该被删除。
-
-Reloading the privilege tables will ensure that all changes made so far
-will take effect immediately.
-
-重新加载权限表将确保所有到目前为止所做的更改将立即生效。
-
-Reload privilege tables now? [Y/n]      现在重新加载权限表(是/否)
-
-All done!  If you've completed all of the above steps, your MariaDB
-installation should now be secure.
-
-Thanks for using MariaDB!
+# cd /usr/local/mysql/bin
+# ./mysql_secure_installation
 ```
 
-### 启动|查看 MariaDB服务
+### 测试链接数据库
 
 ```sh
-# systemctl start mysqld
-# systemctl status mysqld
+# mysql -u root -p
 ```
+
+### 创建账号
+
+```sql
+create database test;
+grant all privileges on test.* to  test@'%' identified  BY '密码';
+flush privileges;
+```
+
+### 删除用户
+
+```sql
+> mysql -u root -p
+> DELETE FROM user WHERE User="admin" and Host="localhost";
+> flush privileges;
+```
+
+### 修改指定用户密码
+
+```sql
+> mysql -u root -p
+> update mysql.user set password=password('新密码') where User="admin" and Host='%';
+> flush privileges
+```
+
+### 管理员设置密码
+
+```sh
+# ./bin/mysqladmin -u root password 'new-password'
+# ./bin/mysqladmin -u root -h iZ2ze3hmvt6cdm95w7xouhZ password 'new-password'
+```
+
+### You can start the MariaDB daemon with:
+
+`cd '.' ; ./bin/mysqld_safe --datadir='/data/mysql'`
