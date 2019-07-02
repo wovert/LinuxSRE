@@ -131,8 +131,6 @@ $ source ~/.bashrc
 
 ### 创建数据库相关目录
 
-> 提前预定MariaDB的安装目录为/usr/local/mysql并且数据目录为/data/mysql，赋予mysql用户权限
-
 ```sh
 # mkdir -pv /data/mysql
 # chown -R mysql:mysql /data/mysql/
@@ -174,85 +172,11 @@ $ source ~/.bashrc
 # yum -y install libaio libaio-devel bison bison-devel zlib-devel openssl openssl-devel ncurses ncurses-devel libcurl-devel libarchive-devel boost boost-devel lsof wget gcc gcc-c++ make cmake perl kernel-headers kernel-devel pcre-devel
 ```
 
-### 下载解压源码包
-
-```sh
-进入下载目录
-# cd /usr/local/src
-
-下载
-# wget https://downloads.mariadb.org/interstitial/mariadb-10.3.16/source/mariadb-10.3.16.tar.gz
-
-解压
-# tar -zxvf mariadb-10.3.16.tar.gz
-```
-
-### 下载安装编译工具
-
-```sh
-[CMake：编译工具]
-# wget https://cmake.org/files/v3.12/cmake-3.12.1.tar.gz
-
-解压
-# tar -zxvf cmake-3.12.1.tar.gz
-
-进入解压后的源码目录编译并安装
-# cd cmake-3.12.1/
-# ./bootstrap
-# gmake
-# make && make install
-# cmake --version
-
-Ncurses：提供功能键定义(快捷键),屏幕绘制以及基于文本终端的图形互动功能的动态库。
-
-下载
-# wget http://ftp.gnu.org/gnu/ncurses/ncurses-6.1.tar.gz
-
-解压
-# tar -zxvf ncurses-6.1.tar.gz
-
-进入解压后的源码目录编译并安装
-# cd ncurses-6.1/
-# ./configure
-# make && make install
-
-
-[Bison：GNU分析器生成器]
-
-下载
-# wget http://ftp.gnu.org/gnu/bison/bison-3.0.5.tar.gz
-
-解压
-# tar -zxvf bison-3.0.5.tar.gz
-
-进入解压后的源码目录编译并安装
-# cd bison-3.0.5/
-# ./configure
-# make && make install
-
-
-[Boost库：一个开源可移植的C++库，是C++标准化进程的开发引擎之一]
-
-下载
-# wget https://dl.bintray.com/boostorg/release/1.68.0/source/boost_1_68_0.tar.gz
-
-
-解压
-# tar -zxvf boost_1_68_0.tar.gz
-
-进入解压后的源码目录编译并安装
-# cd boost_1_68_0/
-# ./bootstrap.sh
-# ./b2 stage --with-iostreams --toolset=gcc link=static runtime-link=shared threading=multi release
-# ./b2 install --prefix=/opt/boost
-```
-
 ### 准备二进制程序
 
 ```sh
-准备二进制程序
-
-默认是放在/usr/local目录下
+# cd /usr/local/src
+# wget https://mirrors.tuna.tsinghua.edu.cn/mariadb//mariadb-10.3.16/bintar-linux-x86_64/mariadb-10.3.16-linux-x86_64.tar.gz
 # tar xvf mariadb-10.3.16-linux-x86_64.tar.gz -C /usr/local  
 # cd /usr/local
 # ln -sv mariadb-10.3.16-linux-x86_64  mysql
