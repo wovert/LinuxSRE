@@ -207,7 +207,7 @@ $ source ~/.bashrc
 
 ```sh
 # cd /usr/local/mysql/
-# scripts/mysql_install_db  --user=mysql --datadir=/data/mysql 
+# ./scripts/mysql_install_db  --user=mysql --datadir=/data/mysql
 # ls /data/mysql
 ```
 
