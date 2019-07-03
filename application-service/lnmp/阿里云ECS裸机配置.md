@@ -165,7 +165,7 @@ $ source ~/.bashrc
   mariadb-libs-5.5.60-1.el7_5.x86_64
 
 卸载
-# rpm -e mariadb-libs-5.5.60-1.el7_5.x86_64 --nodeps`
+# rpm -e mariadb-libs-5.5.60-1.el7_5.x86_64 --nodeps
 ```
 
 ### 安装相关包
