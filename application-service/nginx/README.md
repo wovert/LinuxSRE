@@ -215,18 +215,18 @@ I/O multiplexing: 阻塞在 IO 复用上，而不是阻塞在内核上，而不�
 
 - Nginx 在 epel 源
 
-``` shell
+``` sh
 ~]# yum search nginx
 ~]# vim /etc/yum.repos.d/nginx.repo
 [nginx]
 name=nginx repo
 baseurl=http://nginx.org/packages/OS/OSRELEASE/$basearch/
 gpgcheck=0
-enabled=1`
+enabled=1
 
 ~]# yum -y groupinstall "Development Tools" "Server Platform Development"`
 ~]# yum -y install pcre-devel openssl-devel zlib-devel
-~]# `./configure \
+~]# ./configure \
 --prefix=/usr/local/nginx \
 --sbin-path=/usr/sbin/nginx \
 --conf-path=/etc/nginx/nginx.conf \

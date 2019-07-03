@@ -284,3 +284,41 @@ flush privileges;
 ### You can start the MariaDB daemon with:
 
 `cd '.' ; ./bin/mysqld_safe --datadir='/data/mysql'`
+
+## 码云配置
+
+```sh
+# git config --global user.name "yourusername"
+# git config --global user.email "youremail"
+
+冲突merge使用版本 git config --global merge.tool "kdiff3" (没装kdiff3忽略本行)
+让Git不要管Windows/Unix换行符转换的事
+
+# git config --global core.autocrlf false
+
+避免git gui中的中文乱码
+# git config --global gui.encoding utf-8
+
+避免git status显示的中文名乱码
+# git config --global core.quotepath off
+
+git ssh key pair配置 码云配置 生成 ssh key pair
+# ssh-keygen -t rsa -C "xxxx@xx.com"
+
+# ssh-add ~/.ssh/id_rsa
+如果出现 Could not open a connection to your authentiacation agent 执行 eval `ssh-agent`
+
+# ssh-add ~/.ssh/rsa
+# ssh-add l
+
+查看
+# cat ~/.ssh/id_rsa.pub
+
+将公钥复制出来
+
+gitlib右上角个人资料，进入SSH公钥配置 复制的东西加进去提交
+
+# git remote add origin git@gitee.com:wovert/nuxt-bnhcp.git
+# git push origin master
+# git remote show origin
+```
