@@ -389,3 +389,50 @@ cd /etc/nginx/ && cp nginx.conf{,.bak}
 - 重读配置文件: `# nginx -HUB PID`
 - 关闭服务-PID(主进程号): `# kill -QUIT pid`
 - kill -signal : `# cat /usr/local/nginx/log/nginx.pid`
+
+## redis 安装配置
+
+```sh
+# yum install gcc gcc-c++
+
+# wget http://download.redis.io/releases/redis-5.0.5.tar.gz
+# tar -xzvf redis-5.0.5.tar.gz
+# cd redis-5.0.5 && make
+
+不推荐直接在前台运行Redis，如果用 ctrl+z 将 redis 切换到后台后，此时 redis 将被挂起，不能被连接。所以推荐以下方式运行Redis。不仅可以后台运行，加载自己的配置文件，还可以输入日志到 redis.log 中。
+
+运行命令
+# nohup src/redis-server redis.conf > /home/redis.log 2>&1 &
+
+查看运行的redus：
+
+# ps -ef | grep redis
+
+关闭命令
+# cd redis-5.0.4
+# src/redis-cli shutdown
+
+强制关闭
+# kill -9 id
+
+Redis5 允许远程连接
+
+redis 默认只允许自己的电脑（127.0.0.1）连接。如果想要其他电脑进行远程连接，将 配置文件 redis.conf 中的 bind 127.0.0.1 后添加自己的ip即可。然后重新运行redis服务。
+
+# vim redis.conf
+  bind 127.0.0.1 10.10.10.10 123.123.123.123
+  protected-mode no
+
+Redis5 增加密码
+
+redis 增加密码需要修改 redis.conf 配置文件，将 requirepass 的注释解除掉，在后面加上自己的密码。然后重新运行 redis 服务。
+
+# vim redis.conf
+  requirepass  mypassword
+
+增加密码后连接命令
+# src/redis-cli -a mypassword
+
+增加密码后关闭命令
+# src/redis-cli -a mypassword shutdown
+```
