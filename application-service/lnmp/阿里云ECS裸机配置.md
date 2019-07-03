@@ -107,6 +107,8 @@ $ source ~/.bashrc
 
 设置默认版本
 # nvm alias default v10.16.0
+
+# echo "用户名 ALL=(ALL) NOPSSWD:ALL">> /etc/sudoers
 ```
 
 ## 安装 MariaDB
@@ -322,3 +324,68 @@ gitlib右上角个人资料，进入SSH公钥配置 复制的东西加进去提�
 # git push origin master
 # git remote show origin
 ```
+
+## nginx下载安装
+
+### 安装相关的依赖包
+
+```sh
+yum -y install lrzsz gcc gcc-c++ autoconf automake make
+yum install -y pcre pcre-devel
+yum install -y zlib zlib-devel
+yum install -y openssl openssl-devel
+```
+
+### 下载nginx包
+
+```sh
+wget http://nginx.org/download/nginx-1.16.0.tar.gz
+tar -zxvf nginx-1.16.0.tar.gz
+cd nginx-1.16.0
+```
+
+### 编译安装
+
+```sh
+useradd -r www
+./configure \
+--prefix=/usr/local/nginx \
+--user=www \
+--group=www \
+--conf-path=/etc/nginx/nginx.conf \
+--error-log-path=/var/log/nginx/error.log \
+--http-log-path=/var/log/nginx/access.log \
+--pid-path=/var/run/nginx/nginx.pid \
+--lock-path=/var/lock/nginx.lock \
+--http-client-body-temp-path=/var/tmp/nginx/client \
+--http-proxy-temp-path=/var/tmp/nginx/proxy \
+--http-fastcgi-temp-path=/var/tmp/nginx/fastcgi \
+--http-uwsgi-temp-path=/var/tmp/nginx/uwsgi \
+--http-scgi-temp-path=/var/cache/nginx/scgi \
+--with-http_ssl_module \
+--with-http_stub_status_module \
+--with-http_gzip_static_module \
+--with-http_flv_module \
+--with-http_mp4_module \
+--with-debug
+
+make && make install
+
+cd /etc/nginx/ && cp nginx.conf{,.bak}
+```
+
+### 环境变量配置
+
+```sh
+# vim  /etc/profile.d/nginx.sh
+  export PATH=$PATH:/usr/local/nginx/sbin
+
+# source /etc/profile.d/nginx.sh
+```
+
+### 相关服务
+
+- 启动服务: `# /usr/local/nginx/sbin/nginx`
+- 重读配置文件: `# nginx -HUB PID`
+- 关闭服务-PID(主进程号): `# kill -QUIT pid`
+- kill -signal : `# cat /usr/local/nginx/log/nginx.pid`
