@@ -323,6 +323,9 @@ gitlib右上角个人资料，进入SSH公钥配置 复制的东西加进去提�
 # git remote add origin git@gitee.com:wovert/nuxt-bnhcp.git
 # git push origin master
 # git remote show origin
+
+永久保存密码
+# git config --global credential.helper store
 ```
 
 ## nginx下载安装
