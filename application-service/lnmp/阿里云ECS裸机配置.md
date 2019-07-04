@@ -439,3 +439,38 @@ redis 增加密码需要修改 redis.conf 配置文件，将 requirepass 的注�
 增加密码后关闭命令
 # src/redis-cli -a mypassword shutdown
 ```
+
+### NERDTree
+
+```sh
+# wget http://www.vim.org/scripts/download_script.php?src_id=17123 -O nerdtree.zip
+# unzip nerdtree.zip
+# mkdir -p ~/.vim/{plugin,doc}
+# cp plugin/NERD_tree.vim ~/.vim/plugin/
+# cp doc/NERD_tree.txt ~/.vim/doc/
+
+安装好后，命令行中输入vim，打开vim后，在vim中输入`:NERDTree`，你就可以看到NERDTree的效果了。
+
+使用说明
+  1、在linux命令行界面，输入vim
+  2、输入  :NERDTree ，回车
+  3、进入当前目录的树形界面，通过小键盘上下键，能移动选中的目录或文件
+  4、目录前面有+或者>号，摁Enter会展开目录，文件前面是-号，摁Enter会在右侧窗口展现该文件的内容，光标自动移到右侧文件窗口。
+  5、ctr+w+h  光标移到左侧树形目录，ctrl+w+l 光标移到右侧文件显示窗口。多次摁 ctrl+w，光标自动在左右侧窗口切换
+  6、光标focus左侧树形窗口，摁? 弹出NERDTree的帮助，再次摁？关闭帮助显示
+  7、输入:q回车，关闭光标所在窗口
+
+进阶用法
+  o 打开关闭文件或者目录
+  t 在标签页中打开
+  T 在后台标签页中打开
+  ! 执行此文件
+  p 到上层目录
+  P 到根目录
+  K 到第一个节点
+  J 到最后一个节点
+  u 打开上层目录
+  m 显示文件系统菜单（添加、删除、移动操作）
+ ? 帮助
+ q 关闭
+```
