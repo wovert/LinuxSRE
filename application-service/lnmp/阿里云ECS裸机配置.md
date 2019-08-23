@@ -474,3 +474,61 @@ redis 增加密码需要修改 redis.conf 配置文件，将 requirepass 的注�
  ? 帮助
  q 关闭
 ```
+
+## php7 安装
+
+``` sh
+# cd /usr/local/src && wget http://cn2.php.net/distributions/php-7.3.8.tar.gz
+# tar -xzxvf php-7.2.3.tar.gz
+# yum install gcc
+# yum install libxml2
+# yum install libxml2-devel
+
+configure: error: Cannot find OpenSSL
+# yum install openssl openssl-devel
+
+configure: error: Please reinstall the BZip2 distribution
+# yum install bzip2-devel.x86_64 -y
+# wget http://ftp.gnu.org/gnu/bison/bison-2.4.1.tar.gz
+# tar -zxvf bison-2.4.1.tar.gz
+# cd bison-2.4.1/
+
+# ./configure
+
+configure: error: GNU M4 1.4 is required
+# yum install m4
+
+# make clean && make install
+
+
+安装完成后切入php目录
+
+继续配置checking发现错误：configure: WARNING: unrecognized options: --with-mcrypt, --enable-gd-native-ttf
+
+ 这个是由于php7.2是 17年11月份发行的，在php7.1时，
+官方就开始建议用openssl_*系列函数代替Mcrypt_*系列的函数。
+
+所以我们删除这两项即可。
+
+然后继续发现错误:configure: WARNING: You will need re2c 0.13.4 or later if you want to regenerate PHP parsers.
+
+# wget https://sourceforge.net/projects/re2c/files/0.16/re2c-0.16.tar.gz
+# tar zxf re2c-0.16.tar.gz && cd re2c-0.16
+# ./configure
+# make && make install
+
+
+如果出现错误：configure: error: C++ compiler cannot create executables
+就是gcc扩展没装全。
+# yum install gcc gcc-c++ gcc-g77
+
+当你进行 make时候发现：No targets specified and no makefile found.  Stop.
+
+拿到安装包
+# wget http://ftp.gnu.org/pub/gnu/ncurses/ncurses-5.6.tar.gz
+# tar zxvf ncurses-5.6.tar.gz
+# ./configure -prefix=/usr/src/php-7.3.8
+# make && make install
+
+# cd /usr/local/src/php7.3.8 && make && make install。
+```
