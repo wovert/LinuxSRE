@@ -480,37 +480,105 @@ redis 增加密码需要修改 redis.conf 配置文件，将 requirepass 的注�
 ``` sh
 # cd /usr/local/src && wget http://cn2.php.net/distributions/php-7.3.8.tar.gz
 # tar -xzxvf php-7.2.3.tar.gz
-# yum install gcc
-# yum install libxml2
-# yum install libxml2-devel
 
-configure: error: Cannot find OpenSSL
-# yum install openssl openssl-devel
+# yum install -y gcc gcc-c++  make zlib zlib-devel pcre pcre-devel  libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel libxml2 libxml2-devel glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel ncurses ncurses-devel curl curl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel openssl openssl-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers libXpm-devel postgresql-devel  libxslt-devel  icu libicu libicu-devel
+
+./configure \
+--prefix=/usr/local/php \
+--with-config-file-path=/usr/local/php \
+
+--enable-ftp \
+--enable-zip \
+--enable-fpm \
+--enable-xml \
+--enable-cli \
+--enable-soap \
+--enable-exif \
+--enable-pcntl \
+--enable-bcmath \
+--enable-sockets \
+--enable-opcache \
+--enable-sysvsem \
+--enable-sysvshm \
+--enable-mbregex \
+--enable-mbstring \
+--enable-calendar \
+--with-gd \
+--with-xsl \
+--with-bz2 \
+--with-curl \
+--with-pear \
+--with-zlib \
+--with-iconv \
+--with-pgsql \
+--with-mhash \
+--with-xmlrpc \
+--with-openssl \
+--with-gettext \
+--with-zlib-dir \
+--with-pdo-pgsql \
+--with-pcre-regex \
+--with-xpm-dir=/usr \
+--with-png-dir=/usr \
+--with-fpm-user=www \
+--with-fpm-group=www \
+--with-mysql=mysqlnd \
+--with-jpeg-dir=/usr \
+--with-mysqli=mysqlnd \
+--with-libxml-dir=/usr \
+--with-pdo-mysql=mysqlnd \
+--with-freetype-dir=/usr \
+
+--with-freetype-dir=/usr/lib/ \
+--with-libdir=/lib/x86_64-linux-gnu/ \
+--disable-rpath \
+--enable-inline-optimization
+
+
+configure: error: Please reinstall the libzip distribution
+1. 移除旧的 libzip：
+# yum remove libzip
+
+2. 安装新版本
+# curl -O https://libzip.org/download/libzip-1.5.1.tar.gz
+# tar -zxvf libzip-1.5.1.tar.gz
+# cd libzip-1.5.1
+# mkdir build
+# cd build
+# cmake ..
+# make && make install
+
+注意：如果提示cmake版本过低，需新版本，则需要重新安装cmake
+注意：低版本的可能不需要cmake，例如1.2版本：
+
+# curl -O https://nih.at/libzip/libzip-1.2.0.tar.gz
+# tar -zxvf libzip-1.2.0.tar.gz
+# cd libzip-1.2.0
+# ./configure
+# make && make install
+
 
 configure: error: Please reinstall the BZip2 distribution
 # yum install bzip2-devel.x86_64 -y
 # wget http://ftp.gnu.org/gnu/bison/bison-2.4.1.tar.gz
 # tar -zxvf bison-2.4.1.tar.gz
 # cd bison-2.4.1/
-
 # ./configure
 
 configure: error: GNU M4 1.4 is required
 # yum install m4
-
 # make clean && make install
 
 
 安装完成后切入php目录
-
 继续配置checking发现错误：configure: WARNING: unrecognized options: --with-mcrypt, --enable-gd-native-ttf
 
- 这个是由于php7.2是 17年11月份发行的，在php7.1时，
+这个是由于php7.2是 17年11月份发行的，在php7.1时，
 官方就开始建议用openssl_*系列函数代替Mcrypt_*系列的函数。
 
-所以我们删除这两项即可。
+所以我们删除这两项即可
 
-然后继续发现错误:configure: WARNING: You will need re2c 0.13.4 or later if you want to regenerate PHP parsers.
+configure: WARNING: You will need re2c 0.13.4 or later if you want to regenerate PHP parsers.
 
 # wget https://sourceforge.net/projects/re2c/files/0.16/re2c-0.16.tar.gz
 # tar zxf re2c-0.16.tar.gz && cd re2c-0.16
@@ -518,7 +586,7 @@ configure: error: GNU M4 1.4 is required
 # make && make install
 
 
-如果出现错误：configure: error: C++ compiler cannot create executables
+configure: error: C++ compiler cannot create executables
 就是gcc扩展没装全。
 # yum install gcc gcc-c++ gcc-g77
 
@@ -531,4 +599,77 @@ configure: error: GNU M4 1.4 is required
 # make && make install
 
 # cd /usr/local/src/php7.3.8 && make && make install。
+```
+
+### php配置
+
+安装完成后，我们要把源码包中的配置文件复制到PHP安装目录下，源码包中有两个配置  php.ini-development  php.ini-production  ，看名字就知道，一个是开发环境，一个是生产环境，我们这里就复制开发环境的
+
+```sh
+# cp php.ini-production /usr/local/php/lib/php.ini
+```
+
+配置PHP-fpm
+
+```sh
+# cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf
+# cp /usr/local/php/etc/php-fpm.d/www.conf.default /usr/local/php/etc/php-fpm.d/www.conf
+# ln -s /usr/local/php/sbin/php-fpm /usr/local/bin
+
+# cd /usr/local/php/etc/php-fpm.d
+# vim www.conf
+[www]
+
+listen = 127.0.0.1:9080
+listen.mode = 0666
+user = www
+group = www
+pm = dynamic
+pm.max_children = 128
+pm.start_servers = 20
+pm.min_spare_servers = 5
+pm.max_spare_servers = 35
+pm.max_requests = 10000
+rlimit_files = 1024
+slowlog = log/$pool.log.slow
+
+# cp /usr/src/php-7.3.8/sapi/fpm/init.d.php-fpm /etc/init.d/php-fpm
+# chkconfig --add php-fpm
+# service php-fpm start
+# chkconfig php-fpm on
+# chmod +x /etc/init.d/php-fpm
+
+systemtl 服务
+# cd php-7.3.8/sapi/fpm
+# cp php-fpm.service /usr/lib/systemd/system/
+# systemctl start php-fpm
+
+设置环境变量
+# vim /etc/profiles.d/php.sh
+  PATH=$PATH:/usr/local/php/bin
+# source /etc/profile
+# php -v
+```
+
+## 升级cmake
+
+`wget https://cmake.org/files/v3.10/cmake-3.10.2-Linux-x86_64.tar.gz`
+
+如果原有cmake环境就是使用cmake的二进制包制作的，那么直接修改环境变量文件即可。如果不熟悉这种方法的同学，可以在下文看到相关操作。
+
+如果原有环境是使用yum等工具安装，那么，我们先卸载已有的cmake，如果原有cmake环境也是使用的：
+
+`yum remove cmake`
+
+这时，你可以发现系统中已经没有cmake命令了，如果还有，可能你的环境cmake相关文件做过一些修改，请仔细排查。
+
+解压下载好的cmake二进制包：
+
+```sh
+# tar zxvf cmake-3.10.2-Linux-x86_64.tar.gz
+# vim /etc/profile.d/cmake.sh
+  export CMAKE_HOME=/opt/cmake-3.10.2-Linux-x86_64
+  export PATH=$PATH:$CMAKE_HOME/bin
+# source /etc/profile
+# cmake -version
 ```
