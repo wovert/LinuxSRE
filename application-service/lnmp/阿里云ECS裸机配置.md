@@ -108,7 +108,7 @@ $ source ~/.bashrc
 设置默认版本
 # nvm alias default v10.16.0
 
-# echo "用户名 ALL=(ALL) NOPSSWD:ALL">> /etc/sudoers
+# echo "用户名 ALL=(ALL) NOPASSWD:ALL">> /etc/sudoers
 ```
 
 ## 安装 MariaDB
@@ -179,7 +179,7 @@ $ source ~/.bashrc
 ```sh
 # cd /usr/local/src
 # wget https://mirrors.tuna.tsinghua.edu.cn/mariadb//mariadb-10.3.16/bintar-linux-x86_64/mariadb-10.3.16-linux-x86_64.tar.gz
-# tar xvf mariadb-10.3.16-linux-x86_64.tar.gz -C /usr/local  
+# tar xvf mariadb-10.3.16-linux-x86_64.tar.gz -C /usr/local
 # cd /usr/local
 # ln -sv mariadb-10.3.16-linux-x86_64  mysql
 # cd /usr/local/mysql
