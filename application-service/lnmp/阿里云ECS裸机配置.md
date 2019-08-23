@@ -29,6 +29,9 @@
 ## Setup系统开发工具
 
 ```sh
+
+# yum -y install lrzsz
+
 安装系统开发工具包
 # yum -y groupinstall "Development Tools" "Server Platform Development"
 
