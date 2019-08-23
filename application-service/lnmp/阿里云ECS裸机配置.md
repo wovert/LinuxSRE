@@ -354,15 +354,16 @@ cd nginx-1.16.0
 
 ```sh
 useradd -r www
+
 ./configure \
 --prefix=/usr/local/nginx \
---user=www \
---group=www \
+--pid-path=/var/run/nginx/nginx.pid \
+--lock-path=/var/lock/nginx.lock \
 --conf-path=/etc/nginx/nginx.conf \
 --error-log-path=/var/log/nginx/error.log \
 --http-log-path=/var/log/nginx/access.log \
---pid-path=/var/run/nginx/nginx.pid \
---lock-path=/var/lock/nginx.lock \
+--user=www \
+--group=www \
 --http-client-body-temp-path=/var/tmp/nginx/client \
 --http-proxy-temp-path=/var/tmp/nginx/proxy \
 --http-fastcgi-temp-path=/var/tmp/nginx/fastcgi \
@@ -372,8 +373,7 @@ useradd -r www
 --with-http_stub_status_module \
 --with-http_gzip_static_module \
 --with-http_flv_module \
---with-http_mp4_module \
---with-debug
+--with-http_mp4_module
 
 make && make install
 
@@ -391,7 +391,7 @@ cd /etc/nginx/ && cp nginx.conf{,.bak}
 
 ### 相关服务
 
-- 启动服务: `# /usr/local/nginx/sbin/nginx`
+- 启动服务: `# cd /usr/local/nginx/sbin && ./nginx`
 - 重读配置文件: `# nginx -HUB PID`
 - 关闭服务-PID(主进程号): `# kill -QUIT pid`
 - kill -signal : `# cat /usr/local/nginx/log/nginx.pid`
