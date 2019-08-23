@@ -486,7 +486,6 @@ redis 增加密码需要修改 redis.conf 配置文件，将 requirepass 的注�
 ./configure \
 --prefix=/usr/local/php \
 --with-config-file-path=/usr/local/php \
-
 --enable-ftp \
 --enable-zip \
 --enable-fpm \
@@ -518,21 +517,26 @@ redis 增加密码需要修改 redis.conf 配置文件，将 requirepass 的注�
 --with-zlib-dir \
 --with-pdo-pgsql \
 --with-pcre-regex \
+--with-freetype-dir \
 --with-xpm-dir=/usr \
 --with-png-dir=/usr \
 --with-fpm-user=www \
 --with-fpm-group=www \
---with-mysql=mysqlnd \
 --with-jpeg-dir=/usr \
 --with-mysqli=mysqlnd \
 --with-libxml-dir=/usr \
 --with-pdo-mysql=mysqlnd \
---with-freetype-dir=/usr \
-
---with-freetype-dir=/usr/lib/ \
 --with-libdir=/lib/x86_64-linux-gnu/ \
 --disable-rpath \
 --enable-inline-optimization
+
+configure: error: off_t undefined; check your library configuration
+# vim /etc/ld.so.conf
+/usr/local/lib64
+/usr/local/lib
+/usr/lib
+/usr/lib64
+# ldconfig -v
 
 
 configure: error: Please reinstall the libzip distribution
@@ -557,7 +561,6 @@ configure: error: Please reinstall the libzip distribution
 # ./configure
 # make && make install
 
-
 configure: error: Please reinstall the BZip2 distribution
 # yum install bzip2-devel.x86_64 -y
 # wget http://ftp.gnu.org/gnu/bison/bison-2.4.1.tar.gz
@@ -573,10 +576,7 @@ configure: error: GNU M4 1.4 is required
 安装完成后切入php目录
 继续配置checking发现错误：configure: WARNING: unrecognized options: --with-mcrypt, --enable-gd-native-ttf
 
-这个是由于php7.2是 17年11月份发行的，在php7.1时，
-官方就开始建议用openssl_*系列函数代替Mcrypt_*系列的函数。
-
-所以我们删除这两项即可
+这个是由于php7.2是 17年11月份发行的，在php7.1时，官方就开始建议用openssl_*系列函数代替Mcrypt_*系列的函数。所以我们删除这两项即可。
 
 configure: WARNING: You will need re2c 0.13.4 or later if you want to regenerate PHP parsers.
 
@@ -590,9 +590,7 @@ configure: error: C++ compiler cannot create executables
 就是gcc扩展没装全。
 # yum install gcc gcc-c++ gcc-g77
 
-当你进行 make时候发现：No targets specified and no makefile found.  Stop.
-
-拿到安装包
+No targets specified and no makefile found.  Stop.
 # wget http://ftp.gnu.org/pub/gnu/ncurses/ncurses-5.6.tar.gz
 # tar zxvf ncurses-5.6.tar.gz
 # ./configure -prefix=/usr/src/php-7.3.8
@@ -601,12 +599,16 @@ configure: error: C++ compiler cannot create executables
 # cd /usr/local/src/php7.3.8 && make && make install。
 ```
 
-### php配置
+### php相关配置
 
-安装完成后，我们要把源码包中的配置文件复制到PHP安装目录下，源码包中有两个配置  php.ini-development  php.ini-production  ，看名字就知道，一个是开发环境，一个是生产环境，我们这里就复制开发环境的
+安装完成后，我们要把源码包中的配置文件复制到PHP安装目录下，源码包中有两个配置  php.ini-development  php.ini-production
+
+php配置文件
 
 ```sh
 # cp php.ini-production /usr/local/php/lib/php.ini
+# vim /usr/local/php/lib/php.ini
+  display_errors=On
 ```
 
 配置PHP-fpm
@@ -616,8 +618,7 @@ configure: error: C++ compiler cannot create executables
 # cp /usr/local/php/etc/php-fpm.d/www.conf.default /usr/local/php/etc/php-fpm.d/www.conf
 # ln -s /usr/local/php/sbin/php-fpm /usr/local/bin
 
-# cd /usr/local/php/etc/php-fpm.d
-# vim www.conf
+# vim /usr/local/php/etc/php-fpm.d/www.conf
 [www]
 
 listen = 127.0.0.1:9080
@@ -633,37 +634,45 @@ pm.max_requests = 10000
 rlimit_files = 1024
 slowlog = log/$pool.log.slow
 
+# vim /usr/local/php/etc/php-fpm.conf
+  pid = run/php-fpm.pid
+
 # cp /usr/src/php-7.3.8/sapi/fpm/init.d.php-fpm /etc/init.d/php-fpm
 # chkconfig --add php-fpm
 # service php-fpm start
 # chkconfig php-fpm on
 # chmod +x /etc/init.d/php-fpm
+```
 
 systemtl 服务
+
+```sh
 # cd php-7.3.8/sapi/fpm
 # cp php-fpm.service /usr/lib/systemd/system/
 # systemctl start php-fpm
+```
 
 设置环境变量
-# vim /etc/profiles.d/php.sh
+
+```sh
+# vim /etc/profile.d/php.sh
   PATH=$PATH:/usr/local/php/bin
 # source /etc/profile
 # php -v
+```
+
+查看是否已经成功启动PHP
+
+```sh
+# ps -ef | grep php 或者 ps -A | grep -i php
 ```
 
 ## 升级cmake
 
 `wget https://cmake.org/files/v3.10/cmake-3.10.2-Linux-x86_64.tar.gz`
 
-如果原有cmake环境就是使用cmake的二进制包制作的，那么直接修改环境变量文件即可。如果不熟悉这种方法的同学，可以在下文看到相关操作。
-
-如果原有环境是使用yum等工具安装，那么，我们先卸载已有的cmake，如果原有cmake环境也是使用的：
-
-`yum remove cmake`
-
-这时，你可以发现系统中已经没有cmake命令了，如果还有，可能你的环境cmake相关文件做过一些修改，请仔细排查。
-
-解压下载好的cmake二进制包：
+- 如果原有cmake环境就是使用cmake的二进制包制作的，那么直接修改环境变量文件即可
+- 如果原有环境是使用yum等工具安装，那么，我们先卸载已有的cmake：`yum remove cmake`
 
 ```sh
 # tar zxvf cmake-3.10.2-Linux-x86_64.tar.gz
@@ -673,3 +682,37 @@ systemtl 服务
 # source /etc/profile
 # cmake -version
 ```
+
+## Linux PHP7 的 openssl扩展安装
+
+Linux环境下使用PHPmailer发送邮件时，出现如下错误：
+
+SMTP -> ERROR: Failed to connect to server: Unable to find the socket transport "ssl" - did you forget to enable it when you configured PHP? (32690)
+出现这个问题的原因是当初编译安装PHP缺少了ssl库。
+
+可以重新再次编译PHP，加上--enable-openssl参数即可。
+
+但是如果只为了安装这一个扩展就去重新编译，未免有点麻烦，其实可以简单一点，只要安装openssl.so扩展就可以了。
+
+1. 找到之前编译安装PHP的安装包，或者从php的官网下载php7（本例使用php7，其他版本的PHP类似）
+2. 解压并进入文件夹 `cd php7.0/ext/openssl`
+3. 运行 phpize: `/usr/local/php/bin/phpize`
+
+备注，如果出现如下错误：Cannot find config.m4.
+
+Make sure that you run '/usr/local/php/bin/phpize' in the top level source directory of the module
+
+解决办法: `cp ./config0.m4 ./config.m4`
+
+4. 编译和安装
+
+```sh
+# ./configure --with-openssl --with-php-config=/usr/local/php/bin/php-config
+# make && make install
+```
+
+5. 然后进入最后提示的目录将 openssl.so 复制到PHP的扩展目录下: `cp openssl.so /usr/local/php/include/php/ext`
+
+6. 找到php.ini，在最后面添加如下内容：`extension=openssl.so`
+
+7. 重启 php-fpm 和 nginx/apache，查看`phpinfo()`
