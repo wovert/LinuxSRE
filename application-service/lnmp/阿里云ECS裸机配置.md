@@ -218,6 +218,12 @@ $ source ~/.bashrc
   default-character-set = utf8mb4
 ```
 
+```sql
+mysql> alter database db_herbal_medicine charset=utf8mb4 collate=utf8mb4_general_ci;
+mysql> show variables like'character%';
+mysql> show variables like'collation%';
+```
+
 ### 创建数据库文件
 
 ```sh
