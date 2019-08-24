@@ -627,6 +627,8 @@ AUTH命令跟其他redis命令一样，是没有加密的；阻止不了攻击�
 --disable-rpath \
 --enable-inline-optimization
 
+# php --ini
+
 configure: error: off_t undefined; check your library configuration
 # vim /etc/ld.so.conf
 /usr/local/lib64
@@ -910,3 +912,37 @@ server {
 使用该配置时，你还应该在 `php.ini` 文件中设置 `cgi.fix_pathinfo=0` ， 能避免掉很多不必要的 stat() 系统调用。
 
 还要注意当运行一个 HTTPS 服务器时，需要添加 `fastcgi_param HTTPS on;` 一行， 这样 Yii 才能正确地判断连接是否安全
+
+
+## 安装telnet
+
+```sh
+# rpm -qa | grep telnet
+# yum -y install telnet*
+# rpm -qa | grep xinetd
+# yum -y install xinetd
+# vim /etc/xinetd.d/telnet
+service telnet
+{  
+    flags = REUSE  
+    socket_type = stream  
+    wait = no  
+    user = root  
+    server =/usr/sbin/in.telnetd  
+    log_on_failure += USERID  
+    disable = no
+}
+# systemctl restart xinetd.service
+# ps -ef | grep xinetd
+
+将xinetd服务加入开机自启动
+# systemctl enable xinetd.service
+
+将telnet服务加入开机自启动
+# systemctl enable telnet.socket
+# telnet 127.0.0.1 9501
+
+关闭telnet
+Ctrl+]
+quit
+```
