@@ -206,6 +206,16 @@ $ source ~/.bashrc
 
   # 为了加速访问速度，忽略名字的反向解析
   skip_name_resolve = on  
+
+  character-set-server = utf8mb4  
+  collation-server = utf8mb4_unicode_ci  
+  init_connect='SET NAMES utf8mb4'  
+  skip-character-set-client-handshake = true  
+  [client]  
+  default-character-set=utf8mb4  
+  
+  [mysql]  
+  default-character-set = utf8mb4
 ```
 
 ### 创建数据库文件
