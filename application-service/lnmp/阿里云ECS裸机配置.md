@@ -419,32 +419,83 @@ cd /etc/nginx/ && cp nginx.conf{,.bak}
 
 # wget http://download.redis.io/releases/redis-5.0.5.tar.gz
 # tar -xzvf redis-5.0.5.tar.gz
-# cd redis-5.0.5 && make
+# cd redis-5.0.5
+# make prefix=/usr/local/redis install
+# mkdir /usr/local/redis/ect
+# cp redis.conf ../reids/etc/
+
 
 不推荐直接在前台运行Redis，如果用 ctrl+z 将 redis 切换到后台后，此时 redis 将被挂起，不能被连接。所以推荐以下方式运行Redis。不仅可以后台运行，加载自己的配置文件，还可以输入日志到 redis.log 中。
 
-运行命令
-# nohup src/redis-server redis.conf > /home/redis.log 2>&1 &
+
+
+创建用户
+# useradd -r -s /sbin/nologin redis
+
+更改目录属主属组
+# chown -R redis.redis /usr/local/redis/
+
+创建文件目录
+# mkdir /apps/redis/{etc,run,data,logs}
+
+创建命令软链接
+# ln -sv /apps/redis/bin/redis-* /usr/sbin/
+
+添加systemctl服务
+# vim /lib/systemd/system/redis.service
+[Unit]
+Description=Redis
+After=network.target
+
+[Service]
+PIDFile=/var/run/redis_6379.pid
+ExecStart=/usr/local/redis/bin/redis-server /usr/local/redis/etc/redis.conf --supervised systemd
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s QUIT $MAINPID
+Type=notify
+User=redis
+Group=redis
+RuntimeDirectory=redis
+RuntimeDirectoryMode=0755
+
+[Install]
+WantedBy=multi-user.target
+
+
+创建软连接#系统初始化时自动启动服务
+# ln -s /lib/systemd/system/redis.service /etc/systemd/system/multi-user.target.wants/redis.service
+
+查看软连接是否成功
+# ll /etc/systemd/system/multi-user.target.wants/
+
+重载系统服务
+# systemctl daemon-reload
+
+启动redis
+# systemctl start redis
+# systemctl status redis
+
+设置开机启动
+# systemctl enable redis
+```
 
 查看运行的redus：
 
-# ps -ef | grep redis
-
-关闭命令
-# cd redis-5.0.4
-# src/redis-cli shutdown
+`# ps -ef | grep redis`
 
 强制关闭
-# kill -9 id
+
+`# kill -9 pid`
 
 Redis5 允许远程连接
 
 redis 默认只允许自己的电脑（127.0.0.1）连接。如果想要其他电脑进行远程连接，将 配置文件 redis.conf 中的 bind 127.0.0.1 后添加自己的ip即可。然后重新运行redis服务。
 
+```sh
 # vim redis.conf
   bind 127.0.0.1 10.10.10.10 123.123.123.123
   protected-mode no
-
+```
 Redis5 增加密码
 
 redis 增加密码需要修改 redis.conf 配置文件，将 requirepass 的注释解除掉，在后面加上自己的密码。然后重新运行 redis 服务。
@@ -458,6 +509,8 @@ redis 增加密码需要修改 redis.conf 配置文件，将 requirepass 的注�
 增加密码后关闭命令
 # src/redis-cli -a mypassword shutdown
 ```
+
+
 
 ### NERDTree
 
@@ -504,7 +557,7 @@ redis 增加密码需要修改 redis.conf 配置文件，将 requirepass 的注�
 
 ./configure \
 --prefix=/usr/local/php \
---with-config-file-path=/usr/local/php \
+--with-config-file-path=/usr/local/php/etc/ \
 --enable-ftp \
 --enable-zip \
 --enable-fpm \
@@ -625,8 +678,8 @@ No targets specified and no makefile found.  Stop.
 php配置文件
 
 ```sh
-# cp php.ini-production /usr/local/php/lib/php.ini
-# vim /usr/local/php/lib/php.ini
+# cp php.ini-production /usr/local/php/etc/php.ini
+# vim /usr/local/php/etc/php.ini
   display_errors=On
 ```
 
@@ -739,16 +792,20 @@ Make sure that you run '/usr/local/php/bin/phpize' in the top level source direc
 ### 安装 swoole擴展
 
 ```sh
-cd swoole-src && \
-phpize && \
-./configure \
+# cd /usr/local/src
+# wget https://github.com/swoole/swoole-src/archive/master.tar.gz
+# cd swoole-src && \
+# phpize && \
+# ./configure \
 --enable-coroutine \
 --enable-openssl  \
 --enable-http2  \
 --enable-async-redis \
 --enable-sockets \
 --enable-mysqlnd && \
-make clean && make && sudo make install
+# make clean && make && make install
+# vim /usr/local/php/lib/php.ini
+  extension=swoole.so
 ```
 
 ## Yii框架部署
