@@ -496,21 +496,46 @@ redis 默认只允许自己的电脑（127.0.0.1）连接。如果想要其他�
   bind 127.0.0.1 10.10.10.10 123.123.123.123
   protected-mode no
 ```
+
 Redis5 增加密码
 
 redis 增加密码需要修改 redis.conf 配置文件，将 requirepass 的注释解除掉，在后面加上自己的密码。然后重新运行 redis 服务。
 
-# vim redis.conf
-  requirepass  mypassword
+1. 初始化Redis密码：requirepass test123（需重启Redis才能生效）redis的查询速度是非常快的，外部用户一秒内可以尝试多大150K个密码；所以密码要尽量长（对于DBA 没有必要必须记住密码）；
 
-增加密码后连接命令
-# src/redis-cli -a mypassword
+2. 不重启Redis设置密码：`redis 127.0.0.1:6379> config set requirepass test123`
 
-增加密码后关闭命令
-# src/redis-cli -a mypassword shutdown
+查询密码：
+```sh
+redis 127.0.0.1:6379> config get requirepass
+(error) ERR operation not permitted
+
+密码验证：
+
+redis 127.0.0.1:6379> auth test123
+OK
+
+再次查询：
+
+redis 127.0.0.1:6379> config get requirepass
+1) "requirepass"
+2) "test123"
 ```
 
+如果配置文件中没添加密码 那么redis重启后，密码失效
 
+在登录的时候的时候输入密码：`redis-cli -p 6379 -a test123`
+
+先登陆后验证：
+
+```sh
+# redis-cli -p 6379`
+redis 127.0.0.1:6379> auth test123
+```
+
+AUTH命令跟其他redis命令一样，是没有加密的；阻止不了攻击者在网络上窃取你的密码；
+
+认证层的目标是提供多一层的保护。如果防火墙或者用来保护redis的系统防御外部攻击失败的话，外部用户如果没有通过密码认证还是无法访问redis的
 
 ### NERDTree
 
