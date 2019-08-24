@@ -736,6 +736,21 @@ Make sure that you run '/usr/local/php/bin/phpize' in the top level source direc
 
 7. 重启 php-fpm 和 nginx/apache，查看`phpinfo()`
 
+### 安装 swoole擴展
+
+```sh
+cd swoole-src && \
+phpize && \
+./configure \
+--enable-coroutine \
+--enable-openssl  \
+--enable-http2  \
+--enable-async-redis \
+--enable-sockets \
+--enable-mysqlnd && \
+make clean && make && sudo make install
+```
+
 ## Yii框架部署
 
 ### 使用 Composer 安装 Yii
