@@ -833,6 +833,12 @@ Make sure that you run '/usr/local/php/bin/phpize' in the top level source direc
 # make clean && make && make install
 # vim /usr/local/php/lib/php.ini
   extension=swoole.so
+  
+是否安装成功
+# php -m
+
+是否支持异步 redis
+# php --ri swoole
 ```
 
 ## Yii框架部署
