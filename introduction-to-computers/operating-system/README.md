@@ -737,7 +737,7 @@ Android：Linux kernel + busybox + jvm(java) + android(GUI)
 
 ### Linux 程序包管理器
 
-- Linux内核：
+- Linux内核
   - Kernel+Application
   - GNU/Linux：通常以源码（文本格式）方式提供
   - 自由、灵活
@@ -765,7 +765,7 @@ Android：Linux kernel + busybox + jvm(java) + android(GUI)
     - 安装；卸载；查询；升级；
   - X86-64, CentOS 6.4 32bits, test-1.3.2.el5.x86_64.rpm
 
-- 程序包管理器种类：
+- 程序包管理器种类
   - Redhat: rpm, yum => dnf
   - S.u.S.E: rpm, zypper
   - Debian: deb(.dpkg), apt-get
@@ -775,11 +775,11 @@ Android：Linux kernel + busybox + jvm(java) + android(GUI)
 ## 查看32位于64位
 
 ``` shell
-# uname -a
-# ls -ld /lib64
-# cat /etc/redhat-release 操作系统
-# uname -r 内核版本
-# uname -r 查看系统位数
+uname -a
+ls -ld /lib64
+cat /etc/redhat-release 操作系统
+uname -r 内核版本
+uname -r 查看系统位数
 ```
 
 ## IT 技术岗位
@@ -830,4 +830,3 @@ Android：Linux kernel + busybox + jvm(java) + android(GUI)
 - RH442
 - RH436 集群和存储
 - RHS333
-

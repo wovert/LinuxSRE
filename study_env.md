@@ -29,7 +29,7 @@
   - 动手实践：40%
   - 讲给别人：70%
     - **写博客**：5w1h
-      - 5w: what, why, shen, where, who
+      - 5w: what, why, when, where, who
       - 1h: how
 - 被顶学习
   - 听课：10%

@@ -1,5 +1,54 @@
 # Linux 运维架构-[零壹码博客](https://lingyima.com)
 
+## Linux SRE 行业前景
+
+- 流程化、标准化的工作越来越依赖于信息系统，是各企业发展的必然趋势，信息系统开发和运维也会创造越来越多的工作岗位
+- **机器化、自动化、智能化**是人类科技发展趋势，也越来越要求人们对信息系统有更深入的管控能力
+- Linux系统已经几乎无处不在
+  - **Android** 手机底层的系统
+  - 基于Android 的各种**VR设备**
+  - 各大型互联网公司**IDC主机的操作系统**
+  - 各种**智能设备**，如**智能监控**等
+
+[www.netcraft.com](https://www.netcraft.com)
+
+[www.top500.org](https://www.top500.org)
+
+## Linux 运维工作岗位
+
+- 系统运维工程师
+- 应用运维工程师
+- 运维开发工程师
+- 系统运维架构师
+- 云计算运维工程师
+- 大数据运维工程师
+
+## Linux 知识技能进化路径
+
+- 系统管理/服务管理/脚本管理(系统运维工程师)
+- 系统扩展/系统冗余/数据存储(应用运维工程师、云计算运维工程师、大数据运维工程师)
+- 系统监控/运维工具/性能优化
+- 系统架构(系统运维架构师)
+
+## 站点系统架构演变
+
+- 单机(one box)
+  - httpd -> php module -> php app -> mysql
+  - httpd -> tomcat -> jsp app -> mysql
+- 多机
+  - httpd(server1) -> (fcgi server: php app -> mysql)(server2)
+  - httpd->fcgi server: php app(server1) -> mysql(server2)
+  - httpd(server1)->fcgi server: php app(server2) -> mysql(server3)
+  - 评估、测试、上线
+- 缓存
+  - page cache
+    - httpd
+      - fcgi server: php app
+        - data cache
+        - mysql
+- 大数据系统：商业智能决策
+- 容器：docker
+
 ## [计算机入门](./introduction-to-computers/)
 
 - [计算机概论](./introduction-to-computers/computer-concepts/)
