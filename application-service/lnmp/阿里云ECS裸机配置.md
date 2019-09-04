@@ -420,7 +420,7 @@ cd /etc/nginx/ && cp nginx.conf{,.bak}
 # wget http://download.redis.io/releases/redis-5.0.5.tar.gz
 # tar -xzvf redis-5.0.5.tar.gz
 # cd redis-5.0.5
-# make prefix=/usr/local/redis/ install
+# make && make install PREFIX=/usr/local/redis
 # mkdir /usr/local/redis/etc
 # cp redis.conf /usr/local/redis/etc/
 
