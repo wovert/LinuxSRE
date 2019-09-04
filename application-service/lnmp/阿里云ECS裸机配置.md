@@ -591,6 +591,7 @@ AUTH命令跟其他redis命令一样，是没有加密的；阻止不了攻击�
 --enable-soap \
 --enable-exif \
 --enable-pcntl \
+--enable-posix \
 --enable-bcmath \
 --enable-session \
 --enable-sockets \
