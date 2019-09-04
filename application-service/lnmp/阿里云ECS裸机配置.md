@@ -420,9 +420,9 @@ cd /etc/nginx/ && cp nginx.conf{,.bak}
 # wget http://download.redis.io/releases/redis-5.0.5.tar.gz
 # tar -xzvf redis-5.0.5.tar.gz
 # cd redis-5.0.5
-# make prefix=/usr/local/redis install
-# mkdir /usr/local/redis/ect
-# cp redis.conf ../reids/etc/
+# make prefix=/usr/local/redis/ install
+# mkdir /usr/local/redis/etc
+# cp redis.conf /usr/local/redis/etc/
 
 
 不推荐直接在前台运行Redis，如果用 ctrl+z 将 redis 切换到后台后，此时 redis 将被挂起，不能被连接。所以推荐以下方式运行Redis。不仅可以后台运行，加载自己的配置文件，还可以输入日志到 redis.log 中。
