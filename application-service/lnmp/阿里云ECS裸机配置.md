@@ -592,6 +592,7 @@ AUTH命令跟其他redis命令一样，是没有加密的；阻止不了攻击�
 --enable-exif \
 --enable-pcntl \
 --enable-bcmath \
+--enable-session \
 --enable-sockets \
 --enable-opcache \
 --enable-sysvsem \
@@ -599,6 +600,7 @@ AUTH命令跟其他redis命令一样，是没有加密的；阻止不了攻击�
 --enable-mbregex \
 --enable-mbstring \
 --enable-calendar \
+--enable-tokenizer \
 --with-gd \
 --with-xsl \
 --with-bz2 \
