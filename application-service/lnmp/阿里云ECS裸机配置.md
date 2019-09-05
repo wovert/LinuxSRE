@@ -412,6 +412,45 @@ cd /etc/nginx/ && cp nginx.conf{,.bak}
 - 关闭服务-PID(主进程号): `# kill -QUIT pid`
 - kill -signal : `# cat /usr/local/nginx/log/nginx.pid`
 
+
+### Nginx设置成服务并开机自动启动
+
+在/etc/init.d下创建文件nginx
+
+[root@localhost ~]# vim /etc/init.d/nginx
+其内容参考nginx官方文档
+
+需要注意的配置：
+
+nginx="/usr/local/nginx/sbin/nginx" //修改成nginx执行程序的路径。
+
+NGINX_CONF_FILE="/usr/local/nginx/conf/nginx.conf" //修改成nginx.conf文件的路径。
+保存后设置文件的执行权限
+
+[root@localhost ~]# chmod a+x /etc/init.d/nginx
+至此就可以通过下面指令控制启动停止
+
+```
+/etc/init.d/nginx start
+/etc/init.d/nginx stop
+```
+
+上面的方法完成了用脚本管理nginx服务的功能，但是还是不太方便。
+
+先将nginx服务加入chkconfig管理列表：
+
+[root@localhost ~]# chkconfig --add /etc/init.d/nginx
+加完这个之后，就可以使用service对nginx进行启动，重启等操作了。
+
+```
+service nginx start
+service nginx stop
+service nginx restart
+```
+最后设置开机自动启动
+
+`[root@localhost ~]# chkconfig nginx on`
+
 ## redis 安装配置
 
 ```sh
