@@ -363,3 +363,14 @@ pdbedit [options]
 - IPv4报文首部格式
 - tcp 报文首部格式
 - tcp finite machine
+
+## 错误
+Mar 08 14:07:22 localhost.localdomain smbd[7329]: [2018/03/08 14:07:22.202527,  0] ../lib/util/become_daemon.c:124(daemon_ready)
+Mar 08 14:07:22 localhost.localdomain systemd[1]: Started Samba SMB Daemon.
+Mar 08 14:07:22 localhost.localdomain smbd[7329]:   STATUS=daemon 'smbd' finished starting up and ready to serve connections
+
+`$ getsebool -a | grep samba`
+
+#显示出工具状态，有这一行samba_enable_home_dirs --> off，就是将它on就行了
+
+`$ setsebool -P samba_enable_home_dirs on`
