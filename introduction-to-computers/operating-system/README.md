@@ -138,6 +138,8 @@ FreeBSD
 
 ## GNU
 
+> GNU/Linux 以源码（文本格式）方式提供：自由、灵活
+
 - 源码：编译为二进制格式
 - gcc, glibc, vi, linux
 - Linux 发行版：数百种之多
