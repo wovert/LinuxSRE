@@ -1,5 +1,79 @@
 # shell脚本监控 CPU和内存负载
 
+## 安装linux下面的一个邮件客户端msmtp软件(类似于一个foxmail的工具)
+
+### 1、下载安装：
+http://downloads.sourceforge.net/msmtp/msmtp-1.4.16.tar.bz2?modtime=1217206451&big_mirror=0
+代码如下:
+```
+# tar jxvf msmtp-1.4.16.tar.bz2
+# cd msmtp-1.4.16
+# ./configure --prefix=/usr/local/msmtp
+# make && make install
+```
+### 2、创建msmtp配置文件和日志文件（host为邮件域名，邮件用户名fuquanjun，密码fuquanjun）
+
+```
+# vim /root/.msmtprc
+account default 
+host xxxxx.com 
+from fuquanjun@xxxx.com 
+auth login 
+user fuquanjun 
+password fuquanjun 
+logfile ~/.msmtp.log
+# chmod 600 /root/.msmtprc
+# touch ~/.msmtp.log
+```
+### mutt安装配置：（一般linux下有默认安装mutt）
+
+如果没有安装，则使用yum安装
+
+```sh
+yum -y install mutt
+# vim /root/.muttrc
+set sendmail="/usr/local/msmtp/bin/msmtp" 
+set use_from=yes 
+set realname="moniter" 
+set from=fuquanjun@xxx.com 
+set envelope_from=yes 
+set rfc2047_parameters=yes 
+set charset="utf-8"
+```
+### 邮件发送测试（-s邮件标题，-a表加附件）
+
+`# echo "邮件内容123456" | mutt -s "邮件标题测试邮件" -a /scripts/test.txt fuquanjun@xxxx.com`
+
+出现下面报错信息：
+代码如下:
+
+`msmtp: account default not found: no configuration file available`
+
+发送信件出错，子进程已退出 78 ()。
+
+无法发送此信件。
+
+解决方法：
+
+单独使用msmtp发送测试：/usr/local/msmtp/bin/msmtp -S 发现是配置文件没找到
+
+`msmtp: account default not found: no configuration file available`
+
+查看当前的配置文件路径：/usr/local/msmtp/bin/msmtp -P
+代码如下:
+```
+ignoring system configuration file/work/target/etc/msmtprc: No such file or directory
+ignoring user configuration file /root/.msmtprc: No such file ordirectory
+falling back to default account
+msmtp: account default not found: no configuration file available
+```
+
+故将/usr/local/etc/msmtprc 复制为/root/.msmtprc
+查看一下mutt文件安装目录情况
+代码如下:
+
+`rpm -ql mutt`
+
 ## 监控服务器系统负载情况
 
 ### 用`uptime`命令查看当前负载情况（1分钟，5分钟，15分钟平均负载情况）在苹果公司的Mac电脑上也适用
