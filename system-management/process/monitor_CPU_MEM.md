@@ -3,7 +3,7 @@
 ## 安装linux下面的一个邮件客户端msmtp软件(类似于一个foxmail的工具)
 
 ### 1、下载安装：
-https://sourceforge.net/projects/msmtp/files/msmtp/1.6.6/msmtp-1.6.6.tar.xz/download
+[msmtp-1.6.6](https://sourceforge.net/projects/msmtp/files/msmtp/1.6.6/msmtp-1.6.6.tar.xz)
 代码如下:
 ```
 # tar jxvf msmtp-1.4.16.tar.bz2
