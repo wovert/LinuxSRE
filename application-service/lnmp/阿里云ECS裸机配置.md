@@ -994,3 +994,18 @@ service telnet
 Ctrl+]
 quit
 ```
+
+## centos 7 时间与网络同步
+
+1.安装ntpdate工具
+`sudo yum -y install ntp ntpdate`
+
+2.设置系统时间与网络时间同步
+`sudo ntpdate cn.pool.ntp.org`
+
+3.将系统时间写入硬件时间
+`sudo hwclock --systohc`
+
+4.查看系统时间
+`timedatectl`
+
