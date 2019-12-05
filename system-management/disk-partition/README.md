@@ -1,17 +1,3 @@
-**系统管理**
-
-- 磁盘分区及文件系统管理
-- RAID
-- LVM
-- 网络属性管理
-- 程序包管理
-- 进程管理
-- 内核管理
-- 系统启动流程
-- 定制、编译内核、busybox
-- 系统安装：kickstart
-- shell脚本编程
-
 # 磁盘分区及文件系统管理
 
 ## 磁盘接口类型
@@ -43,14 +29,14 @@
 
 > IOPS (Input/Output Operations Per Second)，即每秒进行读写（I/O）操作的次数，多用于数据库等场合，衡量随机访问的性能。存储端的IOPS性能和主机端的IO是不同的，IOPS是指存储每秒可接受多少次主机发出的访问，主机的一次IO需要多次访问存储才可以完成。例如，主机写入一个最小的数据块，也要经过“发送写入请求、写入数据、收到写入确认”等三个步骤，也就是3个存储端访问
 
-## IOPS理论值
+### IOPS理论值
 
 - IDE: 100
 - SCSI: 150
 - SATA: 100
 - SAS: 150-200
 
-## 硬盘结构
+### 硬盘结构
 
 - 机械硬盘：电子设备
 - 马达带动的轴上多个盘片，盘片划分成等同的同心圆，即磁道track
@@ -62,12 +48,12 @@
 - 机械臂
 - 磁头悬浮在盘面上
 
-## 读取数据：
+### 读取数据：
 
 1. 挪动磁头固定到磁道上
 2. 等待数据转过来
 
-## 平均寻到时间
+### 平均寻到时间
 
 1. 磁头挪动时间
 2. 盘片转速
@@ -76,7 +62,7 @@
 - 7200rpm, 10000rpm, 15000rpm(SCSI) PC
 - 离心机：30000rpm/m
 
-## 固态硬盘：多个并行的USB盘，电气设备
+### 固态硬盘：多个并行的USB盘，电气设备
 
 - IOPS: 400
 - PIC-E：100000
@@ -86,7 +72,7 @@
 - 块(block)：随机访问，数据交换单位是“块”
 - 字符(character)：线性访问，数据交换单位是“字符”
 
-## 设备文件：FHS
+### 设备文件：FHS
 
 - 设备文件的作用：
   - 关联至设备驱动程序（内核中的程序文件）；
@@ -95,7 +81,7 @@
   - major：主设备号，区分**设备类型**；用于标明设备所需要的驱动程序
   - minor：次设备号，区分**同种类型下的不同的设备**;是特定设备的访问入口
 
-## mknod 命令
+### mknod 命令
 
 > make block or charactoer special files
 
@@ -120,12 +106,12 @@
 
 ## 磁盘命令
 
-- IDE: /dev/hd[a-z]
-- SCSI,SATA,SAS,USB: /dev/sd[a-z]
+- IDE: `/dev/hd[a-z]`
+- SCSI,SATA,SAS,USB: `/dev/sd[a-z]`
 - 分区：
-  - /dev/sda#
-  - /dev/sda1,...
-- 注意：CentOS 6和7统统将硬盘设备文件标识为/dev/sd[a-z]#
+  - `/dev/sda#`
+  - `/dev/sda1,...`
+- 注意：CentOS 6和7统统将硬盘设备文件标识为`/dev/sd[a-z]#`
 - 引用设备的方式：
   - 设备文件名
   - 卷标
@@ -148,7 +134,7 @@
 
 - 课外作业：GTP是什么，怎么使用？
 
-## fdisk
+### fdisk
 
 > manipulate disk partion table
 
@@ -170,7 +156,7 @@
 - 所有的操作均在内存中完成，没有直接同步到磁盘；
 - 直到使用w命令保存至磁盘上；
 
-## 常用命令
+### 常用命令
 
 - n: add a new partition
   - p(主分区) or e(扩展分区) or l(逻辑分区)
@@ -313,7 +299,7 @@ message 0x2930239
 - 符号链接文件：存储数据指针的空间当中存储的是真实文件的访问路径
 - 设备文件：存储数据指针的空间当中存储的是设备号（major,minor）
 
-## 文件系统管理工具
+### 文件系统管理工具
 
 - 创建文件系统：`mkfs -t, mkfs.ext2, mke2fs -t`
 - 检测及修复文件系统：`fsck,fsck.ext2,fsc.ext3....`
@@ -337,7 +323,7 @@ message 0x2930239
 
 ### 调整文件系统特性
 
-- tune2fs
+- `tune2fs`
 
 ## 内核及文件系统的组成部分
 
@@ -438,7 +424,7 @@ message 0x2930239
 
 - `tune2fs [OPTIONS] device`
 
-``` options
+```
 -l: 查看超级块信息
   FileSystem magic number: 文件系统类型标识
   Filesystem state: clean(文件没有损坏状态) dirty(数据处理时断电)
@@ -467,14 +453,14 @@ message 0x2930239
 - e2fsck - check a Linux ext2/ext3/ext4 file system
 - `e2fsck [OPTIONS] device`
 
-``` options
+```
 -y：对所有问题自动回答为yes
 -f：即使文件系统处理clean状态，也要进行强制进行检查
 ```
 
 - `fsck`：check repare a Linux file system
 
-``` options
+```
 -t fstype：指明文件系统类型
   fsck -t ext4 = fsck.ext4
 -a：无需交互自动修复所有操作

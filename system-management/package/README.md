@@ -167,7 +167,7 @@
 
 #### rpm命令
 
-``` 常用命令
+```
 rpm [OPTIONS] [PACAGE_FILE]
 安装：-i, --install
 升级：-U,--update, -F, --freshen
@@ -179,7 +179,7 @@ rpm [OPTIONS] [PACAGE_FILE]
 
 #### 安装：-i, --install
 
-``` 安装命令
+```
 rpm {-i|--install} {install-options} PACKAGE_FILE
 rpm -ivh PACKAGE_FILE
 
@@ -205,7 +205,7 @@ postuninstall：卸载过程完整之后运行的脚本：%postun，--nopostun
 
 #### 升级：-U,--update, -F,--freshen
 
-``` 升级命令
+```
 rpm {-U|--upgrade} {options} PACKAGE_FILE...
 rpm {-F|--freshen} {options} PACKAGE_FILE...
 -U：升级或安装
@@ -227,7 +227,7 @@ rpm -Fvh PACKAGE_FILE...
 
 #### 卸载：-e,--erase
 
-``` 卸载命令
+```
 rpm {-e|--erase} {options} PACKAGE_NAME...
 --allmatches: 卸载所有匹配指定名称的程序包的各版本；
 --nodeps: 忽略依赖关系
@@ -236,7 +236,7 @@ rpm {-e|--erase} {options} PACKAGE_NAME...
 
 ### 查询：-q, --query
 
-``` 查询命令
+```
 rpm {-q|--query} {select-options} {query-options} PACKAGE_NAME
 - {select-options}
 
@@ -246,7 +246,7 @@ PACKAGE_NAME: 查询指定的程序包是否已经安装及其版本
 -p,--package PACKAGE_FILE：未安装的程序包执行查询操作
 ```
 
-``` 实例
+```
 rpm -qpl zsh-5.0.2-7.el7_1.2.x86_64.rpm`
 rpm -qpi zsh-5.0.2-7.el7_1.2.x86_64.rpm`
 rpm -qpc zsh-5.0.2-7.el7_1.2.x86_64.rpm`
@@ -264,7 +264,8 @@ rpm -q --scripts zsh-5.0.2-7.el7_1.2.x86_64.rpm`
 --provides：列出指定的程序包提供的CAPABILITY
 ```
 
-``` 项目依赖
+- 项目依赖
+```
 rpm -q --whatprovides bash`
 rpm -q --whatprovides 'config(bash)'`
 -R，--requires：查询指定程序包所依赖关系，依赖关系先解决
@@ -274,7 +275,7 @@ Relocations: 重新定位到新的路径下安装
 
 - 已安装包查询操作
 
-``` 已经安装查询操作选项
+```
 -qi PCK
 -qf FILE
 -qc PCK
@@ -284,7 +285,7 @@ Relocations: 重新定位到新的路径下安装
 
 - 未安装的包查询操作
 
-``` 未安装的包查询选项
+```
 -qpi PACKAGE_FILE
 -qpl PACKAGE_FILE
 -qpc PACKAGE_FILE
@@ -294,7 +295,7 @@ Relocations: 重新定位到新的路径下安装
 
 ### 校验：-V, --Verify
 
-``` 校验选项
+```
 --nodeps
 --nodigest： 校验信息
 --nofiles
@@ -337,13 +338,13 @@ rpm -V zsh
 
 1. 对于CentOS发行版
 
-``` command
+```
 rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
 ```
 
 2. RPM-GPG-KEY-CentOS-7(在光盘里有RPM公钥)
 
-``` RPM公钥
+```
 rpm --import /media/cdrom/RPM-GPG-KEY-CentOS-7
 ```
 
@@ -375,7 +376,7 @@ rpm --import /media/cdrom/RPM-GPG-KEY-CentOS-7
 
 #### 数据库损坏解决方案
 
-``` command
+```
 rpm {--initdb | --rebuilddb}
 
 --initdb：初始化数据库，当前无任何数据库可初始化创建一个新的；当前有时不执行任何操作
@@ -384,7 +385,7 @@ rpm {--initdb | --rebuilddb}
 
 ```
 
-``` shell
+```sh
 # mkdir /tmp/rpm
 # rpm --initdb --dbpath=/tmp/rpm
 # ls /tmp/rpm/
@@ -422,7 +423,7 @@ rpm {--initdb | --rebuilddb}
 
 - `/etc/yum.conf`
 
-``` yum.conf
+```
 cachedir=/var/cache/yum/$basearch/$releasever 缓存目录
 keepcache=0  是否本地保留缓存
 debuglevel=2 调试级别
@@ -436,14 +437,14 @@ bugtracker_url=http://bugs.centos.org/set_project.php?project_id=19&ref=http://b
 distroverpgk=centos-release 发行版号
 ```
 
-``` SOURCE
+```sh
 # whatis yum.conf
 # man 5 yum.conf
 ```
 
 #### 仓库指向的定义
 
-``` SOURCE
+```
 [repositoryID]
 name=Some name for this repository
 baseurl=url://server1/path/to/repository/
@@ -465,7 +466,7 @@ mirrorlist 必须支持plugin
 
 ### 创建 YUM
 
-``` SOURCE
+```
 [base]
 name=Base Repo on 192.168.1.100
 baseurl=http://IP/path/to/ repodata所在目录
@@ -480,20 +481,20 @@ gpgcheck=0
 
 ### yum 命令
 
-``` SOURCE
+```sh
 # yum [opitons] [command] [package ...]
 # yum help [command]
 ```
 
 ### 显示仓库列表
 
-``` command
+```sh
 # yum repolist [all | enabled | disabled]
 ```
 
 ### 显示程序包
 
-``` command
+```sh
 # yum list [all | glob_exp] [glob_exp2]
 # yum list installed [glob_exp1] [...] yum安装的包
 # yum list available [glob_exp1] [...] 可安装的包
@@ -509,56 +510,56 @@ gpgcheck=0
 
 ### 安装程序包
 
-``` command
+```sh
 # yum -y install package[-version] ...
 ```
 
 ### 重新安装
 
-``` command
+```sh
 # yum reinstall package
 ```
 
 ### 查看指定包所依赖胡capabilities：
 
-``` command
+```sh
 # yum deplist package
 ```
 
 ###　降级程序包
 
-``` command
+```sh
 # yum downgrade package
 ```
 
 ### 升级程序包：
 
-``` SOURCE
+```sh
 # yum update package ...
 # yum update-to package ...
 ```
 
 ### 检查可用升级
 
-``` command
+```sh
 # yum check-update
 ```
 
 ### 卸载程序包：
 
-``` command
+```sh
 # yum remove | erase package1...
 ```
 
 ### 查看程序包信息：
 
-``` command
+```sh
 # yum info package1...
 ```
 
 ### 查看指定的特性（可以是某文件）是由哪个程序包所提供：
 
-``` command
+```sh
 # yum provides | whatprovides feature1 ...
 ```
 
@@ -566,15 +567,15 @@ gpgcheck=0
 
 ### 清理本地缓存
 
-``` command
-yum clean [ package | metadata | expire-cache | rpmdb | plugins | all]
+```sh
+# yum clean [ package | metadata | expire-cache | rpmdb | plugins | all]
 ```
 
 ### 构建缓存:
 
 > 取各各仓库获取元数据到本地
 
-``` command
+```sh
 # yum makecache
 ```
 
@@ -582,26 +583,26 @@ yum clean [ package | metadata | expire-cache | rpmdb | plugins | all]
 
 > 以指定的关键字搜索程序包名及summary信息
 
-``` source
+```sh
 # yum search package_name
 ```
 
 ### yum事务历史（安装、升级、卸载）
 
-``` SOURCE
+```sh
 # yum history [list | info | stats]
 ```
 
 ### 安装及升级本地程序包（自动解决依赖关系包）
 
-``` SOURCE
+```sh
 # yum localinstall rpmfile
 # yum localupdate rpmfile
 ```
 
 ###　包组相关命令
 
-``` SOURCE
+```sh
 # yum grouplist
 # yum -y groupinstall "group_package_name"
 # yum groupupdate "group_package_name"
@@ -613,13 +614,13 @@ yum clean [ package | metadata | expire-cache | rpmdb | plugins | all]
 
 1. 挂载光盘至某目录，例如/media/cdrom 
 
-``` source
+```sh
 # mount -r -t iso9660 /dev/cdrom /media/cdrom`
 ```
 
 2. 创建配置文件
 
-``` source
+```
 [CentOS7-CDROM]
 name=cdrom repository
 baseurl=file:///media/cdrom
@@ -629,7 +630,7 @@ enabled=0
 
 ### yum的命令行选项：
 
-``` source
+```
 --nogpgcheck：禁止进行gpg check
 -y：自动回答为yes
 -q：静默模式
@@ -640,7 +641,7 @@ enabled=0
 
 ### yum的repo配置文件中可用的变量：
 
-``` source
+```
 $releasever: 当前OS的发行版的主版本号
 $arch: 平台
 $basearch: 基础平台, i386,x86_64 都认为 i386
@@ -656,13 +657,13 @@ $YUM0-$YUM9
 
 #### 1. 安装createrepo包
 
-``` source
+```sh
 # yum -y install createrepo
 ```
 
 #### 2. ftp里连接发送rpm文件
 
-``` SOURCE
+```sh
 # !mkdir -p /yum/repo
 # lcd /yum/repo
 # mget *.rpm
@@ -670,7 +671,7 @@ $YUM0-$YUM9
 
 #### 3. 创建yum仓库
 
-``` SOURCE
+```sh
 # cd /yum/repo
 # createrepo ./
 
@@ -739,7 +740,7 @@ enabled=1
 
 #### 1.通过包组提供开发组件 CentOS 6
 
-``` SOURCE
+```sh
 # yum -y groupinstall "Development Tools"
 # yum -y groupinstall "Server Platform Development"
 ```
@@ -751,14 +752,14 @@ enabled=1
 - `# ./configure --help`：获取其支持的使用的选项
 - 安装路径设定：
 
-``` options
+```
 --prefix=/PATH/TO/SOMEWHERE`：指定默认安装位置;默认为/usr/local/APPNAME
 --sysconfdir=/PATH/TO/SOMEWHERE`：配置文件安装路径`
 ```
 
 - System types：交叉编译使用这里的选项
 
-``` options
+```
 --build=BUILD
 --host=HOST
 --target=TARGET
@@ -766,14 +767,14 @@ enabled=1
 
 - Optional Features: 可选特性
 
-``` options
+```
 --disable-FEATURE
 --enable-FEATURE[=ARG]
 ```
 
 - Optional Packages：依赖的可选程序包
 
-``` options
+```
 --with-PACKAGE[=ARG]
 --without-PACKAGE
 ```
@@ -798,7 +799,7 @@ enabled=1
 
 > 基于链接的方式实现：
 
-``` SOURCE
+```sh
 # ln -sv /usr/local/apache2/include/ /usr/include/apache
 ```
 
@@ -809,7 +810,7 @@ enabled=1
 
 #### Setup httpd-2.2.29
 
-``` SOURCE
+```sh
 # ./configure --prefix=/usr/local/apache2
 # apachectl [ start | stop | restart ] 脚本文件
 ```

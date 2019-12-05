@@ -69,14 +69,13 @@ i386/i686字样，说明该系统为 32 位。
 8. 初始化主机名及配置网络; 设置主机名; 配置网卡及连接网络
 9. 系统时钟及时区设置
 10. 设置超级用户 root 口令; 设置 8 位以上包含数字、字母大小写、特殊字的的口令
-
 11. 系统安装磁盘空间类型
 - 选择自定义磁盘分区：Create Custom Layout
 - Standard Partition
   - RAID Partition(磁盘冗余阵列): 一般通过硬件 RAID 卡的效率更高，操作系统的 RAID 功能性能差
   - LVM（逻辑卷管理）：设置好的分区大小进行动态调整。所有分区格式都实现做成 LVM 格式，即分区标号为 8e。企业环境的分区一般都是按需求事先规划好的，极少后续调整的需求，因此，不推荐选择 LVM
 
-- 分区方案：
+- 分区方案
   - /boot(ext4): 100~200MB 
   - swap: 物理内存的 1.5 倍，当内存大于或等于 8GB 时，配置为 8 ~ 16 GB即可。
   - /(ext4): 生于硬盘空间
@@ -97,8 +96,8 @@ i386/i686字样，说明该系统为 32 位。
 - Install or upgrade an existing system (安装或升级已经存在的系统)
 - Install system with basic video driver
 - Resue installed system（救援安装系统）
-- Boot from local drive （从本地启动）
-- Memory test （内存测试）
+- Boot from local drive（从本地启动）
+- Memory test（内存测试）
 
 1. 光盘完整性检查：建议(Skip)
 2. Basic Storage Devices (基本存储设备)

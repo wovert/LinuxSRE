@@ -10,11 +10,13 @@
 
 ### 终端的类型
 
-物理终端
+- 物理终端
+
 > 将显示器、键盘鼠标直接接在主机的接口之上，即本机自带的，直接连入的，我们称之为物理终端。物理控制台 console 表示 `/dev/console`
 在系统启动的时候，服务还没有全部起来，这个时候映射的是物理终端，在服务完成启动之后映射的是虚拟终端，当然还有图形终端。
 
-虚拟终端
+- 虚拟终端
+
 > 系统提供的6个虚拟终端，这些终端附加在物理终端之上的，用软件的方式虚拟实现的终端 centos 默认启用 6 个虚拟终端，可以使用快捷键来切换不同虚拟终端
 
 切换方式：`Ctrl+Alt+F[1-6]`
@@ -23,18 +25,19 @@
 
 系统启动之后通过虚拟终端来登录系统，即便是在物理设备上。
 
-图形终端
+- 图形终端
 > 附加在物理终端之上，用软件方式虚拟实现的终端，但额外会提供桌面环境，切换方式：`Ctrl+Alt+F7`
 
-伪终端
+- 伪终端
+
 > 图形界面下打开的命令行接口，还有基于ssh协议和telnet协议等远程打开的命令行界面
 
 伪终端路径文件设备： `/dev/pts/#`
 
-串行终端
+- 串行终端
 > 伪终端路径文件设备：`/dev/ttyS[0-3]` 串口
 
-查看当前的终端设备命令: `# tty`
+- 查看当前的终端设备命令: `# tty`
 
 终端实际上一个设备，一个设备要想与系统进行交互，必须有交互接口，当开启一个终端时，系统会自动在终端上运行一个交互式程序。
 
@@ -46,17 +49,17 @@
 
 - Linux 桌面系统
   - [Gnome](https://www.gnome.org/)(C 程序开发，GTK开发库)
-  - [KDE](https://www.kde.org/)(C++ 程序开发，qt开发库)
+  - [KDE](https://www.kde.org/)(C++ 程序开发，QT 开发库)
   - [xcfe](https://xfce.org/)(轻量级桌面)
 
 ### CLI
 
 > 用户与系统交互，必须通过shell，不同的程序员开发的程序不一样。
-- shell 程序：bash, zsh, sh, csh, tcsh, ksh
 
-获取当前环境的shell : `# echo $SHELL`
+- shell program：`bash, zsh, sh, csh, tcsh, ksh`
 
-显示当前系统使用的 shell 是哪种 shell : `# cat /etc/shells`
+- 获取当前环境的shell: `# echo $SHELL`
+- 显示当前系统使用的 shell 是哪种 shell : `# cat /etc/shells`
 
 ### TUI
 
@@ -153,21 +156,10 @@ WALL
 
 ## Linux 哲学思想
 
-1. 一切皆文件；
-
-把几乎所有的资源统统抽象为文件形式；包括硬件设备，甚至通信接口等；
-open(), read(), write(), close(), delete(), create()
-
-2. 由众多目的单一的小程序组成；一个程序只做一件事，且做好；
-
-组合目的单一的小程序完成复杂任务；
-
-3. 尽量避免跟用户交互；
-
-易于以编程的方式实现自动化任务；
-
+1. 一切皆文件；把几乎所有的资源统统抽象为文件形式；包括硬件设备，甚至通信接口等；open(), read(), write(), close(), delete(), create()
+2. 由众多目的单一的小程序组成；一个程序只做一件事，且做好；组合目的单一的小程序完成复杂任务；
+3. 尽量避免跟用户交互；易于以编程的方式实现自动化任务；
 4. 使用文本文件保存配置信息；
-
 5. 提供机制，而非策略；
 
 ## 文件是什么？众多文件如何有效组织起来？
@@ -705,7 +697,7 @@ echo OPTIONS
 ``` sh
 date [OPTIONS]... [+FORMAT]
 
-系统时钟
+显示系统时钟
 
 +FORMAT:
   %F fulldate
@@ -726,7 +718,7 @@ date [OPTIONS]... [+FORMAT]
 ---
 
 ``` sh
-clock 硬件时钟
+clock 显示硬件时钟
 
 是 hwclcok 的软链接
 ```
@@ -735,8 +727,8 @@ clock 硬件时钟
 ``` sh
 hwclock - query or set the hardware clock(RTC)
 
--s, --hctosys : Set the System Time from the Hardware Clock.
--w, --systohc : Set the Hardware Clock to the current System Time.
+-s, --hctosys : Set the System Time from the Hardware Clock.（硬件时钟是对的）
+-w, --systohc : Set the Hardware Clock to the current System Time.(系统时钟是对的)
 ```
 
 ---
@@ -761,7 +753,6 @@ whereis OPTIONS
 
 OPTIONS:
 -b binary path
-
 -m man path
 ```
 

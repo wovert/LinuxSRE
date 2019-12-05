@@ -256,7 +256,7 @@
 - `*` 匹配**任意长度的任意字符**
   - `pa*, *pa*, *pa, *p*a*`
   - pa, paa, passwd
-- `?`：匹配任意单个字符
+- `?`：匹配任意**单个字符**
   - pa?, ??pa, p?a, p?a?
   - pa, paa, passwd
 - `[]`：匹配指定范围内的**任意单个字符**
@@ -277,6 +277,7 @@
   - `[^[:alnum:]]`：非字母和数字
   - `[^[:space:]]`：非空白字符
   - `[^[:punct:]]`：非标点符号
+- `\`: 转移字符
 
 ### 练习
 
@@ -360,7 +361,9 @@ SET: [:lower:] [:upper:] [:digit:] [:alpha:] [:alnum:]
 [:punct:] [:space:] [:blank:] [CHAR1-CHAR2]
 ```
 
-### Here Document：<<
+### Here Document
+
+> `<<`
 
 ``` sh
 cat << EOF
@@ -378,10 +381,15 @@ cat > /PATH/TO/SOMEFILE << EOF
 > read from standard input and write to standard output and files
 
 - `~]# COMMAND | tee /PATH/TO/SOMEFILE | tr 'a-z' 'A-Z'`
+
+`# cat /etc/issue | tee /tmp/issue.tee | tr 'a-z' 'A-Z'`
+
+cat etc/issue 结果发给 tee, tee 输入流发给 tr
+
 - 练习：把 `/etc/passwwd` 文件的前6行的信息转换为大写字符后输出
-- `~]# head -6 /etc/passwd | tr [a-z] [A-Z]`
-- `~]# head -6 /etc/passwd | tr 'a-z' 'A-Z'`
-- `~]# head -6 /etc/passwd | tr [:lower:] [:upper:]`
+  - `~]# head -6 /etc/passwd | tr [a-z] [A-Z]`
+  - `~]# head -6 /etc/passwd | tr 'a-z' 'A-Z'`
+  - `~]# head -6 /etc/passwd | tr [:lower:] [:upper:]`
 
 ## 12. 多命令执行
 
