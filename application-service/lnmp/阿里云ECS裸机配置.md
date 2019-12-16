@@ -451,6 +451,36 @@ service nginx restart
 
 `[root@localhost ~]# chkconfig nginx on`
 
+
+
+```sh
+# vim /usr/lib/systemd/system/nginx.service
+
+[Unit]
+Description=nginx-The High-performance HTTP Server		 // 描述服务
+After=network.target remote-fs.target nss-lookup.target		// 描述服务类别
+
+[Service]
+Type=forking		// 后台运行的形式
+PIDFile=/var/run/nginx/nginx.pid		// PID文件的路径
+ExecStartPre=/usr/local/nginx/sbin/nginx -t -c /etc/nginx/nginx.conf		// 启动准备
+ExecStart=/usr/local/nginx/sbin/nginx -c /etc/nginx/nginx.conf		//启动命令
+ExecReload=/usr/local/nginx/sbin/nginx -s reload		// 重启命令
+ExecStop=/usr/local/nginx/sbin/nginx -s stop		    // 停止命令
+ExecQuit=/usr/local/nginx/sbin/nginx -s quit		    // 快速停止
+PrivateTmp=true		// 给服务分配临时空间
+
+[Install]
+WantedBy=multi-user.target		// 服务用户的模式
+
+# chmod +x nginx.service		// 赋予该文件执行权限
+# systemctl daemon-reload		// 在启动服务之前，需要先重载systemctl命令
+# systemctl start nginx		    // 启动nginx服务
+# netstat -ntulp |grep nginx
+```
+
+
+
 ## redis 安装配置
 
 ```sh

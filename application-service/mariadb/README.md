@@ -64,7 +64,7 @@
 - DBMS：DataBase Management System
   - RDBMS：Relational
 
-  - MySQL：单进程，多线程
+  - MySQL：**单进程，多线程**
     - 用户连接：通过线程来实现；连接线程
       - 线程池
 
@@ -136,8 +136,9 @@
 
 - 索引：将表中的某一个或某些字段抽取出来，单独将其组织一个独特的数据结构中
   - 常用的索引类型：
-    - b-tree
-    - Hash
+    - B+ tree: Balance Tree，适合排序和范围查询
+    - Hash: kv结构，不适合排序和范围查询，适合精确值匹配
+      - storage engin: memory 支持
   - 有助于读请求，但不利于写请求
 
 - 关系运算：
@@ -171,6 +172,13 @@
 
 - MySQL Enterprise Version
   - 5.1 -> 5.5 -> 5.6 -> 5.7
+
+- MySQL 衍生版
+  - MariaDB
+  - Percona-Server
+  - AliSQL
+  - TiDB(分布式，rust语言，兼容SQL协议)
+
 - MariaDB Community Version
   - 插件式存储引擎
     - 查看存储引擎：`show engines`
@@ -191,25 +199,54 @@
 
 ### MariaDB features
 
-- 插件式存储引擎：
+- 插件式存储引擎；
 - 存储管理器有多种实现版本，彼此间的功能和特性可能略有区别；
 - 用户可根据需要灵活选择；
 - 存储引擎也称为“表类型”；
 
-#### 1. 更多的存储引擎
+1. 更多的存储引擎
 
-- MyISAM：不支持事务
-- MyISAM --> Aria(改进版)
-- InnoDB --> XtraDB(改进版)：支持事务
+- MyISAM：不支持事务，表级锁，崩溃后不保证安全恢复
+  - Aria(改进版)
+- InnoDB：支持事务，行级锁，外键，热备
+  - XtraDB(改进版)
 
 - MySQL-5.1 默认存储引擎：`MyISAM`
 - MySQL-5.5+ 默认存储引擎：`InnoDB`
 
-#### 2. 诸多扩展和新特性
+2. 诸多扩展和新特性
+3. 提供了较多的测试组件
+4. truly open source
 
-#### 3. 提供了较多的测试组件
 
-#### 4. truly open source
+### MariaDB 程序的组成：C/S
+
+#### mysql客户端程序
+
+- mysql: 交互式的CLI工具
+- mysqldump: 备份工具，基于mysql协议向mysqld发起查询请求，并将查得的所有数据转换成insert等写操作语句保存文本文件中
+- mysqladmin： 基于mysql协议管理mysqld
+- mysqlimport： 数据导入工具
+
+#### 非客户端类的管理工具
+
+- `myisamchk, myisampack`
+
+#### mysql服务端
+
+- mysqld
+- mysqld_safe: 运行服务端程序
+- mysqld_multi: 多实例
+
+#### 三类套接字地址
+
+- IPv4｜IPv6, 3306/tcp
+- Unix Sock(本地通信)
+  - /var/lib/mysql/mysql.sock（rpm安装）
+  - /tmp/mysql.sock（二进制安装）
+  - C <---> S: host: localhost, 127.0.0.1
+    - 共享通信
+
 
 ## 安装和使用 MariaDB
 
@@ -240,28 +277,27 @@
   - net start MySQL
   - net stop MySQL
 
-#### 1. 包管理器的程序包（rpm,deb包等）
+#### Linux 安装
 
-(a) 由OS的发行商提供
+1. 包管理器的程序包（rpm,deb包等）
+  - (a) 由OS的发行商提供
+  - (b) 程序官方提供
 
-(b) 程序官方提供
+2. 源码包
+3. 通用二进制格式的程序包
 
-#### 2. 源码包
+#### 通用二进制格式安装MariaDB
 
-#### 3. 通用二进制格式的程序包
+1. 准备数据目录,以/mydata/data目录为例
 
-### 通用二进制格式安装MariaDB：
-
-#### 1. 准备数据目录,以/mydata/data目录为例
-
-``` SHELL
+``` sh
 # mkdir -pv /mydata/data
 # chown -R mysql.mysql /mydata/data/
 ```
 
-#### 2. 安装配置 mariadb
+2. 安装配置 mariadb
 
-``` SHELL
+``` sh
 # useradd -r mysql
 # tar xf mariadb-VERSION.tar.xz -C /usr/local
 # cd /usr/local
@@ -273,35 +309,49 @@
 # chkconfig --add mysqld
 ```
 
-#### 3. 提供配置文件
+3. 提供配置文件
 
 ini格式的配置文件；各程序均可通过此配置文件获取配置信息；
 
-``` sh
- [program_name]
+配置文件：init风格，用一个文件为多个程序提供配置；
+
+
+```
+[mysql]
+[mysqld]
+[mysqld_safe]
+[server]
+[client]
+[mysqldump]
+...
+```
+
+mysql的各类程序启动都读取不止一个配置文件，按顺序读取，且最后读取的为最终生效
 
 1. OS Vendor提供mariadb rpm包安装的服务的配置文件查找次序：
- /etc/mysql/my.cnf  --> /etc/my.cnf  --> --default-extra-file=/PATH/TO/CONF_FILE  --> ~/.my.cnf
+` /etc/mysql/my.cnf  --> /etc/my.cnf  --> --default-extra-file=/PATH/TO/CONF_FILE  --> ~/.my.cnf`
 
 2. 通用二进制格式安装的服务程序其配置文件查找次序：
- /etc/my.cnf 越靠后最终生效的 --> /etc/mysql/my.cnf  --> --default-extra-file=/PATH/TO/CONF_FILE --> ~/.my.cnf
+`/etc/my.cnf 越靠后最终生效的 --> /etc/mysql/my.cnf  --> --default-extra-file=/PATH/TO/CONF_FILE --> ~/.my.cnf`
 
-获取其读取次序的方法：
-# mysqld --verbose --help
 
-my-huge.cnf是总控文件
-# cp  support-files/my-huge.cnf  /etc/my.cnf
+获取其读取次序的方法：`# mysqld --verbose --help`
+
+`my-huge.cnf`是总控文件
+
+`# cp  support-files/my-huge.cnf  /etc/my.cnf`
 
 添加三个选项
+```
 [mysqld] # mysql服务器端配置
 datadir = /mydata/data
 innodb_file_per_table = ON
 skip_name_resolve = ON
 ```
 
-#### 4. 启动服务
+4. 启动服务
 
-``` SHELL
+```sh
 # service mysqld  start
 ```
 
@@ -337,7 +387,7 @@ mysql> update mysql.user SET password = password('password') where cluase;
 mysql> flush privilige
 ```
 
-``` shell
+``` sh
 # mysqladmin
 ```
 
@@ -361,20 +411,10 @@ my.ini文件中修改 `skip_name_resolve=off`
 
 [MySQL](https://dev.mysql.com/downloads/mysql/)官网下载地址
 
-## mysql客户端程序
-
-- mysql: 交互式的CLI工具
-- mysqldump: 备份工具，基于mysql协议向mysqld发起查询请求，并将查得的所有数据转换成insert等写操作语句保存文本文件中
-- mysqladmin： 基于mysql协议管理mysqld
-- mysqlimport： 数据导入工具
-
-## 非客户端类的管理工具
-
-- `myisamchk, myisampack`
 
 ## 如何获取程序默认使用的配置
 
-``` mysql
+```sh
 # mysql --print-defaults
 # mysqld --print-defaults
 # mysqld --verbose
@@ -390,7 +430,8 @@ my.ini文件中修改 `skip_name_resolve=off`
 -p, --password=
 -P, --port=
 --protocol=tcp|sock(同一个主机上)
--S, --socket=统一主机上及，-h localhost，socket文件路径
+-S, --socket=/PATH/TO/mysql.sock 套接字文件路径
+-h localhost
 -D, --database=
 -C, --compress 数据传输时是否压缩
 # mysql -e "SQL" 在shell命令直接执行SQL语句并返回
@@ -511,7 +552,7 @@ create function udf
 create index
 create procedure
 create server
-reate table
+create table
 create tablespace
 create trigger
 create user
@@ -520,7 +561,7 @@ show create database
 show create event
 show create function
 show create procedure
-show crate table
+show create table
 spatial
 ```
 
