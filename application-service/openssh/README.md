@@ -43,6 +43,14 @@
 
 - 抓包操作：`tcpdump`
 
+- nc命令的安装
+
+```sh
+# yum -y install nmap-ncat
+# nc -l IP PORT
+# nc -ul IP PORT
+```
+
 ## ssh：Secure SHell
 
 - C/S：`22/tcp`，安全地远程登录
