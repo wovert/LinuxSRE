@@ -76,7 +76,8 @@
 
 > 加密和解密使用同一个密钥
 
-- DES: Data Encryption Standard(IBM开发，现代加密方法，56bit)
+- DES: Data Encryption Standard(IBM开发，现代加密方法，密钥长度：56bit)
+  - 密钥长度是64bit，但由于每个7比特回设置一个用于错误检查的比特，因此实质上密钥长度是56bit
 - 3DES: Triple DES(3倍DES)
 - AES: Advanced Encryption Standard(128bits, 192bits, 256bits, 384bits)
 
