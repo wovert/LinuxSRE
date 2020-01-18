@@ -1,6 +1,158 @@
 # 容器
 
+## What Docker
+
+> 基于 LCX 容器技术，使用Go语言开发的开源的容器引擎。源代码托管在GitHub上，并遵从Apache2.0协议。
+
+- 开发人员利用 docker 开发和运行应用程序
+- 运维人员利用 docker 部署和管理应用程序
+
 > 容器是一种基础工具；泛指任何可以用于容纳其他物品的工具，可以部分或完全封闭，被用于容纳、存储、运输物品；物体可以被防止在容器中，而容器则可以保护内容物；
+
+## Why Docker
+
+- 将应用程序与基础架构分开，以便可以快速交付软件；
+- 运行环境一致性
+- 降低配置开发环境、测试环境和生产环境的复杂度和成本
+- 实现程序的快速部署和分发
+
+## docker架构
+
+- Container 容器
+- Network 网络
+- Image 镜像
+- Data Volumnes 数据卷
+
+### Docker Client
+
+用户与Docker进行交互界面。在终端输入docker命令时，对应的就会在服务端产生对应的作用，并发结果返回给客户端。Docker Client除了连接本地服务端，通过更改或指定 DOCKER_HOST 连接远程服务端。
+
+### Docker Server
+
+Docker的服务，负责监听Docker API请求（Docker Client）并管理Docker对象(Docker Objects)，如镜像、容器、网络和数据卷等
+
+### Docker Registries
+
+Docker仓库，用于存储镜像的云服务环境。
+
+Docker Hub 是一个共有存放镜像的地方，类似GitHub存储代码文件。
+
+### Docker Objects
+
+- 镜像：一个 Docker 的可执行文件，其中包括运行程序所需要的代码内容、依赖库、环境变量和配置文件等。
+- 容器：镜像被运行起来的实例
+- 网络：外部或者容器间如何互相访问的网络方式，如host模式、bridge模式
+- 数据卷：容器与宿主主机之间、容器与容器之间共享存储方式，类似虚拟机与主机之间的共享文件目录
+
+## Docker 版本
+
+- Docker CE x86_64
+- Docker EE x86_64
+  - CentOS
+  - Ubuntu
+
+
+### Ubuntu
+
+- Bionic 18.04(LTS)
+- Artful 17.10
+- Xenial 16.04(LTS)
+- Trusty 14.04(LTS)
+
+#### ubuntu 主机环境需求
+
+```sh
+$ uname -a
+$ ls -l /sys/class/misc/device-mapper
+
+# 基本软件
+$ sudo apt-get update
+$ sudo apt-get install apt-transport-https ca-certificates curl software-properties-common lrzszl -y
+
+# 推荐源
+$ sudo curl -fsSl https://mirros.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
+$ sudo add-apt-repository "deb [arch=amd64] https://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
+
+# 软件源升级
+$ sudo apt-get update
+
+# 安装 docker
+$ sudo apt-get install docker-ce -y
+$ sudo apt-get install docker-ce=<VERSION> -y
+
+# 查看支持的docker版本
+$ sudo apt-cache madison docker-ce
+
+# 测试docker
+$ docker version
+```
+
+### docker 加速器
+
+> 国内使用 docker 的官方镜像源，造成无法下载，或者一直处于超时，所以使用daocloud的方法进行加速配置。加速器文档连接: http://guide.daocloud.io/dcs/daocloud-9153151.html
+
+1. 访问 https://dashboard.daocloud.io
+
+```sh
+$ curl -sSl https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://e5d212cc.m.daocloud.io
+
+修改daemon.json文件，追加
+,"insecure-registries": []
+
+$ cat /etc/docker/daemon.json
+{"registry-mirrors": ["http://e5d212cc.m.daocloud.io"], "insecure-registries": []}
+
+#重启
+$ systemctl restart docker
+```
+
+## docker 基本命令
+
+```
+$ systemctl stop|start|restart|status docker
+
+# 删除docker命令
+$ sudo apt-get purge docker-ce -y
+
+# 认证目录
+$ sudo rm -rf /etc/docker
+
+# 应用目录
+$ sudo rm -rf /var/lib/docker/
+```
+
+### 执行docker执行问题
+
+- 方法1
+```sh
+$ cd /var/run
+$ ls -l | grep docker.sock
+srw-rw---- 1 root docker 
+
+$ sudo groupadd docker
+
+#用户加入到docker组内，然后退出并重新登录就生效
+$ sudo gpasswd -a ${USER} docker
+
+#重启docker服务
+$ systemctl restart docker
+
+#切换当前会话到新 group 或者重启 X 会话
+#必须执行，否则 groups 命令获取到是缓存的组信息，刚添加的组信息为能生效
+$ newgrp - docker
+```
+
+- 方法2
+
+```sh
+#每次启动docker或者重启docker的之后
+$ cd /var/run
+$ sudo chmod 666 docker.sock
+```
+
+- 方法3
+
+每条命令前面加上`sudo`
 
 ## 由PaaS到Container
 
