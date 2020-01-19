@@ -51,6 +51,138 @@ Docker Hub 是一个共有存放镜像的地方，类似GitHub存储代码文件
   - CentOS
   - Ubuntu
 
+### CentOS 7下安装Docker以及Docker的基本使用
+
+- Docker支持以下CentOS版本
+  - CentOS 7 (64-bit)
+  - CentOS 6.5 (64-bit) 或更高的版本
+
+#### 前提条件
+
+Docker 运行在 CentOS 7 上，要求系统为64位、系统内核版本为 3.10 以上。
+
+Docker 运行在 CentOS-6.5 或更高的版本的 CentOS 上，要求系统为64位、系统内核版本为 2.6.32-431 或者更高版本。
+
+#### 使用 yum 安装（CentOS 7下）
+
+Docker 要求 CentOS 系统的内核版本高于 3.10 ，查看本页面的前提条件来验证你的CentOS 版本是否支持 Docker 。
+
+通过 `uname -r` 命令查看你当前的内核版本
+
+```sh
+[root@node1 ~]# uname -r
+3.10.0-957.21.3.el7.x86_64
+```
+
+从 2017 年 3 月开始 docker 在原来的基础上分为两个分支版本: Docker CE 和 Docker EE。
+
+Docker CE 即社区免费版，Docker EE 即企业版，强调安全，但需付费使用。
+
+本文介绍 Docker CE 的安装使用。
+
+较旧版本的Docker被称为docker或docker-engine，如果已安装这些，请卸载它们
+
+```sh
+# yum remove -y docker \
+docker-client \
+docker-client-latest \
+docker-common \
+docker-latest \
+docker-latest-logrotate \
+docker-logrotate \
+docker-selinux \
+docker-engine-selinux \
+docker-engine
+```
+
+#### 安装一些必要的工具
+
+```sh
+# yum install -y yum-utils device-mapper-persistent-data lvm2
+```
+
+#### 添加Docker的存储库
+
+```sh
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+```
+
+#### 安装Docker-ce
+
+`yum install -y docker-ce`
+
+#### 启动Docker
+
+`systemctl start docker`
+
+测试运行 `hello-world`
+
+`docker run hello-world`
+由于本地没有hello-world这个镜像，所以会下载一个hello-world的镜像，并在容器内运行，看到以上界面说明Docker已经成功安装
+
+
+### 使用脚本安装Docker
+
+1. 使用sudo或者root权限登录CentOS
+
+2. 确保yum包是最新版`yum update`
+
+3. 执行Docker安装脚本
+
+```sh
+# yum -y install yum-utils device-mapper-persistent-data 1vm2
+# yum install deltarpm -y
+# curl -fsSL https://get.docker.com -o get-docker.sh && sh get-docker.sh`
+```
+
+执行这个脚本会添加 docker.repo 源并安装 Docker。
+
+4. 启动Docker
+
+`systemctl start docker`
+
+
+5. 验证 docker 是否安装成功并在容器中执行一个测试的镜像。
+
+```sh
+docker run hello-world
+docker ps
+```
+
+#### 镜像加速
+
+Docker拉取镜像的速度非常缓慢，可以配置加速器来解决
+
+在这里使用阿里云的加速地址：`https://br10hqrl.mirror.aliyuncs.com`
+
+修改Docker的配置文件来设置加速地址
+
+```sh
+# vim /etc/docker/daemon.json
+
+{
+  "registry-mirrors": ["https://br10hqrl.mirror.aliyuncs.com"]
+}
+```
+
+如果没有该文件，新建一个
+
+也可以通过以下命来设置
+
+```sh
+# tee /etc/docker/daemon.json <<-'EOF'
+{
+  "registry-mirrors": ["https://br10hqrl.mirror.aliyuncs.com"]
+}
+```
+
+使配置文件生效: `systemctl daemon-reload && systemctl restart docker`
+
+删除Docker-ce: 
+```sh
+yum remove -y docker-ce
+rm -rf /var/lib/docker
+```
 
 ### Ubuntu
 
@@ -153,6 +285,139 @@ $ sudo chmod 666 docker.sock
 - 方法3
 
 每条命令前面加上`sudo`
+
+## docker 核心技术
+
+### 镜像
+
+> 一个Docker的可执行文件，其中包括运行应用程序的所有代码内容、依赖库、环境变量和配置文件等。通过镜像可以创建一个或多个容器。
+
+#### 搜索镜像
+
+```sh
+# docker search 镜像名
+```
+
+#### 获取镜像
+
+```sh
+# docker pull nginx
+```
+
+获取的镜像文件在 `/var/lib/docker` 目录下
+
+
+#### 查看镜像
+
+```sh
+# docker images [镜像名称]
+```
+
+#### 重命名镜像
+
+对本地镜像的NAME，TAG进行重命名，并新产生一个命名后镜像
+
+```sh
+# docker tag [老镜像名称]:[老镜像版本] [新镜像名称]:[新镜像版本]
+# docker tag nginx:latest panda-nginx:v1.0
+```
+
+#### 删除镜像
+
+将本地的一个或多个镜像删除
+
+```sh
+# docker rmi [命令参数][镜像ID]
+# docker rmi [命令参数][镜像名称]:[镜像版本]
+# docker image rm [命令参数][镜像ID]
+```
+
+- image id 存在多个名称，那么应该使用 `名称:版本` 的格式删除镜像
+- 命令参数：`-f, --force` 强制删除
+
+
+#### 导出镜像
+
+将已经下载好的镜像，导出到本地，以备后用
+
+作用：将本地的一个或多个镜像打包保存成本地 tar 文件
+
+- 命令格式：`docker save [命令参数] [导出镜像名称] [本地镜像]`
+- 命令参数：-o, --output string 指定写入的文件名和路径
+
+```sh
+$ docker save -o nginx.tar nginx
+```
+
+#### 导入镜像
+
+将save命令打包的镜像导入本地镜像库中
+
+```sh
+$ docker load [命令参数] [被导入镜像压缩文件的名称]
+$ docker load < [被导入镜像压缩文件的名称]
+$ docker load --input [被导入镜像压缩文件的名称]
+
+-i, --input string 指定要打入的文件，如没有指定，默认是 STDIN
+
+# 为了演示效果，先将 nginx 的镜像删除掉
+$ docker rmi nginx:v1.0
+$ docker rmi nginx
+
+# 导入镜像文件
+$ docker load < nginx.tar
+
+如果发现导入的时候没有权限，需要使用 chmod 命令修改镜像文件的权限
+```
+
+#### 查看镜像历史
+
+查看本地一个镜像的历史（历史分层）信息
+
+```
+docker history [镜像名成]:[镜像版本]
+docker history [镜像ID]
+```
+
+镜像默认启动了哪些命令或者封装了哪些系统层，那么可以使用 docker history 命令来获取信息
+
+- IMAGE: 编号
+- CREATED: 创建的
+- CREATED BY: 基于那些命令创建的
+- SIZE: 大小
+- COMMENT: 评论
+
+```sh
+docker history nginx:v1.0
+```
+
+#### 查看镜像详细信息
+
+查看本地一个或多个镜像的详细信息
+
+```
+$ docker image inspect [命令参数] [镜像名称]:[镜像版本]
+$ docker inspect [命令参数] [镜像ID]
+ 
+$ docker inspect nginx
+```
+
+#### 根据模版创建镜像
+
+```
+# 登录系统模版镜像网站
+https://download.openvz.org/template/precreated/
+
+# 找到一个镜像模版进行下载，比如: ubuntu-16.04-x86_64.tar.gz
+地址为 https://download.openvz.org/template/precreated/ubuntu-16.04-x86_64.tar.gz
+
+# 命令格式
+cat 模版文件名.tar | docker import - [自定义镜像名]
+
+# 演示效果
+cat ubunt-16.04-x86_64.tar.gz | docker import - ubuntu-mini
+```
+
 
 ## 由PaaS到Container
 
