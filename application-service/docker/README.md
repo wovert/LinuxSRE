@@ -418,7 +418,143 @@ cat 模版文件名.tar | docker import - [自定义镜像名]
 cat ubunt-16.04-x86_64.tar.gz | docker import - ubuntu-mini
 ```
 
+## 容器
 
+### 容器是什么
+
+> 一种轻量级、可移植、并将应用程序进行的打包的技术，使应用生程序可以在几乎任何地方以相同的方式运行
+
+Docker 将镜像文件运行起来后，产生的对象就是容器。容器相当于镜像运行起来的一个实例。
+
+容器具备一定的生命周期
+
+`docker ps` 命令查看运行的容器
+
+容器就是被封装起来的进程操作，只不过现在的进程可以简单也可以复杂，复杂的运行一个操作系统，简单的可以运行一个回显字符串。
+
+### 容器与虚拟机相同点
+
+- 容器与虚拟机都会对硬件资源进行共享使用
+- 容器与虚拟机的生命周期比较相似（创建、运行、暂停、关闭等等）
+- 容器中或虚拟机中都可以安装应用，如 redis、mysql、nginx等
+- 虚拟机一样，容器创建后，会存储在宿主机上: `/var/lib/docker/containers`
+
+### 容器与虚拟机不同点
+
+- 虚拟机的创建、启动和关闭都是基于一个完整的操作系统。一个虚拟机就是一个完整的操作系统。而容器直接运行在宿主机的内核上，其本质上一系列进程的结合。
+
+容器是轻量级的，虚拟机是重量级的
+
+容器不需要额外的资源俩管理，虚拟机额外更多的性能消耗
+
+### 容器相关命令
+
+#### 查看容器
+
+`docker ps -a` -a 显示所有运行过的容器，包括已经不运行的容器
+
+- container 容器ID
+- image 镜像名
+- command 运行镜像使用哪些命令
+- created 多久前创建时间
+- status 开启或关闭
+- ports 端口号
+- names 容器名称，默认随机的
+
+#### 创建待启动容器
+
+- 命令格式
+  - `docker create [OPTIONS] IMAGE [COMMAND] [ARG...]`
+  - `docker create [参数命令] 依赖镜像 [容器内命令] [命令参数]`
+
+- 命令参数
+  - -t, --tty: 分配一个伪终端，分配虚拟终端
+  - -i, --interactive: 即时没有连接，也要保持STDIN打开
+  - --name: 为容器起名，如果没有指定将会随机产生一个名称
+
+- 命令参数：
+  - COMMAND 容器启动后，需要在容器汇总执行的命令，如 `ps, ls`等命令
+  - ARG 表示执行 COMMAND 时需要提供的一些参数，如 `ps`命令的 `aux`, `ls`的`-a`等等
+
+`docker create -it --name ubuntu-1 ubuntu ls -a`
+
+#### 启动容器方式
+
+- 启动待启动或已关闭容器
+- 基于镜像新建一个容器并启动
+- 守护进程方式启动 docker
+
+将一个或多个处于创建状态或关闭状态的容器启动
+
+- 命令格式：
+  - `docker start [容器名称][容器ID]`
+- 命令参数
+  - -a, --attach 将当前shell的 STDOUT/STDERR 连接到容器上
+  - -i, --interactive 将当前 shell的 STDIN 连接到容器上
+
+`docker start -a ubuntu-1`
+
+
+#### 创建新容器并启动
+
+```sh
+docker run [命令参数] [镜像名称][执行的命令]
+-t, --tty 分配虚拟终端
+-i, --interactive 即时没有连接，也要保持 STDIN 打开
+--name 为容器起名，如果没有指定将会随机产生一个名称
+-d, --detach 在后台运行容器并打印处容器ID
+--rm 当容器退出后，自动删除容器
+```
+
+- 启动一个镜像输出内容并删除容器
+`docker run --rm --name nginx1 nginx /bin/echo "hello docker"`
+
+- 守护进程方式启动容器<常用的方式> `docker run -d [image_name] command ...`
+
+`docker run -d nginx`
+
+#### 暂停与取消暂停与重启
+
+- 容器暂停： `docker pause [容器名称]或[容器ID]`
+
+
+#### 容器取消暂停
+
+`docker unpause [容器名称]或[容器ID]`
+
+#### 容器重启
+
+```sh
+命令格式：docker restart [容器名称]或[容器ID]
+命令参数：-t, --time int 重启前，等待的时间，单位秒（默认 10s）
+
+#恢复容器
+docker restart -t 20 a229efea293
+```
+
+#### 关闭容器
+
+生产中，临时关闭某些容器
+
+`docker stop [容器名称]或[容器ID]`
+
+#### 终止容器
+
+强制并立即关闭一个或多个处于暂停状态或者运行状态的容器
+
+`docker kill [容器名称]或[容器ID]`
+
+#### 删除容器
+
+`docker rm [容器名称]或[容器ID]`
+
+`docker rm -rf [容器名称]或[容器ID]` 强制删除一个或多个容器
+
+#### 批量删除关闭容器
+
+`docker rm -rf $(docker ps -a -q)`
+
+- 
 ## 由PaaS到Container
 
 2013年2月，前Gluster的CEO Ben Golub和dotCloud的CEO Solomon Hykes坐在一起聊天时，Solomon谈到想把dotCloud内部使用的Container容器技术单独拿出来开源，然后围绕这个技术开一家新公司提供技术支持。28岁的Solomon在使用python开发dotCloud的PaaS云时发现，使用 LXC(Linux Container) 技术可以打破产品发布过程中应用开发工程师和系统工程师两者之间无法轻松协作发布产品的难题。这个Container容器技术可以把开发者从日常部署应用的繁杂工作中解脱出来，让开发者能专心写好程序；从系统工程师的角度来看也是一样，他们迫切需要从各种混乱的部署文档中解脱出来，让系统工程师专注在应用的水平扩展、稳定发布的解决方案上。他们越深入交谈，越觉得这是一次云技术的变革，紧接着在2013年3月Docker 0.1发布，拉开了基于云计算平台发布产品方式的变革序幕。
