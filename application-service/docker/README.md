@@ -554,8 +554,217 @@ docker restart -t 20 a229efea293
 
 `docker rm -rf $(docker ps -a -q)`
 
+#### 进入、退出
+
+- 进入容器的三种方法
+  - 创建容器的同时进入容器
+  - 手工方式进入容器
+  - 生产方式进入容器
+
+- 创建容器并进入容器
+
+```sh
+$ docker run --name [container_name] -it [docker_image] /bin/bash
+$ docker run -it --name panda-nginx nginx /bin/bash
+
+#守护进程方式进入
+$ docker run -itd --name panda-nginx nginx /bin/bash
+#进入容器后
+$ echo "Hello world"
+
+--name 容器定义一个名称
+-i 容器的表准输入保持打开
+-t docker分配一个伪终端，并绑定到容器的表准输入上
+/bin/bash
+
+#退出容器并停止服务
+# exit
+
+Ctrl+d 退出但不停止服务
+```
+
+- 手动方式进入容器
+```sh
+$ docker exec -it 容器ID /bin/bash
+```
+
+- 生产方式进入容器
+```sh
+$ vim docker_in.sh
+#!/bin/bash
+
+#定义进入仓库函数
+docker_in() {
+  NAME_ID=$1
+  PID=$(docker inspect --format {{.State.Pid}} $NAME_ID)
+  nsenter --target $PID --mount --uts --ipc --net --pid /bin/bash
+}
+docker_in $1
+$ chmod +x docker_in.sh
+$ sudo s./docker_in.sh b3abe9239ead
+```
+
+### 基于容器创建镜像
+
+```sh
+$ docker commit -m "改动信息" -a "作者信息" [container_id] [new_image:tag]
+#进入容器，创建文件后退出
+$ ./docker_in.sh d34fff341685
+$ mkdir /hello
+$ mkdir /world
+$ ls
+$ exit
+#创建一个镜像
+$ docker commit -m 'mkdir /hello /world' -a "panda" d34fff341685 panda-nginx1101:v1.0
+$ docker images
+```
+
+- 方法二
+
+```sh
+#正在运行的容器导入到模版文件中
+$ docker export [容器ID] > 模版文件名.tar
+#创建镜像
+$ docker export ae63ab299a84 > panda-nginx.tar
+#导入镜像
+$ cat panda-nginx.tar | docker import - pandata-nginx
+```
+
+#### 导出(export)导入(import)与保存(save)加载(load)的区别
+
+- import与load的区别
+  - import可以重新指定镜像的名字，docker load不可以
+- export与保存save的区别
+  - export 导出的镜像文件大小，小于save保存的镜像
+  - export 导出(import导入)是根据容器拿到的镜像，再导入时会丢失镜像所有的历史
+
+#### 日志、信息、端口、重命名
+
+- 查看容器运行日志：`docker logs [容器ID]`
+- 查看容器详细信息：`docker inspect [容器ID]`
+- 查看容器网络信息：`docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' [容器ID]`
+- 查看容器端口：`docker port [容器ID]`
+- 容器重命名：`docker rename [容器ID]或[容器名称] [容器新名称]`
 
 
+### 数据卷
+
+#### 什么是数据卷
+
+> 将宿主机的某个目录，映射到容器中，作为数据存储的目录，就可以在宿主机对数据进行存储数据卷（Data Volumnes）：容器内数据直接映射到本地主机环境
+
+- 数据卷特性
+  - 数据卷可以子容器之间共享和重用，本地与容器间传递数据更高效
+  - 对数据卷的修改会立马有效，容器内部与本地目录均可
+  - 对数据卷的更新，不会影响镜像，对数据与应用进行了解藕操作
+  - 卷会一直存在，直到没有容器使用
+
+
+`docker run` 命令时添加 `-v` 参数，就可以创建并挂载一个到多个数据卷到当前运行的容器中。`-v` 参数的作用是将宿主的一个目录作为容器的数据卷挂载到 docker 容器中，是宿主机和容器之间可以共享一个目录，如果本地路径不存在，Docker 也会自动创建。
+
+#### 数据卷实践
+
+```sh
+docker run -itd --name [容器名称] -v [宿主机目录]:[容器目录] [镜像名称] [命令(可选)]
+
+#创建测试文件
+$ echo "file" > /tmp/file1.txt
+
+#启动一个容器，挂载数据卷
+$ docker run -itd --name test1 -v /home/itcast/tmp:/test1/ nginx
+#宿主机目录需要绝对路径
+
+#测试效果
+$ docker exec -it a53c61c77 /bin/bash
+root@xxx:/# cat /test1/file.txt
+file1
+```
+
+1. Docker 挂载数据卷的默认读写权限（rw），用户可以通过ro设置为只读格式：[宿主机文件]:[容器文件]:ro
+
+2. 如果直接挂载一个文件到容器，使用文件工具进行编辑，可能会造成文件的改变，从Docker1.1.0起，这会导致报错误信息，所以推荐方式是直接挂载在文件所在的目录。
+
+
+### 数据卷容器
+
+> 在多个容器之间共享一些持续更新的数据，最简单的方式是使用数据卷容器。数据卷容器也是一个容器，但是它的目的是专门用来提供数据卷供其他容器挂载
+
+数据卷容器（Data Volumne Containers）**使用特定容器维护数据卷**
+
+数据卷容器就是为其他容器提供数据交互存储的容器
+
+#### 数据卷容器操作流程
+
+如果使用数据卷容器，在多个容器间共享数据，并永久保存这些数据，需要有一个规范的流程才能做得到：
+
+1. 创建数据卷容器
+2. 其他容器挂载数据卷容器
+
+注意：数据卷容器自身并不需要启动，但是启动的时候依然可以进行数据卷容器的工作
+
+- 创建一个数据卷容器
+```sh
+docker create -v [容器数据卷目录] --name [容器名称][镜像名称] [命令(可选)]
+$ docker create -v /data --name v1-test1 nginx
+```
+
+- 创建两个容器，同时挂载数据卷容器
+
+```sh
+docker run --volumne-from [数据卷容器ID/name] -tid --name [容器名称] [镜像名称] [命令(可选)]
+
+#创建 vc-test1 容器
+$ docker run --volumes-from 46299390293 -tid --name vc-test1 nginx /bin/bash
+$ docker run --voumnes-from 46299390293 -tid --name vc-test2 nginx /bin/bash
+#创建 vc-test2 容器
+```
+
+- 确认卷容器共享
+
+```sh
+$ docker exec -it vc-test1 /bin/bash
+root@xxx:/# ls /data/
+root@xxx:/# echo 'v-test1' > /data/v-test1.txt
+root@xxx:/# exit
+
+#进入vc-test2，确认数据卷
+$ docker exec -it vc-test2 /bin/bash
+root@xxx:/# echo 'v-test2' > /data/v-test2.txt
+root@xxx:/# ls /data/
+v-test1.txt
+root@xxx:/# exit
+
+#回到vc-test1进行验证
+$ docker exec -it vc-test1 /bin/bash
+root@xxx:/# ls /data
+v-test1.txt v-test2.txt
+root@xxx:/# cat /data/v-test2.txt
+v-test2
+```
+
+#### 数据备份方案
+
+1. 创建一个挂载数据卷容器的容器
+2. 挂载宿主机本地目录作为备份的数据卷
+3. 将数据卷容器的内容备份到宿主机本地目录挂载的数据卷中
+4. 完成备份操作后销毁刚创建的容器
+
+
+```sh
+$ docker run --rm --volumes-from [数据卷容器ID或名称] -v [宿主机目录]:[容器目录] [镜像名称] [备份命令]
+
+#创建备份目录
+$ mkdir /backup
+
+#创建备份的容器
+$ docker run --rm --volumne-from 5020430293 -v /home/itcast/backup/:/backup/ nginx tar zcPf /backup/data.tar.gz /data
+
+#验证操作
+$ ls /backup
+$ zcat /backup/data.tar.gz
+```
+
+-P 使用原文件的原来属性（属性不会依据使用者而变），恢复字段到它们的原始方式，忽略现有的用户权限屏蔽位(umask)，加了-P之后，tar进行解压后，生成的文件的权限，是直接提取tar包里面文件的权限（不会在使用该用户的umask值进行运算），那么不加-P参数，将还要再减去umask的值（位运算的减），但是如果使用root用户进行操作，加不加 -p 参数都一样
 
 ## 由PaaS到Container
 

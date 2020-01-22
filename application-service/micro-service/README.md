@@ -77,7 +77,7 @@ $ sudo make install
 $ sudo ldconfig
 
 #安装是比较卡，成功后需要使用命令测试
-$ protoc -h
+$ protoc --version
 ```
 
 ### 获取 proto 包
@@ -101,3 +101,21 @@ $ go build
 #将生成的 protoc-gen-go 可执行文件，放在 /bin 目录下
 $ sudo cp protoc-gen-go /bin/
 ```
+
+### protobuf 语法
+
+定义 protobuf 文件
+
+```
+syntax = "proto3";
+message PandaRequest {
+  string name = 1;
+  int32 height = 2;
+  repeated int32 weight = 3;
+}
+```
+
+没有指定syntax，默认编译器会使用proto2，语法行必须是文件的非空非注释的第一个行
+
+Repeated 表示重复的那么在重复的那么在Go语言中切片进行代表
+
