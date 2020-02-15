@@ -766,6 +766,92 @@ $ zcat /backup/data.tar.gz
 
 -P 使用原文件的原来属性（属性不会依据使用者而变），恢复字段到它们的原始方式，忽略现有的用户权限屏蔽位(umask)，加了-P之后，tar进行解压后，生成的文件的权限，是直接提取tar包里面文件的权限（不会在使用该用户的umask值进行运算），那么不加-P参数，将还要再减去umask的值（位运算的减），但是如果使用root用户进行操作，加不加 -p 参数都一样
 
+## 网络管理
+
+```sh
+# yum install bridge-utils
+# brctl show
+
+1.添加网桥(br0)
+# brctl addbr br0
+注：设置br0可用
+# ifconfig br0 192.168.100.1 netmask  255.255.255.0
+
+ 
+2.查看网桥
+1）显示所有的网桥信息
+# brctl show
+
+2）显示某个网桥(br0)的信息
+# brctl show br0
+
+3.删除网桥(br0)
+# brctl delbr br0
+
+4. 将eth0端口加入网桥br0
+# brctl addif br0 eth0
+
+5. 从网桥br0中删除eth0端口
+# brctl delif br0 eth0
+```
+
+### 端口映射
+
+容器和宿主机之间的网络是隔离的，可以通过端口映射的方式，将容器中的端口，映射到宿主机的某个端口上。这样就可以通过宿主机的IP+PORT的方式来访问容器里的内容
+
+- docker的端口映射
+  - 1. 随机映射 -P
+  - 2. 指定映射 -p 宿主机ip:宿主机端口:容器端口
+
+生产环境不能使用随机映射，但是随机映射的好处是由Docker分配，端口不会冲突，不管哪种映射都会有所消耗，影响性能，因为涉及到映射的操作
+
+
+#### 随机映射
+
+1. 默认随机映射
+
+```sh
+$ docker run -d -P [镜像名称]
+
+#先启动一个普通的nginx镜像
+$ docker run -d nginx
+
+#查看当前宿主机开发了哪些端口
+$ netstat -tunlp
+
+$ docker run -d -P nginx
+```
+
+2。 指定主机随机映射
+
+```sh
+$ docsker run -d -p [宿主机IP]::[容器端口] --name [容器名称][镜像名称]
+$ docker run -d -p 192.168.8.14::80 --name nginx-1 nginx
+$ docker ps
+
+```
+docker: Error response from daemon: driver failed programming external connectivity on endpoint nignx-3 (e8cd914e76f4ce9b8fc95976e8320847e7daefb0c1ce2439349f094e02cfab94): Error starting userland proxy: listen tcp 47.95.192.23:32797: bind: cannot assign requested address.
+
+```sh
+经过查阅资料得知是docker0网桥的原因，解决上面报错问题需要进行一下步骤
+
+1.kill掉docker所有进程
+[root@node-11 ~]# pkill docker 
+
+2.清空nat表的所有链
+[root@node-11 ~]# iptables -t nat -F
+
+3.停止docker默认网桥docker0
+[root@node-11 ~]# ifconfig docker0 down
+
+4.删除docker0网桥
+[root@node-11 ~]# brctl delbr docker0
+
+5.重启docker服务
+[root@node-11 ~]# systemctl restart docker
+```
+
+
 ## 由PaaS到Container
 
 2013年2月，前Gluster的CEO Ben Golub和dotCloud的CEO Solomon Hykes坐在一起聊天时，Solomon谈到想把dotCloud内部使用的Container容器技术单独拿出来开源，然后围绕这个技术开一家新公司提供技术支持。28岁的Solomon在使用python开发dotCloud的PaaS云时发现，使用 LXC(Linux Container) 技术可以打破产品发布过程中应用开发工程师和系统工程师两者之间无法轻松协作发布产品的难题。这个Container容器技术可以把开发者从日常部署应用的繁杂工作中解脱出来，让开发者能专心写好程序；从系统工程师的角度来看也是一样，他们迫切需要从各种混乱的部署文档中解脱出来，让系统工程师专注在应用的水平扩展、稳定发布的解决方案上。他们越深入交谈，越觉得这是一次云技术的变革，紧接着在2013年3月Docker 0.1发布，拉开了基于云计算平台发布产品方式的变革序幕。
