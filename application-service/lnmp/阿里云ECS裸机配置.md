@@ -1039,3 +1039,7 @@ quit
 4.查看系统时间
 `timedatectl`
 
+
+## 阿里云mongo连接方式
+
+mongo --host host_name --port 27017 -u admin -p --authenticationDatabase admin
