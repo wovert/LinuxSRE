@@ -193,10 +193,14 @@ $ go get -u -v github.com/pkg/errors
 $ go get -u -v github.com/serenize/snaker
 
 # hashicorp_consul.zip 包解压在 github.com/hashicorp/consul
-$ unzip hashicorp_consul.zip -d gihtub.com/hashicorp/consul
+$ unzip hashicorp_consul.zip -d github.com/hashicorp/consul
+或者
+$ git clone git@github.com:hashicorp/consul.git
 
 # miekg_dns.zip 包解压在 github.com/miekg/dns
 $ unzip miekg_dns.zip -d github.com/miekg/dns
+或者
+$ git clone git@github.com:miekg/dns.git
 
 $ go get github.com/micro/micro
 ```
@@ -242,8 +246,75 @@ micro new [command options][arguments ...]
 run                       Run the micro runtime
 ```
 
-##### 创建两个服务
+##### 创建2个服务
 
 ```sh
+#srv表示当前创建的微服务类型, micro/rpc/srv 在$GOPAT目录下
+$ micro new --type "srv" micro/rpc/srv
 
+Creating service go.micro.srv.srv in /home/USERNAME/go/src/micro/rpc/srv
+
+#主函数
+-- main.go
+#插件
+-- plugin.go
+#被调用函数
+-- handler
+  -- example.go
+#订阅服务
+-- subscriber
+  -- example.go
+#proto协议
+-- proto/example
+  - example.proto
+#docker生成文件
+-- Dockerfile
+-- Makefile
+-- README.md
+
+
+download protobuf for micro:
+
+$ brew install protobuf
+$ go get -u github.com/golang/protobuf/{proto,protoc-gen-go}
+$ go get -u github.com/micro/protoc-gen-micro
+
+compile the proto file example.proto:
+
+$ cd /home/USERNAME/go/src/micro/rpc/srv
+$ protoc --proto_path=. --go_out=. --micro_out=. proto/example/example.proto
+```
+
+```sh
+#使用创建srv时给的protobuf命令保留来将proto文件进行编译
+
+$ micro new --type "web" micro/rpc/web
+Creating service go.micro.web.web in /home/USERNAME/go/src/micro/rpc/web
+
+#主函数
+-- main.go
+#插件
+-- plugin.go
+#被调用函数
+-- handler
+  -- handler.go
+#前端页面
+-- index.html
+#docker生成文件
+-- Dockerfile
+-- Makefile
+-- README.md
+
+#编译后将web端呼叫srv端的客户端连接内容修改为srv的内容
+#需要进行调通
+```
+
+- 启动 consul 进行监管: `consul agent -dev`
+
+- 对srv服务进行的操作
+
+```sh
+$ cd /home/USERNAME/go/src/micro/rpc/srv
+$ protoc --proto_path=. --go_out=. --micro_out=. proto/example/example.proto
+#
 ```
