@@ -14,8 +14,8 @@
 
 ### 用户标识、密码：3A
 
-- 认证：Authentication, 通过密码认证用户标识
-- 授权：Authorization，资源使用权
+- 认证：Authentication, 通过密码认证用户标识（登录）
+- 授权：Authorization，资源使用权（角色）
 - 审计：Audition，监督权限（日志）
 
 ### 组（角色）：用户组，用户容器
@@ -704,7 +704,7 @@ $ rm -rf /tmp/sgid/b.fedora
   - `sudoedit`：特殊权限，可用于向其他用户授予sudo权限
   - `cmnd_alias`：命令别名
 
-``` shell
+```sh
 # which useradd
 # which usermod
 # visudo
@@ -729,7 +729,7 @@ $ sudo userel -r slackware
 
 示例
 
-``` shell
+```sh
 User_Alias USERADMINS=tom,jerry
 Cmnd_Alias USERADMINCMNDS=/usr/sbin/useradd,/user/sbin/usermod,/user/bin/passwd [a-z]*, !/usr/bin/passwd root, /usr/sbin/userdel
 USERADMINS ALL=(root) USERADMINCMNDS

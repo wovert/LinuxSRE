@@ -563,7 +563,7 @@ mktemp [OPTION]... [TEMPLATE]
 -u, --dry-run` do not create anything
 ```
 
-`~]# mktemp XXX.ab`
+`~]# mktemp -u file.XXX`
 
 注意：mktemp 会将创建的临时文件名直接返回，因此，可直接通过命令引用保存起来
 
@@ -579,7 +579,7 @@ mktemp [OPTION]... [TEMPLATE]
 
 #### 查看文件内容
 
-``` sh
+```sh
 cat [OPTION]... [FILE]..
 
 options
@@ -593,19 +593,19 @@ options
 
 ---
 
-``` sh
+```sh
 tac [-n] [-E]
 ```
 
 ---
 
-``` sh
+```sh
 more/less
 ```
 
 ---
 
-``` sh
+```sh
 head
 查看文件的前n行
 n # 或者 -#
@@ -613,7 +613,7 @@ n # 或者 -#
 
 ---
 
-``` sh
+```sh
 tail
 查看文件的后n行
 
@@ -623,13 +623,13 @@ n #  或者 -#
 
 #### 从标准输入获取内容创建和执行命令
 
-``` sh
+```sh
 xargs -n 数字
 
 一行显示列数(空白字符分割)
 ```
 
-``` sh
+```sh
 # echo 1 2 3 4 5 > file.txt
 # xargs -n 4 < file.txt
 ```
@@ -638,7 +638,7 @@ xargs -n 数字
 
 #### 回显
 
-``` sh
+```sh
 echo [SHORT-OPTION]... [STRING]...
 
 echo OPTIONS
@@ -666,7 +666,7 @@ echo OPTIONS
 
 `\033[0m` 控制结束符
 
-#  echo -e "\033[31;1;42mHello\033[0m"
+# echo -e "\033[31;1;42mHello\033[0m"
 
 ```
 
@@ -688,7 +688,7 @@ echo OPTIONS
 
 ---
 
-``` sh
+```sh
 date [OPTIONS]... [+FORMAT]
 
 显示系统时钟
@@ -711,14 +711,14 @@ date [OPTIONS]... [+FORMAT]
 
 ---
 
-``` sh
+```sh
 clock 显示硬件时钟
 
 是 hwclcok 的软链接
 ```
 ---
 
-``` sh
+```sh
 hwclock - query or set the hardware clock(RTC)
 
 -s, --hctosys : Set the System Time from the Hardware Clock.（硬件时钟是对的）
@@ -727,13 +727,13 @@ hwclock - query or set the hardware clock(RTC)
 
 ---
 
-``` sh
+```sh
 cal [options] [[[day] month] year]
 ```
 
 ---
 
-``` sh
+```sh
 which OPTIONS
 
 OPTIONS:
@@ -763,7 +763,7 @@ options:
 
 ---
 
-``` sh
+```sh
 w 
 
 增强版的 who 命令
@@ -814,7 +814,7 @@ options
 
 ---
 
-``` sh
+```sh
 rm
 
 options
@@ -827,7 +827,7 @@ options
 
 ---
 
-``` sh
+```sh
 cp 命令 - copy
 ```
 
@@ -851,7 +851,7 @@ cp 命令 - copy
 
 **copy 常用选项**
 
-``` shell
+```sh
 -i interactive : 覆盖文件时提醒信息
 -f force : 强制覆盖目标文件
 -r, -R recursive : 递归复制目录
@@ -870,7 +870,7 @@ cp 命令 - copy
 
 ---
 
-``` sh
+```sh
 install 命令
 ```
 
@@ -884,7 +884,7 @@ install 命令
 
 **install 选项**
 
-``` shell
+```sh
 -m, --mode=MODE : 设定目标文件权限，默认为 755
 -o, --owner=OWNER : 设定文件的属主
 -g, --group=GROUP : 设定文件的属组
@@ -894,14 +894,14 @@ install 命令
 
 **注意**：`install` 命令不能复制目录
 
-``` shell
+```sh
 # install -d demo demo3
 # install -m 770 -o redhat -g linux -t /tmp/etc/ /etc/*
 ```
 
 ---
 
-``` sh
+```sh
 dd 命令 - convert and copy a file
 
 # dd if=/PATH/FROM/SRC of=/PATH/TO/DEST bs=block size count=数量`
