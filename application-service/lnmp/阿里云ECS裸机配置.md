@@ -181,6 +181,7 @@ $ source ~/.bashrc
 
 ```sh
 # cd /usr/local/src
+# wget https://mirrors.nju.edu.cn/mariadb//mariadb-10.5.9/source/mariadb-10.5.9.tar.gz
 # wget https://mirrors.tuna.tsinghua.edu.cn/mariadb//mariadb-10.3.16/bintar-linux-x86_64/mariadb-10.3.16-linux-x86_64.tar.gz
 # tar xvf mariadb-10.3.16-linux-x86_64.tar.gz -C /usr/local
 # cd /usr/local
