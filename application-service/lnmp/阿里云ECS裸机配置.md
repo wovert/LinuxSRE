@@ -744,6 +744,9 @@ configure: error: GNU M4 1.4 is required
 # yum install m4
 # make clean && make install
 
+centos7 安装php7.3.3 解决报错 /usr/local/include/zip.h:59:21: fatal error: zipconf.h: No such file or 
+#解决方法：手动复制过去
+cp /usr/local/lib/libzip/include/zipconf.h /usr/local/include/zipconf.h
 
 安装完成后切入php目录
 继续配置checking发现错误：configure: WARNING: unrecognized options: --with-mcrypt, --enable-gd-native-ttf
