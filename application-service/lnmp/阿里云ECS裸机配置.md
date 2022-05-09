@@ -42,17 +42,16 @@
 # git --version
 
 安装编译依赖软件
-# yum -y install curl-devel expat-devel gettext-devel openssl-devel zlib-devel asciidoc
-# yum -y install gcc perl-ExtUtils-MakeMaker
+# yum -y install curl-devel expat-devel gettext-devel openssl-devel zlib-devel asciidoc install gcc perl-ExtUtils-MakeMaker
 
 卸载老版本
 # yum remove git
 
 下载最新版本
 # cd /usr/local/src/
-# wget https://www.kernel.org/pub/software/scm/git/git-2.22.0.tar.xz
-# tar -vxf git-2.22.0.tar.xz
-# cd git-2.22.0
+# wget https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.34.0.tar.xz --no-check-certificate
+# tar -vxf git-2.34.0.tar.xz 
+# cd git-2.34.0
 
 编译: 编译时发生错误，可能未安装依赖软件包
 # make prefix=/usr/local/git all
@@ -82,6 +81,194 @@ $ source ~/.bashrc
 # git --version
 ```
 
+
+# 先检查是否安装了iptables
+`service iptables status`
+
+# 安装iptables
+`yum install -y iptables`
+
+# 升级iptables
+`yum update iptables `
+
+# 安装iptables-services
+`yum install iptables-services`
+
+
+
+### 禁用/停止自带的firewalld服务
+
+# 停止firewalld服务
+`systemctl stop firewalld`
+
+# 禁用firewalld服务
+`systemctl mask firewalld`
+
+cd /etc/sysconfig 到这个目录下 vi iptables
+
+增加一句
+
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 6379 -j ACCEPT
+
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 27017 -j ACCEPT
+
+注：6379是redis默认端口，如果你修改了端口，请增加对应的
+
+
+#查看iptables现有规则
+iptables -L -n
+#先允许所有,不然有可能会杯具
+iptables -P INPUT ACCEPT
+#清空所有默认规则
+iptables -F
+#清空所有自定义规则
+iptables -X
+#所有计数器归0
+iptables -Z
+#允许来自于lo接口的数据包(本地访问)
+iptables -A INPUT -i lo -j ACCEPT
+#开放22端口
+iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+#开放21端口(FTP)
+iptables -A INPUT -p tcp --dport 21 -j ACCEPT
+#开放80端口(HTTP)
+iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+#开放443端口(HTTPS)
+iptables -A INPUT -p tcp --dport 443 -j ACCEPT
+#允许ping
+iptables -A INPUT -p icmp --icmp-type 8 -j ACCEPT
+#允许接受本机请求之后的返回数据 RELATED,是为FTP设置的
+iptables -A INPUT -m state --state  RELATED,ESTABLISHED -j ACCEPT
+#其他入站一律丢弃
+iptables -P INPUT DROP
+#所有出站一律绿灯
+iptables -P OUTPUT ACCEPT
+#所有转发一律丢弃
+iptables -P FORWARD DROP
+
+#如果要添加内网ip信任（接受其所有TCP请求）
+iptables -A INPUT -p tcp -s 45.96.174.68 -j ACCEPT
+#过滤所有非以上规则的请求
+iptables -P INPUT DROP
+#要封停一个IP，使用下面这条命令：
+iptables -I INPUT -s ***.***.***.*** -j DROP
+#要解封一个IP，使用下面这条命令:
+iptables -D INPUT -s ***.***.***.*** -j DROP
+
+#保存上述规则
+service iptables save
+
+#注册iptables服务
+#相当于以前的chkconfig iptables on
+systemctl enable iptables.service
+#开启服务
+systemctl start iptables.service
+#查看状态
+systemctl status iptables.service
+
+最后重启防火墙使配置生效
+/etc/init.d/iptables restart 
+
+1.首先在/etc/sysconfig/iptables-config中修改或者添加以下内容
+
+#添加以下内容,注意顺序不能调换
+IPTABLES_MODULES="ip_conntrack_ftp"
+IPTABLES_MODULES="ip_nat_ftp"
+2.重新设置iptables设置
+
+iptables -A INPUT -m state --state  RELATED,ESTABLISHED -j ACCEPT
+
+```sh
+执行如下命令
+# systemctl stop firewalld
+# systemctl mask firewalld
+
+安装iptables-service
+# yum install iptables-services
+
+设置开机启动
+# systemctl enable iptables
+
+保存设置
+# service iptables save
+
+
+1.清除所有规则：
+iptables  -F
+
+2.开放常用tcp端口：
+iptables  -I  INPUT  -p  tcp  -m  multiport  --dports 20,21,22,3306,80,443,25,110,8000:9000  -j  ACCEPT
+iptables  -I  OUTPUT  -p  tcp  -m  multiport  --sports 20,21,22,3306,80,443,25,110,8000:9000  -j  ACCEPT
+
+3.开放常用udp端口：
+iptables  -I  INPUT  -p  udp  -m  multiport  --dports  53  -j  ACCEPT
+iptables  -I  OUTPUT  -p  udp  -m  multiport  --sports  53  -j  ACCEPT
+
+4.开放特殊udp端口（如：dns）：
+iptables  -I  INPUT  -p  udp  --sport  53  -j  ACCEPT
+iptables  -I  OUTPUT  -p  udp  --dport  53  -j  ACCEPT
+
+5.开放vrrp协议：
+iptables  -I  INPUT  -p  vrrp  -j  ACCEPT
+
+6.允许服务器互ping：
+iptables  -A  OUTPUT  -p  icmp  -j  ACCEPT
+iptables  -A  INPUT  -p  icmp  -j  ACCEPT
+
+7.允许握手成功的数据通过：
+iptables  -I  INPUT  -p  tcp  -m  state  --state  RELATED,ESTABLISHED  -j  ACCEPT
+iptables  -I  OUTPUT  -p  tcp  -m  state  --state  RELATED,ESTABLISHED  -j  ACCEPT
+
+8.设置默认关闭所有端口：
+iptables  -P  FORWARD  DROP
+iptables  -P  OUTPUT  ACCEPT
+iptables  -P  INPUT  DROP
+
+9.防syn***：
+iptables  -N  syn-flood 
+iptables  -A  INPUT  -p  tcp  --syn  -j  syn-flood 
+iptables  -I  syn-flood  -p  tcp  -m  limit  --limit  3/s  --limit-burst  6  -j  RETURN 
+iptables  -A  syn-flood  -j  REJECT
+
+10.防ddos***：
+iptables  -A  INPUT  -i  eth0  -p  tcp  --syn  -m  connlimit  --connlimit-above  15 -j  DROP 
+iptables  -A  INPUT  -p  tcp  -m  state  --state  ESTABLISHED,RELATED  -j  ACCEPT
+iptables  -A  INPUT  -p  tcp  --syn  -m  limit  --limit  12/s  --limit-burst  24  -j  ACCEPT
+iptables  -A  FORWARD  -p  tcp  --syn  -m  limit  --limit  1/s  -j  ACCEPT
+
+11.防cc***：
+iptables  -I  INPUT  -p  tcp  --dport  80  -m  connlimit  --connlimit-above  50  -j  REJECT  # 允许单个IP的最大连接数为30
+iptables  -A  INPUT  -p  tcp  --dport  80  -m  recent  --name  BAD_HTTP_ACCESS  --update  --seconds  60  --hitcount  30  -j  REJECT
+iptables  -A  INPUT  -p  tcp --dport  80  -m  recent  --name  BAD_HTTP_ACCESS  --set  -j  ACCEPT
+#单个IP在60秒内只允许最多新建30个连接
+
+
+12.保存：
+iptables-save  >  /etc/sysconfig/iptables
+
+
+
+#!/bin/sh
+iptables -P INPUT ACCEPT
+iptables -F
+iptables -X
+iptables -Z
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+iptables -A INPUT -p tcp --dport 21 -j ACCEPT
+iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+iptables -A INPUT -p tcp --dport 443 -j ACCEPT
+iptables -A INPUT -p icmp --icmp-type 8 -j ACCEPT
+iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+iptables -P INPUT DROP
+iptables -P OUTPUT ACCEPT
+iptables -P FORWARD DROP
+service iptables save
+systemctl restart iptables.service
+```
+
+
+
 ## Node开发工具
 
 [Install NVM](https://github.com/nvm-sh/nvm)
@@ -100,16 +287,16 @@ $ source ~/.bashrc
 # nvm ls-remote
 
 安装版本
-# nvm install v10.16.0
+# nvm install v10.24.1
 
 查看一下当前已经安装的版本
 # nvm ls
 
 切换版本
-# nvm use v10.16.0
+# nvm use v10.24.1
 
 设置默认版本
-# nvm alias default v10.16.0
+# nvm alias default v10.24.1
 
 # echo "用户名 ALL=(ALL) NOPASSWD:ALL">> /etc/sudoers
 ```
@@ -181,11 +368,10 @@ $ source ~/.bashrc
 
 ```sh
 # cd /usr/local/src
-# wget https://mirrors.nju.edu.cn/mariadb//mariadb-10.5.9/source/mariadb-10.5.9.tar.gz
-# wget https://mirrors.tuna.tsinghua.edu.cn/mariadb//mariadb-10.3.16/bintar-linux-x86_64/mariadb-10.3.16-linux-x86_64.tar.gz
-# tar xvf mariadb-10.3.16-linux-x86_64.tar.gz -C /usr/local
+# wget https://mirrors.tuna.tsinghua.edu.cn/mariadb/mariadb-10.5.13/bintar-linux-systemd-x86_64/mariadb-10.5.13-linux-systemd-x86_64.tar.gz --no-check-certificate
+# tar xvf mariadb-10.5.13-linux-systemd-x86_64.tar.gz -C /usr/local
 # cd /usr/local
-# ln -sv mariadb-10.3.16-linux-x86_64  mysql
+# ln -sv mariadb-10.3.32  mysql
 # cd /usr/local/mysql
 # chown -R root:mysql ./*
 ```
@@ -277,6 +463,13 @@ mysql> show variables like'collation%';
 ```sql
 create database test;
 grant all privileges on test.* to  test@'%' identified  BY '密码';
+
+
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, RELOAD, SHUTDOWN, PROCESS, FILE,
+REFERENCES, INDEX, ALTER, SHOW DATABASES, SUPER, CREATE TEMPORARY TABLES,
+ LOCK TABLES, EXECUTE, REPLICATION SLAVE, REPLICATION CLIENT  ON *.* TO 'shsadmin'@'%'
+IDENTIFIED BY '' WITH GRANT OPTION;
+
 flush privileges;
 ```
 
@@ -353,12 +546,9 @@ gitlib右上角个人资料，进入SSH公钥配置 复制的东西加进去提�
 ### 安装相关的依赖包
 
 ```sh
-yum -y install lrzsz gcc gcc-c++ autoconf automake make
-yum install -y pcre pcre-devel
-yum install -y zlib zlib-devel
-yum install -y openssl openssl-devel
+yum -y install lrzsz gcc gcc-c++ autoconf automake make pcre pcre-devel zlib zlib-devel openssl openssl-devel
 ```
-
+scp files.tar.gz root@154.38.119.14:/usr/local/src
 ### 下载nginx包
 
 ```sh
@@ -645,8 +835,8 @@ AUTH命令跟其他redis命令一样，是没有加密的；阻止不了攻击�
 ## php7 安装
 
 ``` sh
-# cd /usr/local/src && wget http://cn2.php.net/distributions/php-7.3.8.tar.gz
-# tar -xzxvf php-7.2.3.tar.gz
+# cd /usr/local/src && wget https://www.php.net/distributions/php-7.4.29.tar.gz
+# tar -xzxvf php-7.4.29.tar.gz
 
 # yum install -y gcc gcc-c++  make zlib zlib-devel pcre pcre-devel  libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel libxml2 libxml2-devel glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel ncurses ncurses-devel curl curl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel openssl openssl-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers libXpm-devel postgresql-devel  libxslt-devel  icu libicu libicu-devel
 
@@ -699,6 +889,32 @@ AUTH命令跟其他redis命令一样，是没有加密的；阻止不了攻击�
 --with-libdir=/lib/x86_64-linux-gnu/ \
 --disable-rpath \
 --enable-inline-optimization
+--enable-zip
+--with-gd
+--with-pcre-regex
+--with-freetype-dir
+--with-xpm-dir
+--with-png-dir
+--with-jpeg-dir
+--with-libxml-dir
+
+No package 'oniguruma' found解决
+安装PHP7.4找不到 No package 'oniguruma' found
+
+一、oniguruma是什么？
+oniguruma是一个处理正则表达式的库，我们之所以需要安装它，
+是因为在安装php7.4的过程中，mbstring的正则表达式处理功能对这个包有依赖性，
+所以我们要先安装这个库
+
+```sh
+wget https://github.com/kkos/oniguruma/archive/v6.9.4.tar.gz -O oniguruma-6.9.4.tar.gz 
+tar -zxvf oniguruma-6.9.4.tar.gz
+cd oniguruma-6.9.4/
+./autogen.sh
+./configure
+make
+sudo make install
+```
 
 # php --ini
 
@@ -1047,3 +1263,8 @@ quit
 ## 阿里云mongo连接方式
 
 mongo --host host_name --port 27017 -u admin -p --authenticationDatabase admin
+
+
+export GOROOT=/usr/local/go
+export GOPATH=/home/gopath 
+export PATH=\$PATH:\$GOROOT/bin
