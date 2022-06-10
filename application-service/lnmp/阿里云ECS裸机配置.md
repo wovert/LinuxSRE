@@ -594,6 +594,9 @@ cd /etc/nginx/ && cp nginx.conf{,.bak}
   export PATH=$PATH:/usr/local/nginx/sbin
 
 # source /etc/profile.d/nginx.sh
+
+# mkdir -pv /var/tmp/nginx/client
+# mkdir -pv /var/cache/nginx/scgi
 ```
 
 ### 相关服务
@@ -608,17 +611,18 @@ cd /etc/nginx/ && cp nginx.conf{,.bak}
 
 在/etc/init.d下创建文件nginx
 
-[root@localhost ~]# vim /etc/init.d/nginx
+`[root@localhost ~]# vim /etc/init.d/nginx`
 其内容参考nginx官方文档
 
 需要注意的配置：
-
-nginx="/usr/local/nginx/sbin/nginx" //修改成nginx执行程序的路径。
-
-NGINX_CONF_FILE="/usr/local/nginx/conf/nginx.conf" //修改成nginx.conf文件的路径。
+`
+nginx="/usr/local/nginx/sbin/nginx" # 修改成nginx执行程序的路径
+NGINX_CONF_FILE="/etc/nginx/nginx.conf" # 修改成nginx.conf文件的路径
+`
+ 
 保存后设置文件的执行权限
 
-[root@localhost ~]# chmod a+x /etc/init.d/nginx
+`[root@localhost ~]# chmod a+x /etc/init.d/nginx`
 至此就可以通过下面指令控制启动停止
 
 ```
@@ -677,9 +681,9 @@ WantedBy=multi-user.target		// 服务用户的模式
 ```sh
 # yum install gcc gcc-c++
 
-# wget http://download.redis.io/releases/redis-5.0.5.tar.gz
-# tar -xzvf redis-5.0.5.tar.gz
-# cd redis-5.0.5
+# wget [redis-7.0.1](http://download.redis.io/releases/redis-7.0.1.tar.gz)
+# tar -xzvf redis-7.0.1.tar.gz
+# cd redis-7.0.1
 # make && make install PREFIX=/usr/local/redis
 # mkdir /usr/local/redis/etc
 # cp redis.conf /usr/local/redis/etc/
