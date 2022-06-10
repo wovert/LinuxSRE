@@ -368,10 +368,10 @@ systemctl restart iptables.service
 
 ```sh
 # cd /usr/local/src
-# wget https://mirrors.tuna.tsinghua.edu.cn/mariadb/mariadb-10.5.13/bintar-linux-systemd-x86_64/mariadb-10.5.13-linux-systemd-x86_64.tar.gz --no-check-certificate
-# tar xvf mariadb-10.5.13-linux-systemd-x86_64.tar.gz -C /usr/local
+# wget https://mirrors.tuna.tsinghua.edu.cn/mariadb/mariadb-10.5.16/bintar-linux-systemd-x86_64/mariadb-10.5.16-linux-systemd-x86_64.tar.gz --no-check-certificate
+# tar xvf mariadb-10.5.16-linux-systemd-x86_64.tar.gz -C /usr/local
 # cd /usr/local
-# ln -sv mariadb-10.3.32  mysql
+# ln -sv mariadb-10.5.16  mysql
 # cd /usr/local/mysql
 # chown -R root:mysql ./*
 ```
