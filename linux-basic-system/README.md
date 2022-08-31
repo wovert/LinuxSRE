@@ -1,4 +1,4 @@
-# Linux 基础系统-[零壹码博客](https://lingyima.com)
+# Linux 基础系统
 
 - [Linux 安装与配置](./setup-setting/)
 - [Linux 基础入门](./linux-basic/)

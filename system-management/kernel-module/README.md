@@ -2,6 +2,8 @@
 
 > Linux是单内核设计，但借鉴了微内核设计的优点；为内核引入了模块化机制
 
+[Linux kernel map](https://makelinux.github.io/kernel/map/)
+
 ## 内核的组成部分
 
 - kernel：内核核心一般为bzimage，通常位于`/boot/vmlinuz-VERSION-release`

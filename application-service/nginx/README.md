@@ -1,4 +1,4 @@
-# Nginx -[零壹码博客](https://lingyima.com)
+# Nginx
 
 > engine X: nginx, Igor Sysoev, Rambler Media 服务器 [Nginx官网](http://nginx.org/en/docs)
 

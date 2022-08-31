@@ -1,4 +1,4 @@
-# Linux 安装与配置-[沃尔特](https://www.wovert.com)
+# Linux 安装与配置
 
 ## Linux 发行版安装
 

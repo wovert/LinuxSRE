@@ -1,17 +1,7 @@
-# Linux 运维架构-[零壹码博客](https://lingyima.com)
+# Linux 运维架构
 
-## Linux SRE 行业前景
-
-- 流程化、标准化的工作越来越依赖于信息系统，是各企业发展的必然趋势，信息系统开发和运维也会创造越来越多的工作岗位
-- **机器化、自动化、智能化**是人类科技发展趋势，也越来越要求人们对信息系统有更深入的管控能力
-- Linux系统已经几乎无处不在
-  - **Android** 手机底层的系统
-  - 基于Android 的各种**VR设备**
-  - 各大型互联网公司**IDC主机的操作系统**
-  - 各种**智能设备**，如**智能监控**等
-
-[www.netcraft.com](https://www.netcraft.com)
-
+- [www.netcraft.com](https://www.netcraft.com)
+- 
 [www.top500.org](https://www.top500.org)
 
 ## Linux 运维工作岗位

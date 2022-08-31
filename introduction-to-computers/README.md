@@ -1,4 +1,4 @@
-# 计算机入门-[零壹码博客](https://lingyima.com)
+# 计算机入门
 
 ## [计算机概论](./computer-concepts/)
 

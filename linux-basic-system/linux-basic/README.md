@@ -1,4 +1,4 @@
-# Linux 基础入门-[微明](https://www.wovert.com)
+# Linux 基础入门
 
 ## 终端
 
@@ -63,7 +63,7 @@
 - 获取当前环境的shell: `# echo $SHELL`
 - 显示当前系统使用的 shell 是哪种 shell : `# cat /etc/shells`
 
-### 命令行接口：
+### 命令行接口
 
 `[user@host ~]# COMMAND` prompt
 

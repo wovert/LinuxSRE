@@ -1,4 +1,4 @@
-# 应用服务管理-[零壹码博客](https://lingyima.com)
+# 应用服务管理
 
 - [webervice](./webserivce/)
 - [HTTP协议](./http/)
