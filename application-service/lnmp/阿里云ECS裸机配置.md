@@ -197,8 +197,8 @@ iptables -A INPUT -m state --state  RELATED,ESTABLISHED -j ACCEPT
 iptables  -F
 
 2.开放常用tcp端口：
-iptables  -I  INPUT  -p  tcp  -m  multiport  --dports 20,21,22,3306,80,443,25,110,8000:9000  -j  ACCEPT
-iptables  -I  OUTPUT  -p  tcp  -m  multiport  --sports 20,21,22,3306,80,443,25,110,8000:9000  -j  ACCEPT
+iptables  -I  INPUT  -p  tcp  -m  multiport  --dports 20,21,22,3306,27017,6379,80,443,25,110,8000:9000  -j  ACCEPT
+iptables  -I  OUTPUT  -p  tcp  -m  multiport  --sports 20,21,22,3306,6379,27017,80,443,25,110,8000:9000  -j  ACCEPT
 
 3.开放常用udp端口：
 iptables  -I  INPUT  -p  udp  -m  multiport  --dports  53  -j  ACCEPT
@@ -287,16 +287,16 @@ systemctl restart iptables.service
 # nvm ls-remote
 
 安装版本
-# nvm install v10.24.1
+# nvm install v14.20.1
 
 查看一下当前已经安装的版本
 # nvm ls
 
 切换版本
-# nvm use v10.24.1
+# nvm use v14.20.1
 
 设置默认版本
-# nvm alias default v10.24.1
+# nvm alias default v14.20.1
 
 # echo "用户名 ALL=(ALL) NOPASSWD:ALL">> /etc/sudoers
 ```
@@ -352,7 +352,7 @@ systemctl restart iptables.service
 ```sh
 查询
 # rpm -qa | grep mariadb*
-  mariadb-libs-5.5.60-1.el7_5.x86_64
+  mariadb-libs-5.5.65-1.el7_5.x86_64
 
 卸载
 # rpm -e mariadb-libs-5.5.60-1.el7_5.x86_64 --nodeps
@@ -368,7 +368,7 @@ systemctl restart iptables.service
 
 ```sh
 # cd /usr/local/src
-# wget https://mirrors.tuna.tsinghua.edu.cn/mariadb/mariadb-10.5.16/bintar-linux-systemd-x86_64/mariadb-10.5.16-linux-systemd-x86_64.tar.gz --no-check-certificate
+# wget https://mirrors.xtom.com.hk/mariadb//mariadb-10.5.17/bintar-linux-systemd-x86_64/mariadb-10.5.17-linux-systemd-x86_64.tar.gz --no-check-certificate
 # tar xvf mariadb-10.5.16-linux-systemd-x86_64.tar.gz -C /usr/local
 # cd /usr/local
 # ln -sv mariadb-10.5.16  mysql
