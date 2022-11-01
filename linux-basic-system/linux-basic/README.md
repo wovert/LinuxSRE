@@ -293,7 +293,7 @@ COMMAND [OPTIONS...] [ARGUMENTS...]
 
 ### 查看命令类型
 
-`~]# type COMMAND`
+`~]# type -a COMMAND`
 
 ### OPTIONS 选项
 
