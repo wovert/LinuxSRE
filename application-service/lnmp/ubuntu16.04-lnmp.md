@@ -37,6 +37,48 @@ apt install nginx=1.14.0-0ubuntu1.6   #安装软件包的时候指定安装具�
 
 C/C++开发环境搭建
 # apt install build-essential gdb
+
+查看是否安装了git 及 安装
+# git
+# apt-get install git
+# apt-get update
+
+git的配置
+这里git的配置，与window的相似，只是执行的地方不一样，乌班图直接在终端执行即可！！
+
+
+# git config --global user.name  “aaa”
+# git config --global user.email "aa@qq.com"
+# ssh-keygen -t rsa -C "aa@qq.com"
+
+# cd ~/.ssh
+# less id_rsa.pub
+
+配置静态IP
+
+# vim /etc/netplan/00-installer-config.yaml
+# This is the network config written by 'subiquity'
+network:
+  ethernets:
+    ens33:
+      dhcp4: true
+    ens34:
+      dhcp4: false
+      addresses:
+        - 192.168.1.111/24
+      optional: true
+      routes:
+        - to: default
+          via: 192.168.1.1
+      nameservers:
+        addresses: [192.168.1.1, 8.8.8.8]
+        search:
+          - localhost
+          - local
+  version: 2
+
+应用生效
+# sudo netplan apply
 ```
 
 
