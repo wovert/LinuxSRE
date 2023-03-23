@@ -1,3 +1,45 @@
+# 修改软件管理仓库
+
+```shell
+~# egrep  "^[^#]" /etc/apt/sources.list
+
+修改默认软件仓库（预发布软件仓库源，下载很慢，不建议使用的，替换为国内的软件仓库）
+# sed -i 's/cn.archive.ubuntu/mirrors.aliyun/' /etc/apt/sources.list
+
+
+更新ubuntu 系统
+更新软件仓库，创建链接
+# apt update
+
+系统软件包更新
+# apt upgrade
+
+#apt常用命令
+apt list                #apt列出仓库软件包，等于yum list
+apt update              #更新本地软件包列表索引，修改了apt仓库后必须执⾏
+apt upgrade             #升级所有已安装且可升级到新版本的软件包
+apt search NAME         #搜索安装包
+apt purge apache2       #卸载单个软件包删除配置⽂件
+apt show apache2        #查看某个安装包的详细信息
+apt install apache2     #在线安装软件包
+apt remove apache2      #卸载单个软件包但是保留配置⽂件
+apt autoremove apache2  #删除安装包并解决依赖关系
+apt full-upgrade        #升级整个系统，必要时可以移除旧软件包。
+apt edit-sources        #编辑source源⽂件
+apt-cache madison nginx #查看仓库中软件包有哪些版本可以安装
+apt install nginx=1.14.0-0ubuntu1.6   #安装软件包的时候指定安装具体的版本
+
+安装vim
+先卸载 vim-tiny
+# apt-get remove vim-common
+再安装vim full
+# apt-get install vim
+
+C/C++开发环境搭建
+# apt install build-essential gdb
+```
+
+
 # ubuntu16.04编译安装php7.2.7 + nginx-1.14.0
 
 ```
