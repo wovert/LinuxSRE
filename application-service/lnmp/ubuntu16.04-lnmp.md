@@ -49,6 +49,8 @@ git的配置
 
 # git config --global user.name  “aaa”
 # git config --global user.email "aa@qq.com"
+解除ssl验证后，再次git即可
+# git config --global http.sslVerify false
 # ssh-keygen -t rsa -C "aa@qq.com"
 
 # cd ~/.ssh

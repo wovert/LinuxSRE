@@ -1,34 +1,14 @@
 # 计算机网络
 
-## 运维基础
-
-- 系统
-- 数据库
-- 网络
-- 开发
-
-从系统运维的角度学习网络，了解网络知识
-
-从系统运维的角度学习英语，了解英语的知识
-
-## 学习网络的思想
-
-- 抓重点学习
-- 借助人脉
-- 学会从社会思想上学习网络知识/处理网络问题
-- 学会知识不如掌握学会知识的方法
-
 ## TCP/IP协议栈
 
-ISO:Internatianal Standardization Organization，国际标准化组织
+- ISO:Internatianal Standardization Organization 国际标准化组织
+- OSI:Open System Interconnect Reference Model 开放式系统互联参考模型
 
-OSI:Open System Interconnect Reference Model，开放式系统互联参考模型
+- 资源子网：application(数据如何组织)
+- 通信子网：transform, network, data link（数据如何送往目的地）
 
-资源子网：application(数据如何组织)
-
-通信子网：transform, network, data link（数据如何送往目的地）
-
-## MAC: Media Access Control，物理地址
+## MAC: Media Access Control 物理地址
 
 > 附加在网卡上的全球唯一编号，进行互联网通信物理地址
 - 48bits: 6bytes
@@ -83,6 +63,8 @@ OSI:Open System Interconnect Reference Model，开放式系统互联参考模型
     - `1.3.2.1/255.0.0.0` = 1.0.0.0
     - `1.3.2.1/255.255.0.0` = 1.3.0.0
   - 私网地址：`10.0.0.0/255.0.0.0`
+- 主机号：0.0.0.0 ~ 127.255.255.255
+
 
 ### B类
 
