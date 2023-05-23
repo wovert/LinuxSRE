@@ -44,6 +44,9 @@
 安装编译依赖软件
 # yum -y install curl-devel expat-devel gettext-devel openssl-devel zlib-devel asciidoc install gcc perl-ExtUtils-MakeMaker
 
+
+yum install curl-devel  expat-devel -y
+
 卸载老版本
 # yum remove git
 
@@ -276,9 +279,6 @@ systemctl restart iptables.service
 ```sh
 # curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
 
-# export NVM_DIR="$HOME/.nvm"
-# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-# [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
 查看nvm版本
 # nvm --version
@@ -368,8 +368,8 @@ systemctl restart iptables.service
 
 ```sh
 # cd /usr/local/src
-# wget https://mirrors.xtom.com.hk/mariadb//mariadb-10.5.17/bintar-linux-systemd-x86_64/mariadb-10.5.17-linux-systemd-x86_64.tar.gz --no-check-certificate
-# tar xvf mariadb-10.5.16-linux-systemd-x86_64.tar.gz -C /usr/local
+# wget https://tw1.mirror.blendbyte.net/mariadb//mariadb-10.11.3/bintar-linux-systemd-x86_64/mariadb-10.11.3-linux-systemd-x86_64.tar.gz --no-check-certificate
+# tar xvf mariadb-10.11.3-linux-systemd-x86_64.tar.gz -C /usr/local
 # cd /usr/local
 # ln -sv mariadb-10.5.16  mysql
 # cd /usr/local/mysql
@@ -843,6 +843,63 @@ AUTH命令跟其他redis命令一样，是没有加密的；阻止不了攻击�
 # cd /usr/local/src && wget https://www.php.net/distributions/php-7.4.29.tar.gz
 # tar -xzxvf php-7.4.29.tar.gz
 
+
+yum -y install libxml2 
+
+yum -y install libxml2-devel 
+
+yum -y install openssl 
+
+yum -y install openssl-devel 
+
+yum -y install curl-devel 
+
+yum -y install libjpeg-devel 
+
+yum -y install libpng-devel 
+
+yum -y install freetype-devel 
+
+yum -y install bzip2-devel 
+
+yum -y install libmcrypt libmcrypt-devel 
+
+yum -y install postgresql-devel 
+
+yum -y install aspell-devel 
+
+yum -y install readline-devel 
+
+yum -y install libxslt-devel 
+
+yum -y install net-snmp-devel 
+
+
+yum -y install unixODBC-devel 
+
+yum -y install libicu-devel 
+
+yum -y install libc-client-devel 
+
+yum -y install libXpm-devel 
+
+yum -y install libvpx-devel 
+
+yum -y install enchant-devel 
+
+yum -y install openldap 
+
+yum -y install openldap-devel 
+
+yum -y install db4-devel 
+
+yum -y install gmp-devel 
+
+yum -y install sqlite-devel 
+
+yum -y install mysql-devel
+
+
 # yum install -y gcc gcc-c++  make zlib zlib-devel pcre pcre-devel  libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel libxml2 libxml2-devel glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel ncurses ncurses-devel curl curl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel openssl openssl-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers libXpm-devel postgresql-devel  libxslt-devel  icu libicu libicu-devel
 
 ./configure \
@@ -867,7 +924,17 @@ AUTH命令跟其他redis命令一样，是没有加密的；阻止不了攻击�
 --enable-mbstring \
 --enable-calendar \
 --enable-tokenizer \
---with-gd \
+--enable-gd \
+--with-external-gd \
+--with-avif \
+--with-webp \
+--with-jpeg \
+--with-png \
+--with-xpm \
+--with-freetype \
+--enable-gd-jis-conv \
+--with-gettext \
+--with-libxml \
 --with-xsl \
 --with-bz2 \
 --with-curl \
@@ -882,26 +949,42 @@ AUTH命令跟其他redis命令一样，是没有加密的；阻止不了攻击�
 --with-zlib-dir \
 --with-pdo-pgsql \
 --with-pcre-regex \
---with-freetype-dir \
---with-xpm-dir=/usr \
---with-png-dir=/usr \
 --with-fpm-user=www \
 --with-fpm-group=www \
---with-jpeg-dir=/usr \
 --with-mysqli=mysqlnd \
 --with-libxml-dir=/usr \
 --with-pdo-mysql=mysqlnd \
 --with-libdir=/lib/x86_64-linux-gnu/ \
 --disable-rpath \
---enable-inline-optimization
+--enable-inline-optimization \
+--with-iconv=/usr/local/bin/ \
 --enable-zip
---with-gd
---with-pcre-regex
---with-freetype-dir
---with-xpm-dir
---with-png-dir
---with-jpeg-dir
---with-libxml-dir
+
+make ZEND_EXTRA_LIBS='-liconv'
+make install
+
+
+手动编译 gd
+
+https://github.com/libgd/libgd/releases/download/gd-2.3.3/libgd-2.3.3.tar.gz
+
+
+安装php8.1 编译时提示configure: error: iconv does not support errno
+
+wget https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.17.tar.gz
+
+tar -xzvf libiconv-1.17.tar.gz
+cd libiconv-1.17
+./configure --prefix=/usr/local/libiconv
+
+. 编辑 /etc/ld.so.conf这个文件，最后面添加以下内容
+`/usr/local/lib
+接着执行下面的命令立即生效
+
+`# ldconfig -f`
+
+
+
 
 No package 'oniguruma' found解决
 安装PHP7.4找不到 No package 'oniguruma' found
