@@ -1959,7 +1959,7 @@ show table status [like|where]
 
 ## 事务流程
 
-- 启动事务：`start transaction`
+- 启动事务：`start transaction` 或者 `begin`
 - 结束事务：
   - 完成，提交：`commit`
   - 未完成，回滚：`rollback`
@@ -2004,6 +2004,16 @@ mysql> commit;
 - repeatable read (可重复读)
   - 问题：幻读
 - seriablizable (可串行化)，默认
+
+### 事务默认自动提交
+
+```sql
+-- 查看事务人默认提交方式
+select @@autocommit;
+-- 1：自动提交 0：手动提交
+-- 修改事务提交方式
+set @@autocommit = 0;
+```
 
 ### IP1-session1(read-uncommitted)
 

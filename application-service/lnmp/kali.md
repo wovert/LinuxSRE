@@ -1,3 +1,6 @@
+# Kali
+
+```sh
 echo
 "deb https://mirrors.ustc.edu.cn/kali kali-rolling main non-free contrib
 deb-src https://mirrors.ustc.edu.cn/kali kali-rolling main non-free " 
@@ -6,6 +9,7 @@ deb-src https://mirrors.ustc.edu.cn/kali kali-rolling main non-free "
 apt-get update
 
 apt-cache search linux headers
+```
 
 默认安装完成的Kali Linux是没有图形界面的，对于需要一些需要在图形界面下配置的安全工具，比如CobalStrike，命令行操作界面的局限性就暴露出来了。
 
@@ -149,7 +153,7 @@ kex --win -s
 
 
 
-  1. 下载最新的JAVA JDK
+1. 下载最新的JAVA JDK
 jdk-8u91-linux-x64
 
 2. 解压缩文件并移动至/opt
@@ -182,3 +186,27 @@ java -version
 java version "1.8.0_91"
 Java(TM) SE Runtime Environment (build 1.8.0_91-b14)
 Java HotSpot(TM) 64-Bit Server VM (build 25.91-b14, mixed mode)
+
+
+
+## 翻墙&代理
+
+- GFW长城防火墙
+- 翻墙：传输过程协议
+  - http 代
+  - socks 代理
+  - ssh 隧道
+  - VPN
+- Goagent
+- Tor
+
+- 代理意义
+  - 隐藏来源
+  - 加密通信
+  - 突破网络封锁
+
+## 搜索引擎：
+
+- Fofa
+- Hunter
+- 0Zone

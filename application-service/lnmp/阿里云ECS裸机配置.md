@@ -2,76 +2,49 @@
 
 ## 账号配置
 
-1. 修改root密码：云服务器ECS->实例->实例列表->实例->更多->密码/秘钥->重置实例密码->**重启实例**
-2. 使用ssh协议root账号登录并创建普通登录账号和密码
 
 ```sh
-登录
 # ssh root@IP地址
-
-创建普通登录用户
 # useradd 用户名
-
-修改普通登录用户密码
 # passwd 用户名
-```
 
-3. 禁止root账号远程登录
-
-```sh
 # vim /etc/ssh/sshd_config
   PermitRootLogin no
-
-重启 sshd 服务
 # systemctl restart sshd
 ```
 
 ## Setup系统开发工具
 
 ```sh
-
 # yum -y install lrzsz
+
+# 阿里云镜像
+wget -O /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-7.repo
 
 安装系统开发工具包
 # yum -y groupinstall "Development Tools" "Server Platform Development"
 
-查看系统版本
 # lsb_release -a
-
-安装 git 源码构建
 # git --version
 
-安装编译依赖软件
 # yum -y install curl-devel expat-devel gettext-devel openssl-devel zlib-devel asciidoc install gcc perl-ExtUtils-MakeMaker
 
-
-yum install curl-devel  expat-devel -y
-
-卸载老版本
 # yum remove git
 
-下载最新版本
 # cd /usr/local/src/
 # wget https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.34.0.tar.xz --no-check-certificate
 # tar -vxf git-2.34.0.tar.xz 
 # cd git-2.34.0
 
-编译: 编译时发生错误，可能未安装依赖软件包
 # make prefix=/usr/local/git all
 # make prefix=/usr/local/git install
 
-环境变量设置
-[Root 用户添加环境变量]
 # echo "export PATH=$PATH:/usr/local/git/bin" >> /etc/profile
-
-生效环境变量
 # source /etc/profile
 
 或者
 # vim /etc/profile.d/git.sh
   export PATH=$PATH:/usr/local/git/bin
-
-生效环境变量
 # source /etc/profile.d/git.sh
 
 [其他用户:登录该用户, 配置该用户下的环境变量]
@@ -200,12 +173,16 @@ iptables -A INPUT -m state --state  RELATED,ESTABLISHED -j ACCEPT
 iptables  -F
 
 2.开放常用tcp端口：
-iptables  -I  INPUT  -p  tcp  -m  multiport  --dports 20,21,22,3306,27017,6379,80,443,25,110,8000:9000  -j  ACCEPT
-iptables  -I  OUTPUT  -p  tcp  -m  multiport  --sports 20,21,22,3306,6379,27017,80,443,25,110,8000:9000  -j  ACCEPT
+iptables  -I  INPUT  -p  tcp  -m  multiport  --dports 20,21,22,3306,47708,27017,6379,80,443,25,110,8000:9000  -j  ACCEPT
+iptables  -I  OUTPUT  -p  tcp  -m  multiport  --sports 20,21,22,3306,47708,6379,27017,80,443,25,110,8000:9000  -j  ACCEPT
 
 3.开放常用udp端口：
 iptables  -I  INPUT  -p  udp  -m  multiport  --dports  53  -j  ACCEPT
 iptables  -I  OUTPUT  -p  udp  -m  multiport  --sports  53  -j  ACCEPT
+
+vpn端口
+iptables  -I  INPUT  -p  udp  -m  multiport  --dports 500,4500  -j  ACCEPT
+iptables  -I  OUTPUT  -p  udp  -m  multiport  --sports 500,4500  -j  ACCEPT
 
 4.开放特殊udp端口（如：dns）：
 iptables  -I  INPUT  -p  udp  --sport  53  -j  ACCEPT
@@ -276,8 +253,18 @@ systemctl restart iptables.service
 
 [Install NVM](https://github.com/nvm-sh/nvm)
 
+- ping github.com
+
+140.82.112.4
 ```sh
-# curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+vim /etc/hosts
+ip github.com
+
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+systemctl restart network
+git clone https://github.com/nvm-sh/nvm.git
+cd nvm
+./install.sh
 
 
 查看nvm版本
@@ -287,18 +274,20 @@ systemctl restart iptables.service
 # nvm ls-remote
 
 安装版本
-# nvm install v14.20.1
+# nvm install v14.21.3
 
 查看一下当前已经安装的版本
 # nvm ls
 
 切换版本
-# nvm use v14.20.1
+# nvm use v14.21.3
 
 设置默认版本
-# nvm alias default v14.20.1
+# nvm alias default v14.21.3
 
 # echo "用户名 ALL=(ALL) NOPASSWD:ALL">> /etc/sudoers
+
+echo "trip ALL=(ALL) NOPASSWD:ALL">> /etc/sudoers
 ```
 
 ## 安装 MariaDB
@@ -368,7 +357,8 @@ systemctl restart iptables.service
 
 ```sh
 # cd /usr/local/src
-# wget https://tw1.mirror.blendbyte.net/mariadb//mariadb-10.11.3/bintar-linux-systemd-x86_64/mariadb-10.11.3-linux-systemd-x86_64.tar.gz --no-check-certificate
+
+# wget https://archive.mariadb.org//mariadb-10.11.3/bintar-linux-systemd-x86_64/mariadb-10.11.3-linux-systemd-x86_64.tar.gz --no-check-certificate
 # tar xvf mariadb-10.11.3-linux-systemd-x86_64.tar.gz -C /usr/local
 # cd /usr/local
 # ln -sv mariadb-10.5.16  mysql
@@ -383,6 +373,21 @@ systemctl restart iptables.service
 # mkdir /etc/mysql/
 # cp wsrep.cnf /etc/mysql/my.cnf
 # vim  /etc/mysql/my.cnf
+[mysqld]
+datadir=/data/mysql
+innodb_file_per_table=on
+skip_name_resolve=on
+
+character-set-server = utf8mb4  
+collation-server = utf8mb4_unicode_ci  
+init_connect='SET NAMES utf8mb4'  
+skip-character-set-client-handshake = true
+log-bin=mysql-bin
+binlog_format=mixed
+#skip-grant-tables
+
+
+
   [mysqld]
 
   # 数据库的数据存放存目
@@ -398,11 +403,11 @@ systemctl restart iptables.service
   collation-server = utf8mb4_unicode_ci  
   init_connect='SET NAMES utf8mb4'  
   skip-character-set-client-handshake = true  
-  [client]  
-  default-character-set=utf8mb4  
-  
-  [mysql]  
-  default-character-set = utf8mb4
+[client]  
+default-character-set=utf8mb4  
+
+[mysql]  
+default-character-set = utf8mb4
 ```
 
 ```sql
@@ -436,6 +441,24 @@ mysql> show variables like'collation%';
 # ss -nutl | grep 3306
 ```
 
+
+
+# 准备服务脚本，并启动服务
+
+[root@localhost mysql]# cp support-files/systemd/mariadb.service /usr/lib/systemd/system/mysqld.service
+
+
+# 设置PATH路径并生效
+
+echo 'PATH=/usr/local/mysql/bin:$PATH' >> /etc/profile
+source /etc/profile
+
+
+# 启动服务
+systemctl enable mysqld.service
+systemctl start mysqld
+
+
 ### 添加PATH变量，以方便来运行mysql程序
 
 ```sh
@@ -461,13 +484,13 @@ mysql> show variables like'collation%';
 ### 创建账号
 
 ```sql
-create database test;
-grant all privileges on test.* to  test@'%' identified  BY '密码';
+
+grant all privileges on *.* to 'root'@'%' identified  BY '密码' with grant option;
 
 
 GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, RELOAD, SHUTDOWN, PROCESS, FILE,
 REFERENCES, INDEX, ALTER, SHOW DATABASES, SUPER, CREATE TEMPORARY TABLES,
- LOCK TABLES, EXECUTE, REPLICATION SLAVE, REPLICATION CLIENT  ON *.* TO 'shsadmin'@'%'
+ LOCK TABLES, EXECUTE, REPLICATION SLAVE, REPLICATION CLIENT  ON *.* TO 'shop'@'%'
 IDENTIFIED BY '' WITH GRANT OPTION;
 
 flush privileges;
@@ -499,6 +522,18 @@ flush privileges;
 ### You can start the MariaDB daemon with:
 
 `cd '.' ; ./bin/mysqld_safe --datadir='/data/mysql'`
+
+
+### 备份
+`# mysqldump -uroot -p database_name > /PATH/TO/datbase_name.sql`
+
+### 恢复
+
+`# mysql -uroot -p database_name < /PATH/TO/database_name.sql`
+
+
+
+
 
 ## 码云配置
 
@@ -546,20 +581,25 @@ gitlib右上角个人资料，进入SSH公钥配置 复制的东西加进去提�
 ### 安装相关的依赖包
 
 ```sh
-yum -y install lrzsz gcc gcc-c++ autoconf automake make pcre pcre-devel zlib zlib-devel openssl openssl-devel
+yum -y install lrzsz gcc gcc-c++ autoconf automake make pcre pcre-devel zlib zlib-devel openssl openssl-devel 
+
+
+yum search GeoIP
+ yum install -y GeoIP-devel.x86_64
 ```
-scp files.tar.gz root@154.38.119.14:/usr/local/src
+
+
 ### 下载nginx包
 
 ```sh
-wget http://nginx.org/download/nginx-1.16.0.tar.gz
-tar -zxvf nginx-1.16.0.tar.gz
-cd nginx-1.16.0
+wget https://nginx.org/download/nginx-1.24.0.tar.gz
 ```
 
 ### 编译安装
 
 ```sh
+mkdir -pv /var/tmp/nginx/client
+mkdir -pv /var/cache/nginx/scgi
 useradd -r www
 
 ./configure \
@@ -591,13 +631,16 @@ cd /etc/nginx/ && cp nginx.conf{,.bak}
 ### 环境变量配置
 
 ```sh
+echo "export PATH=$PATH:/usr/local/nginx/sbin" >> /etc/profile
+
+
 # vim  /etc/profile.d/nginx.sh
   export PATH=$PATH:/usr/local/nginx/sbin
 
 # source /etc/profile.d/nginx.sh
 
-# mkdir -pv /var/tmp/nginx/client
-# mkdir -pv /var/cache/nginx/scgi
+
+
 ```
 
 ### 相关服务
@@ -609,6 +652,73 @@ cd /etc/nginx/ && cp nginx.conf{,.bak}
 
 
 ### Nginx设置成服务并开机自动启动
+
+
+cd /lib/systemd/system/
+
+第二步：创建nginx.service文件，并编辑
+# vim nginx.service
+
+[Unit]
+Description=nginx - high performance web server
+Documentation=http://nginx.org/en/docs/
+After=network-online.target remote-fs.target nss-lookup.target
+Wants=network-online.target
+
+[Service]
+Type=forking
+PIDFile=/var/run/nginx/nginx.pid
+ExecStart=/usr/local/nginx/sbin/nginx -c /etc/nginx/nginx.conf
+ExecReload=/bin/sh -c "/bin/kill -s HUP $(/bin/cat /var/run/nginx/nginx.pid)"
+# ExecReload=/usr/local/nginx/sbin/nginx -s reload
+ExecStop=/bin/sh -c "/bin/kill -s TERM $(/bin/cat /var/run/nginx/nginx.pid)"
+# ExecStop=/usr/local/nginx/sbin/nginx -s quit
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+
+
+[Unit]:服务的说明
+Description:描述服务
+After:描述服务类别
+[Service]服务运行参数的设置
+Type=forking是后台运行的形式
+ExecStart为服务的具体运行命令
+ExecReload为重启命令
+ExecStop为停止命令
+PrivateTmp=True表示给服务分配独立的临时空间
+注意：[Service]的启动、重启、停止命令全部要求使用绝对路径
+[Install]运行级别下服务安装的相关设置，可设置为多用户，即系统运行级别为3
+
+保存退出。
+
+第三步：加入开机自启动
+
+# systemctl enable nginx
+
+如果不想开机自启动了，可以使用下面的命令取消开机自启动
+
+# systemctl disable nginx
+
+第四步：服务的启动/停止/刷新配置文件/查看状态
+
+
+# systemctl start nginx.service　 启动nginx服务
+# systemctl stop nginx.service　 停止服务
+# systemctl restart nginx.service　 重新启动服务
+# systemctl list-units --type=service 查看所有已启动的服务
+# systemctl status nginx.service 查看服务当前状态
+# systemctl enable nginx.service 设置开机自启动
+# systemctl disable nginx.service 停止开机自启动
+
+
+
+
+
 
 在/etc/init.d下创建文件nginx
 
@@ -704,7 +814,7 @@ WantedBy=multi-user.target		// 服务用户的模式
 # mkdir /apps/redis/{etc,run,data,logs}
 
 创建命令软链接
-# ln -sv /apps/redis/bin/redis-* /usr/sbin/
+# ln -sv /usr/local/redis/bin/redis-* /usr/sbin/
 
 添加systemctl服务
 # vim /lib/systemd/system/redis.service
@@ -840,73 +950,16 @@ AUTH命令跟其他redis命令一样，是没有加密的；阻止不了攻击�
 ## php7 安装
 
 ``` sh
-# cd /usr/local/src && wget https://www.php.net/distributions/php-7.4.29.tar.gz
-# tar -xzxvf php-7.4.29.tar.gz
+# cd /usr/local/src && wget https://www.php.net/distributions/php-8.2.3.tar.gz
+# tar -xzxvf php-8.2.3.tar.gz
 
 
-yum -y install libxml2 
+yum -y install libxml2 libxml2-devel openssl  openssl-devel curl-devel libjpeg-devel libpng-devel freetype-devel bzip2-devel libmcrypt libmcrypt-devel postgresql-devel aspell-devel readline-devel libxslt-devel net-snmp-devel unixODBC-devel libicu-devel libc-client-devel libXpm-devel libvpx-devel enchant-devel openldap openldap-devel db4-devel gmp-devel sqlite-devel mysql-devel gcc gcc-c++ make zlib zlib-devel pcre pcre-devel  libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel libxml2 libxml2-devel glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel ncurses ncurses-devel curl curl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel openssl openssl-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers libXpm-devel postgresql-devel  libxslt-devel  icu libicu libicu-devel
 
-yum -y install libxml2-devel 
-
-yum -y install openssl 
-
-yum -y install openssl-devel 
-
-yum -y install curl-devel 
-
-yum -y install libjpeg-devel 
-
-yum -y install libpng-devel 
-
-yum -y install freetype-devel 
-
-yum -y install bzip2-devel 
-
-yum -y install libmcrypt libmcrypt-devel 
-
-yum -y install postgresql-devel 
-
-yum -y install aspell-devel 
-
-yum -y install readline-devel 
-
-yum -y install libxslt-devel 
-
-yum -y install net-snmp-devel 
-
-
-yum -y install unixODBC-devel 
-
-yum -y install libicu-devel 
-
-yum -y install libc-client-devel 
-
-yum -y install libXpm-devel 
-
-yum -y install libvpx-devel 
-
-yum -y install enchant-devel 
-
-yum -y install openldap 
-
-yum -y install openldap-devel 
-
-yum -y install db4-devel 
-
-yum -y install gmp-devel 
-
-yum -y install sqlite-devel 
-
-yum -y install mysql-devel
-
-
-# yum install -y gcc gcc-c++  make zlib zlib-devel pcre pcre-devel  libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel libxml2 libxml2-devel glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel ncurses ncurses-devel curl curl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel openssl openssl-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers libXpm-devel postgresql-devel  libxslt-devel  icu libicu libicu-devel
-
-./configure \
+./configure  \
 --prefix=/usr/local/php \
 --with-config-file-path=/usr/local/php/etc/ \
 --enable-ftp \
---enable-zip \
 --enable-fpm \
 --enable-xml \
 --enable-cli \
@@ -924,17 +977,6 @@ yum -y install mysql-devel
 --enable-mbstring \
 --enable-calendar \
 --enable-tokenizer \
---enable-gd \
---with-external-gd \
---with-avif \
---with-webp \
---with-jpeg \
---with-png \
---with-xpm \
---with-freetype \
---enable-gd-jis-conv \
---with-gettext \
---with-libxml \
 --with-xsl \
 --with-bz2 \
 --with-curl \
@@ -948,41 +990,25 @@ yum -y install mysql-devel
 --with-gettext \
 --with-zlib-dir \
 --with-pdo-pgsql \
---with-pcre-regex \
+--with-xpm-dir=/usr \
+--with-png-dir=/usr \
 --with-fpm-user=www \
 --with-fpm-group=www \
+--with-jpeg-dir=/usr \
 --with-mysqli=mysqlnd \
 --with-libxml-dir=/usr \
 --with-pdo-mysql=mysqlnd \
 --with-libdir=/lib/x86_64-linux-gnu/ \
 --disable-rpath \
 --enable-inline-optimization \
---with-iconv=/usr/local/bin/ \
---enable-zip
-
-make ZEND_EXTRA_LIBS='-liconv'
-make install
-
-
-手动编译 gd
-
-https://github.com/libgd/libgd/releases/download/gd-2.3.3/libgd-2.3.3.tar.gz
-
-
-安装php8.1 编译时提示configure: error: iconv does not support errno
-
-wget https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.17.tar.gz
-
-tar -xzvf libiconv-1.17.tar.gz
-cd libiconv-1.17
-./configure --prefix=/usr/local/libiconv
-
-. 编辑 /etc/ld.so.conf这个文件，最后面添加以下内容
-`/usr/local/lib
-接着执行下面的命令立即生效
-
-`# ldconfig -f`
-
+--enable-zip \
+--with-gd \
+--with-pcre-regex \
+--with-freetype-dir \
+--with-xpm-dir \
+--with-png-dir \
+--with-jpeg-dir \
+--with-libxml-dir
 
 
 
@@ -1001,7 +1027,50 @@ cd oniguruma-6.9.4/
 ./autogen.sh
 ./configure
 make
-sudo make install
+make install
+export PKG_CONFIG_PATH=/usr/lib/pkgconfig
+or
+export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+
+configure: error: Please reinstall the iconv library.
+
+make ZEND_EXTRA_LIBS='-liconv'
+make install
+ 
+
+wget https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.42/pcre2-10.42.tar.bz2
+tar xjvfpcre2-10.42.tar.bz2
+./configure --prefix=/usr/local/pcre2 \
+--enable-pcre2-16 \
+--enable-pcre2-32 \
+--enable-jit \
+--enable-jit-sealloc
+
+make && make install
+
+export PKG_CONFIG_PATH=/usr/local/pcre2/lib/pkgconfig/
+
+
+手动编译 gd
+
+https://github.com/libgd/libgd/releases/download/gd-2.3.3/libgd-2.3.3.tar.gz
+
+export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
+
+
+安装php8.1 编译时提示configure: error: iconv does not support errno
+
+wget https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.17.tar.gz
+
+# tar -xzvf libiconv-1.17.tar.gz
+# cd libiconv-1.17
+# ./configure --prefix=/usr/local/libiconv
+
+# vim /etc/ld.so.conf
+  /usr/local/lib
+# ldconfig -v
+
+
 ```
 
 # php --ini
@@ -1133,6 +1202,9 @@ systemtl 服务
 
 设置环境变量
 
+echo "export PATH=$PATH:/usr/local/php/bin" >> /etc/profile
+echo "export PATH=$PATH:/usr/local/php/sbin" >> /etc/profile
+
 ```sh
 # vim /etc/profile.d/php.sh
   PATH=$PATH:/usr/local/php/bin
@@ -1145,6 +1217,26 @@ systemtl 服务
 ```sh
 # ps -ef | grep php 或者 ps -A | grep -i php
 ```
+
+
+wget http://www.ijg.org/files/jpegsrc.v8b.tar.gz
+    tar -zxvf jpegsrc.v8b.tar.gz
+    cd jpeg-8b
+    ./configure --prefix=/usr/local/jpeg --enable-shared --enable-static
+    make && make install
+二、下面进入到 php 源码目录下 的 ext 下的 gd目录：/usr/local/src/php-8.1.10/ext/gd
+
+进入gd 目录后执行 注意下面的 /usr/local/php/ 是你服务器 php的安装路径。我的是 这个路径就写成这样了
+
+    /usr/local/php/bin/phpize
+#注意  --with-jpeg-dir 不在支持，换 --with-jpeg
+  #错误：./configure --with-php-config=/usr/local/php/bin/php-config --with-jpeg-dir=/usr/local/jpeg/
+    ./configure --with-php-config=/usr/local/php/bin/php-config --with-jpeg=/usr/local/jpeg/
+
+    ./configure --with-php-config= --with-jpeg=/usr/local/jpeg/
+make && make install
+
+
 
 ## 升级cmake
 
@@ -1356,3 +1448,48 @@ mongo --host host_name --port 27017 -u admin -p --authenticationDatabase admin
 export GOROOT=/usr/local/go
 export GOPATH=/home/gopath 
 export PATH=\$PATH:\$GOROOT/bin
+
+
+
+## gcc 
+
+yum install -y centos-release-scl
+
+
+红帽其实已经编译好了高版本的gcc，但未更新到base和epel这两个常用源中，而是将这些版本放在scl中。
+
+首先安装scl：
+
+yum install -y centos-release-scl
+如果你之前用过grouplist/install等命令，应该知道gcc包含在Development Tools这个组中。scl中的gcc/g++软件包的前缀都是devtoolset，包含gcc 6的软件包是devtoolset-6，其安装命令是：
+
+yum install -y devtoolset-6-gcc devtoolset-6-gcc-c++
+出了gcc 6，scl中还有如下gcc版本：
+
+devtoolset-3: gcc 4.9
+devtoolset-4: gcc 5
+devtoolset-6: gcc 6
+devtoolset-7: gcc 7
+devtoolset-8: gcc 8
+至于为什么没有devtoolset-5，我也不清楚，估计是包含在devtoolset-4中了吧。
+
+值得说明的是这些软件包可以同时安装，不会相互覆盖和冲突，也不会覆盖系统的版本。即可以在系统中可同时存在gcc 6, gcc 7, gcc 8等多个版本。
+
+因为不会覆盖系统默认的gcc，使用这些软件的方法有四种：
+
+使用绝对路径；
+添加可执行文件路径到PATH环境变量；
+使用官方推荐的加载命令：scl enable devtoolset-x bash, x为要启用的版本;
+执行安装软件自带的脚本： source /opt/rh/devtoolset-x/enable，x为要启用的版本。
+实践推荐使用最后两种方式。例如启用gcc 6: source /opt/rh/devtoolset-6/enable，接着输入gcc -v查看版本已经变成gcc 6.3.1。如果希望长期使用某个高版本，可将此命令写入.bashrc等配置文件。
+
+
+使用官方推荐的加载命令：scl enable devtoolset-x bash, x为要启用的版本;
+执行安装软件自带的脚本： source /opt/rh/devtoolset-x/enable，x为要启用的版本。
+实践推荐使用最后两种方式。例如启用gcc 6: source /opt/rh/devtoolset-6/enable，接着输入gcc -v查看版本已经变成gcc 6.3.1。如果希望长期使用某个高版本，可将此命令写入.bashrc等配置文件。
+
+
+使用绝对路径；
+添加可执行文件路径到PATH环境变量；
+使用官方推荐的加载命令：scl enable devtoolset-x bash, x为要启用的版本;
+执行安装软件自带的脚本： source /opt/rh/devtoolset-x/enable，x为要启用的版本。
